@@ -416,15 +416,16 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeM
 
 /// Top/bottom rule with the date color legend on the top edge.
 fn table_block() -> Block<'static> {
-    let mut legend = vec![Span::raw(" tarih: ").dark_gray()];
-    for (age, label) in [
-        (0, "7 gün"),
-        (8 * DAY, "30 gün"),
-        (31 * DAY, "1 yıl"),
-        (366 * DAY, "daha eski"),
+    let label = Style::new().fg(Color::White);
+    let mut legend = vec![Span::styled(" Tarih: ", label.bold())];
+    for (age, text) in [
+        (0, "≤ 7 gün"),
+        (8 * DAY, "≤ 30 gün"),
+        (31 * DAY, "≤ 1 yıl"),
+        (366 * DAY, "> 1 yıl"),
     ] {
-        legend.push(Span::styled("● ", Style::new().fg(age_color(age))));
-        legend.push(Span::raw(format!("{label}  ")).dark_gray());
+        legend.push(Span::styled("██", Style::new().fg(age_color(age))));
+        legend.push(Span::styled(format!(" {text}   "), label));
     }
     Block::new()
         .borders(Borders::TOP | Borders::BOTTOM)
