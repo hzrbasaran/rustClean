@@ -2,6 +2,7 @@ mod app;
 mod delete;
 mod disks;
 mod scanner;
+mod search;
 mod tree;
 mod ui;
 

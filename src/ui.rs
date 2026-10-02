@@ -8,8 +8,8 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Screen};
-use crate::tree::SizeMode;
+use crate::app::{App, Browser, Screen, SearchResults};
+use crate::tree::{NodeId, SizeMode, Tree};
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 const HIGHLIGHT: Style = Style::new()
@@ -163,29 +163,141 @@ fn stat_line(label: &str, value: &str) -> Line<'static> {
 
 fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: Rect) {
     let Some(b) = &mut app.browser else { return };
-    let tree = &b.tree;
-    let cur = tree.node(b.current);
     let mode = b.size_mode;
     let mode_label = match mode {
         SizeMode::Disk => "diskte",
         SizeMode::Apparent => "görünen",
     };
 
-    f.render_widget(
-        title(format!(
+    let heading = if let Some(r) = &b.results {
+        let tree = &b.tree;
+        let total: u64 = r.items.iter().map(|&id| tree.node(id).size.get(mode)).sum();
+        let checked: u64 = r
+            .checked_ids()
+            .iter()
+            .map(|&id| tree.node(id).size.get(mode))
+            .sum();
+        format!(
+            "Arama „{}” — {}  │  {} sonuç, {} ({mode_label})  │  seçili: {} ({})",
+            r.pattern,
+            tree.path_of(r.base).display(),
+            fmt_count(r.items.len() as u64),
+            fmt_size(total),
+            fmt_count(r.checked.iter().filter(|&&c| c).count() as u64),
+            fmt_size(checked),
+        )
+    } else {
+        let cur = b.tree.node(b.current);
+        format!(
             "{}  │  {} ({mode_label})  │  {} dosya  │  sıralama: {}",
-            tree.path_of(b.current).display(),
+            b.tree.path_of(b.current).display(),
             fmt_size(cur.size.get(mode)),
             fmt_count(cur.file_count.into()),
             b.sort.label()
-        )),
-        header,
-    );
+        )
+    };
+    f.render_widget(title(heading), header);
 
     let [table_area, status_area] =
         Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(body);
 
-    let parent_size = cur.size.get(mode).max(1);
+    if let Some(r) = &mut b.results {
+        render_results(f, &b.tree, r, mode, table_area);
+    } else {
+        render_entries(f, b, table_area);
+    }
+
+    let status = if let Some(input) = &b.input {
+        Line::from(vec![
+            Span::raw(" Ara: ").black().on_yellow().bold(),
+            Span::raw(format!(" {input}")),
+            Span::raw("█").slow_blink(),
+            Span::raw("   örn: deneme · deneme* · *.log").dark_gray(),
+        ])
+    } else if let Some(st) = &b.status {
+        let style = if st.error {
+            Style::new().fg(Color::Red)
+        } else {
+            Style::new().fg(Color::Green)
+        };
+        Line::from(Span::styled(st.text.clone(), style))
+    } else if let Some(r) = &b.results {
+        let text = if r.items.is_empty() {
+            "Eşleşen öğe yok."
+        } else {
+            "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır."
+        };
+        Line::from(text).dark_gray()
+    } else {
+        let mut spans = vec![Span::raw(format!(
+            "{} öğe tarandı, {:.1} sn",
+            fmt_count(b.tree.len() as u64),
+            b.elapsed.as_secs_f64()
+        ))
+        .dark_gray()];
+        if b.errors > 0 {
+            spans.push(
+                Span::raw(format!("   ⚠ {} öğeye erişilemedi", fmt_count(b.errors))).yellow(),
+            );
+        }
+        if b.trashed.get(mode) > 0 {
+            spans.push(
+                Span::raw(format!(
+                    "   🗑 bu oturumda çöpe taşınan: {}",
+                    fmt_size(b.trashed.get(mode))
+                ))
+                .green(),
+            );
+        }
+        if b.entries.is_empty() {
+            spans.push(Span::raw("   (klasör boş)").dark_gray());
+        }
+        Line::from(spans)
+    };
+    f.render_widget(status, status_area);
+
+    let footer_keys: &[(&str, &str)] = if b.confirm.is_some() {
+        &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]
+    } else if b.deleting.is_some() {
+        &[("q", "çık")]
+    } else if b.input.is_some() {
+        &[("Enter", "ara"), ("Esc", "vazgeç")]
+    } else if b.results.is_some() {
+        &[
+            ("↑↓", "gez"),
+            ("Space", "seç"),
+            ("t", "tümü"),
+            ("x", "seçilileri çöpe taşı"),
+            ("Enter", "konuma git"),
+            ("/", "yeni arama"),
+            ("Esc", "listeye dön"),
+            ("q", "çık"),
+        ]
+    } else {
+        &[
+            ("↑↓", "gez"),
+            ("Enter", "gir"),
+            ("⌫", "geri"),
+            ("/", "ara"),
+            ("s", "sırala"),
+            ("a", "görünen/diskte"),
+            ("x", "çöpe taşı"),
+            ("r", "yeniden tara"),
+            ("d", "diskler"),
+            ("q", "çık"),
+        ]
+    };
+    f.render_widget(keys(footer_keys), footer);
+
+    if let Some(ids) = &b.confirm {
+        render_confirm(f, &b.tree, ids, mode, f.area());
+    }
+}
+
+fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
+    let tree = &b.tree;
+    let mode = b.size_mode;
+    let parent_size = tree.node(b.current).size.get(mode).max(1);
     let rows = b.entries.iter().map(|&id| {
         let n = tree.node(id);
         let size = n.size.get(mode);
@@ -230,92 +342,91 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     .row_highlight_style(HIGHLIGHT)
     .highlight_symbol("▶ ")
     .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
-    f.render_stateful_widget(table, table_area, &mut b.table);
-
-    let status = if let Some(st) = &b.status {
-        let style = if st.error {
-            Style::new().fg(Color::Red)
-        } else {
-            Style::new().fg(Color::Green)
-        };
-        Line::from(Span::styled(st.text.clone(), style))
-    } else {
-        let mut spans = vec![Span::raw(format!(
-            "{} öğe tarandı, {:.1} sn",
-            fmt_count(tree.len() as u64),
-            b.elapsed.as_secs_f64()
-        ))
-        .dark_gray()];
-        if b.errors > 0 {
-            spans.push(
-                Span::raw(format!("   ⚠ {} öğeye erişilemedi", fmt_count(b.errors))).yellow(),
-            );
-        }
-        if b.trashed.get(mode) > 0 {
-            spans.push(
-                Span::raw(format!(
-                    "   🗑 bu oturumda çöpe taşınan: {}",
-                    fmt_size(b.trashed.get(mode))
-                ))
-                .green(),
-            );
-        }
-        if b.entries.is_empty() {
-            spans.push(Span::raw("   (klasör boş)").dark_gray());
-        }
-        Line::from(spans)
-    };
-    f.render_widget(status, status_area);
-
-    let footer_keys: &[(&str, &str)] = if b.confirm.is_some() {
-        &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]
-    } else if b.deleting.is_some() {
-        &[("q", "çık")]
-    } else {
-        &[
-            ("↑↓", "gez"),
-            ("Enter", "gir"),
-            ("⌫", "geri"),
-            ("s", "sırala"),
-            ("a", "görünen/diskte"),
-            ("x", "çöpe taşı"),
-            ("r", "yeniden tara"),
-            ("d", "diskler"),
-            ("q", "çık"),
-        ]
-    };
-    f.render_widget(keys(footer_keys), footer);
-
-    if let Some(id) = b.confirm {
-        render_confirm(f, tree, id, mode, f.area());
-    }
+    f.render_stateful_widget(table, area, &mut b.table);
 }
 
-fn render_confirm(
-    f: &mut Frame,
-    tree: &crate::tree::Tree,
-    id: crate::tree::NodeId,
-    mode: SizeMode,
-    area: Rect,
-) {
-    let n = tree.node(id);
-    let width = area.width.saturating_sub(4).min(72);
-    let inner_width = width.saturating_sub(4) as usize;
-    let mut lines = vec![
-        Line::from(""),
-        Line::from(truncate_path(&tree.path_of(id), inner_width)).bold(),
-        Line::from(""),
-        Line::from(format!("Boyut: {}", fmt_size(n.size.get(mode)))),
-    ];
-    if n.is_dir {
-        lines.push(Line::from(format!(
-            "İçindeki dosya: {}",
+fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeMode, area: Rect) {
+    let rows = r.items.iter().enumerate().map(|(i, &id)| {
+        let n = tree.node(id);
+        let check = if r.checked[i] {
+            Span::raw("[✓]").green().bold()
+        } else {
+            Span::raw("[ ]").dark_gray()
+        };
+        let label = if n.is_dir {
+            Span::styled(r.labels[i].clone(), Style::new().fg(Color::Blue).bold())
+        } else {
+            Span::raw(r.labels[i].clone())
+        };
+        let count = if n.is_dir {
             fmt_count(n.file_count.into())
-        )));
+        } else {
+            String::new()
+        };
+        Row::new(vec![
+            Cell::from(check),
+            Cell::from(Line::from(fmt_size(n.size.get(mode))).right_aligned()),
+            Cell::from(Line::from(count).right_aligned().dark_gray()),
+            Cell::from(label),
+        ])
+    });
+    let table = Table::new(
+        rows,
+        [
+            Constraint::Length(3),
+            Constraint::Length(11),
+            Constraint::Length(10),
+            Constraint::Min(10),
+        ],
+    )
+    .header(
+        Row::new(["", "Boyut", "Dosya", "Konum"])
+            .bold()
+            .underlined(),
+    )
+    .row_highlight_style(HIGHLIGHT)
+    .highlight_symbol("▶ ")
+    .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
+    f.render_stateful_widget(table, area, &mut r.table);
+}
+
+fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, area: Rect) {
+    const LISTED: usize = 6;
+    let width = area.width.saturating_sub(4).min(76);
+    let inner_width = width.saturating_sub(4) as usize;
+    let size: u64 = ids.iter().map(|&id| tree.node(id).size.get(mode)).sum();
+    let files: u64 = ids
+        .iter()
+        .map(|&id| u64::from(tree.node(id).file_count))
+        .sum();
+
+    let mut lines = vec![Line::from("")];
+    if let [id] = ids {
+        lines.push(Line::from(truncate_path(&tree.path_of(*id), inner_width)).bold());
+    } else {
+        lines.push(Line::from(format!("{} öğe", fmt_count(ids.len() as u64))).bold());
+        lines.push(Line::from(""));
+        for &id in ids.iter().take(LISTED) {
+            lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).dark_gray());
+        }
+        if ids.len() > LISTED {
+            lines.push(
+                Line::from(format!(
+                    "… ve {} öğe daha",
+                    fmt_count((ids.len() - LISTED) as u64)
+                ))
+                .dark_gray(),
+            );
+        }
+    }
+    lines.push(Line::from(""));
+    lines.push(Line::from(format!("Toplam boyut: {}", fmt_size(size))));
+    if files > 0 {
+        lines.push(Line::from(format!("İçerdiği dosya: {}", fmt_count(files))));
     }
     lines.extend([
         Line::from(""),
-        Line::from("Bu öğe çöp kutusuna taşınacak.").dark_gray(),
+        Line::from("Çöp kutusuna taşınacak.").dark_gray(),
         Line::from(""),
         Line::from(vec![
             Span::raw(" e ").black().on_red().bold(),
@@ -325,12 +436,12 @@ fn render_confirm(
         ]),
     ]);
 
-    let height = lines.len() as u16 + 2;
+    let height = (lines.len() as u16 + 2).min(area.height);
     let popup = Rect {
         x: area.x + (area.width.saturating_sub(width)) / 2,
         y: area.y + (area.height.saturating_sub(height)) / 2,
         width,
-        height: height.min(area.height),
+        height,
     };
     f.render_widget(Clear, popup);
     f.render_widget(

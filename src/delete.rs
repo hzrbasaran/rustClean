@@ -7,6 +7,8 @@ use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, Receiver, TryRecvError};
 use std::thread;
 
+use crate::tree::NodeId;
+
 /// Refuses paths that must not be trashed: entries that no longer exist and
 /// mount points of other volumes.
 pub fn check(path: &Path, mount_points: &[PathBuf]) -> Result<(), String> {
@@ -30,29 +32,50 @@ pub fn check(path: &Path, mount_points: &[PathBuf]) -> Result<(), String> {
     Ok(())
 }
 
-/// A trash operation in progress.
+/// Moves a batch of entries to the trash, one after another.
 pub struct Deletion {
-    rx: Receiver<Result<(), String>>,
+    rx: Receiver<(NodeId, Result<(), String>)>,
+    pub total: usize,
+    pub done: usize,
 }
 
 impl Deletion {
-    pub fn start(path: PathBuf) -> Self {
+    pub fn start(items: Vec<(NodeId, PathBuf)>) -> Self {
+        let total = items.len();
         let (tx, rx) = mpsc::channel();
         thread::spawn(move || {
-            let _ = tx.send(trash_context().delete(&path).map_err(|e| e.to_string()));
+            let ctx = trash_context();
+            for (id, path) in items {
+                let res = ctx.delete(&path).map_err(|e| e.to_string());
+                if tx.send((id, res)).is_err() {
+                    break;
+                }
+            }
         });
-        Self { rx }
+        Self { rx, total, done: 0 }
     }
 
-    /// The outcome, once the move has finished.
-    pub fn poll(&self) -> Option<Result<(), String>> {
-        match self.rx.try_recv() {
-            Ok(res) => Some(res),
-            Err(TryRecvError::Empty) => None,
-            Err(TryRecvError::Disconnected) => {
-                Some(Err("işlem beklenmedik şekilde sonlandı".into()))
+    /// Outcomes that arrived since the last call.
+    pub fn poll(&mut self) -> Vec<(NodeId, Result<(), String>)> {
+        let mut out = Vec::new();
+        loop {
+            match self.rx.try_recv() {
+                Ok(r) => {
+                    self.done += 1;
+                    out.push(r);
+                }
+                Err(TryRecvError::Empty) => break,
+                Err(TryRecvError::Disconnected) => {
+                    self.done = self.total; // worker died; nothing more will come
+                    break;
+                }
             }
         }
+        out
+    }
+
+    pub fn finished(&self) -> bool {
+        self.done >= self.total
     }
 }
 
