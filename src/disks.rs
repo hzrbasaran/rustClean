@@ -56,6 +56,14 @@ pub fn list_disks() -> Vec<DiskInfo> {
     out
 }
 
+/// The disk holding `path`: the one with the longest matching mount point.
+pub fn disk_for<'a>(path: &Path, disks: &'a [DiskInfo]) -> Option<&'a DiskInfo> {
+    disks
+        .iter()
+        .filter(|d| path.starts_with(&d.mount_point))
+        .max_by_key(|d| d.mount_point.components().count())
+}
+
 /// Every mount point on the system, including hidden ones. The scanner skips
 /// these (other than its own root) so other volumes are never counted twice.
 pub fn all_mount_points() -> Vec<PathBuf> {
@@ -110,4 +118,30 @@ fn is_user_visible(mount: &Path, fs: &str) -> bool {
 #[cfg(not(any(target_os = "macos", target_os = "linux")))]
 fn is_user_visible(_mount: &Path, _fs: &str) -> bool {
     true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn disk(mount: &str) -> DiskInfo {
+        DiskInfo {
+            name: mount.into(),
+            mount_point: mount.into(),
+            fs_type: String::new(),
+            total: 0,
+            available: 0,
+            removable: false,
+        }
+    }
+
+    #[test]
+    fn finds_the_innermost_disk() {
+        let disks = [disk("/"), disk("/Volumes/USB")];
+        let on = |p: &str| disk_for(Path::new(p), &disks).map(|d| d.name.as_str());
+        assert_eq!(on("/Users/me/Projects"), Some("/"));
+        assert_eq!(on("/Volumes/USB/photos"), Some("/Volumes/USB"));
+        assert_eq!(on("/Volumes/USB"), Some("/Volumes/USB"));
+        assert_eq!(on("/Volumes/USB2"), Some("/"));
+    }
 }

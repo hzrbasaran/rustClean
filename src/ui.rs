@@ -8,7 +8,8 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Browser, Screen, SearchResults};
+use crate::app::{App, Browser, Dashboard, Pane, Screen, SearchResults};
+use crate::stats;
 use crate::tree::{NodeId, SizeMode, Tree};
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -59,11 +60,7 @@ fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: 
 
     let rows = app.disks.iter().map(|d| {
         let ratio = d.usage_ratio();
-        let color = match ratio {
-            r if r >= 0.9 => Color::Red,
-            r if r >= 0.75 => Color::Yellow,
-            _ => Color::Green,
-        };
+        let color = usage_color(ratio);
         Row::new(vec![
             Cell::from(d.name.clone()),
             Cell::from(d.mount_point.display().to_string()),
@@ -169,7 +166,12 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         SizeMode::Apparent => "görünen",
     };
 
-    let heading = if let Some(r) = &b.results {
+    let heading = if let Some(d) = &b.dashboard {
+        format!(
+            "Özet — {}  │  {mode_label}",
+            b.tree.path_of(d.base).display()
+        )
+    } else if let Some(r) = &b.results {
         let tree = &b.tree;
         let total: u64 = r.items.iter().map(|&id| tree.node(id).size.get(mode)).sum();
         let checked: u64 = r
@@ -201,7 +203,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     let [table_area, status_area] =
         Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(body);
 
-    if let Some(r) = &mut b.results {
+    if let Some(d) = &mut b.dashboard {
+        render_dashboard(f, &b.tree, d, mode, b.errors, table_area);
+    } else if let Some(r) = &mut b.results {
         render_results(f, &b.tree, r, mode, table_area);
     } else {
         render_entries(f, b, table_area);
@@ -221,6 +225,11 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             Style::new().fg(Color::Green)
         };
         Line::from(Span::styled(st.text.clone(), style))
+    } else if b.dashboard.is_some() {
+        Line::from(
+            "„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.",
+        )
+        .dark_gray()
     } else if let Some(r) = &b.results {
         let text = if r.items.is_empty() {
             "Eşleşen öğe yok."
@@ -262,6 +271,16 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         &[("q", "çık")]
     } else if b.input.is_some() {
         &[("Enter", "ara"), ("Esc", "vazgeç")]
+    } else if b.dashboard.is_some() {
+        &[
+            ("Tab", "liste değiştir"),
+            ("↑↓", "gez"),
+            ("Enter", "konuma git"),
+            ("x", "çöpe taşı"),
+            ("a", "görünen/diskte"),
+            ("Esc", "geri"),
+            ("q", "çık"),
+        ]
     } else if b.results.is_some() {
         &[
             ("↑↓", "gez"),
@@ -279,6 +298,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Enter", "gir"),
             ("⌫", "geri"),
             ("/", "ara"),
+            ("i", "özet"),
             ("s", "sırala"),
             ("a", "görünen/diskte"),
             ("x", "çöpe taşı"),
@@ -418,13 +438,8 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeM
 fn table_block() -> Block<'static> {
     let label = Style::new().fg(Color::White);
     let mut legend = vec![Span::styled(" Tarih: ", label.bold())];
-    for (age, text) in [
-        (0, "≤ 7 gün"),
-        (8 * DAY, "≤ 30 gün"),
-        (31 * DAY, "≤ 1 yıl"),
-        (366 * DAY, "> 1 yıl"),
-    ] {
-        legend.push(Span::styled("██", Style::new().fg(age_color(age))));
+    for (color, text) in AGE_COLORS.iter().zip(stats::AGE_LABELS).take(4) {
+        legend.push(Span::styled("██", Style::new().fg(*color)));
         legend.push(Span::styled(format!(" {text}   "), label));
     }
     Block::new()
@@ -432,31 +447,26 @@ fn table_block() -> Block<'static> {
         .title_top(Line::from(legend).right_aligned())
 }
 
-const DAY: u64 = 24 * 60 * 60;
-
-/// Color for a timestamp of the given age in seconds: fresh is green,
+/// Colors of the age groups in `stats::AGE_LABELS`: fresh is green,
 /// untouched for over a year is red.
+const AGE_COLORS: [Color; 5] = [
+    Color::Green,
+    Color::Cyan,
+    Color::Yellow,
+    Color::Red,
+    Color::DarkGray,
+];
+
+/// Color for a timestamp of the given age in seconds.
 fn age_color(age: u64) -> Color {
-    match age {
-        a if a <= 7 * DAY => Color::Green,
-        a if a <= 30 * DAY => Color::Cyan,
-        a if a <= 365 * DAY => Color::Yellow,
-        _ => Color::Red,
-    }
+    AGE_COLORS[stats::age_group(age)]
 }
 
 fn date_cell(secs: u32, now: u64) -> Cell<'static> {
-    if secs == 0 {
-        return Cell::from(Span::raw("—").dark_gray());
-    }
-    let age = now.saturating_sub(u64::from(secs));
-    Cell::from(Span::styled(
-        fmt_date(secs),
-        Style::new().fg(age_color(age)),
-    ))
+    Cell::from(date_span(secs, now))
 }
 
-fn now_secs() -> u64 {
+pub fn now_secs() -> u64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_secs())
@@ -471,6 +481,258 @@ fn fmt_date(secs: u32) -> String {
                 .to_string()
         })
         .unwrap_or_else(|| "—".into())
+}
+
+const CATEGORY_COLORS: [Color; 8] = [
+    Color::Magenta,
+    Color::LightMagenta,
+    Color::LightBlue,
+    Color::LightYellow,
+    Color::LightGreen,
+    Color::LightCyan,
+    Color::LightRed,
+    Color::Gray,
+];
+
+fn render_dashboard(
+    f: &mut Frame,
+    tree: &Tree,
+    d: &mut Dashboard,
+    mode: SizeMode,
+    scan_errors: u64,
+    area: Rect,
+) {
+    let s = &d.stats;
+    let age_rows = if s.ages[stats::AGE_UNKNOWN].files > 0 {
+        5
+    } else {
+        4
+    };
+    let mid_rows = s.categories.len().max(age_rows) as u16;
+    let [top, mid, bottom] = Layout::vertical([
+        Constraint::Length(6),
+        Constraint::Length(mid_rows + 2),
+        Constraint::Min(5),
+    ])
+    .areas(area);
+    let [general, disk_area] = halves(top);
+    let [types, ages] = halves(mid);
+    let [files, dirs] = halves(bottom);
+
+    // General
+    let now = now_secs();
+    let base = tree.node(d.base);
+    let mut lines = vec![
+        Line::from(vec![
+            Span::raw("Toplam boyut   ").white(),
+            Span::raw(fmt_size(s.size)).bold(),
+        ]),
+        Line::from(vec![
+            Span::raw("İçerik         ").white(),
+            Span::raw(format!(
+                "{} dosya · {} klasör",
+                fmt_count(s.files),
+                fmt_count(s.dirs)
+            )),
+        ]),
+        Line::from(vec![
+            Span::raw("En yeni değişiklik  ").white(),
+            date_span(base.modified, now),
+        ]),
+    ];
+    if scan_errors > 0 {
+        lines.push(
+            Line::from(format!(
+                "⚠ Taramada {} öğeye erişilemedi",
+                fmt_count(scan_errors)
+            ))
+            .yellow(),
+        );
+    }
+    f.render_widget(
+        Paragraph::new(lines).block(panel(" Genel ", false)),
+        general,
+    );
+
+    // Disk
+    let disk_lines = if let Some(disk) = &d.disk {
+        let ratio = disk.usage_ratio();
+        let width = (disk_area.width as usize).saturating_sub(2 + 6).max(4);
+        let share = if disk.total > 0 {
+            s.size as f64 / disk.total as f64 * 100.0
+        } else {
+            0.0
+        };
+        vec![
+            Line::from(vec![
+                Span::styled(bar(ratio, width), Style::new().fg(usage_color(ratio))),
+                Span::raw(format!(" %{:.0}", ratio * 100.0)).bold(),
+            ]),
+            Line::from(format!(
+                "{} / {} kullanılıyor · {} boş",
+                fmt_size(disk.used()),
+                fmt_size(disk.total),
+                fmt_size(disk.available)
+            )),
+            Line::from(vec![
+                Span::raw("Disk payı  ").white(),
+                Span::raw(if share > 0.0 && share < 0.1 {
+                    "< %0.1".to_string()
+                } else {
+                    format!("%{share:.1}")
+                })
+                .bold(),
+            ]),
+        ]
+    } else {
+        vec![Line::from("Disk bilgisi bulunamadı.").dark_gray()]
+    };
+    let disk_title = d
+        .disk
+        .as_ref()
+        .map_or(" Disk ".to_string(), |x| format!(" Disk: {} ", x.name));
+    f.render_widget(
+        Paragraph::new(disk_lines).block(panel(&disk_title, false)),
+        disk_area,
+    );
+
+    // File types
+    let inner = types.width.saturating_sub(2) as usize;
+    let bar_w = inner.saturating_sub(20 + 11 + 6 + 2).max(4);
+    let total = s.size.max(1) as f64;
+    let lines: Vec<Line> = s
+        .categories
+        .iter()
+        .map(|&(cat, b)| {
+            let ratio = b.size as f64 / total;
+            Line::from(vec![
+                Span::raw(format!("{:<19}", cat.label())).white(),
+                Span::styled(
+                    bar(ratio, bar_w),
+                    Style::new().fg(CATEGORY_COLORS[cat as usize]),
+                ),
+                Span::raw(format!(" {:>10}", fmt_size(b.size))),
+                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).dark_gray(),
+            ])
+        })
+        .collect();
+    f.render_widget(
+        Paragraph::new(lines).block(panel(" Dosya türleri ", false)),
+        types,
+    );
+
+    // Ages
+    let inner = ages.width.saturating_sub(2) as usize;
+    let bar_w = inner.saturating_sub(11 + 11 + 6 + 2).max(4);
+    let lines: Vec<Line> = (0..age_rows)
+        .map(|i| {
+            let b = s.ages[i];
+            let ratio = b.size as f64 / total;
+            Line::from(vec![
+                Span::raw(format!("{:<11}", stats::AGE_LABELS[i])).white(),
+                Span::styled(bar(ratio, bar_w), Style::new().fg(AGE_COLORS[i])),
+                Span::raw(format!(" {:>10}", fmt_size(b.size))),
+                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).dark_gray(),
+            ])
+        })
+        .collect();
+    f.render_widget(
+        Paragraph::new(lines).block(panel(" Yaş (son değişiklik) ", false)),
+        ages,
+    );
+
+    // Largest files and fullest directories
+    let base_path = tree.path_of(d.base);
+    let rel = |id: NodeId| {
+        if id == d.base {
+            return "(bu klasör)".to_string();
+        }
+        let path = tree.path_of(id);
+        path.strip_prefix(&base_path)
+            .unwrap_or(&path)
+            .display()
+            .to_string()
+    };
+
+    let focus_files = d.focus == Pane::Files;
+    let rows = s.top_files.iter().map(|&id| {
+        let n = tree.node(id);
+        Row::new(vec![
+            Cell::from(Line::from(fmt_size(n.size.get(mode))).right_aligned()),
+            date_cell(n.modified, now),
+            Cell::from(rel(id)),
+        ])
+    });
+    let table = Table::new(
+        rows,
+        [
+            Constraint::Length(10),
+            Constraint::Length(DATE_WIDTH),
+            Constraint::Min(10),
+        ],
+    )
+    .block(panel(" En büyük dosyalar ", focus_files));
+    let table = if focus_files {
+        table.row_highlight_style(HIGHLIGHT).highlight_symbol("▶ ")
+    } else {
+        table
+    };
+    f.render_stateful_widget(table, files, &mut d.files);
+
+    let focus_dirs = d.focus == Pane::Dirs;
+    let rows = s.top_dirs.iter().map(|&(id, size)| {
+        Row::new(vec![
+            Cell::from(Line::from(fmt_size(size)).right_aligned()),
+            Cell::from(Span::styled(
+                if id == d.base {
+                    rel(id)
+                } else {
+                    format!("{}/", rel(id))
+                },
+                Style::new().fg(Color::Blue).bold(),
+            )),
+        ])
+    });
+    let table = Table::new(rows, [Constraint::Length(10), Constraint::Min(10)])
+        .block(panel(" En dolu klasörler (doğrudan içerik) ", focus_dirs));
+    let table = if focus_dirs {
+        table.row_highlight_style(HIGHLIGHT).highlight_symbol("▶ ")
+    } else {
+        table
+    };
+    f.render_stateful_widget(table, dirs, &mut d.dirs);
+}
+
+fn halves(area: Rect) -> [Rect; 2] {
+    Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]).areas(area)
+}
+
+/// Bordered panel; the focused one gets a highlighted border.
+fn panel(title: &str, focused: bool) -> Block<'static> {
+    let border = if focused {
+        Style::new().fg(Color::Cyan)
+    } else {
+        Style::new().fg(Color::DarkGray)
+    };
+    Block::bordered()
+        .title(Span::raw(title.to_string()).white().bold())
+        .border_style(border)
+}
+
+fn usage_color(ratio: f64) -> Color {
+    match ratio {
+        r if r >= 0.9 => Color::Red,
+        r if r >= 0.75 => Color::Yellow,
+        _ => Color::Green,
+    }
+}
+
+fn date_span(secs: u32, now: u64) -> Span<'static> {
+    if secs == 0 {
+        return Span::raw("—").dark_gray();
+    }
+    let age = now.saturating_sub(u64::from(secs));
+    Span::styled(fmt_date(secs), Style::new().fg(age_color(age)))
 }
 
 fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, area: Rect) {
@@ -595,6 +857,7 @@ fn truncate_path(path: &Path, max: usize) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::stats::DAY;
 
     #[test]
     fn formats_sizes() {

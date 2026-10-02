@@ -3,6 +3,7 @@ mod delete;
 mod disks;
 mod scanner;
 mod search;
+mod stats;
 mod tree;
 mod ui;
 

@@ -11,6 +11,7 @@ use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::search;
+use crate::stats::{self, Stats};
 use crate::tree::{NodeId, Size, SizeMode, Tree, ROOT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -88,6 +89,54 @@ impl SearchResults {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Pane {
+    Files,
+    Dirs,
+}
+
+/// Summary of a directory, shown in place of the listing.
+pub struct Dashboard {
+    pub base: NodeId,
+    pub stats: Stats,
+    /// The disk the directory lives on.
+    pub disk: Option<DiskInfo>,
+    pub focus: Pane,
+    pub files: TableState,
+    pub dirs: TableState,
+}
+
+impl Dashboard {
+    fn selected(&self) -> Option<NodeId> {
+        match self.focus {
+            Pane::Files => self
+                .files
+                .selected()
+                .and_then(|i| self.stats.top_files.get(i).copied()),
+            Pane::Dirs => self
+                .dirs
+                .selected()
+                .and_then(|i| self.stats.top_dirs.get(i).map(|&(id, _)| id)),
+        }
+    }
+
+    fn table_mut(&mut self) -> &mut TableState {
+        match self.focus {
+            Pane::Files => &mut self.files,
+            Pane::Dirs => &mut self.dirs,
+        }
+    }
+
+    /// Keeps selections in range after the lists changed.
+    fn clamp_selection(&mut self) {
+        let lens = [self.stats.top_files.len(), self.stats.top_dirs.len()];
+        for (table, len) in [&mut self.files, &mut self.dirs].into_iter().zip(lens) {
+            let sel = table.selected().unwrap_or(0);
+            table.select((len > 0).then(|| sel.min(len - 1)));
+        }
+    }
+}
+
 /// What the browser asks the app to do after a key press.
 pub enum Action {
     None,
@@ -109,6 +158,7 @@ pub struct Browser {
     /// Search pattern being typed.
     pub input: Option<String>,
     pub results: Option<SearchResults>,
+    pub dashboard: Option<Dashboard>,
     /// Entries awaiting a yes/no answer before being moved to the trash.
     pub confirm: Option<Vec<NodeId>>,
     pub deleting: Option<Deletion>,
@@ -135,6 +185,7 @@ impl Browser {
             size_mode: SizeMode::Disk,
             input: None,
             results: None,
+            dashboard: None,
             confirm: None,
             deleting: None,
             status: None,
@@ -211,11 +262,44 @@ impl Browser {
         self.load(self.current, 0);
     }
 
+    /// Opens `dir` itself, with the history leading back to the root.
+    fn open_dir(&mut self, dir: NodeId) {
+        self.reveal(dir);
+        self.history
+            .push((self.current, self.table.selected().unwrap_or(0)));
+        self.load(dir, 0);
+    }
+
+    fn open_dashboard(&mut self) {
+        let base = self.current;
+        let path = self.tree.path_of(base);
+        let disks = disks::list_disks();
+        let mut d = Dashboard {
+            base,
+            stats: stats::compute(&self.tree, base, self.size_mode, crate::ui::now_secs()),
+            disk: disks::disk_for(&path, &disks).cloned(),
+            focus: Pane::Files,
+            files: TableState::default(),
+            dirs: TableState::default(),
+        };
+        d.clamp_selection();
+        self.dashboard = Some(d);
+    }
+
+    /// Recomputes the dashboard after the tree or size mode changed.
+    fn refresh_dashboard(&mut self) {
+        if let Some(d) = &mut self.dashboard {
+            d.stats = stats::compute(&self.tree, d.base, self.size_mode, crate::ui::now_secs());
+            d.clamp_selection();
+        }
+    }
+
     fn toggle_size_mode(&mut self) {
         self.size_mode = match self.size_mode {
             SizeMode::Apparent => SizeMode::Disk,
             SizeMode::Disk => SizeMode::Apparent,
         };
+        self.refresh_dashboard();
         // Re-sort, keeping the cursor on the same entry.
         let selected = self.selected();
         self.load(self.current, 0);
@@ -335,6 +419,7 @@ impl Browser {
         self.deleting = None;
         let row = self.table.selected().unwrap_or(0);
         self.load(self.current, row);
+        self.refresh_dashboard();
         let moved = total - self.batch_failures.len();
         let size = crate::ui::fmt_size(self.batch_trashed.get(self.size_mode));
         if self.batch_failures.is_empty() {
@@ -386,6 +471,9 @@ impl Browser {
             return Action::None;
         }
         self.status = None;
+        if self.dashboard.is_some() {
+            return self.on_key_dashboard(code);
+        }
         if self.results.is_some() {
             return self.on_key_results(code);
         }
@@ -402,6 +490,7 @@ impl Browser {
             KeyCode::Char('s') => self.cycle_sort(),
             KeyCode::Char('a') => self.toggle_size_mode(),
             KeyCode::Char('/') => self.input = Some(String::new()),
+            KeyCode::Char('i') => self.open_dashboard(),
             KeyCode::Char('x') | KeyCode::Delete => {
                 if let Some(id) = self.selected() {
                     self.request_delete(vec![id]);
@@ -409,6 +498,47 @@ impl Browser {
             }
             KeyCode::Char('r') => return Action::Rescan,
             KeyCode::Char('d') => return Action::Disks,
+            _ => {}
+        }
+        Action::None
+    }
+
+    fn on_key_dashboard(&mut self, code: KeyCode) -> Action {
+        let Some(d) = &mut self.dashboard else {
+            return Action::None;
+        };
+        match code {
+            KeyCode::Char('q') => return Action::Quit,
+            KeyCode::Tab | KeyCode::BackTab => {
+                d.focus = match d.focus {
+                    Pane::Files => Pane::Dirs,
+                    Pane::Dirs => Pane::Files,
+                };
+            }
+            KeyCode::Up | KeyCode::Char('k') => d.table_mut().select_previous(),
+            KeyCode::Down | KeyCode::Char('j') => d.table_mut().select_next(),
+            KeyCode::Home | KeyCode::Char('g') => d.table_mut().select_first(),
+            KeyCode::End | KeyCode::Char('G') => d.table_mut().select_last(),
+            KeyCode::Char('a') => self.toggle_size_mode(),
+            KeyCode::Char('x') | KeyCode::Delete => {
+                if let Some(id) = d.selected().filter(|&id| id != d.base) {
+                    self.request_delete(vec![id]);
+                }
+            }
+            KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
+                let target = d.selected();
+                let base = d.base;
+                self.dashboard = None;
+                match target {
+                    Some(id) if id == base => {}
+                    Some(id) if self.tree.node(id).is_dir => self.open_dir(id),
+                    Some(id) => self.reveal(id),
+                    None => {}
+                }
+            }
+            KeyCode::Esc | KeyCode::Char('i') | KeyCode::Backspace | KeyCode::Left => {
+                self.dashboard = None;
+            }
             _ => {}
         }
         Action::None
