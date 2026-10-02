@@ -294,9 +294,15 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     }
 }
 
+/// Terminal width from which the creation date column is shown.
+const WIDE: u16 = 110;
+const DATE_WIDTH: u16 = 16;
+
 fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
     let tree = &b.tree;
     let mode = b.size_mode;
+    let now = now_secs();
+    let wide = area.width >= WIDE;
     let parent_size = tree.node(b.current).size.get(mode).max(1);
     let rows = b.entries.iter().map(|&id| {
         let n = tree.node(id);
@@ -315,37 +321,47 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
         } else {
             String::new()
         };
-        Row::new(vec![
+        let mut cells = vec![
             Cell::from(Line::from(fmt_size(size)).right_aligned()),
             Cell::from(Line::from(vec![
                 Span::styled(bar(ratio, 12), Style::new().fg(Color::Cyan)),
                 Span::raw(format!(" {:>5.1}%", ratio * 100.0)),
             ])),
             Cell::from(Line::from(count).right_aligned().dark_gray()),
-            Cell::from(name),
-        ])
+            date_cell(n.modified, now),
+        ];
+        if wide {
+            cells.push(date_cell(n.created, now));
+        }
+        cells.push(Cell::from(name));
+        Row::new(cells)
     });
-    let table = Table::new(
-        rows,
-        [
-            Constraint::Length(11),
-            Constraint::Length(19),
-            Constraint::Length(10),
-            Constraint::Min(10),
-        ],
-    )
-    .header(
-        Row::new(["Boyut", "Oran", "Dosya", "Ad"])
-            .bold()
-            .underlined(),
-    )
-    .row_highlight_style(HIGHLIGHT)
-    .highlight_symbol("▶ ")
-    .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
+
+    let mut widths = vec![
+        Constraint::Length(11),
+        Constraint::Length(19),
+        Constraint::Length(10),
+        Constraint::Length(DATE_WIDTH),
+    ];
+    let mut header = vec!["Boyut", "Oran", "Dosya", "Son değişiklik"];
+    if wide {
+        widths.push(Constraint::Length(DATE_WIDTH));
+        header.push("Oluşturma");
+    }
+    widths.push(Constraint::Min(10));
+    header.push("Ad");
+
+    let table = Table::new(rows, widths)
+        .header(Row::new(header).bold().underlined())
+        .row_highlight_style(HIGHLIGHT)
+        .highlight_symbol("▶ ")
+        .block(table_block());
     f.render_stateful_widget(table, area, &mut b.table);
 }
 
 fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeMode, area: Rect) {
+    let now = now_secs();
+    let wide = area.width >= WIDE;
     let rows = r.items.iter().enumerate().map(|(i, &id)| {
         let n = tree.node(id);
         let check = if r.checked[i] {
@@ -363,31 +379,97 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeM
         } else {
             String::new()
         };
-        Row::new(vec![
+        let mut cells = vec![
             Cell::from(check),
             Cell::from(Line::from(fmt_size(n.size.get(mode))).right_aligned()),
             Cell::from(Line::from(count).right_aligned().dark_gray()),
-            Cell::from(label),
-        ])
+            date_cell(n.modified, now),
+        ];
+        if wide {
+            cells.push(date_cell(n.created, now));
+        }
+        cells.push(Cell::from(label));
+        Row::new(cells)
     });
-    let table = Table::new(
-        rows,
-        [
-            Constraint::Length(3),
-            Constraint::Length(11),
-            Constraint::Length(10),
-            Constraint::Min(10),
-        ],
-    )
-    .header(
-        Row::new(["", "Boyut", "Dosya", "Konum"])
-            .bold()
-            .underlined(),
-    )
-    .row_highlight_style(HIGHLIGHT)
-    .highlight_symbol("▶ ")
-    .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
+
+    let mut widths = vec![
+        Constraint::Length(3),
+        Constraint::Length(11),
+        Constraint::Length(10),
+        Constraint::Length(DATE_WIDTH),
+    ];
+    let mut header = vec!["", "Boyut", "Dosya", "Son değişiklik"];
+    if wide {
+        widths.push(Constraint::Length(DATE_WIDTH));
+        header.push("Oluşturma");
+    }
+    widths.push(Constraint::Min(10));
+    header.push("Konum");
+
+    let table = Table::new(rows, widths)
+        .header(Row::new(header).bold().underlined())
+        .row_highlight_style(HIGHLIGHT)
+        .highlight_symbol("▶ ")
+        .block(table_block());
     f.render_stateful_widget(table, area, &mut r.table);
+}
+
+/// Top/bottom rule with the date color legend on the top edge.
+fn table_block() -> Block<'static> {
+    let mut legend = vec![Span::raw(" tarih: ").dark_gray()];
+    for (age, label) in [
+        (0, "7 gün"),
+        (8 * DAY, "30 gün"),
+        (31 * DAY, "1 yıl"),
+        (366 * DAY, "daha eski"),
+    ] {
+        legend.push(Span::styled("● ", Style::new().fg(age_color(age))));
+        legend.push(Span::raw(format!("{label}  ")).dark_gray());
+    }
+    Block::new()
+        .borders(Borders::TOP | Borders::BOTTOM)
+        .title_top(Line::from(legend).right_aligned())
+}
+
+const DAY: u64 = 24 * 60 * 60;
+
+/// Color for a timestamp of the given age in seconds: fresh is green,
+/// untouched for over a year is red.
+fn age_color(age: u64) -> Color {
+    match age {
+        a if a <= 7 * DAY => Color::Green,
+        a if a <= 30 * DAY => Color::Cyan,
+        a if a <= 365 * DAY => Color::Yellow,
+        _ => Color::Red,
+    }
+}
+
+fn date_cell(secs: u32, now: u64) -> Cell<'static> {
+    if secs == 0 {
+        return Cell::from(Span::raw("—").dark_gray());
+    }
+    let age = now.saturating_sub(u64::from(secs));
+    Cell::from(Span::styled(
+        fmt_date(secs),
+        Style::new().fg(age_color(age)),
+    ))
+}
+
+fn now_secs() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs())
+}
+
+/// Local date and time, e.g. "03.10.2026 14:22".
+fn fmt_date(secs: u32) -> String {
+    chrono::DateTime::from_timestamp(i64::from(secs), 0)
+        .map(|t| {
+            t.with_timezone(&chrono::Local)
+                .format("%d.%m.%Y %H:%M")
+                .to_string()
+        })
+        .unwrap_or_else(|| "—".into())
 }
 
 fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, area: Rect) {
@@ -527,6 +609,23 @@ mod tests {
         assert_eq!(fmt_count(999), "999");
         assert_eq!(fmt_count(1000), "1.000");
         assert_eq!(fmt_count(1234567), "1.234.567");
+    }
+
+    #[test]
+    fn colors_by_age() {
+        assert_eq!(age_color(0), Color::Green);
+        assert_eq!(age_color(7 * DAY), Color::Green);
+        assert_eq!(age_color(8 * DAY), Color::Cyan);
+        assert_eq!(age_color(100 * DAY), Color::Yellow);
+        assert_eq!(age_color(400 * DAY), Color::Red);
+    }
+
+    #[test]
+    fn formats_dates() {
+        // 2001-09-09 01:46 UTC: 8 or 9 September depending on the time zone.
+        let d = fmt_date(1_000_000_000);
+        assert_eq!(d.chars().count(), 16, "{d}");
+        assert!(d.contains(".09.2001 "), "{d}");
     }
 
     #[test]

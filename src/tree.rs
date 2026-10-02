@@ -58,6 +58,12 @@ pub struct Node {
     name_start: u64,
     /// 1 for files; number of files below for directories (after `finalize`).
     pub file_count: u32,
+    /// Last modification, seconds since the Unix epoch (0 = unknown). For
+    /// directories, the newest modification of anything below (after
+    /// `finalize`).
+    pub modified: u32,
+    /// Creation time, seconds since the Unix epoch (0 = unknown).
+    pub created: u32,
     parent: NodeId,
     first_child: NodeId,
     next_sibling: NodeId,
@@ -108,6 +114,8 @@ impl Tree {
             name_start,
             file_count: u32::from(!is_dir),
             parent,
+            modified: 0,
+            created: 0,
             first_child: NONE,
             next_sibling: NONE,
             name_len: name.len() as u16,
@@ -148,14 +156,23 @@ impl Tree {
         }
     }
 
-    /// Rolls file sizes and counts up into their parent directories.
+    pub fn set_times(&mut self, id: NodeId, modified: u32, created: u32) {
+        let n = &mut self.nodes[id as usize];
+        n.modified = modified;
+        n.created = created;
+    }
+
+    /// Rolls file sizes, counts and newest modification times up into their
+    /// parent directories.
     pub fn finalize(&mut self) {
         for id in (1..self.nodes.len()).rev() {
             let n = &self.nodes[id];
-            let (size, count, parent) = (n.size, n.file_count, n.parent as usize);
+            let (size, count, modified, parent) =
+                (n.size, n.file_count, n.modified, n.parent as usize);
             let p = &mut self.nodes[parent];
             p.size += size;
             p.file_count += count;
+            p.modified = p.modified.max(modified);
         }
     }
 
@@ -245,6 +262,25 @@ mod tests {
     }
 
     #[test]
+    fn finalize_propagates_newest_modification() {
+        let mut t = Tree::new(Path::new("/r"));
+        let a = t.push(ROOT, "a", true, Size::default());
+        t.set_times(a, 100, 50);
+        let old = t.push(a, "old", false, Size::default());
+        t.set_times(old, 200, 200);
+        let new = t.push(a, "new", false, Size::default());
+        t.set_times(new, 900, 300);
+        let b = t.push(ROOT, "b", true, Size::default());
+        t.set_times(b, 400, 40);
+        t.finalize();
+
+        assert_eq!(t.node(a).modified, 900);
+        assert_eq!(t.node(a).created, 50); // creation is not propagated
+        assert_eq!(t.node(b).modified, 400);
+        assert_eq!(t.node(ROOT).modified, 900);
+    }
+
+    #[test]
     fn names_and_children() {
         let mut t = Tree::new(Path::new("/r"));
         let a = t.push(ROOT, "alpha", true, Size::default());
@@ -293,6 +329,6 @@ mod tests {
 
     #[test]
     fn node_stays_small() {
-        assert!(std::mem::size_of::<Node>() <= 48);
+        assert!(std::mem::size_of::<Node>() <= 56);
     }
 }

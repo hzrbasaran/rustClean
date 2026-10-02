@@ -18,6 +18,7 @@ pub enum SortMode {
     Size,
     Name,
     Count,
+    Modified,
 }
 
 impl SortMode {
@@ -25,7 +26,8 @@ impl SortMode {
         match self {
             SortMode::Size => SortMode::Name,
             SortMode::Name => SortMode::Count,
-            SortMode::Count => SortMode::Size,
+            SortMode::Count => SortMode::Modified,
+            SortMode::Modified => SortMode::Size,
         }
     }
 
@@ -34,6 +36,7 @@ impl SortMode {
             SortMode::Size => "boyut",
             SortMode::Name => "ad",
             SortMode::Count => "dosya sayısı",
+            SortMode::Modified => "son değişiklik (en eski önce)",
         }
     }
 }
@@ -155,6 +158,11 @@ impl Browser {
             }
             SortMode::Name => entries.sort_by_cached_key(|&a| tree.name(a).to_lowercase()),
             SortMode::Count => entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).file_count)),
+            // Oldest first; unknown dates (0) go last.
+            SortMode::Modified => entries.sort_by_key(|&a| {
+                let m = tree.node(a).modified;
+                (m == 0, m)
+            }),
         }
         self.entries = entries;
         self.table

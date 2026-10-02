@@ -105,6 +105,8 @@ struct Entry {
     name: Box<str>,
     is_dir: bool,
     size: Size,
+    modified: u32,
+    created: u32,
     /// `(dev, inode)` of files with more than one hard link.
     #[cfg(unix)]
     hard_link: Option<(u64, u64)>,
@@ -183,6 +185,7 @@ pub fn scan(
                 size = Size::default();
             }
             let id = tree.push(listing.node, &entry.name, entry.is_dir, size);
+            tree.set_times(id, entry.modified, entry.created);
             if entry.is_dir {
                 progress.dirs += 1;
             } else {
@@ -269,12 +272,21 @@ fn read_dir(job: Job, ctx: &Ctx) -> Listing {
             name: dir_entry.file_name().to_string_lossy().into(),
             is_dir,
             size,
+            modified: epoch_secs(md.modified()),
+            created: epoch_secs(md.created()),
             #[cfg(unix)]
             hard_link,
             descend,
         });
     }
     listing
+}
+
+/// Seconds since the Unix epoch, or 0 when unknown (or before 1970).
+fn epoch_secs(time: std::io::Result<std::time::SystemTime>) -> u32 {
+    time.ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map_or(0, |d| d.as_secs().min(u64::from(u32::MAX)) as u32)
 }
 
 #[cfg(test)]
@@ -383,6 +395,32 @@ mod tests {
         let sparse = t.node(child(t, ROOT, "sparse.bin")).size;
         assert_eq!(sparse.apparent, 64 * 1024 * 1024);
         assert!(sparse.disk < 1024 * 1024);
+    }
+
+    #[test]
+    fn records_times() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        write(&r.join("f.bin"), 1);
+        write(&r.join("fresh.bin"), 1);
+        let old = std::time::UNIX_EPOCH + Duration::from_secs(1_000_000_000);
+        fs::File::options()
+            .write(true)
+            .open(r.join("f.bin"))
+            .unwrap()
+            .set_modified(old)
+            .unwrap();
+
+        let res = run(r);
+        let t = &res.tree;
+        let f = t.node(child(t, ROOT, "f.bin"));
+        assert_eq!(f.modified, 1_000_000_000);
+        // Creation time is available on macOS, Windows and Linux with statx.
+        // (macOS moves it back when mtime is set earlier, so check a file
+        // that was left alone.)
+        let now = epoch_secs(Ok(std::time::SystemTime::now()));
+        let fresh = t.node(child(t, ROOT, "fresh.bin"));
+        assert!(now - fresh.created < 3600, "created: {}", fresh.created);
     }
 
     #[test]
