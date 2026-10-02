@@ -9,7 +9,7 @@ use ratatui::widgets::TableState;
 
 use crate::disks::{self, DiskInfo};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
-use crate::tree::{NodeId, Tree, ROOT};
+use crate::tree::{NodeId, SizeMode, Tree, ROOT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SortMode {
@@ -51,6 +51,7 @@ pub struct Browser {
     pub entries: Vec<NodeId>,
     pub table: TableState,
     pub sort: SortMode,
+    pub size_mode: SizeMode,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
 }
@@ -65,6 +66,7 @@ impl Browser {
             entries: Vec::new(),
             table: TableState::default(),
             sort: SortMode::Size,
+            size_mode: SizeMode::Disk,
             history: Vec::new(),
         };
         b.load(ROOT, 0);
@@ -74,10 +76,13 @@ impl Browser {
     fn load(&mut self, dir: NodeId, selected: usize) {
         self.current = dir;
         let tree = &self.tree;
-        let mut entries = tree.node(dir).children.clone();
+        let mode = self.size_mode;
+        let mut entries: Vec<NodeId> = tree.children(dir).collect();
         match self.sort {
-            SortMode::Size => entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).size)),
-            SortMode::Name => entries.sort_by_cached_key(|&a| tree.node(a).name.to_lowercase()),
+            SortMode::Size => {
+                entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).size.get(mode)))
+            }
+            SortMode::Name => entries.sort_by_cached_key(|&a| tree.name(a).to_lowercase()),
             SortMode::Count => entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).file_count)),
         }
         self.entries = entries;
@@ -108,6 +113,19 @@ impl Browser {
     fn cycle_sort(&mut self) {
         self.sort = self.sort.next();
         self.load(self.current, 0);
+    }
+
+    fn toggle_size_mode(&mut self) {
+        self.size_mode = match self.size_mode {
+            SizeMode::Apparent => SizeMode::Disk,
+            SizeMode::Disk => SizeMode::Apparent,
+        };
+        // Re-sort, keeping the cursor on the same entry.
+        let selected = self.selected();
+        self.load(self.current, 0);
+        if let Some(pos) = selected.and_then(|id| self.entries.iter().position(|&e| e == id)) {
+            self.table.select(Some(pos));
+        }
     }
 }
 
@@ -241,6 +259,7 @@ impl App {
             KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => b.enter(),
             KeyCode::Backspace | KeyCode::Left | KeyCode::Char('h') | KeyCode::Esc => b.back(),
             KeyCode::Char('s') => b.cycle_sort(),
+            KeyCode::Char('a') => b.toggle_size_mode(),
             KeyCode::Char('r') => {
                 let root = b.tree.root_path().to_path_buf();
                 self.browser = None;

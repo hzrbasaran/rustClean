@@ -1,22 +1,20 @@
 //! Parallel directory scanning.
 //!
-//! `jwalk` reads directories on a rayon pool; per-entry `stat` calls happen in
-//! the `process_read_dir` callback so they run in parallel too. The consuming
-//! thread only assembles the `Tree`.
+//! Directories are read and their entries stat'ed on a thread pool; a single
+//! thread assembles the `Tree` from the results.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc::{self, Receiver};
+use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
-use jwalk::WalkDirGeneric;
 
-use crate::tree::{Tree, ROOT};
+use crate::tree::{NodeId, Size, Tree, ROOT};
 
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(100);
 
@@ -80,22 +78,47 @@ pub fn start(root: PathBuf, skip: Vec<PathBuf>) -> ScanHandle {
     }
 }
 
-/// Metadata gathered in parallel for each entry.
-#[derive(Debug, Default)]
-struct Meta {
-    size: u64,
+/// Settings shared by all worker threads of one scan.
+struct Ctx {
+    cancel: Arc<AtomicBool>,
+    skip: HashSet<PathBuf>,
     #[cfg(unix)]
-    dev: u64,
+    root_dev: u64,
+}
+
+/// A directory waiting to be read; `node` is its id in the tree.
+struct Job {
+    dir: PathBuf,
+    node: NodeId,
+}
+
+/// The contents of one directory, sent from a worker to the tree builder.
+struct Listing {
+    dir: PathBuf,
+    node: NodeId,
+    entries: Vec<Entry>,
+    /// Entries (or the directory itself) that could not be read.
+    errors: u64,
+}
+
+struct Entry {
+    name: Box<str>,
+    is_dir: bool,
+    size: Size,
+    /// `(dev, inode)` of files with more than one hard link.
     #[cfg(unix)]
-    ino: u64,
-    #[cfg(unix)]
-    nlink: u64,
-    error: bool,
+    hard_link: Option<(u64, u64)>,
+    /// Set for directories that should be descended into.
+    descend: Option<PathBuf>,
 }
 
 /// Scans `root` synchronously. Symlinks are not followed, other filesystems
 /// (and any path in `skip`) are not descended into, and hard-linked files are
 /// counted once.
+///
+/// Worker threads read directories in no particular order; this thread owns
+/// the tree and hands out a new job for every subdirectory it inserts, so a
+/// parent is always in the tree before its children.
 pub fn scan(
     root: &Path,
     skip: Vec<PathBuf>,
@@ -106,101 +129,74 @@ pub fn scan(
     let root = std::path::absolute(root).context("geçersiz yol")?;
     let root_md = fs::metadata(&root).with_context(|| format!("{} okunamadı", root.display()))?;
     anyhow::ensure!(root_md.is_dir(), "{} bir klasör değil", root.display());
-    #[cfg(unix)]
-    let root_dev = std::os::unix::fs::MetadataExt::dev(&root_md);
 
-    let skip: HashSet<PathBuf> = skip.into_iter().filter(|p| *p != root).collect();
-    let cancel_flag = Arc::clone(cancel);
-
-    let walk = WalkDirGeneric::<((), Meta)>::new(&root)
-        .follow_links(false)
-        .skip_hidden(false)
-        .process_read_dir(move |_depth, dir, _state, children| {
-            if cancel_flag.load(Ordering::Relaxed) {
-                children.clear();
-                return;
-            }
-            for child in children.iter_mut().flatten() {
-                let path = dir.join(&child.file_name);
-                let md = match fs::symlink_metadata(&path) {
-                    Ok(md) => md,
-                    Err(_) => {
-                        child.client_state.error = true;
-                        child.read_children = None;
-                        continue;
-                    }
-                };
-                let meta = &mut child.client_state;
-                meta.size = md.len();
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::MetadataExt;
-                    meta.dev = md.dev();
-                    meta.ino = md.ino();
-                    meta.nlink = md.nlink();
-                }
-                if child.file_type.is_dir() {
-                    #[cfg(unix)]
-                    let other_fs = meta.dev != root_dev;
-                    #[cfg(not(unix))]
-                    let other_fs = false;
-                    if other_fs || skip.contains(&path) {
-                        child.read_children = None;
-                    }
-                }
-            }
+    let ctx = Arc::new(Ctx {
+        cancel: Arc::clone(cancel),
+        skip: skip.into_iter().filter(|p| *p != root).collect(),
+        #[cfg(unix)]
+        root_dev: std::os::unix::fs::MetadataExt::dev(&root_md),
+    });
+    // Scanning is dominated by I/O latency, so use more threads than cores.
+    let threads = thread::available_parallelism().map_or(4, |n| n.get() * 2);
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .thread_name(|i| format!("scan-{i}"))
+        .build()
+        .context("iş parçacığı havuzu oluşturulamadı")?;
+    let (tx, rx) = mpsc::channel::<Listing>();
+    let spawn = |job: Job| {
+        let ctx = Arc::clone(&ctx);
+        let tx = tx.clone();
+        pool.spawn(move || {
+            let _ = tx.send(read_dir(job, &ctx));
         });
+    };
 
     let mut tree = Tree::new(&root);
-    let mut dirs: HashMap<PathBuf, usize> = HashMap::new();
-    dirs.insert(root.clone(), ROOT);
     #[cfg(unix)]
     let mut seen_links: HashSet<(u64, u64)> = HashSet::new();
     let mut progress = ScanProgress::default();
     let mut last_report = Instant::now();
 
-    for entry in walk {
-        if cancel.load(Ordering::Relaxed) {
-            break;
-        }
-        let entry = match entry {
-            Ok(e) => e,
-            Err(_) => {
-                progress.errors += 1;
+    spawn(Job {
+        dir: root.clone(),
+        node: ROOT,
+    });
+    let mut pending = 1usize;
+    while pending > 0 && !cancel.load(Ordering::Relaxed) {
+        let listing = match rx.recv_timeout(PROGRESS_INTERVAL) {
+            Ok(l) => l,
+            Err(RecvTimeoutError::Timeout) => {
+                on_progress(&progress);
                 continue;
             }
+            Err(RecvTimeoutError::Disconnected) => break,
         };
-        if entry.depth == 0 {
-            continue;
-        }
-        let Some(&parent) = dirs.get(&*entry.parent_path) else {
-            continue;
-        };
-        let meta = &entry.client_state;
-        if meta.error {
-            progress.errors += 1;
-            continue;
-        }
-        let is_dir = entry.file_type.is_dir();
-        #[allow(unused_mut)]
-        let mut size = if is_dir { 0 } else { meta.size };
-        #[cfg(unix)]
-        if !is_dir && meta.nlink > 1 && !seen_links.insert((meta.dev, meta.ino)) {
-            size = 0;
-        }
+        pending -= 1;
+        progress.errors += listing.errors;
 
-        let name = entry.file_name.to_string_lossy();
-        let id = tree.push(parent, &name, is_dir, size);
-        if is_dir {
-            dirs.insert(entry.path(), id);
-            progress.dirs += 1;
-        } else {
-            progress.files += 1;
-            progress.bytes += size;
+        for entry in listing.entries {
+            #[allow(unused_mut)]
+            let mut size = entry.size;
+            #[cfg(unix)]
+            if entry.hard_link.is_some_and(|key| !seen_links.insert(key)) {
+                size = Size::default();
+            }
+            let id = tree.push(listing.node, &entry.name, entry.is_dir, size);
+            if entry.is_dir {
+                progress.dirs += 1;
+            } else {
+                progress.files += 1;
+                progress.bytes += size.apparent;
+            }
+            if let Some(dir) = entry.descend {
+                spawn(Job { dir, node: id });
+                pending += 1;
+            }
         }
 
         if last_report.elapsed() >= PROGRESS_INTERVAL {
-            progress.current = entry.parent_path.to_path_buf();
+            progress.current = listing.dir;
             on_progress(&progress);
             last_report = Instant::now();
         }
@@ -214,10 +210,77 @@ pub fn scan(
     })
 }
 
+/// Reads one directory and stats its entries. Runs on a worker thread.
+fn read_dir(job: Job, ctx: &Ctx) -> Listing {
+    let mut listing = Listing {
+        dir: job.dir,
+        node: job.node,
+        entries: Vec::new(),
+        errors: 0,
+    };
+    if ctx.cancel.load(Ordering::Relaxed) {
+        return listing;
+    }
+    let read = match fs::read_dir(&listing.dir) {
+        Ok(r) => r,
+        Err(_) => {
+            listing.errors = 1;
+            return listing;
+        }
+    };
+    for dir_entry in read {
+        // `DirEntry::metadata` does not follow symlinks.
+        let Ok((dir_entry, md)) = dir_entry.and_then(|e| e.metadata().map(|md| (e, md))) else {
+            listing.errors += 1;
+            continue;
+        };
+        let is_dir = md.is_dir();
+        #[allow(unused_mut)]
+        let mut size = Size {
+            apparent: md.len(),
+            disk: md.len(),
+        };
+        #[cfg(unix)]
+        let hard_link = {
+            use std::os::unix::fs::MetadataExt;
+            // st_blocks is always in 512-byte units.
+            size.disk = md.blocks() * 512;
+            (!is_dir && md.nlink() > 1).then(|| (md.dev(), md.ino()))
+        };
+        // A directory's own length is filesystem bookkeeping, so only its
+        // allocated blocks count (as with `du`).
+        if is_dir {
+            size.apparent = 0;
+        }
+
+        let mut descend = None;
+        if is_dir {
+            #[cfg(unix)]
+            let other_fs = std::os::unix::fs::MetadataExt::dev(&md) != ctx.root_dev;
+            #[cfg(not(unix))]
+            let other_fs = false;
+            let path = dir_entry.path();
+            if !other_fs && !ctx.skip.contains(&path) {
+                descend = Some(path);
+            }
+        }
+
+        listing.entries.push(Entry {
+            name: dir_entry.file_name().to_string_lossy().into(),
+            is_dir,
+            size,
+            #[cfg(unix)]
+            hard_link,
+            descend,
+        });
+    }
+    listing
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tree::NodeId;
+    use crate::tree::SizeMode;
 
     fn write(path: &Path, len: usize) {
         fs::write(path, vec![0u8; len]).unwrap();
@@ -228,11 +291,8 @@ mod tests {
     }
 
     fn child(tree: &Tree, parent: NodeId, name: &str) -> NodeId {
-        *tree
-            .node(parent)
-            .children
-            .iter()
-            .find(|&&c| &*tree.node(c).name == name)
+        tree.children(parent)
+            .find(|&c| tree.name(c) == name)
             .unwrap_or_else(|| panic!("{name} not found"))
     }
 
@@ -249,12 +309,12 @@ mod tests {
         let res = run(r);
         let t = &res.tree;
         assert_eq!(res.errors, 0);
-        assert_eq!(t.node(ROOT).size, 3100);
+        assert_eq!(t.node(ROOT).size.apparent, 3100);
         assert_eq!(t.node(ROOT).file_count, 3);
         let a = child(t, ROOT, "a");
-        assert_eq!(t.node(a).size, 3000);
-        assert_eq!(t.node(child(t, a, "b")).size, 2000);
-        assert_eq!(t.node(child(t, ROOT, "empty")).size, 0);
+        assert_eq!(t.node(a).size.apparent, 3000);
+        assert_eq!(t.node(child(t, a, "b")).size.apparent, 2000);
+        assert_eq!(t.node(child(t, ROOT, "empty")).size.apparent, 0);
         assert_eq!(
             t.path_of(child(t, a, "b")),
             std::path::absolute(r.join("a/b")).unwrap()
@@ -271,7 +331,7 @@ mod tests {
 
         let skip = vec![std::path::absolute(r.join("mnt")).unwrap()];
         let res = scan(r, skip, &Arc::default(), |_| {}).unwrap();
-        assert_eq!(res.tree.node(ROOT).size, 10);
+        assert_eq!(res.tree.node(ROOT).size.apparent, 10);
     }
 
     #[cfg(unix)]
@@ -287,8 +347,8 @@ mod tests {
         let t = &res.tree;
         let link = child(t, ROOT, "link");
         assert!(!t.node(link).is_dir);
-        assert!(t.node(link).size < 4000);
-        assert_eq!(t.node(child(t, ROOT, "real")).size, 4000);
+        assert!(t.node(link).size.apparent < 4000);
+        assert_eq!(t.node(child(t, ROOT, "real")).size.apparent, 4000);
     }
 
     #[cfg(unix)]
@@ -300,7 +360,29 @@ mod tests {
         fs::hard_link(r.join("orig.bin"), r.join("copy.bin")).unwrap();
 
         let res = run(r);
-        assert_eq!(res.tree.node(ROOT).size, 3000);
+        assert_eq!(res.tree.node(ROOT).size.apparent, 3000);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn tracks_disk_usage_separately() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        write(&r.join("tiny.bin"), 1);
+        // A sparse file: large length, almost nothing allocated.
+        fs::File::create(r.join("sparse.bin"))
+            .unwrap()
+            .set_len(64 * 1024 * 1024)
+            .unwrap();
+
+        let res = run(r);
+        let t = &res.tree;
+        let tiny = t.node(child(t, ROOT, "tiny.bin")).size;
+        assert_eq!(tiny.apparent, 1);
+        assert!(tiny.get(SizeMode::Disk) >= 512);
+        let sparse = t.node(child(t, ROOT, "sparse.bin")).size;
+        assert_eq!(sparse.apparent, 64 * 1024 * 1024);
+        assert!(sparse.disk < 1024 * 1024);
     }
 
     #[test]

@@ -9,6 +9,7 @@ use ratatui::widgets::{Block, Borders, Cell, Paragraph, Row, Table};
 use ratatui::Frame;
 
 use crate::app::{App, Screen};
+use crate::tree::SizeMode;
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 const HIGHLIGHT: Style = Style::new()
@@ -164,13 +165,18 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     let Some(b) = &mut app.browser else { return };
     let tree = &b.tree;
     let cur = tree.node(b.current);
+    let mode = b.size_mode;
+    let mode_label = match mode {
+        SizeMode::Disk => "diskte",
+        SizeMode::Apparent => "görünen",
+    };
 
     f.render_widget(
         title(format!(
-            "{}  │  {}  │  {} dosya  │  sıralama: {}",
+            "{}  │  {} ({mode_label})  │  {} dosya  │  sıralama: {}",
             tree.path_of(b.current).display(),
-            fmt_size(cur.size),
-            fmt_count(cur.file_count),
+            fmt_size(cur.size.get(mode)),
+            fmt_count(cur.file_count.into()),
             b.sort.label()
         )),
         header,
@@ -179,22 +185,26 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     let [table_area, status_area] =
         Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(body);
 
-    let parent_size = cur.size.max(1);
+    let parent_size = cur.size.get(mode).max(1);
     let rows = b.entries.iter().map(|&id| {
         let n = tree.node(id);
-        let ratio = n.size as f64 / parent_size as f64;
+        let size = n.size.get(mode);
+        let ratio = size as f64 / parent_size as f64;
         let name = if n.is_dir {
-            Span::styled(format!("{}/", n.name), Style::new().fg(Color::Blue).bold())
+            Span::styled(
+                format!("{}/", tree.name(id)),
+                Style::new().fg(Color::Blue).bold(),
+            )
         } else {
-            Span::raw(n.name.to_string())
+            Span::raw(tree.name(id).to_string())
         };
         let count = if n.is_dir {
-            fmt_count(n.file_count)
+            fmt_count(n.file_count.into())
         } else {
             String::new()
         };
         Row::new(vec![
-            Cell::from(Line::from(fmt_size(n.size)).right_aligned()),
+            Cell::from(Line::from(fmt_size(size)).right_aligned()),
             Cell::from(Line::from(vec![
                 Span::styled(bar(ratio, 12), Style::new().fg(Color::Cyan)),
                 Span::raw(format!(" {:>5.1}%", ratio * 100.0)),
@@ -242,6 +252,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Enter", "gir"),
             ("⌫", "geri"),
             ("s", "sırala"),
+            ("a", "görünen/diskte"),
             ("r", "yeniden tara"),
             ("d", "diskler"),
             ("q", "çık"),

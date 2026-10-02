@@ -23,6 +23,10 @@ struct Args {
     /// Diskleri listeleyip çık
     #[arg(long)]
     list_disks: bool,
+
+    /// Arayüz açmadan YOL'u tarayıp özetini yazdır
+    #[arg(long, requires = "path")]
+    summary: bool,
 }
 
 fn main() -> Result<()> {
@@ -42,11 +46,39 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    if args.summary {
+        return print_summary(&args.path.expect("clap enforces path"));
+    }
+
     // ratatui::init installs a panic hook that restores the terminal.
     let mut terminal = ratatui::init();
     let result = run(&mut terminal, App::new(args.path));
     ratatui::restore();
     result
+}
+
+fn print_summary(path: &std::path::Path) -> Result<()> {
+    use tree::{SizeMode, ROOT};
+
+    let res = scanner::scan(path, disks::all_mount_points(), &Default::default(), |_| {})?;
+    let t = &res.tree;
+    let root = t.node(ROOT);
+    println!("{}", t.root_path().display());
+    println!(
+        "  diskte: {} ({} B)   görünen: {} ({} B)",
+        ui::fmt_size(root.size.get(SizeMode::Disk)),
+        root.size.disk,
+        ui::fmt_size(root.size.apparent),
+        root.size.apparent
+    );
+    println!(
+        "  {} dosya, {} öğe, {} erişilemeyen, {:.1} sn",
+        root.file_count,
+        t.len() - 1,
+        res.errors,
+        res.elapsed.as_secs_f64()
+    );
+    Ok(())
 }
 
 fn run(terminal: &mut ratatui::DefaultTerminal, mut app: App) -> Result<()> {
