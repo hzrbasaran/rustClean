@@ -8,6 +8,7 @@ use std::time::Duration;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::widgets::TableState;
 
+use crate::apps;
 use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
 use crate::lists::{ResultList, Row};
@@ -332,7 +333,10 @@ impl Browser {
         self.pending_report = None;
         self.status = None;
         match kind {
-            ReportKind::Apps | ReportKind::Duplicates => {
+            ReportKind::Apps => {
+                self.results = Some(apps::run(&self.tree, self.current, self.size_mode));
+            }
+            ReportKind::Duplicates => {
                 self.set_status(format!("{}: henüz hazır değil.", kind.label()), true);
             }
             _ => {
@@ -352,8 +356,9 @@ impl Browser {
             return;
         };
         let (tree, mode) = (&self.tree, self.size_mode);
-        let rows: Vec<Row> = row
-            .nodes
+        let mut ids = row.nodes.clone();
+        ids.sort_by_key(|&id| std::cmp::Reverse(tree.node(id).size.get(mode)));
+        let rows: Vec<Row> = ids
             .iter()
             .map(|&id| Row::single(tree, r.base, id, mode, String::new()))
             .collect();
@@ -368,8 +373,8 @@ impl Browser {
                     n.modified
                 }
             };
-            if let Some(keep) = (0..row.nodes.len()).min_by_key(|&i| (age(row.nodes[i]), i)) {
-                list.checked = (0..row.nodes.len()).map(|i| i != keep).collect();
+            if let Some(keep) = (0..ids.len()).min_by_key(|&i| (age(ids[i]), i)) {
+                list.checked = (0..ids.len()).map(|i| i != keep).collect();
                 list.note = format!(
                     "En eski kopya ({}) korunuyor; diğerleri seçili.",
                     list.rows[keep].label

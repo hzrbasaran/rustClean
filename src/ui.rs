@@ -426,7 +426,14 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
 fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
     let now = now_secs();
     let wide = area.width >= WIDE;
-    let has_detail = r.rows.iter().any(|row| !row.detail.is_empty());
+    let detail_width = r
+        .rows
+        .iter()
+        .map(|row| row.detail.chars().count())
+        .max()
+        .unwrap_or(0)
+        .min(44) as u16;
+    let has_detail = detail_width > 0;
     let rows = r.rows.iter().enumerate().map(|(i, row)| {
         let check = if r.checked[i] {
             Span::raw("[✓]").green().bold()
@@ -486,7 +493,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
     widths.push(Constraint::Min(10));
     header.push("Konum");
     if has_detail {
-        widths.push(Constraint::Length(30));
+        widths.push(Constraint::Length(detail_width.max(7)));
         header.push("Ayrıntı");
     }
 
