@@ -8,7 +8,9 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Browser, Dashboard, Pane, Screen, SearchResults};
+use crate::app::{App, Browser, Dashboard, Pane, Screen};
+use crate::lists::ResultList;
+use crate::reports::ReportKind;
 use crate::stats;
 use crate::tree::{NodeId, SizeMode, Tree};
 
@@ -172,21 +174,15 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             b.tree.path_of(d.base).display()
         )
     } else if let Some(r) = &b.results {
-        let tree = &b.tree;
-        let total: u64 = r.items.iter().map(|&id| tree.node(id).size.get(mode)).sum();
-        let checked: u64 = r
-            .checked_ids()
-            .iter()
-            .map(|&id| tree.node(id).size.get(mode))
-            .sum();
+        let shown = if r.truncated { "ilk " } else { "" };
         format!(
-            "Arama „{}” — {}  │  {} sonuç, {} ({mode_label})  │  seçili: {} ({})",
-            r.pattern,
-            tree.path_of(r.base).display(),
-            fmt_count(r.items.len() as u64),
-            fmt_size(total),
+            "{} — {}  │  {shown}{} satır, {} ({mode_label})  │  seçili: {} ({})",
+            r.title,
+            b.tree.path_of(r.base).display(),
+            fmt_count(r.rows.len() as u64),
+            fmt_size(r.total_size()),
             fmt_count(r.checked.iter().filter(|&&c| c).count() as u64),
-            fmt_size(checked),
+            fmt_size(r.checked_size()),
         )
     } else {
         let cur = b.tree.node(b.current);
@@ -206,7 +202,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     if let Some(d) = &mut b.dashboard {
         render_dashboard(f, &b.tree, d, mode, b.errors, table_area);
     } else if let Some(r) = &mut b.results {
-        render_results(f, &b.tree, r, mode, table_area);
+        render_results(f, &b.tree, r, table_area);
     } else {
         render_entries(f, b, table_area);
     }
@@ -231,10 +227,10 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         )
         .dark_gray()
     } else if let Some(r) = &b.results {
-        let text = if r.items.is_empty() {
-            "Eşleşen öğe yok."
+        let text = if r.rows.is_empty() {
+            "Sonuç yok."
         } else {
-            "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır."
+            r.note.as_str()
         };
         Line::from(text).dark_gray()
     } else {
@@ -265,7 +261,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     };
     f.render_widget(status, status_area);
 
-    let footer_keys: &[(&str, &str)] = if b.confirm.is_some() {
+    let footer_keys: &[(&str, &str)] = if b.report_menu.is_some() {
+        &[("↑↓", "seç"), ("Enter", "çalıştır"), ("Esc", "kapat")]
+    } else if b.confirm.is_some() {
         &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]
     } else if b.deleting.is_some() {
         &[("q", "çık")]
@@ -287,9 +285,10 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Space", "seç"),
             ("t", "tümü"),
             ("x", "seçilileri çöpe taşı"),
-            ("Enter", "konuma git"),
-            ("/", "yeni arama"),
-            ("Esc", "listeye dön"),
+            ("Enter", "aç / konuma git"),
+            ("/", "ara"),
+            ("m", "raporlar"),
+            ("Esc", "geri"),
             ("q", "çık"),
         ]
     } else {
@@ -298,6 +297,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Enter", "gir"),
             ("⌫", "geri"),
             ("/", "ara"),
+            ("m", "raporlar"),
             ("i", "özet"),
             ("s", "sırala"),
             ("a", "görünen/diskte"),
@@ -309,9 +309,53 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     };
     f.render_widget(keys(footer_keys), footer);
 
+    if let Some(sel) = b.report_menu {
+        render_report_menu(f, sel, f.area());
+    }
     if let Some(ids) = &b.confirm {
         render_confirm(f, &b.tree, ids, mode, f.area());
     }
+}
+
+fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
+    let width = area.width.saturating_sub(4).min(84);
+    let mut lines = vec![Line::from("")];
+    for (i, kind) in ReportKind::ALL.iter().enumerate() {
+        let marker = if i == selected { "▶ " } else { "  " };
+        let style = if i == selected {
+            HIGHLIGHT
+        } else {
+            Style::new()
+        };
+        lines.push(
+            Line::from(vec![
+                Span::raw(marker),
+                Span::raw(format!("{}. ", i + 1)).dark_gray(),
+                Span::raw(kind.label()).white().bold(),
+            ])
+            .style(style),
+        );
+        lines.push(Line::from(format!("       {}", kind.description())).dark_gray());
+    }
+    lines.push(Line::from(""));
+    lines.push(Line::from(" Raporlar bulunduğunuz klasörün altında çalışır.").dark_gray());
+
+    let height = (lines.len() as u16 + 2).min(area.height);
+    let popup = Rect {
+        x: area.x + (area.width.saturating_sub(width)) / 2,
+        y: area.y + (area.height.saturating_sub(height)) / 2,
+        width,
+        height,
+    };
+    f.render_widget(Clear, popup);
+    f.render_widget(
+        Paragraph::new(lines).block(
+            Block::bordered()
+                .title(Span::raw(" Raporlar ").white().bold())
+                .border_style(Style::new().fg(Color::Cyan)),
+        ),
+        popup,
+    );
 }
 
 /// Terminal width from which the creation date column is shown.
@@ -379,36 +423,52 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
     f.render_stateful_widget(table, area, &mut b.table);
 }
 
-fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeMode, area: Rect) {
+fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
     let now = now_secs();
     let wide = area.width >= WIDE;
-    let rows = r.items.iter().enumerate().map(|(i, &id)| {
-        let n = tree.node(id);
+    let has_detail = r.rows.iter().any(|row| !row.detail.is_empty());
+    let rows = r.rows.iter().enumerate().map(|(i, row)| {
         let check = if r.checked[i] {
             Span::raw("[✓]").green().bold()
         } else {
             Span::raw("[ ]").dark_gray()
         };
-        let label = if n.is_dir {
-            Span::styled(r.labels[i].clone(), Style::new().fg(Color::Blue).bold())
+        // Groups show their member count and newest member; single entries
+        // their file count (directories) and own dates.
+        let (count, modified, created) = if row.group {
+            let newest = row.nodes.iter().map(|&id| tree.node(id).modified).max();
+            (
+                format!("{} adet", fmt_count(row.nodes.len() as u64)),
+                newest.unwrap_or(0),
+                0,
+            )
         } else {
-            Span::raw(r.labels[i].clone())
+            let n = tree.node(row.nodes[0]);
+            let count = if n.is_dir {
+                fmt_count(n.file_count.into())
+            } else {
+                String::new()
+            };
+            (count, n.modified, n.created)
         };
-        let count = if n.is_dir {
-            fmt_count(n.file_count.into())
+        let label_style = if row.group || tree.node(row.nodes[0]).is_dir {
+            Style::new().fg(Color::Blue).bold()
         } else {
-            String::new()
+            Style::new()
         };
         let mut cells = vec![
             Cell::from(check),
-            Cell::from(Line::from(fmt_size(n.size.get(mode))).right_aligned()),
+            Cell::from(Line::from(fmt_size(row.size())).right_aligned()),
             Cell::from(Line::from(count).right_aligned().dark_gray()),
-            date_cell(n.modified, now),
+            date_cell(modified, now),
         ];
         if wide {
-            cells.push(date_cell(n.created, now));
+            cells.push(date_cell(created, now));
         }
-        cells.push(Cell::from(label));
+        cells.push(Cell::from(Span::styled(row.label.clone(), label_style)));
+        if has_detail {
+            cells.push(Cell::from(Span::raw(row.detail.clone()).dark_gray()));
+        }
         Row::new(cells)
     });
 
@@ -418,13 +478,17 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut SearchResults, mode: SizeM
         Constraint::Length(10),
         Constraint::Length(DATE_WIDTH),
     ];
-    let mut header = vec!["", "Boyut", "Dosya", "Son değişiklik"];
+    let mut header = vec!["", "Boyut", "Adet", "Son değişiklik"];
     if wide {
         widths.push(Constraint::Length(DATE_WIDTH));
         header.push("Oluşturma");
     }
     widths.push(Constraint::Min(10));
     header.push("Konum");
+    if has_detail {
+        widths.push(Constraint::Length(30));
+        header.push("Ayrıntı");
+    }
 
     let table = Table::new(rows, widths)
         .header(Row::new(header).bold().underlined())

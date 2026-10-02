@@ -1,5 +1,6 @@
 //! Application state and key handling.
 
+use std::collections::HashSet;
 use std::path::PathBuf;
 use std::sync::mpsc::TryRecvError;
 use std::time::Duration;
@@ -9,6 +10,8 @@ use ratatui::widgets::TableState;
 
 use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
+use crate::lists::{ResultList, Row};
+use crate::reports::{self, ReportKind};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::search;
 use crate::stats::{self, Stats};
@@ -52,41 +55,6 @@ pub enum Screen {
 pub struct Status {
     pub text: String,
     pub error: bool,
-}
-
-/// Entries found by a name search, shown in place of the directory listing.
-pub struct SearchResults {
-    pub pattern: String,
-    /// Directory the search ran in.
-    pub base: NodeId,
-    pub items: Vec<NodeId>,
-    /// Path of each item relative to `base`.
-    pub labels: Vec<String>,
-    pub checked: Vec<bool>,
-    pub table: TableState,
-}
-
-impl SearchResults {
-    pub fn checked_ids(&self) -> Vec<NodeId> {
-        self.items
-            .iter()
-            .zip(&self.checked)
-            .filter_map(|(&id, &c)| c.then_some(id))
-            .collect()
-    }
-
-    fn remove(&mut self, id: NodeId) {
-        if let Some(i) = self.items.iter().position(|&x| x == id) {
-            self.items.remove(i);
-            self.labels.remove(i);
-            self.checked.remove(i);
-            if self.items.is_empty() {
-                self.table.select(None);
-            } else if self.table.selected().is_some_and(|s| s >= self.items.len()) {
-                self.table.select(Some(self.items.len() - 1));
-            }
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -157,8 +125,12 @@ pub struct Browser {
     pub size_mode: SizeMode,
     /// Search pattern being typed.
     pub input: Option<String>,
-    pub results: Option<SearchResults>,
+    pub results: Option<ResultList>,
     pub dashboard: Option<Dashboard>,
+    /// Selected row of the open report menu.
+    pub report_menu: Option<usize>,
+    /// Report to run once the "preparing" message has been drawn.
+    pending_report: Option<(ReportKind, u8)>,
     /// Entries awaiting a yes/no answer before being moved to the trash.
     pub confirm: Option<Vec<NodeId>>,
     pub deleting: Option<Deletion>,
@@ -186,6 +158,8 @@ impl Browser {
             input: None,
             results: None,
             dashboard: None,
+            report_menu: None,
+            pending_report: None,
             confirm: None,
             deleting: None,
             status: None,
@@ -300,6 +274,10 @@ impl Browser {
             SizeMode::Disk => SizeMode::Apparent,
         };
         self.refresh_dashboard();
+        if let Some(r) = &mut self.results {
+            let (tree, mode) = (&self.tree, self.size_mode);
+            r.resize(&|id| tree.node(id).size.get(mode));
+        }
         // Re-sort, keeping the cursor on the same entry.
         let selected = self.selected();
         self.load(self.current, 0);
@@ -320,34 +298,87 @@ impl Browser {
         if pat.is_empty() {
             return;
         }
-        let base = self.current;
-        let tree = &self.tree;
-        let mode = self.size_mode;
+        let (tree, base, mode) = (&self.tree, self.current, self.size_mode);
         let mut items = search::find(tree, base, &pat);
         items.sort_by_key(|&id| std::cmp::Reverse(tree.node(id).size.get(mode)));
-        let base_path = tree.path_of(base);
-        let labels = items
-            .iter()
-            .map(|&id| {
-                let path = tree.path_of(id);
-                let rel = path.strip_prefix(&base_path).unwrap_or(&path);
-                let mut label = rel.display().to_string();
-                if tree.node(id).is_dir {
-                    label.push('/');
-                }
-                label
-            })
+        let rows = items
+            .into_iter()
+            .map(|id| Row::single(tree, base, id, mode, String::new()))
             .collect();
-        let mut table = TableState::default();
-        table.select((!items.is_empty()).then_some(0));
-        self.results = Some(SearchResults {
-            pattern,
-            base,
-            checked: vec![true; items.len()],
-            items,
-            labels,
-            table,
-        });
+        // Search results start checked: the user typed exactly what to find.
+        let mut list = ResultList::new(format!("Arama „{pattern}”"), base, rows, true);
+        list.note = "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır.".into();
+        list.pattern = Some(pattern);
+        self.results = Some(list);
+    }
+
+    fn request_report(&mut self, kind: ReportKind) {
+        self.report_menu = None;
+        self.dashboard = None;
+        self.set_status(format!("Rapor hazırlanıyor: {}…", kind.label()), false);
+        // Skip one frame so the message is drawn before the work starts.
+        self.pending_report = Some((kind, 1));
+    }
+
+    fn poll_report(&mut self) {
+        let Some((kind, frames)) = &mut self.pending_report else {
+            return;
+        };
+        if *frames > 0 {
+            *frames -= 1;
+            return;
+        }
+        let kind = *kind;
+        self.pending_report = None;
+        self.status = None;
+        match kind {
+            ReportKind::Apps | ReportKind::Duplicates => {
+                self.set_status(format!("{}: henüz hazır değil.", kind.label()), true);
+            }
+            _ => {
+                let now = crate::ui::now_secs();
+                let list = reports::run(&self.tree, self.current, self.size_mode, now, kind);
+                self.results = Some(list);
+            }
+        }
+    }
+
+    /// Opens the members of the selected group row.
+    fn drill_down(&mut self) {
+        let Some(r) = &self.results else {
+            return;
+        };
+        let Some(row) = r.selected_row() else {
+            return;
+        };
+        let (tree, mode) = (&self.tree, self.size_mode);
+        let rows: Vec<Row> = row
+            .nodes
+            .iter()
+            .map(|&id| Row::single(tree, r.base, id, mode, String::new()))
+            .collect();
+        let mut list = ResultList::new(format!("{} › {}", r.title, row.label), r.base, rows, false);
+        if r.keep_one {
+            // Keep the copy that has existed longest; check the rest.
+            let age = |id: NodeId| {
+                let n = tree.node(id);
+                if n.created != 0 {
+                    n.created
+                } else {
+                    n.modified
+                }
+            };
+            if let Some(keep) = (0..row.nodes.len()).min_by_key(|&i| (age(row.nodes[i]), i)) {
+                list.checked = (0..row.nodes.len()).map(|i| i != keep).collect();
+                list.note = format!(
+                    "En eski kopya ({}) korunuyor; diğerleri seçili.",
+                    list.rows[keep].label
+                );
+            }
+        }
+        if let Some(r) = &mut self.results {
+            r.drill_into(list);
+        }
     }
 
     fn request_delete(&mut self, ids: Vec<NodeId>) {
@@ -403,7 +434,7 @@ impl Browser {
                     self.trashed += size;
                     self.batch_trashed += size;
                     if let Some(r) = &mut self.results {
-                        r.remove(id);
+                        r.remove_nodes(&HashSet::from([id]));
                     }
                 }
                 Err(err) => self
@@ -454,6 +485,9 @@ impl Browser {
             }
             return Action::None;
         }
+        if self.pending_report.is_some() {
+            return Action::None;
+        }
         if let Some(input) = &mut self.input {
             match code {
                 KeyCode::Char(c) => input.push(c),
@@ -471,6 +505,21 @@ impl Browser {
             return Action::None;
         }
         self.status = None;
+        if let Some(sel) = &mut self.report_menu {
+            let n = ReportKind::ALL.len();
+            match code {
+                KeyCode::Up | KeyCode::Char('k') => *sel = (*sel + n - 1) % n,
+                KeyCode::Down | KeyCode::Char('j') => *sel = (*sel + 1) % n,
+                KeyCode::Enter => {
+                    let kind = ReportKind::ALL[*sel];
+                    self.request_report(kind);
+                }
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Esc | KeyCode::Char('m') => self.report_menu = None,
+                _ => {}
+            }
+            return Action::None;
+        }
         if self.dashboard.is_some() {
             return self.on_key_dashboard(code);
         }
@@ -491,6 +540,7 @@ impl Browser {
             KeyCode::Char('a') => self.toggle_size_mode(),
             KeyCode::Char('/') => self.input = Some(String::new()),
             KeyCode::Char('i') => self.open_dashboard(),
+            KeyCode::Char('m') => self.report_menu = Some(0),
             KeyCode::Char('x') | KeyCode::Delete => {
                 if let Some(id) = self.selected() {
                     self.request_delete(vec![id]);
@@ -556,30 +606,28 @@ impl Browser {
             KeyCode::PageDown => r.table.scroll_down_by(20),
             KeyCode::Home | KeyCode::Char('g') => r.table.select_first(),
             KeyCode::End | KeyCode::Char('G') => r.table.select_last(),
-            KeyCode::Char(' ') => {
-                if let Some(i) = r.table.selected().filter(|&i| i < r.checked.len()) {
-                    r.checked[i] = !r.checked[i];
-                    r.table.select_next();
-                }
-            }
-            KeyCode::Char('t') => {
-                let all = r.checked.iter().all(|&c| c);
-                r.checked.iter_mut().for_each(|c| *c = !all);
-            }
+            KeyCode::Char(' ') => r.toggle_selected(),
+            KeyCode::Char('t') => r.toggle_all(),
             KeyCode::Char('x') | KeyCode::Delete => {
-                let ids = r.checked_ids();
+                let ids = r.checked_nodes();
                 self.request_delete(ids);
             }
-            KeyCode::Char('/') => self.input = Some(r.pattern.clone()),
+            KeyCode::Char('/') => self.input = Some(r.pattern.clone().unwrap_or_default()),
+            KeyCode::Char('m') => self.report_menu = Some(0),
             KeyCode::Char('a') => self.toggle_size_mode(),
-            KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
-                let target = r.table.selected().and_then(|i| r.items.get(i).copied());
-                self.results = None;
-                if let Some(id) = target {
+            KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => match r.selected_row() {
+                Some(row) if row.group => self.drill_down(),
+                Some(row) => {
+                    let id = row.nodes[0];
+                    self.results = None;
                     self.reveal(id);
                 }
-            }
+                None => {}
+            },
             KeyCode::Esc | KeyCode::Backspace | KeyCode::Left | KeyCode::Char('h') => {
+                if r.back() {
+                    return Action::None;
+                }
                 self.results = None;
                 let row = self.table.selected().unwrap_or(0);
                 self.load(self.current, row);
@@ -643,6 +691,7 @@ impl App {
         self.tick = self.tick.wrapping_add(1);
         if let Some(b) = &mut self.browser {
             b.poll_delete();
+            b.poll_report();
         }
         let Some(handle) = &self.scan else { return };
         loop {

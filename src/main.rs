@@ -1,6 +1,8 @@
 mod app;
 mod delete;
 mod disks;
+mod lists;
+mod reports;
 mod scanner;
 mod search;
 mod stats;
