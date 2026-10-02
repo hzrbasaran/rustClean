@@ -11,7 +11,8 @@ use ratatui::widgets::TableState;
 use crate::apps;
 use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
-use crate::lists::{ResultList, Row};
+use crate::duplicates::{self, DupJob};
+use crate::lists::{ResultList, Row, RowSize};
 use crate::reports::{self, ReportKind};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::search;
@@ -132,6 +133,8 @@ pub struct Browser {
     pub report_menu: Option<usize>,
     /// Report to run once the "preparing" message has been drawn.
     pending_report: Option<(ReportKind, u8)>,
+    /// Running duplicate search.
+    pub dup_job: Option<DupJob>,
     /// Entries awaiting a yes/no answer before being moved to the trash.
     pub confirm: Option<Vec<NodeId>>,
     pub deleting: Option<Deletion>,
@@ -161,6 +164,7 @@ impl Browser {
             dashboard: None,
             report_menu: None,
             pending_report: None,
+            dup_job: None,
             confirm: None,
             deleting: None,
             status: None,
@@ -337,7 +341,15 @@ impl Browser {
                 self.results = Some(apps::run(&self.tree, self.current, self.size_mode));
             }
             ReportKind::Duplicates => {
-                self.set_status(format!("{}: henüz hazır değil.", kind.label()), true);
+                let cands = duplicates::candidates(&self.tree, self.current);
+                if cands.is_empty() {
+                    let mut list =
+                        ResultList::new(kind.label().to_string(), self.current, Vec::new(), false);
+                    list.note = "1 MiB üzerinde aynı boyutta iki dosya yok.".into();
+                    self.results = Some(list);
+                } else {
+                    self.dup_job = Some(DupJob::start(self.current, cands));
+                }
             }
             _ => {
                 let now = crate::ui::now_secs();
@@ -345,6 +357,57 @@ impl Browser {
                 self.results = Some(list);
             }
         }
+    }
+
+    /// Turns a finished duplicate search into a report.
+    fn poll_dups(&mut self) {
+        let Some(job) = &self.dup_job else {
+            return;
+        };
+        let Some(groups) = job.poll() else {
+            return;
+        };
+        let base = job.base;
+        self.dup_job = None;
+        let (tree, mode) = (&self.tree, self.size_mode);
+        let mut rows: Vec<Row> = groups
+            .into_iter()
+            .map(|ids| {
+                let first = ids[0];
+                let detail = format!(
+                    "{} kopya · her biri {}",
+                    ids.len(),
+                    crate::ui::fmt_size(tree.node(first).size.get(mode))
+                );
+                let members = ids
+                    .iter()
+                    .map(|&id| (id, tree.node(id).size.get(mode)))
+                    .collect();
+                Row::group(
+                    tree.name(first).to_string(),
+                    detail,
+                    members,
+                    RowSize::Wasted,
+                    2,
+                )
+            })
+            .collect();
+        rows.sort_by_key(|r| std::cmp::Reverse(r.size()));
+        let truncated = rows.len() > reports::LIMIT;
+        rows.truncate(reports::LIMIT);
+        let mut list = ResultList::new(
+            ReportKind::Duplicates.label().to_string(),
+            base,
+            rows,
+            false,
+        );
+        list.truncated = truncated;
+        list.keep_one = true;
+        list.note =
+            "Boyut: kopyalar silinince açılacak yer. Enter: kopyaları gör (en eskisi korunur). \
+                     APFS klonları blok paylaştığından silmek yer açmayabilir."
+                .into();
+        self.results = Some(list);
     }
 
     /// Opens the members of the selected group row.
@@ -491,6 +554,17 @@ impl Browser {
             return Action::None;
         }
         if self.pending_report.is_some() {
+            return Action::None;
+        }
+        if self.dup_job.is_some() {
+            match code {
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Esc => {
+                    self.dup_job = None; // dropping the job cancels it
+                    self.set_status("Kopya araması iptal edildi.", true);
+                }
+                _ => {}
+            }
             return Action::None;
         }
         if let Some(input) = &mut self.input {
@@ -697,6 +771,7 @@ impl App {
         if let Some(b) = &mut self.browser {
             b.poll_delete();
             b.poll_report();
+            b.poll_dups();
         }
         let Some(handle) = &self.scan else { return };
         loop {

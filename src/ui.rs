@@ -207,7 +207,29 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         render_entries(f, b, table_area);
     }
 
-    let status = if let Some(input) = &b.input {
+    let status = if let Some(job) = &b.dup_job {
+        use std::sync::atomic::Ordering::Relaxed;
+        let p = &job.progress;
+        let (done, total) = (p.done.load(Relaxed), p.total.load(Relaxed));
+        let spin = SPINNER[app.tick % SPINNER.len()];
+        let step = match p.stage.load(Relaxed) {
+            0 => "aynı boyuttaki dosyalar bulunuyor".to_string(),
+            1 => format!(
+                "1/2 dosya uçları karşılaştırılıyor: {} / {}",
+                fmt_count(done),
+                fmt_count(total)
+            ),
+            _ => format!(
+                "2/2 içerikler okunuyor: {} / {}",
+                fmt_size(done),
+                fmt_size(total)
+            ),
+        };
+        Line::from(vec![
+            Span::raw(format!("{spin} Kopyalar aranıyor — {step}")).cyan(),
+            Span::raw("   Esc: iptal").dark_gray(),
+        ])
+    } else if let Some(input) = &b.input {
         Line::from(vec![
             Span::raw(" Ara: ").black().on_yellow().bold(),
             Span::raw(format!(" {input}")),
@@ -261,7 +283,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     };
     f.render_widget(status, status_area);
 
-    let footer_keys: &[(&str, &str)] = if b.report_menu.is_some() {
+    let footer_keys: &[(&str, &str)] = if b.dup_job.is_some() {
+        &[("Esc", "iptal"), ("q", "çık")]
+    } else if b.report_menu.is_some() {
         &[("↑↓", "seç"), ("Enter", "çalıştır"), ("Esc", "kapat")]
     } else if b.confirm.is_some() {
         &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]

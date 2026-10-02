@@ -1,9 +1,10 @@
 //! Predefined reports over the directory being browsed.
 
 use std::cmp::Reverse;
-use std::collections::hash_map::DefaultHasher;
 use std::collections::{BinaryHeap, HashMap};
-use std::hash::Hasher;
+use std::hash::{BuildHasherDefault, Hasher};
+
+use xxhash_rust::xxh3::xxh3_64;
 
 use crate::lists::{ResultList, Row, RowSize};
 use crate::stats::DAY;
@@ -335,18 +336,43 @@ fn caches(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     )
 }
 
-/// Case-insensitive hash of a file name, without allocating.
+/// Case-insensitive hash of a file name; ASCII names (nearly all) are
+/// lowercased on the stack.
 fn name_hash(name: &str) -> u64 {
-    let mut h = DefaultHasher::new();
-    for c in name.chars().flat_map(char::to_lowercase) {
-        h.write_u32(c as u32);
+    let mut buf = [0u8; 255];
+    if name.is_ascii() && name.len() <= buf.len() {
+        let lower = &mut buf[..name.len()];
+        lower.copy_from_slice(name.as_bytes());
+        lower.make_ascii_lowercase();
+        xxh3_64(lower)
+    } else {
+        xxh3_64(name.to_lowercase().as_bytes())
     }
-    h.finish()
 }
+
+/// The keys are already hashes; hashing them again would only cost time.
+#[derive(Default)]
+struct IdentityHasher(u64);
+
+impl Hasher for IdentityHasher {
+    fn finish(&self) -> u64 {
+        self.0
+    }
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.0 = (self.0 << 8) | u64::from(b);
+        }
+    }
+    fn write_u64(&mut self, n: u64) {
+        self.0 = n;
+    }
+}
+
+type HashKeyed<V> = HashMap<u64, V, BuildHasherDefault<IdentityHasher>>;
 
 fn repeated_names(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     // Pass 1: count per name (by hash, to keep memory small on big disks).
-    let mut counts: HashMap<u64, (u32, u64)> = HashMap::new();
+    let mut counts: HashKeyed<(u32, u64)> = HashKeyed::default();
     walk(tree, base, |id| {
         let n = tree.node(id);
         if !n.is_dir {
@@ -364,7 +390,7 @@ fn repeated_names(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     repeated.sort_by_key(|&(h, count, size)| (Reverse(count), Reverse(size), h));
     let truncated = repeated.len() > LIMIT;
     repeated.truncate(LIMIT);
-    let order: HashMap<u64, usize> = repeated
+    let order: HashKeyed<usize> = repeated
         .iter()
         .enumerate()
         .map(|(i, &(h, ..))| (h, i))
