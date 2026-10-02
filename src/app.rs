@@ -7,9 +7,10 @@ use std::time::Duration;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::widgets::TableState;
 
+use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
-use crate::tree::{NodeId, SizeMode, Tree, ROOT};
+use crate::tree::{NodeId, Size, SizeMode, Tree, ROOT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SortMode {
@@ -42,6 +43,12 @@ pub enum Screen {
     Browser,
 }
 
+/// One-line feedback shown under the file list.
+pub struct Status {
+    pub text: String,
+    pub error: bool,
+}
+
 pub struct Browser {
     pub tree: Tree,
     pub errors: u64,
@@ -52,6 +59,13 @@ pub struct Browser {
     pub table: TableState,
     pub sort: SortMode,
     pub size_mode: SizeMode,
+    /// Entry awaiting a yes/no answer before being moved to the trash.
+    pub confirm: Option<NodeId>,
+    /// Entry currently being moved to the trash.
+    pub deleting: Option<(NodeId, Deletion)>,
+    pub status: Option<Status>,
+    /// Total moved to the trash during this session.
+    pub trashed: Size,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
 }
@@ -67,6 +81,10 @@ impl Browser {
             table: TableState::default(),
             sort: SortMode::Size,
             size_mode: SizeMode::Disk,
+            confirm: None,
+            deleting: None,
+            status: None,
+            trashed: Size::default(),
             history: Vec::new(),
         };
         b.load(ROOT, 0);
@@ -113,6 +131,59 @@ impl Browser {
     fn cycle_sort(&mut self) {
         self.sort = self.sort.next();
         self.load(self.current, 0);
+    }
+
+    fn set_status(&mut self, text: impl Into<String>, error: bool) {
+        self.status = Some(Status {
+            text: text.into(),
+            error,
+        });
+    }
+
+    fn request_delete(&mut self) {
+        let Some(id) = self.selected() else { return };
+        match delete::check(&self.tree.path_of(id), &disks::all_mount_points()) {
+            Ok(()) => self.confirm = Some(id),
+            Err(msg) => self.set_status(msg, true),
+        }
+    }
+
+    fn confirm_delete(&mut self) {
+        if let Some(id) = self.confirm.take() {
+            let path = self.tree.path_of(id);
+            self.set_status(format!("Çöp kutusuna taşınıyor: {}", path.display()), false);
+            self.deleting = Some((id, Deletion::start(path)));
+        }
+    }
+
+    /// Applies the result of a finished trash operation.
+    fn poll_delete(&mut self) {
+        let Some((id, deletion)) = &self.deleting else {
+            return;
+        };
+        let Some(result) = deletion.poll() else {
+            return;
+        };
+        let id = *id;
+        self.deleting = None;
+        let name = self.tree.name(id).to_string();
+        match result {
+            Ok(()) => {
+                let size = self.tree.node(id).size;
+                self.tree.remove(id);
+                self.trashed += size;
+                let row = self.table.selected().unwrap_or(0);
+                self.load(self.current, row);
+                self.set_status(
+                    format!(
+                        "✓ {name} çöp kutusuna taşındı ({}). Yer, çöp kutusu boşaltılınca açılır.",
+                        crate::ui::fmt_size(size.get(self.size_mode))
+                    ),
+                    false,
+                );
+            }
+            Err(err) => self.set_status(format!("✗ {name} taşınamadı: {err}"), true),
+        }
     }
 
     fn toggle_size_mode(&mut self) {
@@ -180,6 +251,9 @@ impl App {
     /// Drains messages from a running scan.
     pub fn on_tick(&mut self) {
         self.tick = self.tick.wrapping_add(1);
+        if let Some(b) = &mut self.browser {
+            b.poll_delete();
+        }
         let Some(handle) = &self.scan else { return };
         loop {
             match handle.rx.try_recv() {
@@ -248,6 +322,20 @@ impl App {
 
     fn on_key_browser(&mut self, code: KeyCode) {
         let Some(b) = &mut self.browser else { return };
+        if b.deleting.is_some() {
+            if code == KeyCode::Char('q') {
+                self.should_quit = true;
+            }
+            return;
+        }
+        if b.confirm.is_some() {
+            match code {
+                KeyCode::Char('e' | 'E' | 'y' | 'Y') => b.confirm_delete(),
+                _ => b.confirm = None,
+            }
+            return;
+        }
+        b.status = None;
         match code {
             KeyCode::Char('q') => self.should_quit = true,
             KeyCode::Up | KeyCode::Char('k') => b.table.select_previous(),
@@ -260,6 +348,7 @@ impl App {
             KeyCode::Backspace | KeyCode::Left | KeyCode::Char('h') | KeyCode::Esc => b.back(),
             KeyCode::Char('s') => b.cycle_sort(),
             KeyCode::Char('a') => b.toggle_size_mode(),
+            KeyCode::Char('x') | KeyCode::Delete => b.request_delete(),
             KeyCode::Char('r') => {
                 let root = b.tree.root_path().to_path_buf();
                 self.browser = None;

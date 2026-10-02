@@ -6,7 +6,7 @@
 //! are `u32`, children form a sibling-linked list and all names share one
 //! byte buffer.
 
-use std::ops::AddAssign;
+use std::ops::{AddAssign, SubAssign};
 use std::path::{Path, PathBuf};
 
 pub type NodeId = u32;
@@ -40,6 +40,13 @@ impl AddAssign for Size {
     fn add_assign(&mut self, rhs: Self) {
         self.apparent += rhs.apparent;
         self.disk += rhs.disk;
+    }
+}
+
+impl SubAssign for Size {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.apparent = self.apparent.saturating_sub(rhs.apparent);
+        self.disk = self.disk.saturating_sub(rhs.disk);
     }
 }
 
@@ -107,6 +114,38 @@ impl Tree {
             is_dir,
         });
         id
+    }
+
+    /// Detaches `id` (and everything below it) from the tree and subtracts its
+    /// size and file count from every ancestor. Call after `finalize`. The
+    /// node's storage is not reclaimed.
+    pub fn remove(&mut self, id: NodeId) {
+        let Some(parent) = self.parent(id) else {
+            return;
+        };
+        let next = self.node(id).next_sibling;
+        if self.node(parent).first_child == id {
+            self.nodes[parent as usize].first_child = next;
+        } else {
+            let mut cur = self.node(parent).first_child;
+            while cur != NONE && self.node(cur).next_sibling != id {
+                cur = self.node(cur).next_sibling;
+            }
+            if cur == NONE {
+                return; // already detached
+            }
+            self.nodes[cur as usize].next_sibling = next;
+        }
+        self.nodes[id as usize].next_sibling = NONE;
+
+        let (size, count) = (self.node(id).size, self.node(id).file_count);
+        let mut ancestor = Some(parent);
+        while let Some(a) = ancestor {
+            let n = &mut self.nodes[a as usize];
+            n.size -= size;
+            n.file_count = n.file_count.saturating_sub(count);
+            ancestor = self.parent(a);
+        }
     }
 
     /// Rolls file sizes and counts up into their parent directories.
@@ -221,6 +260,35 @@ mod tests {
         assert_eq!(t.children(b).count(), 0);
         assert_eq!(t.parent(c), Some(a));
         assert_eq!(t.parent(ROOT), None);
+    }
+
+    #[test]
+    fn remove_updates_ancestors() {
+        let mut t = Tree::new(Path::new("/r"));
+        let a = t.push(ROOT, "a", true, sz(0, 0));
+        let f1 = t.push(a, "f1", false, sz(10, 100));
+        let b = t.push(a, "b", true, sz(0, 0));
+        t.push(b, "f2", false, sz(5, 50));
+        let f3 = t.push(a, "f3", false, sz(1, 10));
+        t.finalize();
+
+        // Middle of the sibling list (children are prepended: f3, b, f1).
+        t.remove(b);
+        assert_eq!(t.node(a).size, sz(11, 110));
+        assert_eq!(t.node(ROOT).size, sz(11, 110));
+        assert_eq!(t.node(ROOT).file_count, 2);
+        let mut kids: Vec<_> = t.children(a).collect();
+        kids.sort();
+        assert_eq!(kids, vec![f1, f3]);
+
+        // Head of the list, then removing twice is a no-op.
+        t.remove(f3);
+        t.remove(f3);
+        assert_eq!(t.children(a).collect::<Vec<_>>(), vec![f1]);
+        assert_eq!(t.node(ROOT).size, sz(10, 100));
+
+        t.remove(ROOT);
+        assert_eq!(t.node(ROOT).size, sz(10, 100));
     }
 
     #[test]

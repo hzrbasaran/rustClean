@@ -5,7 +5,7 @@ use std::path::Path;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style, Stylize};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Cell, Paragraph, Row, Table};
+use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
 use crate::app::{App, Screen};
@@ -232,32 +232,117 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
     f.render_stateful_widget(table, table_area, &mut b.table);
 
-    let mut status = vec![Span::raw(format!(
-        "{} öğe tarandı, {:.1} sn",
-        fmt_count(tree.len() as u64),
-        b.elapsed.as_secs_f64()
-    ))
-    .dark_gray()];
-    if b.errors > 0 {
-        status.push(Span::raw(format!("   ⚠ {} öğeye erişilemedi", fmt_count(b.errors))).yellow());
-    }
-    if b.entries.is_empty() {
-        status.push(Span::raw("   (klasör boş)").dark_gray());
-    }
-    f.render_widget(Line::from(status), status_area);
+    let status = if let Some(st) = &b.status {
+        let style = if st.error {
+            Style::new().fg(Color::Red)
+        } else {
+            Style::new().fg(Color::Green)
+        };
+        Line::from(Span::styled(st.text.clone(), style))
+    } else {
+        let mut spans = vec![Span::raw(format!(
+            "{} öğe tarandı, {:.1} sn",
+            fmt_count(tree.len() as u64),
+            b.elapsed.as_secs_f64()
+        ))
+        .dark_gray()];
+        if b.errors > 0 {
+            spans.push(
+                Span::raw(format!("   ⚠ {} öğeye erişilemedi", fmt_count(b.errors))).yellow(),
+            );
+        }
+        if b.trashed.get(mode) > 0 {
+            spans.push(
+                Span::raw(format!(
+                    "   🗑 bu oturumda çöpe taşınan: {}",
+                    fmt_size(b.trashed.get(mode))
+                ))
+                .green(),
+            );
+        }
+        if b.entries.is_empty() {
+            spans.push(Span::raw("   (klasör boş)").dark_gray());
+        }
+        Line::from(spans)
+    };
+    f.render_widget(status, status_area);
 
-    f.render_widget(
-        keys(&[
+    let footer_keys: &[(&str, &str)] = if b.confirm.is_some() {
+        &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]
+    } else if b.deleting.is_some() {
+        &[("q", "çık")]
+    } else {
+        &[
             ("↑↓", "gez"),
             ("Enter", "gir"),
             ("⌫", "geri"),
             ("s", "sırala"),
             ("a", "görünen/diskte"),
+            ("x", "çöpe taşı"),
             ("r", "yeniden tara"),
             ("d", "diskler"),
             ("q", "çık"),
+        ]
+    };
+    f.render_widget(keys(footer_keys), footer);
+
+    if let Some(id) = b.confirm {
+        render_confirm(f, tree, id, mode, f.area());
+    }
+}
+
+fn render_confirm(
+    f: &mut Frame,
+    tree: &crate::tree::Tree,
+    id: crate::tree::NodeId,
+    mode: SizeMode,
+    area: Rect,
+) {
+    let n = tree.node(id);
+    let width = area.width.saturating_sub(4).min(72);
+    let inner_width = width.saturating_sub(4) as usize;
+    let mut lines = vec![
+        Line::from(""),
+        Line::from(truncate_path(&tree.path_of(id), inner_width)).bold(),
+        Line::from(""),
+        Line::from(format!("Boyut: {}", fmt_size(n.size.get(mode)))),
+    ];
+    if n.is_dir {
+        lines.push(Line::from(format!(
+            "İçindeki dosya: {}",
+            fmt_count(n.file_count.into())
+        )));
+    }
+    lines.extend([
+        Line::from(""),
+        Line::from("Bu öğe çöp kutusuna taşınacak.").dark_gray(),
+        Line::from(""),
+        Line::from(vec![
+            Span::raw(" e ").black().on_red().bold(),
+            Span::raw(" evet, taşı     "),
+            Span::raw(" h ").black().on_gray(),
+            Span::raw(" vazgeç"),
         ]),
-        footer,
+    ]);
+
+    let height = lines.len() as u16 + 2;
+    let popup = Rect {
+        x: area.x + (area.width.saturating_sub(width)) / 2,
+        y: area.y + (area.height.saturating_sub(height)) / 2,
+        width,
+        height: height.min(area.height),
+    };
+    f.render_widget(Clear, popup);
+    f.render_widget(
+        Paragraph::new(lines)
+            .wrap(Wrap { trim: false })
+            .centered()
+            .block(
+                Block::bordered()
+                    .title(" Çöp kutusuna taşınsın mı? ")
+                    .border_style(Style::new().fg(Color::Red)),
+            ),
+        popup,
     );
 }
 

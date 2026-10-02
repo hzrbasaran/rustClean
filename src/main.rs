@@ -1,4 +1,5 @@
 mod app;
+mod delete;
 mod disks;
 mod scanner;
 mod tree;
