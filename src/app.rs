@@ -18,6 +18,7 @@ use crate::reports::{self, MenuItem, ReportKind};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::search;
 use crate::stats::{self, Stats};
+use crate::system::{self, SystemInfo};
 use crate::tree::{NodeId, Size, SizeMode, Tree, ROOT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -148,6 +149,8 @@ pub struct Browser {
     pub report_menu: Option<usize>,
     /// Saved scans to compare with, and the selected one.
     pub snapshot_picker: Option<(Vec<history::Saved>, usize)>,
+    /// Open "system data" panel.
+    pub system: Option<SystemInfo>,
     /// Report to run once the "preparing" message has been drawn.
     pending_report: Option<(ReportKind, u8)>,
     /// Running duplicate search.
@@ -183,6 +186,7 @@ impl Browser {
             dashboard: None,
             report_menu: None,
             snapshot_picker: None,
+            system: None,
             pending_report: None,
             dup_job: None,
             snapshot_time: None,
@@ -342,7 +346,11 @@ impl Browser {
         match item {
             MenuItem::Report(kind) => self.request_report(kind),
             MenuItem::Changes => self.open_snapshot_picker(),
-            MenuItem::Tools | MenuItem::System => {
+            MenuItem::System => {
+                self.dashboard = None;
+                self.system = Some(system::collect());
+            }
+            MenuItem::Tools => {
                 self.set_status(format!("{}: henüz hazır değil.", item.label()), true);
             }
         }
@@ -741,6 +749,16 @@ impl Browser {
                 }
                 KeyCode::Char('q') => return Action::Quit,
                 KeyCode::Esc => self.snapshot_picker = None,
+                _ => {}
+            }
+            return Action::None;
+        }
+        if self.system.is_some() {
+            match code {
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Char('r') => self.system = Some(system::collect()),
+                KeyCode::Char('m') => self.report_menu = Some(0),
+                KeyCode::Esc | KeyCode::Backspace | KeyCode::Left => self.system = None,
                 _ => {}
             }
             return Action::None;

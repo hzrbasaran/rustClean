@@ -12,6 +12,7 @@ use crate::app::{App, Browser, Dashboard, Pane, Screen};
 use crate::lists::ResultList;
 use crate::reports::MenuItem;
 use crate::stats;
+use crate::system::{self, SystemInfo};
 use crate::tree::{NodeId, SizeMode, Tree};
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -168,7 +169,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         SizeMode::Apparent => "görünen",
     };
 
-    let heading = if let Some(d) = &b.dashboard {
+    let heading = if b.system.is_some() {
+        "Sistem verileri".to_string()
+    } else if let Some(d) = &b.dashboard {
         format!(
             "Özet — {}  │  {mode_label}",
             b.tree.path_of(d.base).display()
@@ -199,7 +202,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     let [table_area, status_area] =
         Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(body);
 
-    if let Some(d) = &mut b.dashboard {
+    if let Some(sys) = &b.system {
+        render_system(f, b, sys, table_area);
+    } else if let Some(d) = &mut b.dashboard {
         render_dashboard(f, &b.tree, d, mode, b.errors, table_area);
     } else if let Some(r) = &mut b.results {
         render_results(f, &b.tree, r, table_area);
@@ -243,6 +248,8 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             Style::new().fg(Color::Green)
         };
         Line::from(Span::styled(st.text.clone(), style))
+    } else if b.system.is_some() {
+        Line::from("Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.").gray()
     } else if b.dashboard.is_some() {
         Line::from(
             "„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.",
@@ -293,6 +300,13 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         &[("q", "çık")]
     } else if b.input.is_some() {
         &[("Enter", "ara"), ("Esc", "vazgeç")]
+    } else if b.system.is_some() {
+        &[
+            ("r", "yenile"),
+            ("m", "menü"),
+            ("Esc", "geri"),
+            ("q", "çık"),
+        ]
     } else if b.dashboard.is_some() {
         &[
             ("Tab", "liste değiştir"),
@@ -870,6 +884,161 @@ fn render_dashboard(
         table
     };
     f.render_stateful_widget(table, dirs, &mut d.dirs);
+}
+
+fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
+    let vol_rows = sys.main.as_ref().map_or(1, |c| c.volumes.len()) as u16;
+    let [top, mid, bottom] = Layout::vertical([
+        Constraint::Length(vol_rows + 4),
+        Constraint::Length(9),
+        Constraint::Min(3),
+    ])
+    .areas(area);
+    let [gap_area, other_area] = halves(mid);
+    let line = |label: &str, value: String| {
+        Line::from(vec![
+            Span::raw(format!("{label:<30}")).white(),
+            Span::raw(value).bold(),
+        ])
+    };
+
+    // APFS container and its volumes
+    let mut lines = Vec::new();
+    let title = match &sys.main {
+        Some(c) => {
+            let used = c.total.saturating_sub(c.free);
+            let ratio = used as f64 / c.total.max(1) as f64;
+            let bar_w = (top.width as usize).saturating_sub(60).max(10);
+            lines.push(Line::from(vec![
+                Span::raw(format!(
+                    "Toplam {}  ·  kullanılan {}  ·  boş {}   ",
+                    fmt_size(c.total),
+                    fmt_size(used),
+                    fmt_size(c.free)
+                )),
+                Span::styled(bar(ratio, bar_w), Style::new().fg(usage_color(ratio))),
+                Span::raw(format!(" %{:.0}", ratio * 100.0)).bold(),
+            ]));
+            lines.push(Line::from(""));
+            let mut vols = c.volumes.clone();
+            vols.sort_by_key(|v| std::cmp::Reverse(v.used));
+            for v in vols {
+                let ratio = v.used as f64 / c.total.max(1) as f64;
+                lines.push(Line::from(vec![
+                    Span::raw(format!("{:<26}", v.name)).white().bold(),
+                    Span::raw(format!("{:<38}", system::role_label(&v.role))).gray(),
+                    Span::raw(format!("{:>11}  ", fmt_size(v.used))),
+                    Span::styled(bar(ratio, 20), Style::new().fg(Color::Cyan)),
+                ]));
+            }
+            format!(" APFS kapsayıcısı ({}) ", c.reference)
+        }
+        None => {
+            lines.push(Line::from("APFS bilgisi alınamadı.").yellow());
+            " APFS kapsayıcısı ".to_string()
+        }
+    };
+    f.render_widget(Paragraph::new(lines).block(panel(&title, false)), top);
+
+    // What the scan cannot see
+    let scanned = b.tree.node(crate::tree::ROOT).size.disk;
+    let mut lines = Vec::new();
+    match sys.scannable_used() {
+        Some(expected) if b.tree.root_path() == std::path::Path::new("/") => {
+            lines.push(line("Sistem + Veri bölümleri", fmt_size(expected)));
+            lines.push(line("Taramanın bulduğu", fmt_size(scanned)));
+            if expected >= scanned {
+                lines.push(line("Taramanın göremediği", fmt_size(expected - scanned)).yellow());
+                lines.push(Line::from("Olası nedenler:").gray());
+                if b.errors > 0 {
+                    lines.push(Line::from(format!(
+                        " • erişilemeyen {} öğe — terminale Tam Disk Erişimi verin",
+                        fmt_count(b.errors)
+                    )));
+                }
+                if !sys.snapshots.is_empty() {
+                    lines.push(Line::from(format!(
+                        " • {} Time Machine yerel anlık görüntüsü",
+                        sys.snapshots.len()
+                    )));
+                }
+                lines.push(Line::from(
+                    " • silinebilir (purgeable) alan ve dosya sistemi meta verisi",
+                ));
+            } else {
+                lines.push(line("Fazla sayılan", fmt_size(scanned - expected)));
+                lines.push(
+                    Line::from(
+                        "APFS klonları ve kopyalar blok paylaşsa da tarama onları ayrı sayar.",
+                    )
+                    .gray(),
+                );
+            }
+        }
+        _ => {
+            lines.push(Line::from(
+                "Bu karşılaştırma için diskin kökünü (/) tarayın:",
+            ));
+            lines.push(Line::from("d → Macintosh HD").cyan());
+        }
+    }
+    f.render_widget(
+        Paragraph::new(lines)
+            .wrap(Wrap { trim: false })
+            .block(panel(" Taramanın göremediği ", false)),
+        gap_area,
+    );
+
+    // Snapshots and memory files
+    let mut lines = vec![line(
+        "Time Machine anlık görüntüsü",
+        format!("{} adet", sys.snapshots.len()),
+    )];
+    for name in sys.snapshots.iter().take(2) {
+        lines.push(Line::from(format!("  {name}")).gray());
+    }
+    if let Some(first) = sys.snapshots.first() {
+        let date = first
+            .trim_start_matches("com.apple.TimeMachine.")
+            .trim_end_matches(".local");
+        lines.push(
+            Line::from(format!(
+                "  silmek için: sudo tmutil deletelocalsnapshots {date}"
+            ))
+            .cyan(),
+        );
+    }
+    if let Some((total, used)) = sys.swap {
+        lines.push(line(
+            "Takas (swap)",
+            format!("{} / {}", fmt_size(used), fmt_size(total)),
+        ));
+    }
+    if let Some(sleep) = sys.sleepimage {
+        lines.push(line("Uyku görüntüsü (sleepimage)", fmt_size(sleep)));
+    }
+    f.render_widget(
+        Paragraph::new(lines).block(panel(" Anlık görüntüler ve bellek ", false)),
+        other_area,
+    );
+
+    // Simulator runtimes and problems
+    let mut lines = Vec::new();
+    if !sys.simulators.is_empty() {
+        let total: u64 = sys.simulators.iter().map(|c| c.used()).sum();
+        lines.push(line(
+            "Simülatör çalışma zamanları",
+            format!("{} imaj, {}", sys.simulators.len(), fmt_size(total)),
+        ));
+        lines.push(
+            Line::from("  Ayrı disk imajlarında durur, taramada görünmez. Temizlik: m → Geliştirici araçları temizliği")
+                .gray(),
+        );
+    }
+    for p in &sys.problems {
+        lines.push(Line::from(format!("⚠ {p}")).yellow());
+    }
+    f.render_widget(Paragraph::new(lines).block(panel(" Diğer ", false)), bottom);
 }
 
 fn halves(area: Rect) -> [Rect; 2] {

@@ -9,6 +9,7 @@ mod reports;
 mod scanner;
 mod search;
 mod stats;
+mod system;
 mod tree;
 mod ui;
 
