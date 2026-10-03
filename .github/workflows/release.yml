@@ -74,3 +74,35 @@ jobs:
           ' CHANGELOG.md > notes.md
           gh release create "$GITHUB_REF_NAME" dist/* \
             --title "rustClean $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+
+  # Points the Homebrew formula (hzrbasaran/homebrew-tap) at the new release.
+  # Needs the HOMEBREW_TAP_TOKEN secret: a fine-grained token with
+  # "Contents: read and write" on the tap repository only.
+  homebrew:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Update the formula
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [ -z "$TAP_TOKEN" ]; then
+            echo "::warning::HOMEBREW_TAP_TOKEN is not set; the Homebrew formula was not updated."
+            exit 0
+          fi
+          version="${GITHUB_REF_NAME#v}"
+          gh release download "$GITHUB_REF_NAME" -p SHA256SUMS.txt
+          git clone --depth 1 "https://x-access-token:${TAP_TOKEN}@github.com/hzrbasaran/homebrew-tap.git" tap
+          scripts/homebrew-formula.sh "$version" SHA256SUMS.txt > tap/Formula/rustclean.rb
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/rustclean.rb
+          if git diff --cached --quiet; then
+            echo "The formula is already up to date."
+            exit 0
+          fi
+          git commit -m "rustclean ${version}"
+          git push

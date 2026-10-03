@@ -13,6 +13,9 @@ follows [Semantic Versioning](https://semver.org/).
   ([#5](https://github.com/hzrbasaran/rustClean/issues/5)).
 
 ### Changed
+- Install with Homebrew: `brew install hzrbasaran/tap/rustclean`. The
+  release workflow updates the formula
+  ([#28](https://github.com/hzrbasaran/rustClean/issues/28)).
 - Dependencies: ratatui 0.30, sysinfo 0.39; release workflow actions updated.
 - On APFS, pure clones (`cp -c`, Finder duplicates) are counted once in the
   on-disk size, so a folder of clones no longer looks many times larger than

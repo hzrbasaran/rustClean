@@ -82,6 +82,15 @@ Note that moving to the trash does not free space until the trash is emptied.
 
 ## Installation
 
+### With Homebrew (macOS, Linux)
+
+```bash
+brew install hzrbasaran/tap/rustclean
+```
+
+Installs the pre-built binary for Apple Silicon, Intel Macs or Linux x86_64;
+`brew upgrade` picks up new releases.
+
 ### With Cargo
 
 ```bash
