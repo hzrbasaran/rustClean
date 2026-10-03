@@ -79,7 +79,7 @@ impl Deletion {
     }
 }
 
-fn trash_context() -> trash::TrashContext {
+pub(crate) fn trash_context() -> trash::TrashContext {
     #[allow(unused_mut)]
     let mut ctx = trash::TrashContext::default();
     // The default Finder method needs an Automation permission prompt per

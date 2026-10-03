@@ -201,6 +201,94 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
     }
 }
 
+// ---------------------------------------------------------------- running
+
+/// Progress of running cleanup steps.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RunEvent {
+    Started(String),
+    Output(String),
+    Done { step: String, ok: bool },
+    Finished,
+}
+
+/// Runs the steps one after another on a background thread. Programs are
+/// started directly (never through a shell), so arguments are passed as is.
+pub fn run(steps: Vec<Step>) -> Receiver<RunEvent> {
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        for step in steps {
+            let desc = step.describe();
+            let _ = tx.send(RunEvent::Started(desc.clone()));
+            let ok = run_step(&step, &tx);
+            let _ = tx.send(RunEvent::Done { step: desc, ok });
+        }
+        let _ = tx.send(RunEvent::Finished);
+    });
+    rx
+}
+
+fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
+    match step {
+        Step::Command(args) => {
+            let child = Command::new(&args[0])
+                .args(&args[1..])
+                .stdin(Stdio::null())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn();
+            let mut child = match child {
+                Ok(c) => c,
+                Err(e) => {
+                    let _ = tx.send(RunEvent::Output(format!("başlatılamadı: {e}")));
+                    return false;
+                }
+            };
+            let forward = |pipe: Option<Box<dyn std::io::Read + Send>>| {
+                let tx = tx.clone();
+                thread::spawn(move || {
+                    if let Some(pipe) = pipe {
+                        use std::io::BufRead;
+                        for line in std::io::BufReader::new(pipe).lines().map_while(Result::ok) {
+                            let _ = tx.send(RunEvent::Output(line));
+                        }
+                    }
+                })
+            };
+            let out = forward(child.stdout.take().map(|p| Box::new(p) as _));
+            let err = forward(child.stderr.take().map(|p| Box::new(p) as _));
+            let status = child.wait();
+            let _ = out.join();
+            let _ = err.join();
+            status.is_ok_and(|s| s.success())
+        }
+        Step::TrashContents(dir) => {
+            let entries: Vec<PathBuf> = match std::fs::read_dir(dir) {
+                Ok(r) => r.flatten().map(|e| e.path()).collect(),
+                Err(e) => {
+                    let _ = tx.send(RunEvent::Output(format!("okunamadı: {e}")));
+                    return false;
+                }
+            };
+            if entries.is_empty() {
+                let _ = tx.send(RunEvent::Output("klasör zaten boş".into()));
+                return true;
+            }
+            let _ = tx.send(RunEvent::Output(format!(
+                "{} öğe çöp kutusuna taşınıyor…",
+                entries.len()
+            )));
+            match crate::delete::trash_context().delete_all(&entries) {
+                Ok(()) => true,
+                Err(e) => {
+                    let _ = tx.send(RunEvent::Output(format!("hata: {e}")));
+                    false
+                }
+            }
+        }
+    }
+}
+
 // ---------------------------------------------------------------- helpers
 
 fn home() -> Option<PathBuf> {
@@ -661,6 +749,39 @@ mod tests {
         assert!(runtimes.windows(2).all(|w| w[0].size >= w[1].size));
         assert!(runtimes.iter().all(|r| r.name.starts_with("iOS ")));
         assert_eq!(parse_unavailable_devices("not json"), (0, 0));
+    }
+
+    fn collect(rx: Receiver<RunEvent>) -> Vec<RunEvent> {
+        let mut out = Vec::new();
+        while let Ok(ev) = rx.recv_timeout(Duration::from_secs(10)) {
+            let end = ev == RunEvent::Finished;
+            out.push(ev);
+            if end {
+                break;
+            }
+        }
+        out
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn runs_steps_in_order_and_reports_failures() {
+        let events = collect(run(vec![
+            Step::Command(vec!["/bin/echo".into(), "merhaba; rm -rf /".into()]),
+            Step::Command(vec!["/usr/bin/false".into()]),
+            Step::Command(vec!["/nonexistent/tool".into()]),
+        ]));
+        // Arguments are not interpreted by a shell.
+        assert!(events.contains(&RunEvent::Output("merhaba; rm -rf /".into())));
+        let done: Vec<bool> = events
+            .iter()
+            .filter_map(|e| match e {
+                RunEvent::Done { ok, .. } => Some(*ok),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(done, vec![true, false, false]);
+        assert_eq!(events.last(), Some(&RunEvent::Finished));
     }
 
     #[test]

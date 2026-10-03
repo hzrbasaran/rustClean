@@ -8,12 +8,13 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Browser, Dashboard, Pane, Screen, ToolsView};
+use crate::app::{App, Browser, Dashboard, Pane, Screen};
 use crate::lists::ResultList;
 use crate::reports::MenuItem;
 use crate::stats;
 use crate::system::{self, SystemInfo};
 use crate::tools::{Risk, Status as ToolStatus};
+use crate::toolsview::{ToolsView, CONFIRM_WORD};
 use crate::tree::{NodeId, SizeMode, Tree};
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -261,8 +262,15 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             Style::new().fg(Color::Green)
         };
         Line::from(Span::styled(st.text.clone(), style))
-    } else if b.tools.is_some() {
-        Line::from("Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.").gray()
+    } else if let Some(view) = &b.tools {
+        match &view.run {
+            Some(run) if run.finished => Line::from(
+                "Bitti. Araç yeniden ölçülüyor; ana listedeki boyutlar için gezginde r ile yeniden tarayın.",
+            )
+            .green(),
+            Some(_) => Line::from("Komutlar çalışıyor, lütfen bekleyin…").cyan(),
+            None => Line::from("Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.").gray(),
+        }
     } else if b.system.is_some() {
         Line::from("Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.").gray()
     } else if b.dashboard.is_some() {
@@ -315,14 +323,21 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         &[("q", "çık")]
     } else if b.input.is_some() {
         &[("Enter", "ara"), ("Esc", "vazgeç")]
-    } else if b.tools.is_some() {
-        &[
-            ("↑↓", "seç"),
-            ("r", "yeniden ölç"),
-            ("m", "menü"),
-            ("Esc", "geri"),
-            ("q", "çık"),
-        ]
+    } else if let Some(view) = &b.tools {
+        if view.running() {
+            &[("…", "komutlar çalışıyor")]
+        } else if view.confirm.is_some() || view.picker.is_some() {
+            &[("Esc", "vazgeç")]
+        } else {
+            &[
+                ("↑↓", "seç"),
+                ("Enter", "temizle"),
+                ("r", "yeniden ölç"),
+                ("m", "menü"),
+                ("Esc", "geri"),
+                ("q", "çık"),
+            ]
+        }
     } else if b.system.is_some() {
         &[
             ("r", "yenile"),
@@ -924,13 +939,17 @@ fn risk_style(risk: Risk) -> (Style, &'static str) {
 }
 
 fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
-    let action_rows: u16 = view.selected().map_or(1, |t| {
-        t.actions
-            .iter()
-            .map(|a| 1 + a.steps.len() as u16)
-            .sum::<u16>()
-            .max(1)
-    });
+    let action_rows: u16 = if view.run.is_some() {
+        area.height / 2
+    } else {
+        view.selected().map_or(1, |t| {
+            t.actions
+                .iter()
+                .map(|a| 1 + a.steps.len() as u16)
+                .sum::<u16>()
+                .max(1)
+        })
+    };
     let [list_area, detail_area] = Layout::vertical([
         Constraint::Min(6),
         Constraint::Length((action_rows + 2).min(area.height / 2)),
@@ -1001,9 +1020,139 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
         Some(t) if t.status == ToolStatus::Measuring => lines.push(Line::from("Ölçülüyor…").cyan()),
         _ => lines.push(Line::from("Bu araç için yapılacak bir şey yok.").gray()),
     }
+    if let Some(run) = &view.run {
+        // Show the end of the log.
+        let visible = detail_area.height.saturating_sub(2) as usize;
+        let start = run.log.len().saturating_sub(visible);
+        let lines: Vec<Line> = run.log[start..]
+            .iter()
+            .map(|l| {
+                if l.starts_with('$') {
+                    Line::from(l.clone()).white().bold()
+                } else if l.contains('✗') {
+                    Line::from(l.clone()).red()
+                } else if l.contains('✓') {
+                    Line::from(l.clone()).green()
+                } else {
+                    Line::from(l.clone()).gray()
+                }
+            })
+            .collect();
+        let title = if !run.finished {
+            format!(" {} Çalışıyor… ", SPINNER[tick % SPINNER.len()])
+        } else if run.failures > 0 {
+            format!(" Bitti — {} adım başarısız ", run.failures)
+        } else {
+            " Bitti ".to_string()
+        };
+        f.render_widget(
+            Paragraph::new(lines).block(panel(&title, true)),
+            detail_area,
+        );
+    } else {
+        f.render_widget(
+            Paragraph::new(lines).block(panel(" İşlemler ", false)),
+            detail_area,
+        );
+    }
+
+    if let Some(p) = &view.picker {
+        let tool = &view.tools[p.tool];
+        let mut lines = vec![Line::from("")];
+        for (i, a) in tool.actions.iter().enumerate() {
+            let (style, text) = risk_style(a.risk);
+            let check = if p.checked[i] { "[✓] " } else { "[ ] " };
+            let row = Line::from(vec![
+                Span::raw(if i == p.cursor { "▶ " } else { "  " }),
+                Span::raw(check).bold(),
+                Span::styled(text, style),
+                Span::raw(format!(" {}", a.label)).white(),
+            ]);
+            lines.push(if i == p.cursor {
+                row.style(HIGHLIGHT)
+            } else {
+                row
+            });
+        }
+        lines.push(Line::from(""));
+        lines.push(Line::from(" Space: seç   Enter: devam   Esc: vazgeç").gray());
+        popup(
+            f,
+            &format!(" {} — ne temizlensin? ", tool.kind.label()),
+            Color::Cyan,
+            lines,
+            90,
+        );
+    }
+
+    if let Some(c) = &view.confirm {
+        let tool = &view.tools[c.tool];
+        let mut lines = vec![
+            Line::from(""),
+            Line::from("Şu komutlar sırayla çalışacak:").white(),
+        ];
+        for a in &c.actions {
+            let (style, text) = risk_style(a.risk);
+            lines.push(Line::from(vec![
+                Span::styled(text, style),
+                Span::raw(format!(" {}", a.label)).white().bold(),
+            ]));
+            for step in &a.steps {
+                lines.push(Line::from(format!("    $ {}", step.describe())).gray());
+            }
+        }
+        lines.push(Line::from(""));
+        match &c.typed {
+            Some(typed) => {
+                lines.push(
+                    Line::from("Seçimde VERİ KAYBI olan bir işlem var. Onaylamak için „evet” yazıp Enter'a basın:")
+                        .red()
+                        .bold(),
+                );
+                let ok = typed.trim() == CONFIRM_WORD;
+                lines.push(Line::from(vec![
+                    Span::raw(" > "),
+                    Span::raw(format!("{typed}█")).white().bold(),
+                    Span::raw(if ok { "   Enter: çalıştır" } else { "" }).green(),
+                ]));
+                lines.push(Line::from(" Esc: vazgeç").gray());
+            }
+            None => lines.push(Line::from(vec![
+                Span::raw(" e ").black().on_red().bold(),
+                Span::raw(" evet, çalıştır     "),
+                Span::raw(" h ").black().on_gray(),
+                Span::raw(" vazgeç"),
+            ])),
+        }
+        popup(
+            f,
+            &format!(" {} — onay ", tool.kind.label()),
+            Color::Red,
+            lines,
+            100,
+        );
+    }
+}
+
+/// A centered bordered box sized to its lines.
+fn popup(f: &mut Frame, title: &str, color: Color, lines: Vec<Line>, max_width: u16) {
+    let area = f.area();
+    let width = area.width.saturating_sub(4).min(max_width);
+    let height = (lines.len() as u16 + 2).min(area.height);
+    let rect = Rect {
+        x: area.x + (area.width.saturating_sub(width)) / 2,
+        y: area.y + (area.height.saturating_sub(height)) / 2,
+        width,
+        height,
+    };
+    f.render_widget(Clear, rect);
     f.render_widget(
-        Paragraph::new(lines).block(panel(" İşlemler ", false)),
-        detail_area,
+        Paragraph::new(lines).wrap(Wrap { trim: false }).block(
+            Block::bordered()
+                .title(Span::raw(title.to_string()).white().bold())
+                .border_style(Style::new().fg(color)),
+        ),
+        rect,
     );
 }
 

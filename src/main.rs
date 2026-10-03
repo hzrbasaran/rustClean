@@ -11,6 +11,7 @@ mod search;
 mod stats;
 mod system;
 mod tools;
+mod toolsview;
 mod tree;
 mod ui;
 
