@@ -191,13 +191,11 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     } else if let Some(r) = &b.results {
         let shown = if r.truncated { "ilk " } else { "" };
         format!(
-            "{} — {}  │  {shown}{} satır, {} ({mode_label})  │  seçili: {} ({})",
+            "{} — {}  │  {shown}{} satır, {} ({mode_label})",
             r.title,
             b.tree.path_of(r.base).display(),
             fmt_count(r.rows.len() as u64),
             fmt_size(r.total_size()),
-            fmt_count(r.checked.iter().filter(|&&c| c).count() as u64),
-            fmt_size(r.checked_size()),
         )
     } else {
         let cur = b.tree.node(b.current);
@@ -207,6 +205,16 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             fmt_size(cur.size.get(mode)),
             fmt_count(cur.file_count.into()),
             b.sort.label()
+        )
+    };
+    let heading = if b.basket.is_empty() {
+        heading
+    } else {
+        // First, so long paths cannot push it off screen.
+        format!(
+            "🧺 {} öğe, {} (S)  │  {heading}",
+            fmt_count(b.basket.len() as u64),
+            fmt_size(b.basket.size(&b.tree, mode))
         )
     };
     f.render_widget(title(heading), header);
@@ -220,8 +228,11 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         render_system(f, b, sys, table_area);
     } else if let Some(d) = &mut b.dashboard {
         render_dashboard(f, &b.tree, d, mode, b.errors, table_area);
-    } else if let Some(r) = &mut b.results {
-        render_results(f, &b.tree, r, table_area);
+    } else if let Some(r) = &b.results {
+        let checks: Vec<bool> = r.rows.iter().map(|row| b.row_in_basket(r, row)).collect();
+        if let Some(r) = &mut b.results {
+            render_results(f, &b.tree, r, &checks, table_area);
+        }
     } else {
         render_entries(f, b, table_area);
     }
@@ -350,6 +361,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Tab", "liste değiştir"),
             ("↑↓", "gez"),
             ("Enter", "konuma git"),
+            ("Space", "sepete"),
             ("x", "çöpe taşı"),
             ("a", "görünen/diskte"),
             ("Esc", "geri"),
@@ -358,9 +370,10 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     } else if b.results.is_some() {
         &[
             ("↑↓", "gez"),
-            ("Space", "seç"),
+            ("Space", "sepete"),
             ("t", "tümü"),
-            ("x", "seçilileri çöpe taşı"),
+            ("x", "çöpe taşı"),
+            ("S", "sepet"),
             ("Enter", "aç / konuma git"),
             ("/", "ara"),
             ("m", "raporlar"),
@@ -377,7 +390,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("i", "özet"),
             ("s", "sırala"),
             ("a", "görünen/diskte"),
+            ("Space", "sepete"),
             ("x", "çöpe taşı"),
+            ("S", "sepet"),
             ("r", "yeniden tara"),
             ("d", "diskler"),
             ("q", "çık"),
@@ -535,7 +550,13 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
         } else {
             String::new()
         };
+        let in_basket = if b.basket.covers(tree, id) {
+            Span::raw("✓").green().bold()
+        } else {
+            Span::raw(" ")
+        };
         let mut cells = vec![
+            Cell::from(in_basket),
             Cell::from(Line::from(fmt_size(size)).right_aligned()),
             Cell::from(Line::from(vec![
                 Span::styled(bar(ratio, 12), Style::new().fg(Color::Cyan)),
@@ -552,12 +573,13 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
     });
 
     let mut widths = vec![
+        Constraint::Length(1),
         Constraint::Length(11),
         Constraint::Length(19),
         Constraint::Length(10),
         Constraint::Length(DATE_WIDTH),
     ];
-    let mut header = vec!["Boyut", "Oran", "Dosya", "Son değişiklik"];
+    let mut header = vec!["", "Boyut", "Oran", "Dosya", "Son değişiklik"];
     if wide {
         widths.push(Constraint::Length(DATE_WIDTH));
         header.push("Oluşturma");
@@ -573,7 +595,7 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
     f.render_stateful_widget(table, area, &mut b.table);
 }
 
-fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
+fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, checks: &[bool], area: Rect) {
     let now = now_secs();
     let wide = area.width >= WIDE;
     let detail_width = r
@@ -585,7 +607,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
         .min(44) as u16;
     let has_detail = detail_width > 0;
     let rows = r.rows.iter().enumerate().map(|(i, row)| {
-        let check = if r.checked[i] {
+        let check = if checks[i] {
             Span::raw("[✓]").green().bold()
         } else {
             Span::raw("[ ]").gray()

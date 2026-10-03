@@ -1,5 +1,6 @@
 mod app;
 mod apps;
+mod basket;
 mod delete;
 mod disks;
 mod duplicates;

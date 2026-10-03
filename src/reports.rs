@@ -129,7 +129,7 @@ pub fn run(tree: &Tree, base: NodeId, mode: SizeMode, now: u64, kind: ReportKind
             unreachable!("{kind:?} is computed elsewhere")
         }
     };
-    let mut list = ResultList::new(kind.label().to_string(), base, rows, false);
+    let mut list = ResultList::new(kind.label().to_string(), base, rows);
     list.truncated = truncated;
     list.note = note.to_string();
     list
@@ -492,7 +492,6 @@ mod tests {
         let l = report(&t, ReportKind::LargestFiles);
         assert_eq!(labels(&l), vec!["d/big", "mid", "d/small"]);
         assert!(!l.truncated);
-        assert!(l.checked.iter().all(|&c| !c), "reports start unchecked");
     }
 
     #[test]

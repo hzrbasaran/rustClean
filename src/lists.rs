@@ -105,32 +105,36 @@ pub struct ResultList {
     /// Directory the list was computed for.
     pub base: NodeId,
     pub rows: Vec<Row>,
-    pub checked: Vec<bool>,
     pub table: TableState,
     /// More results existed than are shown.
     pub truncated: bool,
     /// The search pattern, for search results.
     pub pattern: Option<String>,
-    /// When drilling into a group, pre-check every member but the oldest.
+    /// Groups of copies: selecting a group selects all but its oldest copy.
     pub keep_one: bool,
+    /// In a list of copies, the one to keep when selecting all.
+    pub keep: Option<NodeId>,
+    /// This list shows the basket itself.
+    pub basket_view: bool,
     /// The group list this list was drilled down from.
     pub parent: Option<Box<ResultList>>,
 }
 
 impl ResultList {
-    pub fn new(title: String, base: NodeId, rows: Vec<Row>, checked: bool) -> Self {
+    pub fn new(title: String, base: NodeId, rows: Vec<Row>) -> Self {
         let mut table = TableState::default();
         table.select((!rows.is_empty()).then_some(0));
         Self {
             title,
             note: String::new(),
             base,
-            checked: vec![checked; rows.len()],
             rows,
             table,
             truncated: false,
             pattern: None,
             keep_one: false,
+            keep: None,
+            basket_view: false,
             parent: None,
         }
     }
@@ -139,29 +143,8 @@ impl ResultList {
         self.table.selected().and_then(|i| self.rows.get(i))
     }
 
-    pub fn checked_size(&self) -> u64 {
-        self.rows
-            .iter()
-            .zip(&self.checked)
-            .filter(|(_, &c)| c)
-            .map(|(r, _)| r.size())
-            .sum()
-    }
-
     pub fn total_size(&self) -> u64 {
         self.rows.iter().map(Row::size).sum()
-    }
-
-    pub fn toggle_selected(&mut self) {
-        if let Some(i) = self.table.selected().filter(|&i| i < self.checked.len()) {
-            self.checked[i] = !self.checked[i];
-            self.table.select_next();
-        }
-    }
-
-    pub fn toggle_all(&mut self) {
-        let all = self.checked.iter().all(|&c| c);
-        self.checked.iter_mut().for_each(|c| *c = !all);
     }
 
     /// Replaces this list with `child`, remembering it for `back`.
@@ -203,7 +186,6 @@ impl ResultList {
             row.retain_nodes(removed);
             if row.nodes.len() < row.min_members {
                 self.rows.remove(i);
-                self.checked.remove(i);
             } else {
                 i += 1;
             }
@@ -248,32 +230,14 @@ mod tests {
     }
 
     #[test]
-    fn checks_and_toggles() {
-        let rows = vec![
-            one("a", 1, 10),
-            group("b", &[(2, 20), (3, 5)], RowSize::Sum),
-        ];
-        let mut l = ResultList::new("t".into(), 0, rows, false);
-        assert_eq!(l.checked, vec![false, false]);
-        l.table.select(Some(1));
-        l.toggle_selected();
-        assert_eq!(l.checked, vec![false, true]);
-        assert_eq!(l.checked_size(), 25);
-        l.toggle_all();
-        assert_eq!(l.checked, vec![true, true]);
-        l.toggle_all();
-        assert_eq!(l.checked, vec![false, false]);
-    }
-
-    #[test]
     fn drill_and_remove() {
         let groups = vec![
             group("dup", &[(1, 30), (2, 30)], RowSize::Wasted),
             group("other", &[(3, 5), (4, 5), (5, 5)], RowSize::Wasted),
         ];
-        let mut l = ResultList::new("groups".into(), 0, groups, false);
+        let mut l = ResultList::new("groups".into(), 0, groups);
         let members = vec![one("1", 3, 5), one("2", 4, 5), one("3", 5, 5)];
-        l.drill_into(ResultList::new("members".into(), 0, members, false));
+        l.drill_into(ResultList::new("members".into(), 0, members));
         assert_eq!(l.title, "members");
 
         l.remove_nodes(&HashSet::from([4, 1]));

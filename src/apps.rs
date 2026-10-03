@@ -85,7 +85,7 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
     let truncated = rows.len() > LIMIT;
     rows.truncate(LIMIT);
 
-    let mut list = ResultList::new(ReportKind::Apps.label().to_string(), base, rows, false);
+    let mut list = ResultList::new(ReportKind::Apps.label().to_string(), base, rows);
     list.truncated = truncated;
     list.note = if apps.is_empty() {
         "Bu taramada uygulama yok. Uygulamalar için diski tarayın: d → Macintosh HD (Windows: C:\\, Linux: /)."

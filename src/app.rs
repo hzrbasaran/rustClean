@@ -9,6 +9,7 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::widgets::TableState;
 
 use crate::apps;
+use crate::basket::{Added, Basket};
 use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
 use crate::duplicates::{self, DupJob};
@@ -164,6 +165,8 @@ pub struct Browser {
     pub confirm: Option<Vec<NodeId>>,
     pub deleting: Option<Deletion>,
     pub status: Option<Status>,
+    /// Entries collected for deletion.
+    pub basket: Basket,
     /// Total moved to the trash during this session.
     pub trashed: Size,
     /// Outcome of the running deletion batch.
@@ -197,6 +200,7 @@ impl Browser {
             confirm: None,
             deleting: None,
             status: None,
+            basket: Basket::default(),
             trashed: Size::default(),
             batch_trashed: Size::default(),
             batch_failures: Vec::new(),
@@ -339,8 +343,7 @@ impl Browser {
             .into_iter()
             .map(|id| Row::single(tree, base, id, mode, String::new()))
             .collect();
-        // Search results start checked: the user typed exactly what to find.
-        let mut list = ResultList::new(format!("Arama „{pattern}”"), base, rows, true);
+        let mut list = ResultList::new(format!("Arama „{pattern}”"), base, rows);
         list.note = "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır.".into();
         list.pattern = Some(pattern);
         self.results = Some(list);
@@ -395,7 +398,7 @@ impl Browser {
             "Değişenler ({} taramasına göre)",
             crate::ui::fmt_date(snap.header.time.min(u64::from(u32::MAX)) as u32)
         );
-        let mut list = ResultList::new(title, self.current, rows, false);
+        let mut list = ResultList::new(title, self.current, rows);
         list.truncated = truncated;
         list.note = note;
         self.results = Some(list);
@@ -428,7 +431,7 @@ impl Browser {
                 let cands = duplicates::candidates(&self.tree, self.current);
                 if cands.is_empty() {
                     let mut list =
-                        ResultList::new(kind.label().to_string(), self.current, Vec::new(), false);
+                        ResultList::new(kind.label().to_string(), self.current, Vec::new());
                     list.note = "1 MiB üzerinde aynı boyutta iki dosya yok.".into();
                     self.results = Some(list);
                 } else {
@@ -504,62 +507,180 @@ impl Browser {
         rows.sort_by_key(|r| std::cmp::Reverse(r.size()));
         let truncated = rows.len() > reports::LIMIT;
         rows.truncate(reports::LIMIT);
-        let mut list = ResultList::new(
-            ReportKind::Duplicates.label().to_string(),
-            base,
-            rows,
-            false,
-        );
+        let mut list = ResultList::new(ReportKind::Duplicates.label().to_string(), base, rows);
         list.truncated = truncated;
         list.keep_one = true;
-        list.note =
-            "Boyut: kopyalar silinince açılacak yer. Enter: kopyaları gör (en eskisi korunur). \
-                     APFS klonları blok paylaştığından silmek yer açmayabilir."
-                .into();
+        list.note = "Boyut: kopyalar silinince açılacak yer. Space: en eski kopya hariç sepete ekle · \
+                     Enter: kopyaları gör. APFS klonları blok paylaştığından silmek yer açmayabilir."
+            .into();
         self.results = Some(list);
     }
 
-    /// What `x` removes in a result list: the checked rows, or the row under
-    /// the cursor when nothing is checked. Duplicate groups always keep their
-    /// oldest copy.
-    fn result_targets(&self) -> Result<Vec<NodeId>, &'static str> {
-        let Some(r) = &self.results else {
-            return Ok(Vec::new());
-        };
-        let rows: Vec<&Row> = if r.checked.iter().any(|&c| c) {
-            r.rows
-                .iter()
-                .zip(&r.checked)
-                .filter(|(_, &c)| c)
-                .map(|(row, _)| row)
-                .collect()
+    /// The entries a result row stands for: its members, except the oldest
+    /// copy in a group of duplicates.
+    fn row_targets(&self, list: &ResultList, row: &Row) -> Vec<NodeId> {
+        let keep = if list.keep_one && row.group {
+            oldest(&self.tree, &row.nodes).map(|i| row.nodes[i])
         } else {
-            match r.selected_row() {
-                Some(row) if row.group && !r.keep_one => {
-                    return Err(
-                        "Bu bir grup: içine girmek için Enter, tamamını seçmek için Space.",
-                    );
-                }
-                Some(row) => vec![row],
-                None => return Ok(Vec::new()),
-            }
+            None
         };
-        let mut ids = Vec::new();
-        for row in rows {
-            let keep = if r.keep_one && row.group {
-                oldest(&self.tree, &row.nodes)
-            } else {
-                None
-            };
-            ids.extend(
-                row.nodes
-                    .iter()
-                    .enumerate()
-                    .filter(|&(i, _)| Some(i) != keep)
-                    .map(|(_, &id)| id),
-            );
+        row.nodes
+            .iter()
+            .copied()
+            .filter(|&id| Some(id) != keep)
+            .collect()
+    }
+
+    /// Whether a result row is fully in the basket (shown as `[✓]`).
+    pub fn row_in_basket(&self, list: &ResultList, row: &Row) -> bool {
+        let targets = self.row_targets(list, row);
+        !targets.is_empty() && targets.iter().all(|&id| self.basket.covers(&self.tree, id))
+    }
+
+    /// Adds the entries to the basket, or removes them when all are in it.
+    fn toggle_basket(&mut self, ids: Vec<NodeId>) {
+        if ids.is_empty() {
+            return;
         }
-        Ok(ids)
+        if ids.iter().all(|&id| self.basket.covers(&self.tree, id)) {
+            let mut by_parent = 0;
+            for id in ids {
+                if self.basket.items().contains(&id) {
+                    self.basket.remove(id);
+                } else {
+                    by_parent += 1;
+                }
+            }
+            if by_parent > 0 {
+                self.set_status(
+                    "Üst klasörü sepette olduğu için ayrıca çıkarılamaz; önce üst klasörü çıkarın.",
+                    true,
+                );
+            }
+        } else {
+            let covered = ids
+                .into_iter()
+                .filter(|&id| self.basket.add(&self.tree, id) == Added::CoveredByParent)
+                .count();
+            if covered > 0 {
+                self.set_status(
+                    format!("{covered} öğenin üst klasörü zaten sepette."),
+                    false,
+                );
+            }
+        }
+        self.refresh_basket_view();
+    }
+
+    /// Space in a result list.
+    fn toggle_row(&mut self) {
+        let Some(r) = &self.results else {
+            return;
+        };
+        let Some(row) = r.selected_row() else {
+            return;
+        };
+        let ids = self.row_targets(r, row);
+        let basket_view = r.basket_view;
+        if basket_view {
+            for id in ids {
+                self.basket.remove(id);
+            }
+            self.refresh_basket_view();
+        } else {
+            self.toggle_basket(ids);
+        }
+        if let Some(r) = &mut self.results {
+            r.table.select_next();
+        }
+    }
+
+    /// `t` in a result list: every row (in a list of copies, all but the one
+    /// to keep).
+    fn toggle_all_rows(&mut self) {
+        let Some(r) = &self.results else {
+            return;
+        };
+        let ids: Vec<NodeId> = r
+            .rows
+            .iter()
+            .flat_map(|row| self.row_targets(r, row))
+            .filter(|&id| Some(id) != r.keep)
+            .collect();
+        self.toggle_basket(ids);
+    }
+
+    /// What `x` deletes: the basket when it has anything, otherwise the
+    /// entry under the cursor.
+    fn delete_targets(&self) -> Result<Vec<NodeId>, &'static str> {
+        if !self.basket.is_empty() {
+            return Ok(self.basket.items().to_vec());
+        }
+        if let Some(r) = &self.results {
+            return match r.selected_row() {
+                Some(row) if row.group && !r.keep_one => {
+                    Err("Bu bir grup: içine girmek için Enter, sepete eklemek için Space.")
+                }
+                Some(row) => Ok(self.row_targets(r, row)),
+                None => Ok(Vec::new()),
+            };
+        }
+        if let Some(d) = &self.dashboard {
+            return Ok(d
+                .selected()
+                .filter(|&id| id != d.base)
+                .into_iter()
+                .collect());
+        }
+        Ok(self.selected().into_iter().collect())
+    }
+
+    fn delete_key(&mut self) {
+        match self.delete_targets() {
+            Ok(ids) => self.request_delete(ids),
+            Err(msg) => self.set_status(msg, true),
+        }
+    }
+
+    /// Shows the basket as a result list.
+    fn open_basket(&mut self) {
+        if self.basket.is_empty() {
+            self.set_status("Sepet boş. Space ile öğe ekleyin.", false);
+            return;
+        }
+        self.dashboard = None;
+        self.results = Some(self.basket_list());
+    }
+
+    fn basket_list(&self) -> ResultList {
+        let (tree, mode) = (&self.tree, self.size_mode);
+        let mut ids = self.basket.items().to_vec();
+        ids.sort_by_key(|&id| std::cmp::Reverse(tree.node(id).size.get(mode)));
+        let rows = ids
+            .into_iter()
+            .map(|id| Row::single(tree, ROOT, id, mode, String::new()))
+            .collect();
+        let mut list = ResultList::new("Sepet".into(), ROOT, rows);
+        list.basket_view = true;
+        list.note = "Space: sepetten çıkar · c: sepeti boşalt · x: hepsini çöpe taşı".into();
+        list
+    }
+
+    /// Rebuilds the basket view after the basket changed, keeping the cursor.
+    fn refresh_basket_view(&mut self) {
+        if !self.results.as_ref().is_some_and(|r| r.basket_view) {
+            return;
+        }
+        let row = self
+            .results
+            .as_ref()
+            .and_then(|r| r.table.selected())
+            .unwrap_or(0);
+        let mut list = self.basket_list();
+        if !list.rows.is_empty() {
+            list.table.select(Some(row.min(list.rows.len() - 1)));
+        }
+        self.results = Some(list);
     }
 
     /// Opens the members of the selected group row.
@@ -577,13 +698,12 @@ impl Browser {
             .iter()
             .map(|&id| Row::single(tree, r.base, id, mode, String::new()))
             .collect();
-        let mut list = ResultList::new(format!("{} › {}", r.title, row.label), r.base, rows, false);
+        let mut list = ResultList::new(format!("{} › {}", r.title, row.label), r.base, rows);
         if r.keep_one {
-            // Keep the copy that has existed longest; check the rest.
             if let Some(keep) = oldest(tree, &ids) {
-                list.checked = (0..ids.len()).map(|i| i != keep).collect();
+                list.keep = Some(ids[keep]);
                 list.note = format!(
-                    "En eski kopya ({}) korunuyor; diğerleri seçili.",
+                    "En eski kopya: {} · t: diğerlerini sepete ekle",
                     list.rows[keep].label
                 );
             }
@@ -643,6 +763,7 @@ impl Browser {
                 Ok(()) => {
                     let size = self.tree.node(id).size;
                     self.tree.remove(id);
+                    self.basket.remove(id);
                     self.trashed += size;
                     self.batch_trashed += size;
                     if let Some(r) = &mut self.results {
@@ -663,6 +784,7 @@ impl Browser {
         let row = self.table.selected().unwrap_or(0);
         self.load(self.current, row);
         self.refresh_dashboard();
+        self.refresh_basket_view();
         let moved = total - self.batch_failures.len();
         let size = crate::ui::fmt_size(self.batch_trashed.get(self.size_mode));
         if self.batch_failures.is_empty() {
@@ -800,11 +922,14 @@ impl Browser {
             KeyCode::Char('/') => self.input = Some(String::new()),
             KeyCode::Char('i') => self.open_dashboard(),
             KeyCode::Char('m') => self.report_menu = Some(0),
-            KeyCode::Char('x') | KeyCode::Delete => {
+            KeyCode::Char('x') | KeyCode::Delete => self.delete_key(),
+            KeyCode::Char(' ') => {
                 if let Some(id) = self.selected() {
-                    self.request_delete(vec![id]);
+                    self.toggle_basket(vec![id]);
+                    self.table.select_next();
                 }
             }
+            KeyCode::Char('S') => self.open_basket(),
             KeyCode::Char('r') => return Action::Rescan,
             KeyCode::Char('d') => return Action::Disks,
             _ => {}
@@ -829,11 +954,14 @@ impl Browser {
             KeyCode::Home | KeyCode::Char('g') => d.table_mut().select_first(),
             KeyCode::End | KeyCode::Char('G') => d.table_mut().select_last(),
             KeyCode::Char('a') => self.toggle_size_mode(),
-            KeyCode::Char('x') | KeyCode::Delete => {
+            KeyCode::Char('x') | KeyCode::Delete => self.delete_key(),
+            KeyCode::Char(' ') => {
                 if let Some(id) = d.selected().filter(|&id| id != d.base) {
-                    self.request_delete(vec![id]);
+                    d.table_mut().select_next();
+                    self.toggle_basket(vec![id]);
                 }
             }
+            KeyCode::Char('S') => self.open_basket(),
             KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
                 let target = d.selected();
                 let base = d.base;
@@ -865,12 +993,14 @@ impl Browser {
             KeyCode::PageDown => r.table.scroll_down_by(20),
             KeyCode::Home | KeyCode::Char('g') => r.table.select_first(),
             KeyCode::End | KeyCode::Char('G') => r.table.select_last(),
-            KeyCode::Char(' ') => r.toggle_selected(),
-            KeyCode::Char('t') => r.toggle_all(),
-            KeyCode::Char('x') | KeyCode::Delete => match self.result_targets() {
-                Ok(ids) => self.request_delete(ids),
-                Err(msg) => self.set_status(msg, true),
-            },
+            KeyCode::Char(' ') => self.toggle_row(),
+            KeyCode::Char('t') => self.toggle_all_rows(),
+            KeyCode::Char('x') | KeyCode::Delete => self.delete_key(),
+            KeyCode::Char('S') => self.open_basket(),
+            KeyCode::Char('c') if r.basket_view => {
+                self.basket.clear();
+                self.refresh_basket_view();
+            }
             KeyCode::Char('/') => self.input = Some(r.pattern.clone().unwrap_or_default()),
             KeyCode::Char('m') => self.report_menu = Some(0),
             KeyCode::Char('a') => self.toggle_size_mode(),
@@ -1072,7 +1202,7 @@ mod tests {
                 r
             })
             .collect();
-        let mut list = ResultList::new("t".into(), ROOT, rows, false);
+        let mut list = ResultList::new("t".into(), ROOT, rows);
         list.keep_one = keep_one;
         br.results = Some(list);
         (br, [a, b, c])
@@ -1084,26 +1214,49 @@ mod tests {
     }
 
     #[test]
-    fn x_without_checks_uses_the_cursor_row() {
+    fn x_without_basket_uses_the_cursor_row() {
         let single = Row::group("s".into(), String::new(), vec![(2, 1)], RowSize::Sum, 1);
         let (mut br, [_, _, c]) = browser_with(vec![single], false);
         br.results.as_mut().unwrap().rows[0].group = false;
-        assert_eq!(br.result_targets(), Ok(vec![c]));
+        assert_eq!(br.delete_targets(), Ok(vec![c]));
     }
 
     #[test]
     fn unchecked_name_group_is_not_deleted_whole() {
         let (br, _) = browser_with(vec![group(&[0, 1, 2])], false);
-        assert!(br.result_targets().is_err());
+        assert!(br.delete_targets().is_err());
     }
 
     #[test]
     fn duplicate_groups_keep_the_oldest_copy() {
         // Under the cursor…
-        let (mut br, [a, _, c]) = browser_with(vec![group(&[0, 1, 2])], true);
-        assert_eq!(br.result_targets(), Ok(vec![a, c]));
-        // …and when checked.
-        br.results.as_mut().unwrap().checked = vec![true];
-        assert_eq!(br.result_targets(), Ok(vec![a, c]));
+        let (mut br, [a, b, c]) = browser_with(vec![group(&[0, 1, 2])], true);
+        assert_eq!(br.delete_targets(), Ok(vec![a, c]));
+        // …and through the basket: Space adds all but the oldest copy.
+        br.toggle_row();
+        assert_eq!(br.basket.items(), &[a, c]);
+        assert!(!br.basket.covers(&br.tree, b));
+        let list = br.results.as_ref().unwrap();
+        assert!(br.row_in_basket(list, &list.rows[0]));
+        assert_eq!(br.delete_targets(), Ok(vec![a, c]));
+    }
+
+    #[test]
+    fn space_toggles_and_t_selects_all() {
+        let rows = vec![group(&[0, 1]), group(&[2])];
+        let (mut br, [a, b, c]) = browser_with(rows, false);
+        br.toggle_all_rows();
+        assert_eq!(br.basket.items(), &[a, b, c]);
+        br.toggle_all_rows();
+        assert!(br.basket.is_empty());
+        br.toggle_row(); // first row
+        assert_eq!(br.basket.items(), &[a, b]);
+        // The basket view lists the basket; Space there removes.
+        br.open_basket();
+        assert!(br.results.as_ref().unwrap().basket_view);
+        assert_eq!(br.results.as_ref().unwrap().rows.len(), 2);
+        br.toggle_row();
+        assert_eq!(br.basket.len(), 1);
+        assert_eq!(br.results.as_ref().unwrap().rows.len(), 1);
     }
 }
