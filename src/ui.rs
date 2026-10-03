@@ -9,12 +9,13 @@ use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap}
 use ratatui::Frame;
 
 use crate::app::{App, Browser, Dashboard, FailureDialog, MapColor, Pane, Screen, View};
+use crate::i18n::{lang, Lang};
 use crate::lists::ResultList;
 use crate::reports::MenuItem;
 use crate::stats;
 use crate::system::{self, SystemInfo};
 use crate::tools::{Risk, Status as ToolStatus};
-use crate::toolsview::{ToolsView, CONFIRM_WORD};
+use crate::toolsview::{confirm_word, ToolsView};
 use crate::tree::{NodeId, SizeMode, Tree};
 use crate::treemap::Slot;
 
@@ -57,7 +58,13 @@ fn keys(pairs: &[(&str, &str)]) -> Line<'static> {
 
 fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: Rect) {
     f.render_widget(
-        title("Diskler — taramak için bir disk seçin".into()),
+        title(
+            t!(
+                "Diskler — taramak için bir disk seçin",
+                "Disks — choose a disk to scan"
+            )
+            .into(),
+        ),
         header,
     );
 
@@ -75,9 +82,13 @@ fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: 
             Cell::from(Line::from(fmt_size(d.total)).right_aligned()),
             Cell::from(Line::from(vec![
                 Span::styled(bar(ratio, 20), Style::new().fg(color)),
-                Span::raw(format!(" {:>3.0}%", ratio * 100.0)),
+                Span::raw(format!(" {:>4}", fmt_pct(ratio * 100.0, 0))),
             ])),
-            Cell::from(if d.removable { "çıkarılabilir" } else { "" }),
+            Cell::from(if d.removable {
+                t!("çıkarılabilir", "removable")
+            } else {
+                ""
+            }),
         ])
     });
     let table = Table::new(
@@ -94,12 +105,12 @@ fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: 
     )
     .header(
         Row::new([
-            "Ad",
-            "Bağlama noktası",
+            t!("Ad", "Name"),
+            t!("Bağlama noktası", "Mount point"),
             "FS",
-            "Kullanılan",
-            "Toplam",
-            "Doluluk",
+            t!("Kullanılan", "Used"),
+            t!("Toplam", "Total"),
+            t!("Doluluk", "Usage"),
             "",
         ])
         .bold()
@@ -113,15 +124,19 @@ fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: 
     if let Some(msg) = &app.message {
         f.render_widget(Line::from(msg.clone()).yellow(), msg_area);
     } else if app.disks.is_empty() {
-        f.render_widget(Line::from("Hiç disk bulunamadı.").yellow(), msg_area);
+        f.render_widget(
+            Line::from(t!("Hiç disk bulunamadı.", "No disks found.")).yellow(),
+            msg_area,
+        );
     }
 
     f.render_widget(
         keys(&[
-            ("↑↓", "seç"),
-            ("Enter", "tara"),
-            ("r", "yenile"),
-            ("q", "çık"),
+            ("↑↓", t!("seç", "select")),
+            ("Enter", t!("tara", "scan")),
+            ("r", t!("yenile", "refresh")),
+            ("L", t!("English", "Türkçe")),
+            ("q", t!("çık", "quit")),
         ]),
         footer,
     );
@@ -129,7 +144,11 @@ fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: 
 
 fn render_scanning(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: Rect) {
     f.render_widget(
-        title(format!("Taranıyor: {}", app.scan_root.display())),
+        title(tf!(
+            "Taranıyor: {}",
+            "Scanning: {}",
+            app.scan_root.display()
+        )),
         header,
     );
 
@@ -143,18 +162,26 @@ fn render_scanning(f: &mut Frame, app: &mut App, header: Rect, body: Rect, foote
     let width = body.width.saturating_sub(16) as usize;
     let lines = vec![
         Line::from(""),
-        Line::from(format!("  {spin} Taranıyor…")).cyan().bold(),
+        Line::from(tf!("  {spin} Taranıyor…", "  {spin} Scanning…"))
+            .cyan()
+            .bold(),
         Line::from(""),
-        stat_line("Dosya", &fmt_count(p.files)),
-        stat_line("Klasör", &fmt_count(p.dirs)),
-        stat_line("Boyut", &fmt_size(p.bytes)),
-        stat_line("Erişilemeyen", &fmt_count(p.errors)),
-        stat_line("Süre", &format!("{:.1} sn", elapsed.as_secs_f64())),
+        stat_line(t!("Dosya", "Files"), &fmt_count(p.files)),
+        stat_line(t!("Klasör", "Folders"), &fmt_count(p.dirs)),
+        stat_line(t!("Boyut", "Size"), &fmt_size(p.bytes)),
+        stat_line(t!("Erişilemeyen", "Inaccessible"), &fmt_count(p.errors)),
+        stat_line(
+            t!("Süre", "Time"),
+            &tf!("{:.1} sn", "{:.1} s", elapsed.as_secs_f64()),
+        ),
         Line::from(""),
-        stat_line("Şu an", &truncate_path(&p.current, width)),
+        stat_line(t!("Şu an", "Now"), &truncate_path(&p.current, width)),
     ];
     f.render_widget(Paragraph::new(lines), body);
-    f.render_widget(keys(&[("Esc", "iptal"), ("q", "çık")]), footer);
+    f.render_widget(
+        keys(&[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]),
+        footer,
+    );
 }
 
 fn stat_line(label: &str, value: &str) -> Line<'static> {
@@ -168,31 +195,38 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     let Some(b) = &mut app.browser else { return };
     let mode = b.size_mode;
     let mode_label = match mode {
-        SizeMode::Disk => "diskte",
-        SizeMode::Apparent => "görünen",
+        SizeMode::Disk => t!("diskte", "on disk"),
+        SizeMode::Apparent => t!("görünen", "apparent"),
     };
 
     let heading = if let Some(view) = &b.tools {
-        format!(
+        tf!(
             "Geliştirici araçları temizliği  │  geri kazanılabilir: {}{}",
+            "Developer tools cleanup  │  reclaimable: {}{}",
             fmt_size(view.reclaimable()),
             if view.measuring() {
-                " (ölçülüyor…)"
+                t!(" (ölçülüyor…)", " (measuring…)")
             } else {
                 ""
             }
         )
     } else if b.system.is_some() {
-        "Sistem verileri".to_string()
+        t!("Sistem verileri", "System data").to_string()
     } else if let Some(d) = &b.dashboard {
-        format!(
+        tf!(
             "Özet — {}  │  {mode_label}",
+            "Summary — {}  │  {mode_label}",
             b.tree.path_of(d.base).display()
         )
     } else if let Some(r) = &b.results {
-        let shown = if r.truncated { "ilk " } else { "" };
-        format!(
+        let shown = if r.truncated {
+            t!("ilk ", "first ")
+        } else {
+            ""
+        };
+        tf!(
             "{} — {}  │  {shown}{} satır, {} ({mode_label})",
+            "{} — {}  │  {shown}{} rows, {} ({mode_label})",
             r.title,
             b.tree.path_of(r.base).display(),
             fmt_count(r.rows.len() as u64),
@@ -200,8 +234,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         )
     } else {
         let cur = b.tree.node(b.current);
-        format!(
+        tf!(
             "{}  │  {} ({mode_label})  │  {} dosya  │  sıralama: {}",
+            "{}  │  {} ({mode_label})  │  {} files  │  sort: {}",
             b.tree.path_of(b.current).display(),
             fmt_size(cur.size.get(mode)),
             fmt_count(cur.file_count.into()),
@@ -212,8 +247,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         heading
     } else {
         // First, so long paths cannot push it off screen.
-        format!(
+        tf!(
             "🧺 {} öğe, {} (S)  │  {heading}",
+            "🧺 {} items, {} (S)  │  {heading}",
             fmt_count(b.basket.len() as u64),
             fmt_size(b.basket.size(&b.tree, mode))
         )
@@ -246,28 +282,45 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         let (done, total) = (p.done.load(Relaxed), p.total.load(Relaxed));
         let spin = SPINNER[app.tick % SPINNER.len()];
         let step = match p.stage.load(Relaxed) {
-            0 => "aynı boyuttaki dosyalar bulunuyor".to_string(),
-            1 => format!(
+            0 => t!(
+                "aynı boyuttaki dosyalar bulunuyor",
+                "finding files of equal size"
+            )
+            .to_string(),
+            1 => tf!(
                 "1/2 dosya uçları karşılaştırılıyor: {} / {}",
+                "1/2 comparing file edges: {} / {}",
                 fmt_count(done),
                 fmt_count(total)
             ),
-            _ => format!(
+            _ => tf!(
                 "2/2 içerikler okunuyor: {} / {}",
+                "2/2 reading contents: {} / {}",
                 fmt_size(done),
                 fmt_size(total)
             ),
         };
         Line::from(vec![
-            Span::raw(format!("{spin} Kopyalar aranıyor — {step}")).cyan(),
-            Span::raw("   Esc: iptal").gray(),
+            Span::raw(tf!(
+                "{spin} Kopyalar aranıyor — {step}",
+                "{spin} Looking for duplicates — {step}"
+            ))
+            .cyan(),
+            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).gray(),
         ])
     } else if let Some(input) = &b.input {
         Line::from(vec![
-            Span::raw(" Ara: ").black().on_yellow().bold(),
+            Span::raw(t!(" Ara: ", " Find: "))
+                .black()
+                .on_yellow()
+                .bold(),
             Span::raw(format!(" {input}")),
             Span::raw("█").slow_blink(),
-            Span::raw("   örn: deneme · deneme* · *.log").gray(),
+            Span::raw(t!(
+                "   örn: deneme · deneme* · *.log",
+                "   e.g. test · test* · *.log"
+            ))
+            .gray(),
         ])
     } else if let Some(st) = &b.status {
         let style = if st.error {
@@ -278,144 +331,174 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         Line::from(Span::styled(st.text.clone(), style))
     } else if let Some(view) = &b.tools {
         match &view.run {
-            Some(run) if run.finished => Line::from(
+            Some(run) if run.finished => Line::from(t!(
                 "Bitti. Araç yeniden ölçülüyor; ana listedeki boyutlar için gezginde r ile yeniden tarayın.",
-            )
+                "Done. Measuring the tool again; rescan with r in the browser to update the main list.",
+            ))
             .green(),
-            Some(_) => Line::from("Komutlar çalışıyor, lütfen bekleyin…").cyan(),
-            None => Line::from("Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.").gray(),
+            Some(_) => Line::from(t!("Komutlar çalışıyor, lütfen bekleyin…", "Commands are running, please wait…")).cyan(),
+            None => Line::from(t!(
+                "Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.",
+                "Measuring only reads. No command runs without your confirmation.",
+            ))
+            .gray(),
         }
     } else if b.system.is_some() {
-        Line::from("Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.").gray()
+        Line::from(t!(
+            "Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.",
+            "This screen only shows information; it changes nothing.",
+        ))
+        .gray()
     } else if b.dashboard.is_some() {
-        Line::from(
+        Line::from(t!(
             "„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.",
-        )
+            "“Fullest folders” ignores subfolders: it shows where the space actually sits.",
+        ))
         .gray()
     } else if let Some(r) = &b.results {
         let text = if r.rows.is_empty() {
-            "Sonuç yok."
+            t!("Sonuç yok.", "No results.")
         } else {
             r.note.as_str()
         };
         Line::from(text).gray()
     } else {
-        let mut spans = vec![Span::raw(format!(
+        let mut spans = vec![Span::raw(tf!(
             "{} öğe tarandı, {:.1} sn",
+            "{} items scanned, {:.1} s",
             fmt_count(b.tree.len() as u64),
             b.elapsed.as_secs_f64()
         ))
         .gray()];
         if b.errors > 0 {
             spans.push(
-                Span::raw(format!("   ⚠ {} öğeye erişilemedi", fmt_count(b.errors))).yellow(),
+                Span::raw(tf!(
+                    "   ⚠ {} öğeye erişilemedi",
+                    "   ⚠ {} items inaccessible",
+                    fmt_count(b.errors)
+                ))
+                .yellow(),
             );
         }
         if b.trashed.get(mode) > 0 {
             spans.push(
-                Span::raw(format!(
+                Span::raw(tf!(
                     "   🗑 bu oturumda çöpe taşınan: {}",
+                    "   🗑 moved to trash this session: {}",
                     fmt_size(b.trashed.get(mode))
                 ))
                 .green(),
             );
         }
         if b.entries.is_empty() {
-            spans.push(Span::raw("   (klasör boş)").gray());
+            spans.push(Span::raw(t!("   (klasör boş)", "   (empty folder)")).gray());
         }
         Line::from(spans)
     };
     f.render_widget(status, status_area);
 
     let footer_keys: &[(&str, &str)] = if b.failures.is_some() {
-        &[("↑↓", "kaydır"), ("Esc", "kapat")]
+        &[
+            ("↑↓", t!("kaydır", "scroll")),
+            ("Esc", t!("kapat", "close")),
+        ]
     } else if b.dup_job.is_some() {
-        &[("Esc", "iptal"), ("q", "çık")]
+        &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
     } else if b.report_menu.is_some() || b.snapshot_picker.is_some() {
-        &[("↑↓", "seç"), ("Enter", "çalıştır"), ("Esc", "kapat")]
+        &[
+            ("↑↓", t!("seç", "select")),
+            ("Enter", t!("çalıştır", "run")),
+            ("Esc", t!("kapat", "close")),
+        ]
     } else if b.confirm.is_some() {
-        &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]
+        &[
+            ("e", t!("evet, çöpe taşı", "yes, move to trash")),
+            ("h / Esc", t!("vazgeç", "cancel")),
+        ]
     } else if b.deleting.is_some() {
-        &[("q", "çık")]
+        &[("q", t!("çık", "quit"))]
     } else if b.input.is_some() {
-        &[("Enter", "ara"), ("Esc", "vazgeç")]
+        &[
+            ("Enter", t!("ara", "find")),
+            ("Esc", t!("vazgeç", "cancel")),
+        ]
     } else if let Some(view) = &b.tools {
         if view.running() {
-            &[("…", "komutlar çalışıyor")]
+            &[("…", t!("komutlar çalışıyor", "commands running"))]
         } else if view.confirm.is_some() || view.picker.is_some() {
-            &[("Esc", "vazgeç")]
+            &[("Esc", t!("vazgeç", "cancel"))]
         } else {
             &[
-                ("↑↓", "seç"),
-                ("Enter", "temizle"),
-                ("r", "yeniden ölç"),
-                ("m", "menü"),
-                ("Esc", "geri"),
-                ("q", "çık"),
+                ("↑↓", t!("seç", "select")),
+                ("Enter", t!("temizle", "clean")),
+                ("r", t!("yeniden ölç", "measure again")),
+                ("m", t!("menü", "menu")),
+                ("Esc", t!("geri", "back")),
+                ("q", t!("çık", "quit")),
             ]
         }
     } else if b.system.is_some() {
         &[
-            ("r", "yenile"),
-            ("m", "menü"),
-            ("Esc", "geri"),
-            ("q", "çık"),
+            ("r", t!("yenile", "refresh")),
+            ("m", t!("menü", "menu")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
         ]
     } else if b.dashboard.is_some() {
         &[
-            ("Tab", "liste değiştir"),
-            ("↑↓", "gez"),
-            ("Enter", "konuma git"),
-            ("Space", "sepete"),
-            ("x", "çöpe taşı"),
-            ("a", "görünen/diskte"),
-            ("Esc", "geri"),
-            ("q", "çık"),
+            ("Tab", t!("liste değiştir", "switch list")),
+            ("↑↓", t!("gez", "move")),
+            ("Enter", t!("konuma git", "go to location")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("a", t!("görünen/diskte", "apparent/on disk")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
         ]
     } else if b.results.is_some() {
         &[
-            ("↑↓", "gez"),
-            ("Space", "sepete"),
-            ("t", "tümü"),
-            ("f", "yaş filtresi"),
-            ("x", "çöpe taşı"),
-            ("S", "sepet"),
-            ("Enter", "aç / konuma git"),
-            ("/", "ara"),
-            ("m", "raporlar"),
-            ("Esc", "geri"),
-            ("q", "çık"),
+            ("↑↓", t!("gez", "move")),
+            ("Space", t!("sepete", "to basket")),
+            ("t", t!("tümü", "all")),
+            ("f", t!("yaş filtresi", "age filter")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("Enter", t!("aç / konuma git", "open / go to")),
+            ("/", t!("ara", "find")),
+            ("m", t!("raporlar", "reports")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
         ]
     } else if b.view == View::Map {
         &[
-            ("←↑↓→", "blok seç"),
-            ("Enter", "gir"),
-            ("⌫", "geri"),
-            ("c", "renk"),
-            ("t/Esc", "liste"),
-            ("Space", "sepete"),
-            ("x", "çöpe taşı"),
-            ("S", "sepet"),
-            ("m", "raporlar"),
-            ("q", "çık"),
+            ("←↑↓→", t!("blok seç", "select block")),
+            ("Enter", t!("gir", "open")),
+            ("⌫", t!("geri", "back")),
+            ("c", t!("renk", "color")),
+            ("t/Esc", t!("liste", "list")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("m", t!("raporlar", "reports")),
+            ("q", t!("çık", "quit")),
         ]
     } else {
         &[
-            ("↑↓", "gez"),
-            ("Enter", "gir"),
-            ("⌫", "geri"),
-            ("t", "harita"),
-            ("/", "ara"),
-            ("m", "raporlar"),
-            ("i", "özet"),
-            ("s", "sırala"),
-            ("a", "görünen/diskte"),
-            ("Space", "sepete"),
-            ("x", "çöpe taşı"),
-            ("S", "sepet"),
-            ("r", "yeniden tara"),
-            ("d", "diskler"),
-            ("q", "çık"),
+            ("↑↓", t!("gez", "move")),
+            ("Enter", t!("gir", "open")),
+            ("⌫", t!("geri", "back")),
+            ("t", t!("harita", "map")),
+            ("/", t!("ara", "find")),
+            ("m", t!("raporlar", "reports")),
+            ("i", t!("özet", "summary")),
+            ("s", t!("sırala", "sort")),
+            ("a", t!("görünen/diskte", "apparent/on disk")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("r", t!("yeniden tara", "rescan")),
+            ("d", t!("diskler", "disks")),
+            ("q", t!("çık", "quit")),
         ]
     };
     f.render_widget(keys(footer_keys), footer);
@@ -448,10 +531,20 @@ fn render_failures(f: &mut Frame, d: &mut FailureDialog, area: Rect) {
     let mut lines = vec![
         Line::from(""),
         Line::from(vec![
-            Span::raw(format!(" ✗ {} öğe taşınamadı", d.items.len()))
-                .red()
-                .bold(),
-            Span::raw(format!("   ·   ✓ {} öğe taşındı ({})", d.moved, d.size)).green(),
+            Span::raw(tf!(
+                " ✗ {} öğe taşınamadı",
+                " ✗ {} items could not be moved",
+                d.items.len()
+            ))
+            .red()
+            .bold(),
+            Span::raw(tf!(
+                "   ·   ✓ {} öğe taşındı ({})",
+                "   ·   ✓ {} items moved ({})",
+                d.moved,
+                d.size
+            ))
+            .green(),
         ]),
         Line::from(""),
     ];
@@ -484,9 +577,12 @@ fn render_failures(f: &mut Frame, d: &mut FailureDialog, area: Rect) {
     d.scroll = d.scroll.min(max_scroll);
 
     let footer = if max_scroll > 0 {
-        " ↑↓ kaydır · Esc / Enter: kapat "
+        t!(
+            " ↑↓ kaydır · Esc / Enter: kapat ",
+            " ↑↓ scroll · Esc / Enter: close "
+        )
     } else {
-        " Esc / Enter: kapat "
+        t!(" Esc / Enter: kapat ", " Esc / Enter: close ")
     };
     f.render_widget(Clear, rect);
     f.render_widget(
@@ -495,7 +591,11 @@ fn render_failures(f: &mut Frame, d: &mut FailureDialog, area: Rect) {
             .scroll((d.scroll, 0))
             .block(
                 Block::bordered()
-                    .title(Span::raw(" Taşınamayan öğeler ").white().bold())
+                    .title(
+                        Span::raw(t!(" Taşınamayan öğeler ", " Items not moved "))
+                            .white()
+                            .bold(),
+                    )
                     .title_bottom(Line::from(footer).centered().gray())
                     .border_style(Style::new().fg(Color::Red)),
             ),
@@ -527,9 +627,10 @@ fn render_snapshot_picker(
                     .white()
                     .bold(),
                 Span::raw(format!("  {:<16}", fmt_ago(now.saturating_sub(h.time)))).gray(),
-                Span::raw(format!("toplam {:>10}", fmt_size(h.total.disk))),
-                Span::raw(format!(
+                Span::raw(tf!("toplam {:>10}", "total {:>10}", fmt_size(h.total.disk))),
+                Span::raw(tf!(
                     "   şimdiye göre {}",
+                    "   vs. now {}",
                     fmt_delta(total_now, h.total.disk)
                 ))
                 .yellow(),
@@ -538,7 +639,13 @@ fn render_snapshot_picker(
         );
     }
     lines.push(Line::from(""));
-    lines.push(Line::from(" Karşılaştırma bulunduğunuz klasörün altında yapılır.").gray());
+    lines.push(
+        Line::from(t!(
+            " Karşılaştırma bulunduğunuz klasörün altında yapılır.",
+            " The comparison covers the folder you are in.",
+        ))
+        .gray(),
+    );
     let height = (lines.len() as u16 + 2).min(area.height);
     let popup = Rect {
         x: area.x + (area.width.saturating_sub(width)) / 2,
@@ -551,9 +658,12 @@ fn render_snapshot_picker(
         Paragraph::new(lines).block(
             Block::bordered()
                 .title(
-                    Span::raw(" Hangi taramayla karşılaştırılsın? ")
-                        .white()
-                        .bold(),
+                    Span::raw(t!(
+                        " Hangi taramayla karşılaştırılsın? ",
+                        " Compare with which scan? "
+                    ))
+                    .white()
+                    .bold(),
                 )
                 .border_style(Style::new().fg(Color::Cyan)),
         ),
@@ -567,9 +677,9 @@ fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
     for (i, item) in MenuItem::ALL.iter().enumerate() {
         if i == 0 || item.is_tool() != MenuItem::ALL[i - 1].is_tool() {
             let heading = if item.is_tool() {
-                " Araçlar"
+                t!(" Araçlar", " Tools")
             } else {
-                " Raporlar"
+                t!(" Raporlar", " Reports")
             };
             lines.push(Line::from(""));
             lines.push(Line::from(heading).cyan().bold());
@@ -592,8 +702,11 @@ fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
     lines.push(Line::from(""));
     lines.push(Line::from(format!(" {}", MenuItem::ALL[selected].description())).yellow());
     lines.push(
-        Line::from(" Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama).")
-            .gray(),
+        Line::from(t!(
+            " Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama). L: English",
+            " Reports cover the folder you are in (apps: the whole scan). L: Türkçe",
+        ))
+        .gray(),
     );
 
     let height = (lines.len() as u16 + 2).min(area.height);
@@ -607,7 +720,7 @@ fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
     f.render_widget(
         Paragraph::new(lines).block(
             Block::bordered()
-                .title(Span::raw(" Menü ").white().bold())
+                .title(Span::raw(t!(" Menü ", " Menu ")).white().bold())
                 .border_style(Style::new().fg(Color::Cyan)),
         ),
         popup,
@@ -651,7 +764,7 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
             Cell::from(Line::from(fmt_size(size)).right_aligned()),
             Cell::from(Line::from(vec![
                 Span::styled(bar(ratio, 12), Style::new().fg(Color::Cyan)),
-                Span::raw(format!(" {:>5.1}%", ratio * 100.0)),
+                Span::raw(format!(" {:>6}", fmt_pct(ratio * 100.0, 1))),
             ])),
             Cell::from(Line::from(count).right_aligned().gray()),
             date_cell(n.modified, now),
@@ -670,13 +783,19 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
         Constraint::Length(10),
         Constraint::Length(DATE_WIDTH),
     ];
-    let mut header = vec!["", "Boyut", "Oran", "Dosya", "Son değişiklik"];
+    let mut header = vec![
+        "",
+        t!("Boyut", "Size"),
+        t!("Oran", "Share"),
+        t!("Dosya", "Files"),
+        t!("Son değişiklik", "Modified"),
+    ];
     if wide {
         widths.push(Constraint::Length(DATE_WIDTH));
-        header.push("Oluşturma");
+        header.push(t!("Oluşturma", "Created"));
     }
     widths.push(Constraint::Min(10));
-    header.push("Ad");
+    header.push(t!("Ad", "Name"));
 
     let table = Table::new(rows, widths)
         .header(Row::new(header).bold().underlined())
@@ -708,7 +827,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, checks: &[bool
         let (count, modified, created) = if row.group {
             let newest = row.nodes.iter().map(|&id| tree.node(id).modified).max();
             (
-                format!("{} adet", fmt_count(row.nodes.len() as u64)),
+                tf!("{} adet", "{} items", fmt_count(row.nodes.len() as u64)),
                 newest.unwrap_or(0),
                 0,
             )
@@ -748,16 +867,21 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, checks: &[bool
         Constraint::Length(10),
         Constraint::Length(DATE_WIDTH),
     ];
-    let mut header = vec!["", "Boyut", "Adet", "Son değişiklik"];
+    let mut header = vec![
+        "",
+        t!("Boyut", "Size"),
+        t!("Adet", "Count"),
+        t!("Son değişiklik", "Modified"),
+    ];
     if wide {
         widths.push(Constraint::Length(DATE_WIDTH));
-        header.push("Oluşturma");
+        header.push(t!("Oluşturma", "Created"));
     }
     widths.push(Constraint::Min(10));
-    header.push("Konum");
+    header.push(t!("Konum", "Location"));
     if has_detail {
         widths.push(Constraint::Length(detail_width.max(7)));
-        header.push("Ayrıntı");
+        header.push(t!("Ayrıntı", "Details"));
     }
 
     let table = Table::new(rows, widths)
@@ -771,8 +895,8 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, checks: &[bool
 /// Top/bottom rule with the date color legend on the top edge.
 fn table_block() -> Block<'static> {
     let label = Style::new().fg(Color::White);
-    let mut legend = vec![Span::styled(" Tarih: ", label.bold())];
-    for (color, text) in AGE_COLORS.iter().zip(stats::AGE_LABELS).take(4) {
+    let mut legend = vec![Span::styled(t!(" Tarih: ", " Date: "), label.bold())];
+    for (color, text) in AGE_COLORS.iter().zip((0..4).map(stats::age_label)) {
         legend.push(Span::styled("██", Style::new().fg(*color)));
         legend.push(Span::styled(format!(" {text}   "), label));
     }
@@ -781,7 +905,7 @@ fn table_block() -> Block<'static> {
         .title_top(Line::from(legend).right_aligned())
 }
 
-/// Colors of the age groups in `stats::AGE_LABELS`: fresh is green,
+/// Colors of the age groups of `stats::age_label`: fresh is green,
 /// untouched for over a year is red.
 const AGE_COLORS: [Color; 5] = [
     Color::Green,
@@ -808,13 +932,26 @@ pub fn now_secs() -> u64 {
 
 /// Local date and time, e.g. "03.10.2026 14:22".
 pub fn fmt_date(secs: u32) -> String {
+    fmt_date_in(lang(), secs)
+}
+
+/// "03.10.2026 14:22" in Turkish, "2026-10-03 14:22" in English.
+fn fmt_date_in(lang: Lang, secs: u32) -> String {
+    let pattern = match lang {
+        Lang::Tr => "%d.%m.%Y %H:%M",
+        Lang::En => "%Y-%m-%d %H:%M",
+    };
     chrono::DateTime::from_timestamp(i64::from(secs), 0)
-        .map(|t| {
-            t.with_timezone(&chrono::Local)
-                .format("%d.%m.%Y %H:%M")
-                .to_string()
-        })
+        .map(|t| t.with_timezone(&chrono::Local).format(pattern).to_string())
         .unwrap_or_else(|| "—".into())
+}
+
+/// A percentage: "%51.0" in Turkish, "51.0%" in English.
+pub fn fmt_pct(value: f64, decimals: usize) -> String {
+    match lang() {
+        Lang::Tr => format!("%{value:.decimals$}"),
+        Lang::En => format!("{value:.decimals$}%"),
+    }
 }
 
 /// Text color that stays readable on `bg`.
@@ -915,7 +1052,10 @@ fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
                     .sum();
                 (
                     Color::DarkGray,
-                    format!("diğer ({count} küçük öğe — Enter: listede gör)"),
+                    tf!(
+                        "diğer ({count} küçük öğe — Enter: listede gör)",
+                        "other ({count} small items — Enter: show in list)"
+                    ),
                     size,
                     false,
                 )
@@ -943,7 +1083,7 @@ fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
         if inner.height >= 2 {
             let pct = size as f64 / total as f64 * 100.0;
             lines.push(Line::from(clip(
-                &format!("{} · %{pct:.1}", fmt_size(size)),
+                &format!("{} · {}", fmt_size(size), fmt_pct(pct, 1)),
                 width,
             )));
         }
@@ -958,27 +1098,33 @@ fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
 
     let mut legend = vec![
         Span::raw(" t / Esc ").black().on_gray(),
-        Span::raw(" listeye dön   ").white(),
-        Span::raw("Renk: ").white().bold(),
+        Span::raw(t!(" listeye dön   ", " back to list   ")).white(),
+        Span::raw(t!("Renk: ", "Color: ")).white().bold(),
     ];
     match b.map_color {
         MapColor::Kind => {
             for color in DIR_COLORS.iter().take(4) {
                 legend.push(Span::styled("█", Style::new().fg(*color)));
             }
-            legend.push(Span::raw(" klasörler (her biri ayrı)  ").white());
+            legend.push(
+                Span::raw(t!(
+                    " klasörler (her biri ayrı)  ",
+                    " folders (each its own)  "
+                ))
+                .white(),
+            );
             for (cat, color) in stats::Category::ALL.iter().zip(CATEGORY_COLORS) {
                 legend.push(Span::styled("██", Style::new().fg(color)));
                 legend.push(Span::raw(format!(" {}  ", cat.label())).white());
             }
-            legend.push(Span::raw("  (c: yaşa göre)").gray());
+            legend.push(Span::raw(t!("  (c: yaşa göre)", "  (c: by age)")).gray());
         }
         MapColor::Age => {
-            for (color, text) in AGE_COLORS.iter().zip(stats::AGE_LABELS).take(4) {
+            for (color, text) in AGE_COLORS.iter().zip((0..4).map(stats::age_label)) {
                 legend.push(Span::styled("██", Style::new().fg(*color)));
                 legend.push(Span::raw(format!(" {text}  ")).white());
             }
-            legend.push(Span::raw("  (c: türe göre)").gray());
+            legend.push(Span::raw(t!("  (c: türe göre)", "  (c: by type)")).gray());
         }
     }
     f.render_widget(Line::from(legend), legend_area);
@@ -1025,33 +1171,35 @@ fn render_dashboard(
     let base = tree.node(d.base);
     let mut lines = vec![
         Line::from(vec![
-            Span::raw("Toplam boyut   ").white(),
+            Span::raw(format!("{:<15}", t!("Toplam boyut", "Total size"))).white(),
             Span::raw(fmt_size(s.size)).bold(),
         ]),
         Line::from(vec![
-            Span::raw("İçerik         ").white(),
-            Span::raw(format!(
+            Span::raw(format!("{:<15}", t!("İçerik", "Contents"))).white(),
+            Span::raw(tf!(
                 "{} dosya · {} klasör",
+                "{} files · {} folders",
                 fmt_count(s.files),
                 fmt_count(s.dirs)
             )),
         ]),
         Line::from(vec![
-            Span::raw("En yeni değişiklik  ").white(),
+            Span::raw(format!("{}  ", t!("En yeni değişiklik", "Latest change"))).white(),
             date_span(base.modified, now),
         ]),
     ];
     if scan_errors > 0 {
         lines.push(
-            Line::from(format!(
+            Line::from(tf!(
                 "⚠ Taramada {} öğeye erişilemedi",
+                "⚠ {} items were inaccessible during the scan",
                 fmt_count(scan_errors)
             ))
             .yellow(),
         );
     }
     f.render_widget(
-        Paragraph::new(lines).block(panel(" Genel ", false)),
+        Paragraph::new(lines).block(panel(t!(" Genel ", " General "), false)),
         general,
     );
 
@@ -1067,26 +1215,27 @@ fn render_dashboard(
         vec![
             Line::from(vec![
                 Span::styled(bar(ratio, width), Style::new().fg(usage_color(ratio))),
-                Span::raw(format!(" %{:.0}", ratio * 100.0)).bold(),
+                Span::raw(format!(" {}", fmt_pct(ratio * 100.0, 0))).bold(),
             ]),
-            Line::from(format!(
+            Line::from(tf!(
                 "{} / {} kullanılıyor · {} boş",
+                "{} / {} used · {} free",
                 fmt_size(disk.used()),
                 fmt_size(disk.total),
                 fmt_size(disk.available)
             )),
             Line::from(vec![
-                Span::raw("Disk payı  ").white(),
+                Span::raw(t!("Disk payı  ", "Disk share  ")).white(),
                 Span::raw(if share > 0.0 && share < 0.1 {
-                    "< %0.1".to_string()
+                    format!("< {}", fmt_pct(0.1, 1))
                 } else {
-                    format!("%{share:.1}")
+                    fmt_pct(share, 1)
                 })
                 .bold(),
             ]),
         ]
     } else {
-        vec![Line::from("Disk bilgisi bulunamadı.").gray()]
+        vec![Line::from(t!("Disk bilgisi bulunamadı.", "No disk information.")).gray()]
     };
     let disk_title = d
         .disk
@@ -1113,12 +1262,12 @@ fn render_dashboard(
                     Style::new().fg(CATEGORY_COLORS[cat as usize]),
                 ),
                 Span::raw(format!(" {:>10}", fmt_size(b.size))),
-                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).gray(),
+                Span::raw(format!(" {:>5}", fmt_pct(ratio * 100.0, 0))).gray(),
             ])
         })
         .collect();
     f.render_widget(
-        Paragraph::new(lines).block(panel(" Dosya türleri ", false)),
+        Paragraph::new(lines).block(panel(t!(" Dosya türleri ", " File types "), false)),
         types,
     );
 
@@ -1130,15 +1279,18 @@ fn render_dashboard(
             let b = s.ages[i];
             let ratio = b.size as f64 / total;
             Line::from(vec![
-                Span::raw(format!("{:<11}", stats::AGE_LABELS[i])).white(),
+                Span::raw(format!("{:<11}", stats::age_label(i))).white(),
                 Span::styled(bar(ratio, bar_w), Style::new().fg(AGE_COLORS[i])),
                 Span::raw(format!(" {:>10}", fmt_size(b.size))),
-                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).gray(),
+                Span::raw(format!(" {:>5}", fmt_pct(ratio * 100.0, 0))).gray(),
             ])
         })
         .collect();
     f.render_widget(
-        Paragraph::new(lines).block(panel(" Yaş (son değişiklik) ", false)),
+        Paragraph::new(lines).block(panel(
+            t!(" Yaş (son değişiklik) ", " Age (last modified) "),
+            false,
+        )),
         ages,
     );
 
@@ -1146,7 +1298,7 @@ fn render_dashboard(
     let base_path = tree.path_of(d.base);
     let rel = |id: NodeId| {
         if id == d.base {
-            return "(bu klasör)".to_string();
+            return t!("(bu klasör)", "(this folder)").to_string();
         }
         let path = tree.path_of(id);
         path.strip_prefix(&base_path)
@@ -1172,7 +1324,10 @@ fn render_dashboard(
             Constraint::Min(10),
         ],
     )
-    .block(panel(" En büyük dosyalar ", focus_files));
+    .block(panel(
+        t!(" En büyük dosyalar ", " Largest files "),
+        focus_files,
+    ));
     let table = if focus_files {
         table.row_highlight_style(HIGHLIGHT).highlight_symbol("▶ ")
     } else {
@@ -1194,8 +1349,13 @@ fn render_dashboard(
             )),
         ])
     });
-    let table = Table::new(rows, [Constraint::Length(10), Constraint::Min(10)])
-        .block(panel(" En dolu klasörler (doğrudan içerik) ", focus_dirs));
+    let table = Table::new(rows, [Constraint::Length(10), Constraint::Min(10)]).block(panel(
+        t!(
+            " En dolu klasörler (doğrudan içerik) ",
+            " Fullest folders (direct contents) "
+        ),
+        focus_dirs,
+    ));
     let table = if focus_dirs {
         table.row_highlight_style(HIGHLIGHT).highlight_symbol("▶ ")
     } else {
@@ -1206,14 +1366,17 @@ fn render_dashboard(
 
 fn risk_style(risk: Risk) -> (Style, &'static str) {
     match risk {
-        Risk::Safe => (Style::new().fg(Color::Black).bg(Color::Green), " güvenli "),
+        Risk::Safe => (
+            Style::new().fg(Color::Black).bg(Color::Green),
+            t!(" güvenli ", " safe "),
+        ),
         Risk::Redownload => (
             Style::new().fg(Color::Black).bg(Color::Yellow),
-            " yeniden indirilir ",
+            t!(" yeniden indirilir ", " re-downloaded "),
         ),
         Risk::DataLoss => (
             Style::new().fg(Color::White).bg(Color::Red).bold(),
-            " VERİ KAYBI ",
+            t!(" VERİ KAYBI ", " DATA LOSS "),
         ),
     }
 }
@@ -1241,7 +1404,7 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
         let (size, info) = match &t.status {
             ToolStatus::Measuring => (
                 Line::from(format!("{spin}")).cyan(),
-                Span::raw("ölçülüyor…").cyan(),
+                Span::raw(t!("ölçülüyor…", "measuring…")).cyan(),
             ),
             ToolStatus::Missing(why) => (Line::from("—").gray(), Span::raw(why.clone()).gray()),
             ToolStatus::Unavailable(why) => {
@@ -1274,9 +1437,13 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
         ],
     )
     .header(
-        Row::new(["Araç", "Kazanılır", "Ayrıntı"])
-            .bold()
-            .underlined(),
+        Row::new([
+            t!("Araç", "Tool"),
+            t!("Kazanılır", "Reclaimable"),
+            t!("Ayrıntı", "Details"),
+        ])
+        .bold()
+        .underlined(),
     )
     .row_highlight_style(HIGHLIGHT)
     .highlight_symbol("▶ ")
@@ -1297,8 +1464,16 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
                 }
             }
         }
-        Some(t) if t.status == ToolStatus::Measuring => lines.push(Line::from("Ölçülüyor…").cyan()),
-        _ => lines.push(Line::from("Bu araç için yapılacak bir şey yok.").gray()),
+        Some(t) if t.status == ToolStatus::Measuring => {
+            lines.push(Line::from(t!("Ölçülüyor…", "Measuring…")).cyan())
+        }
+        _ => lines.push(
+            Line::from(t!(
+                "Bu araç için yapılacak bir şey yok.",
+                "Nothing to do for this tool."
+            ))
+            .gray(),
+        ),
     }
     if let Some(run) = &view.run {
         // Show the end of the log.
@@ -1319,11 +1494,19 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
             })
             .collect();
         let title = if !run.finished {
-            format!(" {} Çalışıyor… ", SPINNER[tick % SPINNER.len()])
+            tf!(
+                " {} Çalışıyor… ",
+                " {} Running… ",
+                SPINNER[tick % SPINNER.len()]
+            )
         } else if run.failures > 0 {
-            format!(" Bitti — {} adım başarısız ", run.failures)
+            tf!(
+                " Bitti — {} adım başarısız ",
+                " Done — {} steps failed ",
+                run.failures
+            )
         } else {
-            " Bitti ".to_string()
+            t!(" Bitti ", " Done ").to_string()
         };
         f.render_widget(
             Paragraph::new(lines).block(panel(&title, true)),
@@ -1331,7 +1514,7 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
         );
     } else {
         f.render_widget(
-            Paragraph::new(lines).block(panel(" İşlemler ", false)),
+            Paragraph::new(lines).block(panel(t!(" İşlemler ", " Actions "), false)),
             detail_area,
         );
     }
@@ -1355,10 +1538,20 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
             });
         }
         lines.push(Line::from(""));
-        lines.push(Line::from(" Space: seç   Enter: devam   Esc: vazgeç").gray());
+        lines.push(
+            Line::from(t!(
+                " Space: seç   Enter: devam   Esc: vazgeç",
+                " Space: select   Enter: continue   Esc: cancel",
+            ))
+            .gray(),
+        );
         popup(
             f,
-            &format!(" {} — ne temizlensin? ", tool.kind.label()),
+            &tf!(
+                " {} — ne temizlensin? ",
+                " {} — what to clean? ",
+                tool.kind.label()
+            ),
             Color::Cyan,
             lines,
             90,
@@ -1369,7 +1562,11 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
         let tool = &view.tools[c.tool];
         let mut lines = vec![
             Line::from(""),
-            Line::from("Şu komutlar sırayla çalışacak:").white(),
+            Line::from(t!(
+                "Şu komutlar sırayla çalışacak:",
+                "These commands will run in order:"
+            ))
+            .white(),
         ];
         for a in &c.actions {
             let (style, text) = risk_style(a.risk);
@@ -1385,28 +1582,36 @@ fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
         match &c.typed {
             Some(typed) => {
                 lines.push(
-                    Line::from("Seçimde VERİ KAYBI olan bir işlem var. Onaylamak için „evet” yazıp Enter'a basın:")
+                    Line::from(t!(
+                        "Seçimde VERİ KAYBI olan bir işlem var. Onaylamak için „evet” yazıp Enter'a basın:",
+                        "The selection includes a DATA LOSS action. Type “yes” and press Enter to confirm:",
+                    ))
                         .red()
                         .bold(),
                 );
-                let ok = typed.trim() == CONFIRM_WORD;
+                let ok = typed.trim() == confirm_word();
                 lines.push(Line::from(vec![
                     Span::raw(" > "),
                     Span::raw(format!("{typed}█")).white().bold(),
-                    Span::raw(if ok { "   Enter: çalıştır" } else { "" }).green(),
+                    Span::raw(if ok {
+                        t!("   Enter: çalıştır", "   Enter: run")
+                    } else {
+                        ""
+                    })
+                    .green(),
                 ]));
-                lines.push(Line::from(" Esc: vazgeç").gray());
+                lines.push(Line::from(t!(" Esc: vazgeç", " Esc: cancel")).gray());
             }
             None => lines.push(Line::from(vec![
-                Span::raw(" e ").black().on_red().bold(),
-                Span::raw(" evet, çalıştır     "),
-                Span::raw(" h ").black().on_gray(),
-                Span::raw(" vazgeç"),
+                Span::raw(t!(" e ", " y ")).black().on_red().bold(),
+                Span::raw(t!(" evet, çalıştır     ", " yes, run     ")),
+                Span::raw(t!(" h ", " n ")).black().on_gray(),
+                Span::raw(t!(" vazgeç", " cancel")),
             ])),
         }
         popup(
             f,
-            &format!(" {} — onay ", tool.kind.label()),
+            &tf!(" {} — onay ", " {} — confirm ", tool.kind.label()),
             Color::Red,
             lines,
             100,
@@ -1464,8 +1669,9 @@ fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
             let ratio = used as f64 / c.total.max(1) as f64;
             let bar_w = (top.width as usize).saturating_sub(60).max(10);
             lines.push(Line::from(vec![
-                Span::raw(format!(
+                Span::raw(tf!(
                     "Toplam {}  ·  kullanılan {}  ·  boş {}   ",
+                    "Total {}  ·  used {}  ·  free {}   ",
                     fmt_size(c.total),
                     fmt_size(used),
                     fmt_size(c.free)
@@ -1485,11 +1691,21 @@ fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
                     Span::styled(bar(ratio, 20), Style::new().fg(Color::Cyan)),
                 ]));
             }
-            format!(" APFS kapsayıcısı ({}) ", c.reference)
+            tf!(
+                " APFS kapsayıcısı ({}) ",
+                " APFS container ({}) ",
+                c.reference
+            )
         }
         None => {
-            lines.push(Line::from("APFS bilgisi alınamadı.").yellow());
-            " APFS kapsayıcısı ".to_string()
+            lines.push(
+                Line::from(t!(
+                    "APFS bilgisi alınamadı.",
+                    "Could not read APFS information."
+                ))
+                .yellow(),
+            );
+            t!(" APFS kapsayıcısı ", " APFS container ").to_string()
         }
     };
     f.render_widget(Paragraph::new(lines).block(panel(&title, false)), top);
@@ -1499,54 +1715,77 @@ fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
     let mut lines = Vec::new();
     match sys.scannable_used() {
         Some(expected) if b.tree.root_path() == std::path::Path::new("/") => {
-            lines.push(line("Sistem + Veri bölümleri", fmt_size(expected)));
-            lines.push(line("Taramanın bulduğu", fmt_size(scanned)));
+            lines.push(line(
+                t!("Sistem + Veri bölümleri", "System + Data volumes"),
+                fmt_size(expected),
+            ));
+            lines.push(line(
+                t!("Taramanın bulduğu", "Found by the scan"),
+                fmt_size(scanned),
+            ));
             if expected >= scanned {
-                lines.push(line("Taramanın göremediği", fmt_size(expected - scanned)).yellow());
-                lines.push(Line::from("Olası nedenler:").gray());
+                lines.push(
+                    line(
+                        t!("Taramanın göremediği", "Not seen by the scan"),
+                        fmt_size(expected - scanned),
+                    )
+                    .yellow(),
+                );
+                lines.push(Line::from(t!("Olası nedenler:", "Possible reasons:")).gray());
                 if b.errors > 0 {
-                    lines.push(Line::from(format!(
+                    lines.push(Line::from(tf!(
                         " • erişilemeyen {} öğe — terminale Tam Disk Erişimi verin",
+                        " • {} inaccessible items — give the terminal Full Disk Access",
                         fmt_count(b.errors)
                     )));
                 }
                 if !sys.snapshots.is_empty() {
-                    lines.push(Line::from(format!(
+                    lines.push(Line::from(tf!(
                         " • {} Time Machine yerel anlık görüntüsü",
+                        " • {} local Time Machine snapshots",
                         sys.snapshots.len()
                     )));
                 }
-                lines.push(Line::from(
+                lines.push(Line::from(t!(
                     " • silinebilir (purgeable) alan ve dosya sistemi meta verisi",
-                ));
+                    " • purgeable space and file system metadata",
+                )));
             } else {
-                lines.push(line("Fazla sayılan", fmt_size(scanned - expected)));
+                lines.push(line(
+                    t!("Fazla sayılan", "Counted extra"),
+                    fmt_size(scanned - expected),
+                ));
                 lines.push(
-                    Line::from(
+                    Line::from(t!(
                         "APFS klonları ve kopyalar blok paylaşsa da tarama onları ayrı sayar.",
-                    )
+                        "APFS clones and copies share blocks, but the scan counts them separately.",
+                    ))
                     .gray(),
                 );
             }
         }
         _ => {
-            lines.push(Line::from(
+            lines.push(Line::from(t!(
                 "Bu karşılaştırma için diskin kökünü (/) tarayın:",
-            ));
+                "For this comparison, scan the disk root (/):",
+            )));
             lines.push(Line::from("d → Macintosh HD").cyan());
         }
     }
     f.render_widget(
         Paragraph::new(lines)
             .wrap(Wrap { trim: false })
-            .block(panel(" Taramanın göremediği ", false)),
+            .block(panel(
+                t!(" Taramanın göremediği ", " Not seen by the scan "),
+                false,
+            )),
         gap_area,
     );
 
     // Snapshots and memory files
     let mut lines = vec![line(
-        "Time Machine anlık görüntüsü",
-        format!("{} adet", sys.snapshots.len()),
+        t!("Time Machine anlık görüntüsü", "Time Machine snapshots"),
+        tf!("{} adet", "{}", sys.snapshots.len()),
     )];
     for name in sys.snapshots.iter().take(2) {
         lines.push(Line::from(format!("  {name}")).gray());
@@ -1556,23 +1795,30 @@ fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
             .trim_start_matches("com.apple.TimeMachine.")
             .trim_end_matches(".local");
         lines.push(
-            Line::from(format!(
-                "  silmek için: sudo tmutil deletelocalsnapshots {date}"
+            Line::from(tf!(
+                "  silmek için: sudo tmutil deletelocalsnapshots {date}",
+                "  to delete: sudo tmutil deletelocalsnapshots {date}"
             ))
             .cyan(),
         );
     }
     if let Some((total, used)) = sys.swap {
         lines.push(line(
-            "Takas (swap)",
+            t!("Takas (swap)", "Swap"),
             format!("{} / {}", fmt_size(used), fmt_size(total)),
         ));
     }
     if let Some(sleep) = sys.sleepimage {
-        lines.push(line("Uyku görüntüsü (sleepimage)", fmt_size(sleep)));
+        lines.push(line(
+            t!("Uyku görüntüsü (sleepimage)", "Sleep image (sleepimage)"),
+            fmt_size(sleep),
+        ));
     }
     f.render_widget(
-        Paragraph::new(lines).block(panel(" Anlık görüntüler ve bellek ", false)),
+        Paragraph::new(lines).block(panel(
+            t!(" Anlık görüntüler ve bellek ", " Snapshots and memory "),
+            false,
+        )),
         other_area,
     );
 
@@ -1581,18 +1827,29 @@ fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
     if !sys.simulators.is_empty() {
         let total: u64 = sys.simulators.iter().map(|c| c.used()).sum();
         lines.push(line(
-            "Simülatör çalışma zamanları",
-            format!("{} imaj, {}", sys.simulators.len(), fmt_size(total)),
+            t!("Simülatör çalışma zamanları", "Simulator runtimes"),
+            tf!(
+                "{} imaj, {}",
+                "{} images, {}",
+                sys.simulators.len(),
+                fmt_size(total)
+            ),
         ));
         lines.push(
-            Line::from("  Ayrı disk imajlarında durur, taramada görünmez. Temizlik: m → Geliştirici araçları temizliği")
+            Line::from(t!(
+                "  Ayrı disk imajlarında durur, taramada görünmez. Temizlik: m → Geliştirici araçları temizliği",
+                "  Kept in separate disk images, not in the scan. Clean up: m → Developer tools cleanup",
+            ))
                 .gray(),
         );
     }
     for p in &sys.problems {
         lines.push(Line::from(format!("⚠ {p}")).yellow());
     }
-    f.render_widget(Paragraph::new(lines).block(panel(" Diğer ", false)), bottom);
+    f.render_widget(
+        Paragraph::new(lines).block(panel(t!(" Diğer ", " Other "), false)),
+        bottom,
+    );
 }
 
 fn halves(area: Rect) -> [Rect; 2] {
@@ -1641,15 +1898,16 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
     if let [id] = ids {
         lines.push(Line::from(truncate_path(&tree.path_of(*id), inner_width)).bold());
     } else {
-        lines.push(Line::from(format!("{} öğe", fmt_count(ids.len() as u64))).bold());
+        lines.push(Line::from(tf!("{} öğe", "{} items", fmt_count(ids.len() as u64))).bold());
         lines.push(Line::from(""));
         for &id in ids.iter().take(LISTED) {
             lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).gray());
         }
         if ids.len() > LISTED {
             lines.push(
-                Line::from(format!(
+                Line::from(tf!(
                     "… ve {} öğe daha",
+                    "… and {} more",
                     fmt_count((ids.len() - LISTED) as u64)
                 ))
                 .gray(),
@@ -1657,19 +1915,27 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
         }
     }
     lines.push(Line::from(""));
-    lines.push(Line::from(format!("Toplam boyut: {}", fmt_size(size))));
+    lines.push(Line::from(tf!(
+        "Toplam boyut: {}",
+        "Total size: {}",
+        fmt_size(size)
+    )));
     if files > 0 {
-        lines.push(Line::from(format!("İçerdiği dosya: {}", fmt_count(files))));
+        lines.push(Line::from(tf!(
+            "İçerdiği dosya: {}",
+            "Files inside: {}",
+            fmt_count(files)
+        )));
     }
     lines.extend([
         Line::from(""),
-        Line::from("Çöp kutusuna taşınacak.").gray(),
+        Line::from(t!("Çöp kutusuna taşınacak.", "Will be moved to the trash.")).gray(),
         Line::from(""),
         Line::from(vec![
-            Span::raw(" e ").black().on_red().bold(),
-            Span::raw(" evet, taşı     "),
-            Span::raw(" h ").black().on_gray(),
-            Span::raw(" vazgeç"),
+            Span::raw(t!(" e ", " y ")).black().on_red().bold(),
+            Span::raw(t!(" evet, taşı     ", " yes, move     ")),
+            Span::raw(t!(" h ", " n ")).black().on_gray(),
+            Span::raw(t!(" vazgeç", " cancel")),
         ]),
     ]);
 
@@ -1687,7 +1953,7 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
             .centered()
             .block(
                 Block::bordered()
-                    .title(" Çöp kutusuna taşınsın mı? ")
+                    .title(t!(" Çöp kutusuna taşınsın mı? ", " Move to the trash? "))
                     .border_style(Style::new().fg(Color::Red)),
             ),
         popup,
@@ -1712,17 +1978,30 @@ pub fn fmt_delta(now: u64, then: u64) -> String {
     match now.cmp(&then) {
         std::cmp::Ordering::Greater => format!("+{}", fmt_size(now - then)),
         std::cmp::Ordering::Less => format!("−{}", fmt_size(then - now)),
-        std::cmp::Ordering::Equal => "değişmedi".into(),
+        std::cmp::Ordering::Equal => t!("değişmedi", "unchanged").into(),
     }
 }
 
-/// "az önce", "5 dakika önce", "3 saat önce", "2 gün önce".
+/// "az önce" / "just now", "5 dakika önce" / "5 minutes ago", …
 pub fn fmt_ago(secs: u64) -> String {
-    match secs {
-        s if s < 60 => "az önce".into(),
-        s if s < 3600 => format!("{} dakika önce", s / 60),
-        s if s < 86_400 => format!("{} saat önce", s / 3600),
-        s => format!("{} gün önce", s / 86_400),
+    fmt_ago_in(lang(), secs)
+}
+
+fn fmt_ago_in(lang: Lang, secs: u64) -> String {
+    let (n, tr, en) = match secs {
+        s if s < 60 => {
+            return match lang {
+                Lang::Tr => "az önce".into(),
+                Lang::En => "just now".into(),
+            }
+        }
+        s if s < 3600 => (s / 60, "dakika", "minute"),
+        s if s < 86_400 => (s / 3600, "saat", "hour"),
+        s => (s / 86_400, "gün", "day"),
+    };
+    match lang {
+        Lang::Tr => format!("{n} {tr} önce"),
+        Lang::En => format!("{n} {en}{} ago", if n == 1 { "" } else { "s" }),
     }
 }
 
@@ -1743,12 +2022,21 @@ pub fn fmt_size(bytes: u64) -> String {
 }
 
 /// Integer with thousands separators: 1234567 -> "1.234.567".
-fn fmt_count(n: u64) -> String {
+pub fn fmt_count(n: u64) -> String {
+    fmt_count_in(lang(), n)
+}
+
+/// Thousands separators: "1.234.567" in Turkish, "1,234,567" in English.
+fn fmt_count_in(lang: Lang, n: u64) -> String {
+    let sep = match lang {
+        Lang::Tr => '.',
+        Lang::En => ',',
+    };
     let digits = n.to_string();
     let mut out = String::with_capacity(digits.len() + digits.len() / 3);
     for (i, c) in digits.chars().enumerate() {
         if i > 0 && (digits.len() - i).is_multiple_of(3) {
-            out.push('.');
+            out.push(sep);
         }
         out.push(c);
     }
@@ -1787,6 +2075,17 @@ mod tests {
         assert_eq!(fmt_ago(600), "10 dakika önce");
         assert_eq!(fmt_ago(7200), "2 saat önce");
         assert_eq!(fmt_ago(3 * 86_400 + 5), "3 gün önce");
+    }
+
+    #[test]
+    fn formats_in_english() {
+        assert_eq!(fmt_count_in(Lang::En, 1234567), "1,234,567");
+        assert_eq!(fmt_ago_in(Lang::En, 30), "just now");
+        assert_eq!(fmt_ago_in(Lang::En, 60), "1 minute ago");
+        assert_eq!(fmt_ago_in(Lang::En, 7200), "2 hours ago");
+        assert_eq!(fmt_ago_in(Lang::Tr, 7200), "2 saat önce");
+        let d = fmt_date_in(Lang::En, 1_000_000_000);
+        assert!(d.starts_with("2001-09-0"), "{d}");
     }
 
     #[test]

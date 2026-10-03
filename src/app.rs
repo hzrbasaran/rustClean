@@ -45,10 +45,13 @@ impl SortMode {
 
     pub fn label(self) -> &'static str {
         match self {
-            SortMode::Size => "boyut",
-            SortMode::Name => "ad",
-            SortMode::Count => "dosya sayısı",
-            SortMode::Modified => "son değişiklik (en eski önce)",
+            SortMode::Size => t!("boyut", "size"),
+            SortMode::Name => t!("ad", "name"),
+            SortMode::Count => t!("dosya sayısı", "file count"),
+            SortMode::Modified => t!(
+                "son değişiklik (en eski önce)",
+                "last modified (oldest first)"
+            ),
         }
     }
 }
@@ -379,8 +382,12 @@ impl Browser {
             .into_iter()
             .map(|id| Row::single(tree, base, id, mode, String::new()))
             .collect();
-        let mut list = ResultList::new(format!("Arama „{pattern}”"), base, rows);
-        list.note = "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır.".into();
+        let mut list = ResultList::new(tf!("Arama „{pattern}”", "Search “{pattern}”"), base, rows);
+        list.note = t!(
+            "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır.",
+            "Contents of matching folders are not listed separately; they go with the folder.",
+        )
+        .into();
         list.pattern = Some(pattern);
         self.results = Some(list);
     }
@@ -412,7 +419,10 @@ impl Browser {
             .collect();
         if saved.is_empty() {
             self.set_status(
-                "Bu klasörün kayıtlı eski bir taraması yok; bir sonraki taramadan sonra karşılaştırabilirsiniz.",
+                t!(
+                    "Bu klasörün kayıtlı eski bir taraması yok; bir sonraki taramadan sonra karşılaştırabilirsiniz.",
+                    "No earlier scan of this folder is saved; you can compare after the next scan.",
+                ),
                 true,
             );
         } else {
@@ -424,15 +434,19 @@ impl Browser {
         let snap = match history::load(file) {
             Ok(s) => s,
             Err(e) => {
-                self.set_status(format!("Kayıt okunamadı: {e}"), true);
+                self.set_status(
+                    tf!("Kayıt okunamadı: {e}", "Could not read the saved scan: {e}"),
+                    true,
+                );
                 return;
             }
         };
         self.dashboard = None;
         let (rows, truncated, note) =
             history::changes(&self.tree, self.current, &snap, self.size_mode);
-        let title = format!(
+        let title = tf!(
             "Değişenler ({} taramasına göre)",
+            "Changes (since the scan of {})",
             crate::ui::fmt_date(snap.header.time.min(u64::from(u32::MAX)) as u32)
         );
         let mut list = ResultList::new(title, self.current, rows);
@@ -444,7 +458,14 @@ impl Browser {
     fn request_report(&mut self, kind: ReportKind) {
         self.report_menu = None;
         self.dashboard = None;
-        self.set_status(format!("Rapor hazırlanıyor: {}…", kind.label()), false);
+        self.set_status(
+            tf!(
+                "Rapor hazırlanıyor: {}…",
+                "Preparing report: {}…",
+                kind.label()
+            ),
+            false,
+        );
         // Skip one frame so the message is drawn before the work starts.
         self.pending_report = Some((kind, 1));
     }
@@ -473,7 +494,11 @@ impl Browser {
                 if cands.is_empty() {
                     let mut list =
                         ResultList::new(kind.label().to_string(), self.current, Vec::new());
-                    list.note = "1 MiB üzerinde aynı boyutta iki dosya yok.".into();
+                    list.note = t!(
+                        "1 MiB üzerinde aynı boyutta iki dosya yok.",
+                        "No two files of 1 MiB or more have the same size.",
+                    )
+                    .into();
                     self.results = Some(list);
                 } else {
                     self.dup_job = Some(DupJob::start(self.current, cands));
@@ -497,8 +522,9 @@ impl Browser {
         if let Some(prev) = history::list(&dir).first() {
             let total = self.tree.node(ROOT).size.disk;
             self.set_status(
-                format!(
+                tf!(
                     "Son taramadan beri ({}): {} · m → Değişenler",
+                    "Since the last scan ({}): {} · m → Changes",
                     crate::ui::fmt_ago(now.saturating_sub(prev.header.time)),
                     crate::ui::fmt_delta(total, prev.header.total.disk)
                 ),
@@ -527,8 +553,9 @@ impl Browser {
             .into_iter()
             .map(|ids| {
                 let first = ids[0];
-                let detail = format!(
+                let detail = tf!(
                     "{} kopya · her biri {}",
+                    "{} copies · {} each",
                     ids.len(),
                     crate::ui::fmt_size(tree.node(first).size.get(mode))
                 );
@@ -551,9 +578,13 @@ impl Browser {
         let mut list = ResultList::new(ReportKind::Duplicates.label().to_string(), base, rows);
         list.truncated = truncated;
         list.keep_one = true;
-        list.note = "Boyut: kopyalar silinince açılacak yer. Space: en eski kopya hariç sepete ekle · \
-                     Enter: kopyaları gör. APFS klonları blok paylaştığından silmek yer açmayabilir."
-            .into();
+        list.note = t!(
+            "Boyut: kopyalar silinince açılacak yer. Space: en eski kopya hariç sepete ekle · \
+             Enter: kopyaları gör. APFS klonları blok paylaştığından silmek yer açmayabilir.",
+            "Size: space freed by deleting the copies. Space: add all but the oldest copy to the \
+             basket · Enter: see the copies. APFS clones share blocks, so deleting them may free nothing.",
+        )
+        .into();
         self.results = Some(list);
     }
 
@@ -594,7 +625,10 @@ impl Browser {
             }
             if by_parent > 0 {
                 self.set_status(
-                    "Üst klasörü sepette olduğu için ayrıca çıkarılamaz; önce üst klasörü çıkarın.",
+                    t!(
+                        "Üst klasörü sepette olduğu için ayrıca çıkarılamaz; önce üst klasörü çıkarın.",
+                        "Its parent folder is in the basket, so it cannot be removed on its own; remove the parent first.",
+                    ),
                     true,
                 );
             }
@@ -605,7 +639,10 @@ impl Browser {
                 .count();
             if covered > 0 {
                 self.set_status(
-                    format!("{covered} öğenin üst klasörü zaten sepette."),
+                    tf!(
+                        "{covered} öğenin üst klasörü zaten sepette.",
+                        "The parent folder of {covered} items is already in the basket.",
+                    ),
                     false,
                 );
             }
@@ -659,9 +696,10 @@ impl Browser {
         }
         if let Some(r) = &self.results {
             return match r.selected_row() {
-                Some(row) if row.group && !r.keep_one => {
-                    Err("Bu bir grup: içine girmek için Enter, sepete eklemek için Space.")
-                }
+                Some(row) if row.group && !r.keep_one => Err(t!(
+                    "Bu bir grup: içine girmek için Enter, sepete eklemek için Space.",
+                    "This is a group: Enter to open it, Space to add it to the basket.",
+                )),
                 Some(row) => Ok(self.row_targets(r, row)),
                 None => Ok(Vec::new()),
             };
@@ -739,7 +777,13 @@ impl Browser {
             return;
         };
         let Some(kind) = r.report.filter(|k| k.supports_age()) else {
-            self.set_status("Bu listede yaş filtresi yok.", true);
+            self.set_status(
+                t!(
+                    "Bu listede yaş filtresi yok.",
+                    "This list has no age filter."
+                ),
+                true,
+            );
             return;
         };
         let steps = reports::AGE_STEPS;
@@ -760,7 +804,13 @@ impl Browser {
     /// Shows the basket as a result list.
     fn open_basket(&mut self) {
         if self.basket.is_empty() {
-            self.set_status("Sepet boş. Space ile öğe ekleyin.", false);
+            self.set_status(
+                t!(
+                    "Sepet boş. Space ile öğe ekleyin.",
+                    "The basket is empty. Add entries with Space."
+                ),
+                false,
+            );
             return;
         }
         self.dashboard = None;
@@ -775,9 +825,13 @@ impl Browser {
             .into_iter()
             .map(|id| Row::single(tree, ROOT, id, mode, String::new()))
             .collect();
-        let mut list = ResultList::new("Sepet".into(), ROOT, rows);
+        let mut list = ResultList::new(t!("Sepet", "Basket").into(), ROOT, rows);
         list.basket_view = true;
-        list.note = "Space: sepetten çıkar · c: sepeti boşalt · x: hepsini çöpe taşı".into();
+        list.note = t!(
+            "Space: sepetten çıkar · c: sepeti boşalt · x: hepsini çöpe taşı",
+            "Space: remove from basket · c: empty the basket · x: move all to the trash",
+        )
+        .into();
         list
     }
 
@@ -817,8 +871,9 @@ impl Browser {
         if r.keep_one {
             if let Some(keep) = oldest(tree, &ids) {
                 list.keep = Some(ids[keep]);
-                list.note = format!(
+                list.note = tf!(
                     "En eski kopya: {} · t: diğerlerini sepete ekle",
+                    "Oldest copy: {} · t: add the others to the basket",
                     list.rows[keep].label
                 );
             }
@@ -830,7 +885,7 @@ impl Browser {
 
     fn request_delete(&mut self, ids: Vec<NodeId>) {
         if ids.is_empty() {
-            self.set_status("Seçili öğe yok.", true);
+            self.set_status(t!("Seçili öğe yok.", "Nothing selected."), true);
             return;
         }
         let mounts = disks::all_mount_points();
@@ -844,11 +899,14 @@ impl Browser {
         }
         if !refused.is_empty() {
             let more = if refused.len() > 1 {
-                format!(" (+{} öğe daha)", refused.len() - 1)
+                tf!(" (+{} öğe daha)", " (+{} more)", refused.len() - 1)
             } else {
                 String::new()
             };
-            self.set_status(format!("Atlandı — {}{more}", refused[0]), true);
+            self.set_status(
+                tf!("Atlandı — {}{more}", "Skipped — {}{more}", refused[0]),
+                true,
+            );
         }
         if !ok.is_empty() {
             self.confirm = Some(ok);
@@ -862,7 +920,14 @@ impl Browser {
         let items: Vec<_> = ids.iter().map(|&id| (id, self.tree.path_of(id))).collect();
         self.batch_trashed = Size::default();
         self.batch_failures.clear();
-        self.set_status(format!("Çöp kutusuna taşınıyor… 0/{}", items.len()), false);
+        self.set_status(
+            tf!(
+                "Çöp kutusuna taşınıyor… 0/{}",
+                "Moving to the trash… 0/{}",
+                items.len()
+            ),
+            false,
+        );
         self.deleting = Some(Deletion::start(items));
     }
 
@@ -892,7 +957,13 @@ impl Browser {
             }
         }
         if !finished {
-            self.set_status(format!("Çöp kutusuna taşınıyor… {done}/{total}"), false);
+            self.set_status(
+                tf!(
+                    "Çöp kutusuna taşınıyor… {done}/{total}",
+                    "Moving to the trash… {done}/{total}"
+                ),
+                false,
+            );
             return;
         }
 
@@ -905,13 +976,17 @@ impl Browser {
         let size = crate::ui::fmt_size(self.batch_trashed.get(self.size_mode));
         if self.batch_failures.is_empty() {
             self.set_status(
-                format!("✓ {moved} öğe çöp kutusuna taşındı ({size}). Yer, çöp kutusu boşaltılınca açılır."),
+                tf!(
+                    "✓ {moved} öğe çöp kutusuna taşındı ({size}). Yer, çöp kutusu boşaltılınca açılır.",
+                    "✓ {moved} items moved to the trash ({size}). The space is freed when the trash is emptied.",
+                ),
                 false,
             );
         } else {
             self.set_status(
-                format!(
+                tf!(
                     "✗ {} öğe taşınamadı, {moved} öğe taşındı ({size}).",
+                    "✗ {} items could not be moved, {moved} moved ({size}).",
                     self.batch_failures.len()
                 ),
                 true,
@@ -960,7 +1035,10 @@ impl Browser {
                 KeyCode::Char('q') => return Action::Quit,
                 KeyCode::Esc => {
                     self.dup_job = None; // dropping the job cancels it
-                    self.set_status("Kopya araması iptal edildi.", true);
+                    self.set_status(
+                        t!("Kopya araması iptal edildi.", "Duplicate search cancelled."),
+                        true,
+                    );
                 }
                 _ => {}
             }
@@ -1284,7 +1362,7 @@ impl App {
                 }
                 Ok(ScanMsg::Failed(err)) => {
                     self.scan = None;
-                    self.message = Some(format!("Tarama başarısız: {err}"));
+                    self.message = Some(tf!("Tarama başarısız: {err}", "Scan failed: {err}"));
                     self.screen = Screen::DiskSelect;
                     return;
                 }
@@ -1303,10 +1381,38 @@ impl App {
             self.should_quit = true;
             return;
         }
+        if key.code == KeyCode::Char('L') && !self.typing() {
+            self.switch_language();
+            return;
+        }
         match self.screen {
             Screen::DiskSelect => self.on_key_disks(key.code),
             Screen::Scanning => self.on_key_scanning(key.code),
             Screen::Browser => self.on_key_browser(key.code),
+        }
+    }
+
+    /// Whether a text field has the keyboard, so letters are text.
+    fn typing(&self) -> bool {
+        self.browser.as_ref().is_some_and(|b| {
+            b.input.is_some()
+                || b.tools
+                    .as_ref()
+                    .and_then(|t| t.confirm.as_ref())
+                    .is_some_and(|c| c.typed.is_some())
+        })
+    }
+
+    /// `L`: Turkish ↔ English, remembered for the next start. Texts built
+    /// before (an open report) keep their language until rebuilt.
+    fn switch_language(&mut self) {
+        let lang = crate::i18n::lang().other();
+        crate::i18n::set_lang(lang);
+        crate::i18n::save(lang);
+        let msg = t!("Dil: Türkçe (L: English)", "Language: English (L: Türkçe)");
+        match &mut self.browser {
+            Some(b) if matches!(self.screen, Screen::Browser) => b.set_status(msg, false),
+            _ => self.message = Some(msg.to_string()),
         }
     }
 
@@ -1331,7 +1437,7 @@ impl App {
             KeyCode::Char('q') => self.should_quit = true,
             KeyCode::Esc => {
                 self.scan = None; // dropping the handle cancels the scan
-                self.message = Some("Tarama iptal edildi.".into());
+                self.message = Some(t!("Tarama iptal edildi.", "Scan cancelled.").into());
                 self.screen = Screen::DiskSelect;
             }
             _ => {}

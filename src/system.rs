@@ -61,8 +61,13 @@ impl SystemInfo {
 pub fn collect() -> SystemInfo {
     let mut info = SystemInfo::default();
     if !cfg!(target_os = "macos") {
-        info.problems
-            .push("Sistem verileri paneli yalnızca macOS'ta çalışır.".into());
+        info.problems.push(
+            t!(
+                "Sistem verileri paneli yalnızca macOS'ta çalışır.",
+                "The system data panel only works on macOS.",
+            )
+            .into(),
+        );
         return info;
     }
     match run(&["diskutil", "apfs", "list", "-plist"]).and_then(|out| parse_apfs(out.as_bytes())) {
@@ -75,11 +80,19 @@ pub fn collect() -> SystemInfo {
                 }
             }
         }
-        None => info.problems.push("diskutil apfs list okunamadı".into()),
+        None => info.problems.push(
+            t!(
+                "diskutil apfs list okunamadı",
+                "could not read diskutil apfs list"
+            )
+            .into(),
+        ),
     }
     match run(&["tmutil", "listlocalsnapshots", "/"]) {
         Some(out) => info.snapshots = parse_snapshots(&out),
-        None => info.problems.push("tmutil çalıştırılamadı".into()),
+        None => info
+            .problems
+            .push(t!("tmutil çalıştırılamadı", "could not run tmutil").into()),
     }
     info.swap = run(&["sysctl", "-n", "vm.swapusage"]).and_then(|s| parse_swap(&s));
     info.sleepimage = fs::metadata("/private/var/vm/sleepimage")
@@ -166,15 +179,18 @@ pub fn parse_swap(out: &str) -> Option<(u64, u64)> {
     Some((value("total")?, value("used")?))
 }
 
-/// Turkish name for an APFS volume role.
+/// Name for an APFS volume role, in the interface language.
 pub fn role_label(role: &str) -> &str {
     match role {
-        "System" => "Sistem (salt okunur macOS)",
-        "Data" => "Veri (uygulamalar ve dosyalarınız)",
-        "VM" => "Sanal bellek (takas)",
-        "Preboot" => "Önyükleme",
-        "Recovery" => "Kurtarma",
-        "Update" => "Güncelleme",
+        "System" => t!("Sistem (salt okunur macOS)", "System (read-only macOS)"),
+        "Data" => t!(
+            "Veri (uygulamalar ve dosyalarınız)",
+            "Data (apps and your files)"
+        ),
+        "VM" => t!("Sanal bellek (takas)", "Virtual memory (swap)"),
+        "Preboot" => t!("Önyükleme", "Preboot"),
+        "Recovery" => t!("Kurtarma", "Recovery"),
+        "Update" => t!("Güncelleme", "Update"),
         "" => "—",
         other => other,
     }

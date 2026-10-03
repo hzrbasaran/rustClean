@@ -50,7 +50,10 @@ pub struct ToolsView {
     measurements: Receiver<Measurement>,
 }
 
-pub const CONFIRM_WORD: &str = "evet";
+/// The word that confirms a data-loss action.
+pub fn confirm_word() -> &'static str {
+    t!("evet", "yes")
+}
 
 impl ToolsView {
     pub fn open() -> Self {
@@ -83,9 +86,9 @@ impl ToolsView {
                 RunEvent::Output(line) => run.log.push(format!("  {line}")),
                 RunEvent::Done { ok: false, .. } => {
                     run.failures += 1;
-                    run.log.push("  ✗ başarısız".into());
+                    run.log.push(t!("  ✗ başarısız", "  ✗ failed").into());
                 }
-                RunEvent::Done { ok: true, .. } => run.log.push("  ✓ tamam".into()),
+                RunEvent::Done { ok: true, .. } => run.log.push(t!("  ✓ tamam", "  ✓ done").into()),
                 RunEvent::Finished => {
                     run.finished = true;
                     // Measure again to show what is left.
@@ -145,7 +148,7 @@ impl ToolsView {
                 (Some(typed), KeyCode::Backspace) => {
                     typed.pop();
                 }
-                (Some(typed), KeyCode::Enter) if typed.trim() == CONFIRM_WORD => self.start(),
+                (Some(typed), KeyCode::Enter) if typed.trim() == confirm_word() => self.start(),
                 (None, KeyCode::Char('e' | 'E' | 'y' | 'Y')) => self.start(),
                 (Some(_), KeyCode::Enter) => {}
                 _ => self.confirm = None,

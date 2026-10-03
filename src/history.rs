@@ -258,7 +258,7 @@ pub fn changes(
         .map(|c| {
             let now = tree.node(c.id).size.get(mode);
             let detail = if c.is_new {
-                format!("yeni (+{})", fmt_size(now))
+                tf!("yeni (+{})", "new (+{})", fmt_size(now))
             } else {
                 fmt_delta(now, (i128::from(now) - c.delta) as u64)
             };
@@ -278,7 +278,10 @@ pub fn changes(
         .collect();
     gone.sort_by_key(|&(p, s)| (std::cmp::Reverse(s), p));
     let note = if gone.is_empty() {
-        String::from("Silinen büyük öğe yok.")
+        String::from(t!(
+            "Silinen büyük öğe yok.",
+            "No large entries were removed."
+        ))
     } else {
         let total: u64 = gone.iter().map(|g| g.1).sum();
         let names: Vec<String> = gone
@@ -289,8 +292,9 @@ pub fn changes(
                 format!("{p} ({})", fmt_size(*s))
             })
             .collect();
-        format!(
+        tf!(
             "Silinenler: {} öğe, {} — {}",
+            "Removed: {} items, {} — {}",
             gone.len(),
             fmt_size(total),
             names.join(", ")

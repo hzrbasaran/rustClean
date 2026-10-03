@@ -1,3 +1,6 @@
+#[macro_use]
+mod i18n;
+
 mod app;
 mod apps;
 mod basket;
@@ -26,24 +29,31 @@ use crossterm::event::{self, Event, KeyEventKind};
 
 use app::App;
 
-/// Disk kullanım analizcisi: diskleri bulur, klasör ve dosya boyutlarını gösterir.
+/// Disk kullanım analizcisi / disk usage analyzer: diskleri bulur, klasör ve dosya boyutlarını
+/// gösterir / finds disks and shows folder and file sizes.
 #[derive(Parser)]
 #[command(version)]
 struct Args {
-    /// Doğrudan taranacak klasör (verilmezse disk seçim ekranı açılır)
+    /// Doğrudan taranacak klasör (verilmezse disk seçim ekranı açılır) / folder to scan directly
+    /// (without it, the disk list opens)
     path: Option<PathBuf>,
 
-    /// Diskleri listeleyip çık
+    /// Diskleri listeleyip çık / list the disks and exit
     #[arg(long)]
     list_disks: bool,
 
-    /// Arayüz açmadan YOL'u tarayıp özetini yazdır
+    /// Arayüz dili / interface language: tr, en (programda L ile değişir / switch with L)
+    #[arg(long, value_name = "tr|en")]
+    lang: Option<String>,
+
+    /// Arayüz açmadan YOL'u tarayıp özetini yazdır / scan PATH and print a summary, no interface
     #[arg(long, requires = "path")]
     summary: bool,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
+    i18n::init(args.lang.as_deref());
 
     if args.list_disks {
         for d in disks::list_disks() {
@@ -78,18 +88,26 @@ fn print_summary(path: &std::path::Path) -> Result<()> {
     let root = t.node(ROOT);
     println!("{}", t.root_path().display());
     println!(
-        "  diskte: {} ({} B)   görünen: {} ({} B)",
-        ui::fmt_size(root.size.get(SizeMode::Disk)),
-        root.size.disk,
-        ui::fmt_size(root.size.apparent),
-        root.size.apparent
+        "{}",
+        tf!(
+            "  diskte: {} ({} B)   görünen: {} ({} B)",
+            "  on disk: {} ({} B)   apparent: {} ({} B)",
+            ui::fmt_size(root.size.get(SizeMode::Disk)),
+            root.size.disk,
+            ui::fmt_size(root.size.apparent),
+            root.size.apparent
+        )
     );
     println!(
-        "  {} dosya, {} öğe, {} erişilemeyen, {:.1} sn",
-        root.file_count,
-        t.len() - 1,
-        res.errors,
-        res.elapsed.as_secs_f64()
+        "{}",
+        tf!(
+            "  {} dosya, {} öğe, {} erişilemeyen, {:.1} sn",
+            "  {} files, {} entries, {} inaccessible, {:.1} s",
+            root.file_count,
+            t.len() - 1,
+            res.errors,
+            res.elapsed.as_secs_f64()
+        )
     );
     Ok(())
 }

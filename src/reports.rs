@@ -35,15 +35,21 @@ pub enum ReportKind {
 impl ReportKind {
     pub fn label(self) -> &'static str {
         match self {
-            ReportKind::LargestFiles => "En büyük dosyalar",
-            ReportKind::LargestDirs => "En büyük klasörler",
-            ReportKind::RepeatedNames => "En çok tekrar eden dosya adları",
-            ReportKind::Apps => "Uygulamalar ve verileri",
-            ReportKind::Orphans => "Sahipsiz uygulama artıkları",
-            ReportKind::DevJunk => "Geliştirici çöpleri",
-            ReportKind::Caches => "Önbellek klasörleri",
-            ReportKind::OldBig => "Eski ve büyük dosyalar",
-            ReportKind::Duplicates => "Kopya dosyalar (içeriği aynı)",
+            ReportKind::LargestFiles => t!("En büyük dosyalar", "Largest files"),
+            ReportKind::LargestDirs => t!("En büyük klasörler", "Largest folders"),
+            ReportKind::RepeatedNames => t!(
+                "En çok tekrar eden dosya adları",
+                "Most repeated file names"
+            ),
+            ReportKind::Apps => t!("Uygulamalar ve verileri", "Applications and their data"),
+            ReportKind::Orphans => t!("Sahipsiz uygulama artıkları", "Orphaned app leftovers"),
+            ReportKind::DevJunk => t!("Geliştirici çöpleri", "Developer junk"),
+            ReportKind::Caches => t!("Önbellek klasörleri", "Cache folders"),
+            ReportKind::OldBig => t!("Eski ve büyük dosyalar", "Old and large files"),
+            ReportKind::Duplicates => t!(
+                "Kopya dosyalar (içeriği aynı)",
+                "Duplicate files (same content)"
+            ),
         }
     }
 
@@ -62,20 +68,41 @@ impl ReportKind {
 
     pub fn description(self) -> &'static str {
         match self {
-            ReportKind::LargestFiles => "Bu klasörün altındaki en büyük 200 dosya",
+            ReportKind::LargestFiles => t!(
+                "Bu klasörün altındaki en büyük 200 dosya",
+                "The 200 largest files below this folder"
+            ),
             ReportKind::LargestDirs => {
-                "Toplam boyuta göre; yalnızca tek bir alt klasörü saran klasörler elenir"
+                t!(
+                    "Toplam boyuta göre; yalnızca tek bir alt klasörü saran klasörler elenir",
+                    "By total size; folders that only wrap one subfolder are skipped"
+                )
             }
-            ReportKind::RepeatedNames => "Aynı adı taşıyan dosyalar, adet sırasıyla",
-            ReportKind::Apps => "Uygulama paketi + Library'deki verileri (önbellek, destek…)",
+            ReportKind::RepeatedNames => t!(
+                "Aynı adı taşıyan dosyalar, adet sırasıyla",
+                "Files sharing a name, by count"
+            ),
+            ReportKind::Apps => t!(
+                "Uygulama paketi + Library'deki verileri (önbellek, destek…)",
+                "App bundle + its data in Library (caches, support…)"
+            ),
             ReportKind::Orphans => {
-                "Silinmiş uygulamalardan kalan veriler (Library: destek, önbellek, kapsayıcılar)"
+                t!("Silinmiş uygulamalardan kalan veriler (Library: destek, önbellek, kapsayıcılar)", "Data left behind by removed apps (Library: support, caches, containers)")
             }
             ReportKind::DevJunk => "node_modules, target, build, Pods, DerivedData, .venv…",
-            ReportKind::Caches => "Caches ve .cache içindeki uygulama önbellekleri",
-            ReportKind::OldBig => "100 MiB'tan büyük, 1 yıldır değişmemiş dosyalar",
+            ReportKind::Caches => t!(
+                "Caches ve .cache içindeki uygulama önbellekleri",
+                "App caches inside Caches and .cache"
+            ),
+            ReportKind::OldBig => t!(
+                "100 MiB'tan büyük, 1 yıldır değişmemiş dosyalar",
+                "Files over 100 MiB, unchanged for a year"
+            ),
             ReportKind::Duplicates => {
-                "İçeriği birebir aynı dosyalar (≥ 1 MiB); dosyalar okunur, sürebilir"
+                t!(
+                    "İçeriği birebir aynı dosyalar (≥ 1 MiB); dosyalar okunur, sürebilir",
+                    "Files with identical content (≥ 1 MiB); files are read, may take a while"
+                )
             }
         }
     }
@@ -112,10 +139,13 @@ impl MenuItem {
     pub fn label(self) -> &'static str {
         match self {
             MenuItem::Report(k) => k.label(),
-            MenuItem::Changes => "Son taramadan bu yana değişenler",
-            MenuItem::Leftovers => "Silinmiş uygulama artıkları",
-            MenuItem::Tools => "Geliştirici araçları temizliği",
-            MenuItem::System => "Sistem verileri",
+            MenuItem::Changes => t!(
+                "Son taramadan bu yana değişenler",
+                "Changes since the last scan"
+            ),
+            MenuItem::Leftovers => t!("Silinmiş uygulama artıkları", "Removed app leftovers"),
+            MenuItem::Tools => t!("Geliştirici araçları temizliği", "Developer tools cleanup"),
+            MenuItem::System => t!("Sistem verileri", "System data"),
         }
     }
 
@@ -123,15 +153,27 @@ impl MenuItem {
         match self {
             MenuItem::Report(k) => k.description(),
             MenuItem::Changes => {
-                "Kayıtlı bir taramayla karşılaştırır: büyüyen, yeni ve silinen klasörler"
+                t!(
+                    "Kayıtlı bir taramayla karşılaştırır: büyüyen, yeni ve silinen klasörler",
+                    "Compares with a saved scan: grown, new and removed folders"
+                )
             }
             MenuItem::Leftovers => {
-                "Kaldırılmış uygulamalardan kalan veriler; ev klasörü taraması yeterli"
+                t!(
+                    "Kaldırılmış uygulamalardan kalan veriler; ev klasörü taraması yeterli",
+                    "Data left by uninstalled apps; scanning the home folder is enough"
+                )
             }
             MenuItem::Tools => {
-                "Docker, Xcode, npm, Gradle… önbelleklerini aracın kendi komutuyla temizler"
+                t!(
+                    "Docker, Xcode, npm, Gradle… önbelleklerini aracın kendi komutuyla temizler",
+                    "Cleans Docker, Xcode, npm, Gradle… caches with the tool's own commands"
+                )
             }
-            MenuItem::System => "APFS bölümleri, Time Machine anlık görüntüleri, takas dosyası",
+            MenuItem::System => t!(
+                "APFS bölümleri, Time Machine anlık görüntüleri, takas dosyası",
+                "APFS volumes, Time Machine snapshots, swap file"
+            ),
         }
     }
 
@@ -188,7 +230,11 @@ pub fn run(
     };
     let mut title = kind.label().to_string();
     if age.min_days > 0 {
-        title.push_str(&format!(" · ≥ {} gündür dokunulmamış", age.min_days));
+        title.push_str(&tf!(
+            " · ≥ {} gündür dokunulmamış",
+            " · untouched for ≥ {} days",
+            age.min_days
+        ));
     }
     let mut list = ResultList::new(title, base, rows);
     list.truncated = truncated;
@@ -285,7 +331,14 @@ fn largest_files(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> R
         mode,
         ids.into_iter().map(|id| (id, String::new())),
     );
-    (rows, truncated, "Enter: dosyanın bulunduğu klasörü aç")
+    (
+        rows,
+        truncated,
+        t!(
+            "Enter: dosyanın bulunduğu klasörü aç",
+            "Enter: open the file's folder"
+        ),
+    )
 }
 
 fn largest_dirs(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
@@ -315,7 +368,10 @@ fn largest_dirs(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Re
         mode,
         ids.into_iter().map(|id| (id, String::new())),
     );
-    let note = "İç içe klasörler ayrıca listelenebilir; boyutları birbirini içerir.";
+    let note = t!(
+        "İç içe klasörler ayrıca listelenebilir; boyutları birbirini içerir.",
+        "Nested folders can be listed separately; their sizes include each other."
+    );
     (rows, truncated, note)
 }
 
@@ -334,7 +390,10 @@ fn old_big(tree: &Tree, base: NodeId, mode: SizeMode, now: u64) -> Report {
     (
         rows,
         truncated,
-        "≥ 100 MiB ve 1 yıldan uzun süredir değişmemiş dosyalar.",
+        t!(
+            "≥ 100 MiB ve 1 yıldan uzun süredir değişmemiş dosyalar.",
+            "Files ≥ 100 MiB, unchanged for more than a year."
+        ),
     )
 }
 
@@ -345,13 +404,15 @@ fn dev_junk_kind(tree: &Tree, id: NodeId) -> Option<&'static str> {
     let sibling = |pred: &dyn Fn(&str) -> bool| tree.children(parent).any(|c| pred(tree.name(c)));
     let has = |file: &str| sibling(&|n| n == file);
     let kind = match name {
-        "node_modules" => "Node.js bağımlılıkları",
-        "__pycache__" => "Python önbelleği",
-        ".gradle" => "Gradle önbelleği",
-        "DerivedData" => "Xcode derleme verisi",
-        ".next" | ".nuxt" | ".turbo" | ".parcel-cache" | ".angular" => "web derleme önbelleği",
-        ".dart_tool" => "Dart/Flutter araçları",
-        "target" if has("Cargo.toml") => "Rust derleme çıktısı",
+        "node_modules" => t!("Node.js bağımlılıkları", "Node.js dependencies"),
+        "__pycache__" => t!("Python önbelleği", "Python cache"),
+        ".gradle" => t!("Gradle önbelleği", "Gradle cache"),
+        "DerivedData" => t!("Xcode derleme verisi", "Xcode build data"),
+        ".next" | ".nuxt" | ".turbo" | ".parcel-cache" | ".angular" => {
+            t!("web derleme önbelleği", "web build cache")
+        }
+        ".dart_tool" => t!("Dart/Flutter araçları", "Dart/Flutter tooling"),
+        "target" if has("Cargo.toml") => t!("Rust derleme çıktısı", "Rust build output"),
         "build"
             if has("build.gradle")
                 || has("build.gradle.kts")
@@ -359,16 +420,18 @@ fn dev_junk_kind(tree: &Tree, id: NodeId) -> Option<&'static str> {
                 || has("package.json")
                 || has("setup.py") =>
         {
-            "derleme çıktısı"
+            t!("derleme çıktısı", "build output")
         }
-        "dist" if has("package.json") || has("setup.py") => "paket çıktısı",
-        "Pods" if has("Podfile") => "CocoaPods bağımlılıkları",
-        ".build" if has("Package.swift") => "Swift derleme çıktısı",
+        "dist" if has("package.json") || has("setup.py") => t!("paket çıktısı", "package output"),
+        "Pods" if has("Podfile") => t!("CocoaPods bağımlılıkları", "CocoaPods dependencies"),
+        ".build" if has("Package.swift") => t!("Swift derleme çıktısı", "Swift build output"),
         ".venv" | "venv" if tree.children(id).any(|c| tree.name(c) == "pyvenv.cfg") => {
-            "Python sanal ortamı"
+            t!("Python sanal ortamı", "Python virtual environment")
         }
-        "vendor" if has("composer.json") => "PHP bağımlılıkları",
-        "bin" | "obj" if sibling(&|n| n.ends_with(".csproj")) => ".NET derleme çıktısı",
+        "vendor" if has("composer.json") => t!("PHP bağımlılıkları", "PHP dependencies"),
+        "bin" | "obj" if sibling(&|n| n.ends_with(".csproj")) => {
+            t!(".NET derleme çıktısı", ".NET build output")
+        }
         _ => return None,
     };
     Some(kind)
@@ -402,7 +465,11 @@ fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report
                     let detail = if project == 0 {
                         kind.to_string()
                     } else {
-                        format!("{kind} · proje: {}", crate::ui::fmt_date(project))
+                        tf!(
+                            "{kind} · proje: {}",
+                            "{kind} · project: {}",
+                            crate::ui::fmt_date(project)
+                        )
                     };
                     found.push((id, detail));
                 }
@@ -416,7 +483,10 @@ fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report
     (
         rows,
         truncated,
-        "Bu klasörler projeyi yeniden derleyince / kurunca geri gelir.",
+        t!(
+            "Bu klasörler projeyi yeniden derleyince / kurunca geri gelir.",
+            "These folders come back when the project is built / installed again."
+        ),
     )
 }
 
@@ -439,11 +509,11 @@ fn caches(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
         if CONTAINERS.contains(&name.as_str()) {
             found.extend(
                 tree.children(id)
-                    .map(|c| (c, format!("{} içinde", tree.name(id)))),
+                    .map(|c| (c, tf!("{} içinde", "in {}", tree.name(id)))),
             );
             false
         } else if SELF.contains(&name.as_str()) {
-            found.push((id, "önbellek".to_string()));
+            found.push((id, t!("önbellek", "cache").to_string()));
             false
         } else {
             true
@@ -459,7 +529,10 @@ fn caches(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
     (
         rows,
         truncated,
-        "Önbellekler silinince uygulamalar gerektiğinde yeniden oluşturur.",
+        t!(
+            "Önbellekler silinince uygulamalar gerektiğinde yeniden oluşturur.",
+            "Apps recreate caches when needed after they are deleted."
+        ),
     )
 }
 
@@ -543,7 +616,14 @@ fn repeated_names(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> 
             Row::group(label, String::new(), m, RowSize::Sum, 2)
         })
         .collect();
-    (rows, truncated, "Enter: bu adı taşıyan dosyaları listele")
+    (
+        rows,
+        truncated,
+        t!(
+            "Enter: bu adı taşıyan dosyaları listele",
+            "Enter: list the files with this name"
+        ),
+    )
 }
 
 #[cfg(test)]

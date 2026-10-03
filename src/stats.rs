@@ -9,7 +9,16 @@ pub const DAY: u64 = 24 * 60 * 60;
 /// Upper bounds (inclusive) of the first three age groups; older entries
 /// fall in the fourth.
 pub const AGE_LIMITS: [u64; 3] = [7 * DAY, 30 * DAY, 365 * DAY];
-pub const AGE_LABELS: [&str; 5] = ["≤ 7 gün", "≤ 30 gün", "≤ 1 yıl", "> 1 yıl", "bilinmiyor"];
+/// Label of age group `i` (as returned by `age_group`, or `AGE_UNKNOWN`).
+pub fn age_label(i: usize) -> &'static str {
+    match i {
+        0 => t!("≤ 7 gün", "≤ 7 days"),
+        1 => t!("≤ 30 gün", "≤ 30 days"),
+        2 => t!("≤ 1 yıl", "≤ 1 year"),
+        3 => t!("> 1 yıl", "> 1 year"),
+        _ => t!("bilinmiyor", "unknown"),
+    }
+}
 /// Index of the age group for unknown dates.
 pub const AGE_UNKNOWN: usize = 4;
 
@@ -46,14 +55,14 @@ impl Category {
 
     pub fn label(self) -> &'static str {
         match self {
-            Category::Video => "Video",
-            Category::Audio => "Ses",
-            Category::Image => "Resim",
-            Category::Archive => "Arşiv / disk imajı",
-            Category::Document => "Belge",
-            Category::Code => "Kod",
-            Category::Build => "Derleme çıktısı",
-            Category::Other => "Diğer",
+            Category::Video => t!("Video", "Video"),
+            Category::Audio => t!("Ses", "Audio"),
+            Category::Image => t!("Resim", "Images"),
+            Category::Archive => t!("Arşiv / disk imajı", "Archives / disk images"),
+            Category::Document => t!("Belge", "Documents"),
+            Category::Code => t!("Kod", "Code"),
+            Category::Build => t!("Derleme çıktısı", "Build output"),
+            Category::Other => t!("Diğer", "Other"),
         }
     }
 
@@ -122,7 +131,7 @@ pub struct Stats {
     pub dirs: u64,
     /// Non-empty categories, largest first.
     pub categories: Vec<(Category, Bucket)>,
-    /// Files by last modification; indexed like `AGE_LABELS`.
+    /// Files by last modification; indexed like `age_label`.
     pub ages: [Bucket; 5],
     /// Largest files, largest first.
     pub top_files: Vec<NodeId>,

@@ -53,10 +53,15 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
             let app_size = size(app.id);
             let data_size: u64 = data.iter().map(|&d| size(d)).sum();
             let detail = if data_dirs.is_empty() {
-                format!("uygulama {} · veri taranmadı", fmt_size(app_size))
+                tf!(
+                    "uygulama {} · veri taranmadı",
+                    "app {} · data not scanned",
+                    fmt_size(app_size)
+                )
             } else {
-                format!(
+                tf!(
                     "uygulama {} · veri {}",
+                    "app {} · data {}",
                     fmt_size(app_size),
                     fmt_size(data_size)
                 )
@@ -83,17 +88,28 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
     let mut list = ResultList::new(ReportKind::Apps.label().to_string(), base, rows);
     list.truncated = truncated;
     list.note = if apps.is_empty() {
-        "Bu taramada uygulama yok. Uygulamalar için diski tarayın: d → Macintosh HD (Windows: C:\\, Linux: /)."
-            .into()
+        t!(
+            "Bu taramada uygulama yok. Uygulamalar için diski tarayın: d → Macintosh HD (Windows: C:\\, Linux: /).",
+            "No applications in this scan. Scan the disk to see them: d → Macintosh HD (Windows: C:\\, Linux: /)."
+        )
+        .into()
     } else if data_dirs.is_empty() {
-        "Uygulama verileri taranmamış: ev klasörünü ya da diski tarayın.".into()
+        t!(
+            "Uygulama verileri taranmamış: ev klasörünü ya da diski tarayın.",
+            "App data was not scanned: scan the home folder or the disk."
+        )
+        .into()
     } else {
         let mut note =
-            "Veri eşleştirmesi ad ve paket kimliğine göre tahmindir; silmeden önce Enter ile gruba bakın."
-                .to_string();
+            t!(
+                "Veri eşleştirmesi ad ve paket kimliğine göre tahmindir; silmeden önce Enter ile gruba bakın.",
+                "Data is matched by name and bundle id, so it is a guess; press Enter to check a group before deleting."
+            )
+            .to_string();
         if unreadable > 0 {
-            note.push_str(&format!(
-                " {unreadable} kapsayıcı okunamadı (Tam Disk Erişimi)."
+            note.push_str(&tf!(
+                " {unreadable} kapsayıcı okunamadı (Tam Disk Erişimi).",
+                " {unreadable} containers could not be read (Full Disk Access)."
             ));
         }
         note
@@ -511,7 +527,10 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
     }
     let mut title = kind.label().to_string();
     if min_age_days > 0 {
-        title.push_str(&format!(" · ≥ {min_age_days} gündür dokunulmamış"));
+        title.push_str(&tf!(
+            " · ≥ {min_age_days} gündür dokunulmamış",
+            " · untouched for ≥ {min_age_days} days"
+        ));
     }
     let finish = |rows: Vec<Row>, truncated: bool, note: String| {
         let mut list = ResultList::new(title.clone(), ROOT, rows);
@@ -525,7 +544,11 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
         return finish(
             Vec::new(),
             false,
-            "Kurulu uygulama bulunamadı, bu yüzden sahipsiz veri belirlenemez.".into(),
+            t!(
+                "Kurulu uygulama bulunamadı, bu yüzden sahipsiz veri belirlenemez.",
+                "No installed applications found, so leftovers cannot be determined."
+            )
+            .into(),
         );
     }
     let (data, _) = data_folders(tree, platform);
@@ -533,7 +556,11 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
         return finish(
             Vec::new(),
             false,
-            "Bu taramada Library klasörü yok. Ev klasörünüzü (~) ya da diski tarayın.".into(),
+            t!(
+                "Bu taramada Library klasörü yok. Ev klasörünüzü (~) ya da diski tarayın.",
+                "This scan has no Library folder. Scan your home folder (~) or the disk."
+            )
+            .into(),
         );
     }
     let (_, unmatched) = match_all(&apps, &data, &|id| vendor_children(tree, id));
@@ -551,9 +578,15 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
         .map(|d| {
             let place = tree.parent(d.id).map_or("", |p| tree.name(p));
             let reason = if is_bundle_like(container_core(&d.key)) {
-                "paket kimliği: yüklü uygulama yok"
+                t!(
+                    "paket kimliği: yüklü uygulama yok",
+                    "bundle id: no installed app"
+                )
             } else {
-                "ad: yüklü uygulama yok (araç olabilir)"
+                t!(
+                    "ad: yüklü uygulama yok (araç olabilir)",
+                    "name: no installed app (may be a tool)"
+                )
             };
             (d.id, format!("{place} · {reason}"))
         })
@@ -568,7 +601,11 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
     finish(
         rows,
         truncated,
-        "Komut satırı araçları da veri tutabilir; silmeden önce Enter ile içine bakın.".into(),
+        t!(
+            "Komut satırı araçları da veri tutabilir; silmeden önce Enter ile içine bakın.",
+            "Command line tools keep data too; press Enter to look inside before deleting."
+        )
+        .into(),
     )
 }
 

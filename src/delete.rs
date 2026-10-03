@@ -12,9 +12,14 @@ use crate::tree::NodeId;
 /// Refuses paths that must not be trashed: entries that no longer exist and
 /// mount points of other volumes.
 pub fn check(path: &Path, mount_points: &[PathBuf]) -> Result<(), String> {
-    let md = fs::symlink_metadata(path).map_err(|_| "Öğe artık mevcut değil.".to_string())?;
+    let md = fs::symlink_metadata(path)
+        .map_err(|_| t!("Öğe artık mevcut değil.", "The entry no longer exists.").to_string())?;
     if mount_points.iter().any(|m| m == path) {
-        return Err("Bu bir disk bağlama noktası, silinemez.".into());
+        return Err(t!(
+            "Bu bir disk bağlama noktası, silinemez.",
+            "This is a disk mount point and cannot be deleted.",
+        )
+        .into());
     }
     #[cfg(unix)]
     if md.is_dir() {
@@ -24,7 +29,11 @@ pub fn check(path: &Path, mount_points: &[PathBuf]) -> Result<(), String> {
             .and_then(|p| fs::symlink_metadata(p).ok())
             .map(|p| p.dev());
         if parent_dev.is_some_and(|dev| dev != md.dev()) {
-            return Err("Bu klasör başka bir diske ait, silinemez.".into());
+            return Err(t!(
+                "Bu klasör başka bir diske ait, silinemez.",
+                "This folder belongs to another disk and cannot be deleted.",
+            )
+            .into());
         }
     }
     #[cfg(not(unix))]
@@ -92,18 +101,28 @@ pub fn explain(raw: &str) -> Option<&'static str> {
     .iter()
     .any(|k| e.contains(k));
     if permission {
-        return Some(
+        return Some(t!(
             "macOS izin vermedi. Öğe kilitli olabilir (Finder → Bilgi Al → Kilitli) ya da \
              korumalı bir konumdadır (ör. Library/Containers). Korumalı konumlar için \
              Sistem Ayarları → Gizlilik ve Güvenlik → Tam Disk Erişimi'nden terminal \
              uygulamanızı ekleyip terminali yeniden açın.",
-        );
+            "macOS did not allow it. The item may be locked (Finder → Get Info → Locked) or \
+             in a protected location (e.g. Library/Containers). For protected locations, add \
+             your terminal app under System Settings → Privacy & Security → Full Disk Access \
+             and reopen the terminal.",
+        ));
     }
     if e.contains("no such file") || e.contains("code=4") || e.contains("couldn’t be found") {
-        return Some("Öğe artık yerinde değil; başka bir program silmiş ya da taşımış olabilir.");
+        return Some(t!(
+            "Öğe artık yerinde değil; başka bir program silmiş ya da taşımış olabilir.",
+            "The item is no longer there; another program may have deleted or moved it.",
+        ));
     }
     if e.contains("in use") || e.contains("busy") {
-        return Some("Öğe kullanımda. İlgili uygulamayı kapatıp yeniden deneyin.");
+        return Some(t!(
+            "Öğe kullanımda. İlgili uygulamayı kapatıp yeniden deneyin.",
+            "The item is in use. Quit the app using it and try again.",
+        ));
     }
     None
 }

@@ -47,7 +47,7 @@ impl Step {
                 }
                 args.join(" ")
             }
-            Step::TrashContents(dir) => format!("{}/* → çöp kutusu", dir.display()),
+            Step::TrashContents(dir) => tf!("{}/* → çöp kutusu", "{}/* → trash", dir.display()),
         }
     }
 }
@@ -104,16 +104,16 @@ impl ToolKind {
     pub fn label(self) -> &'static str {
         match self {
             ToolKind::Docker => "Docker",
-            ToolKind::Simulators => "Xcode simülatörleri",
+            ToolKind::Simulators => t!("Xcode simülatörleri", "Xcode simulators"),
             ToolKind::XcodeData => "Xcode DerivedData / DeviceSupport",
-            ToolKind::Npm => "npm önbelleği",
-            ToolKind::Pnpm => "pnpm deposu",
-            ToolKind::Yarn => "Yarn önbelleği",
-            ToolKind::Pip => "pip önbelleği",
-            ToolKind::Gradle => "Gradle önbelleği",
-            ToolKind::CocoaPods => "CocoaPods önbelleği",
+            ToolKind::Npm => t!("npm önbelleği", "npm cache"),
+            ToolKind::Pnpm => t!("pnpm deposu", "pnpm store"),
+            ToolKind::Yarn => t!("Yarn önbelleği", "Yarn cache"),
+            ToolKind::Pip => t!("pip önbelleği", "pip cache"),
+            ToolKind::Gradle => t!("Gradle önbelleği", "Gradle cache"),
+            ToolKind::CocoaPods => t!("CocoaPods önbelleği", "CocoaPods cache"),
             ToolKind::Homebrew => "Homebrew",
-            ToolKind::Cargo => "Cargo indirme önbelleği",
+            ToolKind::Cargo => t!("Cargo indirme önbelleği", "Cargo download cache"),
         }
     }
 }
@@ -160,21 +160,24 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
             &["config", "get", "cache"],
             &["cache", "clean", "--force"],
             Risk::Redownload,
-            "npm önbelleğini temizle",
+            t!("npm önbelleğini temizle", "Clean the npm cache"),
         ),
         ToolKind::Pnpm => cache_command(
             "pnpm",
             &["store", "path"],
             &["store", "prune"],
             Risk::Safe,
-            "Kullanılmayan paketleri depodan sil (store prune)",
+            t!(
+                "Kullanılmayan paketleri depodan sil (store prune)",
+                "Remove unused packages from the store (store prune)",
+            ),
         ),
         ToolKind::Yarn => cache_command(
             "yarn",
             &["cache", "dir"],
             &["cache", "clean"],
             Risk::Redownload,
-            "Yarn önbelleğini temizle",
+            t!("Yarn önbelleğini temizle", "Clean the Yarn cache"),
         ),
         ToolKind::Pip => {
             let pip = if which("pip3").is_some() {
@@ -187,7 +190,7 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
                 &["cache", "dir"],
                 &["cache", "purge"],
                 Risk::Redownload,
-                "pip önbelleğini boşalt",
+                t!("pip önbelleğini boşalt", "Purge the pip cache"),
             )
         }
         ToolKind::Gradle => gradle(),
@@ -196,7 +199,10 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
         ToolKind::Cargo => trash_folder(
             home().map(|h| h.join(".cargo/registry/cache")),
             Risk::Redownload,
-            "İndirilmiş .crate dosyalarını çöpe taşı",
+            t!(
+                "İndirilmiş .crate dosyalarını çöpe taşı",
+                "Move downloaded .crate files to the trash",
+            ),
         ),
     }
 }
@@ -240,7 +246,10 @@ fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
             let mut child = match child {
                 Ok(c) => c,
                 Err(e) => {
-                    let _ = tx.send(RunEvent::Output(format!("başlatılamadı: {e}")));
+                    let _ = tx.send(RunEvent::Output(tf!(
+                        "başlatılamadı: {e}",
+                        "could not start: {e}"
+                    )));
                     return false;
                 }
             };
@@ -266,22 +275,28 @@ fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
             let entries: Vec<PathBuf> = match std::fs::read_dir(dir) {
                 Ok(r) => r.flatten().map(|e| e.path()).collect(),
                 Err(e) => {
-                    let _ = tx.send(RunEvent::Output(format!("okunamadı: {e}")));
+                    let _ = tx.send(RunEvent::Output(tf!(
+                        "okunamadı: {e}",
+                        "could not read: {e}"
+                    )));
                     return false;
                 }
             };
             if entries.is_empty() {
-                let _ = tx.send(RunEvent::Output("klasör zaten boş".into()));
+                let _ = tx.send(RunEvent::Output(
+                    t!("klasör zaten boş", "folder is already empty").into(),
+                ));
                 return true;
             }
-            let _ = tx.send(RunEvent::Output(format!(
+            let _ = tx.send(RunEvent::Output(tf!(
                 "{} öğe çöp kutusuna taşınıyor…",
+                "moving {} items to the trash…",
                 entries.len()
             )));
             match crate::delete::trash_context().delete_all(&entries) {
                 Ok(()) => true,
                 Err(e) => {
-                    let _ = tx.send(RunEvent::Output(format!("hata: {e}")));
+                    let _ = tx.send(RunEvent::Output(tf!("hata: {e}", "error: {e}")));
                     false
                 }
             }
@@ -388,13 +403,13 @@ fn cache_command(
     label: &str,
 ) -> (Status, Vec<CleanAction>) {
     let Some(exe) = which(program) else {
-        return missing("kurulu değil");
+        return missing(t!("kurulu değil", "not installed"));
     };
     let Some(dir) = output(&exe, where_args, Duration::from_secs(20))
         .map(|s| PathBuf::from(s.trim()))
         .filter(|p| p.is_dir())
     else {
-        return missing("önbellek klasörü yok");
+        return missing(t!("önbellek klasörü yok", "no cache folder"));
     };
     let size = dir_size(&dir).unwrap_or(0);
     ready(
@@ -406,7 +421,7 @@ fn cache_command(
 
 fn trash_folder(dir: Option<PathBuf>, risk: Risk, label: &str) -> (Status, Vec<CleanAction>) {
     let Some(dir) = dir.filter(|d| d.is_dir()) else {
-        return missing("klasör yok");
+        return missing(t!("klasör yok", "no folder"));
     };
     let size = dir_size(&dir).unwrap_or(0);
     ready(
@@ -420,14 +435,17 @@ fn trash_folder(dir: Option<PathBuf>, risk: Risk, label: &str) -> (Status, Vec<C
 
 fn docker() -> (Status, Vec<CleanAction>) {
     let Some(exe) = which("docker") else {
-        return missing("kurulu değil");
+        return missing(t!("kurulu değil", "not installed"));
     };
     let Some(out) = output(
         &exe,
         &["system", "df", "--format", "{{json .}}"],
         Duration::from_secs(15),
     ) else {
-        return (Status::Unavailable("Docker çalışmıyor".into()), Vec::new());
+        return (
+            Status::Unavailable(t!("Docker çalışmıyor", "Docker is not running").into()),
+            Vec::new(),
+        );
     };
     let parts = parse_docker_df(&out);
     let total = parts.iter().map(|p| p.1).sum();
@@ -438,7 +456,10 @@ fn docker() -> (Status, Vec<CleanAction>) {
         .join(" · ");
     let actions = vec![
         action(
-            "Durmuş container'lar, sahipsiz imajlar ve derleme önbelleği",
+            t!(
+                "Durmuş container'lar, sahipsiz imajlar ve derleme önbelleği",
+                "Stopped containers, dangling images and build cache",
+            ),
             Risk::Safe,
             vec![
                 command(&exe, &["container", "prune", "-f"]),
@@ -447,12 +468,18 @@ fn docker() -> (Status, Vec<CleanAction>) {
             ],
         ),
         action(
-            "Kullanılmayan TÜM imajlar (gerekince yeniden indirilir)",
+            t!(
+                "Kullanılmayan TÜM imajlar (gerekince yeniden indirilir)",
+                "ALL unused images (downloaded again when needed)",
+            ),
             Risk::Redownload,
             vec![command(&exe, &["image", "prune", "-a", "-f"])],
         ),
         action(
-            "Kullanılmayan volume'lar — İÇİNDEKİ VERİLER SİLİNİR",
+            t!(
+                "Kullanılmayan volume'lar — İÇİNDEKİ VERİLER SİLİNİR",
+                "Unused volumes — THE DATA IN THEM IS DELETED",
+            ),
             Risk::DataLoss,
             vec![command(&exe, &["volume", "prune", "-a", "-f"])],
         ),
@@ -466,9 +493,9 @@ pub fn parse_docker_df(out: &str) -> Vec<(String, u64)> {
         .filter_map(|line| {
             let v: serde_json::Value = serde_json::from_str(line).ok()?;
             let kind = match v.get("Type")?.as_str()? {
-                "Images" => "imaj",
-                "Containers" => "container",
-                "Local Volumes" => "volume",
+                "Images" => t!("imaj", "images"),
+                "Containers" => t!("container", "containers"),
+                "Local Volumes" => t!("volume", "volumes"),
                 "Build Cache" => "build cache",
                 other => other,
             };
@@ -503,7 +530,7 @@ pub fn parse_human(s: &str) -> Option<u64> {
 
 fn simulators() -> (Status, Vec<CleanAction>) {
     let Some(xcrun) = which("xcrun") else {
-        return missing("Xcode kurulu değil");
+        return missing(t!("Xcode kurulu değil", "Xcode is not installed"));
     };
     let devices = output(
         &xcrun,
@@ -516,7 +543,7 @@ fn simulators() -> (Status, Vec<CleanAction>) {
         Duration::from_secs(30),
     );
     let Some(devices) = devices else {
-        return missing("simctl çalıştırılamadı");
+        return missing(t!("simctl çalıştırılamadı", "could not run simctl"));
     };
     let (count, size) = parse_unavailable_devices(&devices);
     let runtimes = runtimes.map(|r| parse_runtimes(&r)).unwrap_or_default();
@@ -525,20 +552,30 @@ fn simulators() -> (Status, Vec<CleanAction>) {
     let mut actions = Vec::new();
     if count > 0 {
         actions.push(action(
-            format!("Kullanılamayan {count} simülatörü sil ({})", fmt_size(size)),
+            tf!(
+                "Kullanılamayan {count} simülatörü sil ({})",
+                "Delete {count} unavailable simulators ({})",
+                fmt_size(size)
+            ),
             Risk::Safe,
             vec![command(&xcrun, &["simctl", "delete", "unavailable"])],
         ));
     }
     for r in &runtimes {
         actions.push(action(
-            format!("{} çalışma zamanını sil ({})", r.name, fmt_size(r.size)),
+            tf!(
+                "{} çalışma zamanını sil ({})",
+                "Delete the {} runtime ({})",
+                r.name,
+                fmt_size(r.size)
+            ),
             Risk::Redownload,
             vec![command(&xcrun, &["simctl", "runtime", "delete", &r.id])],
         ));
     }
-    let detail = format!(
+    let detail = tf!(
         "kullanılamayan cihaz {count} ({}) · çalışma zamanı {} ({})",
+        "unavailable devices {count} ({}) · runtimes {} ({})",
         fmt_size(size),
         runtimes.len(),
         fmt_size(runtime_total)
@@ -605,7 +642,7 @@ pub fn parse_runtimes(json: &str) -> Vec<Runtime> {
 
 fn xcode_data() -> (Status, Vec<CleanAction>) {
     let Some(base) = home().map(|h| h.join("Library/Developer/Xcode")) else {
-        return missing("klasör yok");
+        return missing(t!("klasör yok", "no folder"));
     };
     let mut total = 0;
     let mut details = Vec::new();
@@ -613,11 +650,17 @@ fn xcode_data() -> (Status, Vec<CleanAction>) {
     for (name, label) in [
         (
             "DerivedData",
-            "DerivedData içeriğini çöpe taşı (projeler yeniden derlenir)",
+            t!(
+                "DerivedData içeriğini çöpe taşı (projeler yeniden derlenir)",
+                "Move DerivedData contents to the trash (projects are rebuilt)",
+            ),
         ),
         (
             "iOS DeviceSupport",
-            "iOS DeviceSupport içeriğini çöpe taşı (cihaz bağlanınca yeniden oluşur)",
+            t!(
+                "iOS DeviceSupport içeriğini çöpe taşı (cihaz bağlanınca yeniden oluşur)",
+                "Move iOS DeviceSupport contents to the trash (recreated when a device connects)",
+            ),
         ),
     ] {
         let dir = base.join(name);
@@ -628,7 +671,7 @@ fn xcode_data() -> (Status, Vec<CleanAction>) {
         }
     }
     if actions.is_empty() {
-        return missing("klasör yok");
+        return missing(t!("klasör yok", "no folder"));
     }
     ready(total, details.join(" · "), actions)
 }
@@ -637,7 +680,10 @@ fn gradle() -> (Status, Vec<CleanAction>) {
     let (status, mut actions) = trash_folder(
         home().map(|h| h.join(".gradle/caches")),
         Risk::Redownload,
-        "Gradle önbelleğini çöpe taşı (bağımlılıklar yeniden indirilir)",
+        t!(
+            "Gradle önbelleğini çöpe taşı (bağımlılıklar yeniden indirilir)",
+            "Move the Gradle cache to the trash (dependencies are downloaded again)",
+        ),
     );
     // Running daemons hold files in the cache; stop them first.
     if let (Some(gradle), Some(a)) = (which("gradle"), actions.first_mut()) {
@@ -651,7 +697,7 @@ fn cocoapods() -> (Status, Vec<CleanAction>) {
         .map(|h| h.join("Library/Caches/CocoaPods"))
         .filter(|d| d.is_dir())
     else {
-        return missing("klasör yok");
+        return missing(t!("klasör yok", "no folder"));
     };
     let size = dir_size(&dir).unwrap_or(0);
     let step = match which("pod") {
@@ -662,7 +708,7 @@ fn cocoapods() -> (Status, Vec<CleanAction>) {
         size,
         dir.display().to_string(),
         vec![action(
-            "CocoaPods önbelleğini temizle",
+            t!("CocoaPods önbelleğini temizle", "Clean the CocoaPods cache"),
             Risk::Redownload,
             vec![step],
         )],
@@ -671,20 +717,26 @@ fn cocoapods() -> (Status, Vec<CleanAction>) {
 
 fn homebrew() -> (Status, Vec<CleanAction>) {
     let Some(brew) = which("brew") else {
-        return missing("kurulu değil");
+        return missing(t!("kurulu değil", "not installed"));
     };
     let Some(out) = output(&brew, &["cleanup", "-n"], Duration::from_secs(120)) else {
         return (
-            Status::Unavailable("brew cleanup -n başarısız".into()),
+            Status::Unavailable(t!("brew cleanup -n başarısız", "brew cleanup -n failed").into()),
             Vec::new(),
         );
     };
     let size = parse_brew_cleanup(&out).unwrap_or(0);
     ready(
         size,
-        "eski sürümler, indirme önbelleği",
+        t!(
+            "eski sürümler, indirme önbelleği",
+            "old versions, download cache"
+        ),
         vec![action(
-            "Eski sürümleri ve önbelleği temizle (brew cleanup)",
+            t!(
+                "Eski sürümleri ve önbelleği temizle (brew cleanup)",
+                "Remove old versions and the cache (brew cleanup)",
+            ),
             Risk::Safe,
             vec![command(&brew, &["cleanup", "--prune=all"])],
         )],

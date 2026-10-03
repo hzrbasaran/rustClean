@@ -128,9 +128,14 @@ pub fn scan(
     mut on_progress: impl FnMut(&ScanProgress),
 ) -> Result<ScanResult> {
     let started = Instant::now();
-    let root = std::path::absolute(root).context("geçersiz yol")?;
-    let root_md = fs::metadata(&root).with_context(|| format!("{} okunamadı", root.display()))?;
-    anyhow::ensure!(root_md.is_dir(), "{} bir klasör değil", root.display());
+    let root = std::path::absolute(root).context(t!("geçersiz yol", "invalid path"))?;
+    let root_md = fs::metadata(&root)
+        .with_context(|| tf!("{} okunamadı", "could not read {}", root.display()))?;
+    anyhow::ensure!(
+        root_md.is_dir(),
+        "{}",
+        tf!("{} bir klasör değil", "{} is not a folder", root.display())
+    );
 
     let ctx = Arc::new(Ctx {
         cancel: Arc::clone(cancel),
@@ -144,7 +149,10 @@ pub fn scan(
         .num_threads(threads)
         .thread_name(|i| format!("scan-{i}"))
         .build()
-        .context("iş parçacığı havuzu oluşturulamadı")?;
+        .context(t!(
+            "iş parçacığı havuzu oluşturulamadı",
+            "could not create the thread pool"
+        ))?;
     let (tx, rx) = mpsc::channel::<Listing>();
     let spawn = |job: Job| {
         let ctx = Arc::clone(&ctx);
