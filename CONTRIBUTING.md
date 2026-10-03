@@ -94,6 +94,18 @@ Please use the issue templates and include:
 For anything involving data being deleted unexpectedly, see
 [SECURITY.md](SECURITY.md).
 
+## Releasing (maintainers)
+
+1. Bump `version` in `Cargo.toml`, run `cargo check` (updates `Cargo.lock`),
+   and turn *Unreleased* in `CHANGELOG.md` into the new version with its date.
+2. After the release PR is merged, tag `main` and push the tag:
+   `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. The release workflow builds the binaries, publishes the GitHub release with
+   the CHANGELOG section as notes, and updates the Homebrew formula in
+   [hzrbasaran/homebrew-tap](https://github.com/hzrbasaran/homebrew-tap)
+   (needs the `HOMEBREW_TAP_TOKEN` secret).
+4. Publish the crate: `cargo publish`.
+
 ## License
 
 By contributing, you agree that your contributions are dual licensed under the

@@ -87,6 +87,15 @@ rustClean kendiliğinden hiçbir şey silmez:
 
 ## Kurulum
 
+### Homebrew ile (macOS, Linux)
+
+```bash
+brew install hzrbasaran/tap/rustclean
+```
+
+Apple Silicon, Intel Mac ya da Linux x86_64 için hazır derlemeyi kurar; yeni
+sürümler `brew upgrade` ile gelir.
+
 ### Cargo ile
 
 ```bash
