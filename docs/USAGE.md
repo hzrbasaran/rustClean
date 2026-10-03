@@ -115,7 +115,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Largest files | the 200 largest files |
 | Largest folders | by total size, skipping folders that merely wrap one big subfolder |
 | Most repeated file names | names that occur most often; `Enter` lists the files |
-| Applications and their data | each app with its data folders in `~/Library` (support, caches, containers, logs…); the whole scan is used |
+| Applications and their data | each app with its data folders in `~/Library` (support, caches, containers, logs…) and preference files; the whole scan is used; `u` uninstalls |
 | Orphaned app leftovers | data folders that belong to no installed app (installed apps are read from `/Applications` as well, so scanning your home folder is enough) |
 | Developer junk | `node_modules`, Cargo `target`, `build`, `dist`, `Pods`, `.build`, `DerivedData`, `.gradle`, `.venv`, `__pycache__`, `vendor`, .NET `bin`/`obj`… only when the project's marker file is present |
 | Cache folders | entries of `Caches` / `.cache`, and `GPUCache`, `Code Cache`… |
@@ -126,6 +126,15 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 → 365 days since the last change. For developer junk the age is the
 project's (the newest change next to the junk folder), so a freshly reinstalled
 `node_modules` in an abandoned project still counts as old.
+
+**Uninstalling an app** (macOS). In "Applications and their data", `u` on an
+app (or inside its group) lists the bundle and every data folder and
+preference file matched to it, all checked. `Space` unchecks an entry, `t`
+toggles all, and `e` moves the checked ones to the trash. Apps under `/System`
+are refused. If the app is running, the dialog says so; quit it first. The
+report is listed again afterwards. Preference files
+(`~/Library/Preferences/<bundle id>….plist`, also `ByHost`) are matched by
+bundle id only.
 
 **Leftovers are a best guess.** Matching data folders to apps uses names and
 bundle identifiers. The report excludes shared and system folders and
