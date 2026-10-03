@@ -7,6 +7,11 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Uninstall an app with its data (macOS): `u` in "Applications and their
+  data" lists the bundle, its data folders and preference files, all checked
+  and each one can be unchecked, then moves them to the trash. System apps
+  are refused, a running app is flagged, and the report is refreshed
+  ([#7](https://github.com/hzrbasaran/rustClean/issues/7)).
 - `R` rescans only the current folder in the background and updates the
   tree in place (sizes, counts and dates of the folder and its parents), so
   refreshing after a cleanup no longer needs a full rescan

@@ -35,7 +35,9 @@ harekete geçmenizi sağlar:
 - **Raporlar** (`m`):
   - en büyük dosyalar ve klasörler
   - en çok tekrar eden dosya adları
-  - **verileriyle birlikte** uygulamalar (`~/Library`, kapsayıcılar, önbellekler…)
+  - **verileriyle birlikte** uygulamalar (`~/Library`, kapsayıcılar,
+    önbellekler, tercihler…); `u` bir uygulamayı verisiyle tek adımda
+    kaldırır (macOS)
   - artık yüklü olmayan uygulamaların **sahipsiz artıkları**
   - **geliştirici çöpleri:** `node_modules`, Cargo `target`, `build`/`dist`,
     `Pods`, `DerivedData`, `.venv`… (yalnızca projenin işaret dosyası yanındaysa)
