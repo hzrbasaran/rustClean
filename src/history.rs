@@ -488,14 +488,17 @@ mod tests {
         now.finalize();
 
         let (rows, truncated, note) = changes(&now, ROOT, &snap, SizeMode::Disk);
-        let got: Vec<(&str, &str)> = rows
+        let got: Vec<(String, &str)> = rows
             .iter()
-            .map(|r| (r.label.as_str(), r.detail.as_str()))
+            .map(|r| (r.label.replace('\\', "/"), r.detail.as_str()))
             .collect();
         // "big/" only wraps "big/iç klasör/", so it is not listed.
         assert_eq!(
             got,
-            vec![("big/iç klasör/", "+40.0 MiB"), ("new/", "yeni (+3.0 MiB)")]
+            vec![
+                ("big/iç klasör/".to_string(), "+40.0 MiB"),
+                ("new/".to_string(), "yeni (+3.0 MiB)")
+            ]
         );
         assert!(!truncated);
         assert_eq!(note, "Silinenler: 1 öğe, 5.0 MiB — old (5.0 MiB)");
@@ -503,7 +506,7 @@ mod tests {
         // Below "big" only.
         let (rows, _, note) = changes(&now, big, &snap, SizeMode::Disk);
         assert_eq!(rows.len(), 1);
-        assert_eq!(rows[0].label, "iç klasör/");
+        assert_eq!(rows[0].label.replace('\\', "/"), "iç klasör/");
         assert_eq!(note, "Silinen büyük öğe yok.");
     }
 

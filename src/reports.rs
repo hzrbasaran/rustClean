@@ -639,8 +639,12 @@ mod tests {
         }
     }
 
-    fn labels(list: &ResultList) -> Vec<&str> {
-        list.rows.iter().map(|r| r.label.as_str()).collect()
+    /// Row labels with '/' separators on every platform.
+    fn labels(list: &ResultList) -> Vec<String> {
+        list.rows
+            .iter()
+            .map(|r| r.label.replace('\\', "/"))
+            .collect()
     }
 
     fn report(t: &Tree, kind: ReportKind) -> ResultList {

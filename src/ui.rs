@@ -744,7 +744,7 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
         let name = if n.is_dir {
             Span::styled(
                 format!("{}/", tree.name(id)),
-                Style::new().fg(Color::Blue).bold(),
+                Style::new().fg(Color::LightBlue).bold(),
             )
         } else {
             Span::raw(tree.name(id).to_string())
@@ -841,7 +841,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, checks: &[bool
             (count, n.modified, n.created)
         };
         let label_style = if row.group || tree.node(row.nodes[0]).is_dir {
-            Style::new().fg(Color::Blue).bold()
+            Style::new().fg(Color::LightBlue).bold()
         } else {
             Style::new()
         };
@@ -877,10 +877,12 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, checks: &[bool
         widths.push(Constraint::Length(DATE_WIDTH));
         header.push(t!("Oluşturma", "Created"));
     }
-    widths.push(Constraint::Min(10));
+    // The location matters most: it gets at least 30 columns, details
+    // whatever is left up to their length.
+    widths.push(Constraint::Min(30));
     header.push(t!("Konum", "Location"));
     if has_detail {
-        widths.push(Constraint::Length(detail_width.max(7)));
+        widths.push(Constraint::Max(detail_width.max(7)));
         header.push(t!("Ayrıntı", "Details"));
     }
 
@@ -1345,7 +1347,7 @@ fn render_dashboard(
                 } else {
                     format!("{}/", rel(id))
                 },
-                Style::new().fg(Color::Blue).bold(),
+                Style::new().fg(Color::LightBlue).bold(),
             )),
         ])
     });

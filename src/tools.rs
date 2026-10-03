@@ -803,6 +803,7 @@ mod tests {
         assert_eq!(parse_unavailable_devices("not json"), (0, 0));
     }
 
+    #[cfg(unix)]
     fn collect(rx: Receiver<RunEvent>) -> Vec<RunEvent> {
         let mut out = Vec::new();
         while let Ok(ev) = rx.recv_timeout(Duration::from_secs(10)) {

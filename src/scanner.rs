@@ -300,6 +300,7 @@ fn epoch_secs(time: std::io::Result<std::time::SystemTime>) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(unix)]
     use crate::tree::SizeMode;
 
     fn write(path: &Path, len: usize) {
