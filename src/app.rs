@@ -1021,6 +1021,11 @@ impl Browser {
                 return Action::None;
             }
             match code {
+                // Esc leaves the map (Backspace still goes up a folder).
+                KeyCode::Esc => {
+                    self.view = View::List;
+                    return Action::None;
+                }
                 KeyCode::Char('c') => {
                     self.map_color = match self.map_color {
                         MapColor::Kind => MapColor::Age,

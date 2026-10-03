@@ -390,7 +390,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Enter", "gir"),
             ("⌫", "geri"),
             ("c", "renk"),
-            ("t", "liste"),
+            ("t/Esc", "liste"),
             ("Space", "sepete"),
             ("x", "çöpe taşı"),
             ("S", "sepet"),
@@ -748,9 +748,45 @@ pub fn fmt_date(secs: u32) -> String {
 fn text_on(bg: Color) -> Color {
     match bg {
         Color::Blue | Color::Magenta | Color::Red | Color::DarkGray | Color::Black => Color::White,
+        Color::Indexed(n) if indexed_luma(n) < 140.0 => Color::White,
         _ => Color::Black,
     }
 }
+
+/// Perceived brightness (0–255) of an xterm 256-color palette entry.
+fn indexed_luma(n: u8) -> f64 {
+    const LEVELS: [f64; 6] = [0.0, 95.0, 135.0, 175.0, 215.0, 255.0];
+    let (r, g, b) = match n {
+        16..=231 => {
+            let i = usize::from(n - 16);
+            (LEVELS[i / 36], LEVELS[(i / 6) % 6], LEVELS[i % 6])
+        }
+        232..=255 => {
+            let v = 8.0 + 10.0 * f64::from(n - 232);
+            (v, v, v)
+        }
+        _ => (128.0, 128.0, 128.0),
+    };
+    0.299 * r + 0.587 * g + 0.114 * b
+}
+
+/// Folder colors in the treemap: distinct mid-dark hues (xterm 256-color
+/// palette, which Terminal.app supports, unlike 24-bit color). Files keep
+/// the lighter type colors, so folders and files stay apart.
+const DIR_COLORS: [Color; 12] = [
+    Color::Indexed(25),  // blue
+    Color::Indexed(130), // orange
+    Color::Indexed(29),  // green
+    Color::Indexed(90),  // magenta
+    Color::Indexed(31),  // teal
+    Color::Indexed(124), // red
+    Color::Indexed(60),  // slate
+    Color::Indexed(64),  // olive
+    Color::Indexed(54),  // purple
+    Color::Indexed(94),  // brown
+    Color::Indexed(23),  // dark teal
+    Color::Indexed(89),  // wine
+];
 
 /// Cuts `s` to at most `width` characters.
 fn clip(s: &str, width: usize) -> String {
@@ -782,13 +818,8 @@ fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
                 let n = tree.node(id);
                 let bg = match b.map_color {
                     MapColor::Age => age_color(now.saturating_sub(u64::from(n.modified))),
-                    MapColor::Kind if n.is_dir => {
-                        if i % 2 == 0 {
-                            Color::Blue
-                        } else {
-                            Color::LightBlue
-                        }
-                    }
+                    // Entries are in size order, so neighbours get different colors.
+                    MapColor::Kind if n.is_dir => DIR_COLORS[i % DIR_COLORS.len()],
                     MapColor::Kind => CATEGORY_COLORS[stats::Category::of(tree.name(id)) as usize],
                 };
                 let mut name = tree.name(id).to_string();
@@ -852,11 +883,17 @@ fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
         f.render_widget(Paragraph::new(lines).style(text_style), inner);
     }
 
-    let mut legend = vec![Span::raw(" Renk: ").white().bold()];
+    let mut legend = vec![
+        Span::raw(" t / Esc ").black().on_gray(),
+        Span::raw(" listeye dön   ").white(),
+        Span::raw("Renk: ").white().bold(),
+    ];
     match b.map_color {
         MapColor::Kind => {
-            legend.push(Span::styled("██", Style::new().fg(Color::Blue)));
-            legend.push(Span::raw(" klasör  ").white());
+            for color in DIR_COLORS.iter().take(4) {
+                legend.push(Span::styled("█", Style::new().fg(*color)));
+            }
+            legend.push(Span::raw(" klasörler (her biri ayrı)  ").white());
             for (cat, color) in stats::Category::ALL.iter().zip(CATEGORY_COLORS) {
                 legend.push(Span::styled("██", Style::new().fg(color)));
                 legend.push(Span::raw(format!(" {}  ", cat.label())).white());
@@ -1702,6 +1739,17 @@ mod tests {
         let d = fmt_date(1_000_000_000);
         assert_eq!(d.chars().count(), 16, "{d}");
         assert!(d.contains(".09.2001 "), "{d}");
+    }
+
+    #[test]
+    fn folder_colors_get_readable_text() {
+        // Dark palette entries get white text, light ones black.
+        for c in DIR_COLORS {
+            assert_eq!(text_on(c), Color::White, "{c:?}");
+        }
+        assert_eq!(text_on(Color::Indexed(231)), Color::Black); // white
+        assert_eq!(text_on(Color::Indexed(16)), Color::White); // black
+        assert_eq!(text_on(Color::LightYellow), Color::Black);
     }
 
     #[test]
