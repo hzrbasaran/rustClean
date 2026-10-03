@@ -1776,8 +1776,10 @@ fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
                 ));
                 lines.push(
                     Line::from(t!(
-                        "APFS klonları ve kopyalar blok paylaşsa da tarama onları ayrı sayar.",
-                        "APFS clones and copies share blocks, but the scan counts them separately.",
+                        "Tam klonlar bir kez sayılır; kısmen değiştirilmiş klonlar ve küçük \
+                         dosyaların klonları ise blok paylaşsa da ayrı sayılır.",
+                        "Pure clones are counted once; partly modified clones and clones of \
+                         small files share blocks but are still counted separately.",
                     ))
                     .gray(),
                 );

@@ -14,6 +14,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result};
 
+use crate::clones::{self, CloneInfo};
 use crate::tree::{NodeId, Size, Tree, ROOT};
 
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(100);
@@ -110,6 +111,8 @@ struct Entry {
     /// `(dev, inode)` of files with more than one hard link.
     #[cfg(unix)]
     hard_link: Option<(u64, u64)>,
+    /// Set for APFS clones (files sharing blocks with another file).
+    clone: Option<CloneInfo>,
     /// Set for directories that should be descended into.
     descend: Option<PathBuf>,
 }
@@ -165,6 +168,7 @@ pub fn scan(
     let mut tree = Tree::new(&root);
     #[cfg(unix)]
     let mut seen_links: HashSet<(u64, u64)> = HashSet::new();
+    let mut seen_clones: HashSet<u64> = HashSet::new();
     let mut progress = ScanProgress::default();
     let mut last_report = Instant::now();
 
@@ -192,7 +196,17 @@ pub fn scan(
             if entry.hard_link.is_some_and(|key| !seen_links.insert(key)) {
                 size = Size::default();
             }
+            // Clones share blocks: the first one seen carries them, the
+            // others only what they hold on their own.
+            if let Some(c) = entry.clone {
+                if !seen_clones.insert(c.id) {
+                    size.disk = size.disk.min(c.private);
+                }
+            }
             let id = tree.push(listing.node, &entry.name, entry.is_dir, size);
+            if let Some(c) = entry.clone {
+                tree.set_clone(id, c.id, c.private);
+            }
             tree.set_times(id, entry.modified, entry.created);
             if entry.is_dir {
                 progress.dirs += 1;
@@ -239,6 +253,8 @@ fn read_dir(job: Job, ctx: &Ctx) -> Listing {
             return listing;
         }
     };
+    // Opened on the first file: clone lookups go through it.
+    let mut clone_dir: Option<Option<clones::Dir>> = None;
     for dir_entry in read {
         // `DirEntry::metadata` does not follow symlinks.
         let Ok((dir_entry, md)) = dir_entry.and_then(|e| e.metadata().map(|md| (e, md))) else {
@@ -276,10 +292,21 @@ fn read_dir(job: Job, ctx: &Ctx) -> Listing {
             }
         }
 
+        let clone = if md.is_file() && size.disk >= clones::MIN_SIZE {
+            clone_dir
+                .get_or_insert_with(|| clones::Dir::open(&listing.dir))
+                .as_ref()
+                .and_then(|d| d.info(&dir_entry.file_name()))
+                .filter(CloneInfo::is_shared)
+        } else {
+            None
+        };
+
         listing.entries.push(Entry {
             name: dir_entry.file_name().to_string_lossy().into(),
             is_dir,
             size,
+            clone,
             modified: epoch_secs(md.modified()),
             created: epoch_secs(md.created()),
             #[cfg(unix)]
@@ -432,6 +459,38 @@ mod tests {
         assert!(now - fresh.created < 3600, "created: {}", fresh.created);
     }
 
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn counts_apfs_clones_once() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        let data: Vec<u8> = (0..3_000_000u32)
+            .map(|i| (i.wrapping_mul(2654435761) >> 9) as u8)
+            .collect();
+        fs::write(r.join("a.bin"), &data).unwrap();
+        fs::copy(r.join("a.bin"), r.join("clone.bin")).unwrap(); // clonefile on APFS
+        fs::write(r.join("copy.bin"), &data).unwrap(); // a real second copy
+
+        let res = run(r);
+        let t = &res.tree;
+        let a = child(t, ROOT, "a.bin");
+        let clone = child(t, ROOT, "clone.bin");
+        let copy = child(t, ROOT, "copy.bin");
+        if t.clone_of(a).is_none() {
+            eprintln!("not an APFS volume; skipping");
+            return;
+        }
+        assert_eq!(t.clone_of(a).unwrap().0, t.clone_of(clone).unwrap().0);
+        assert!(t.clone_of(copy).is_none());
+        // Apparent sizes are file lengths: three files.
+        assert_eq!(t.node(ROOT).size.apparent, 9_000_000);
+        // On disk the clone's shared blocks count once: about two files.
+        let one = t.node(copy).size.disk;
+        let shared = t.node(a).size.disk + t.node(clone).size.disk;
+        assert_eq!(shared, one, "a + clone hold one file's blocks");
+        assert_eq!(t.node(ROOT).size.disk, 2 * one);
+    }
+
     /// Sizes and file counts of every entry, by relative path.
     fn snapshot(tree: &Tree) -> Vec<(String, u64, u64, u32)> {
         let root = tree.path_of(ROOT);
@@ -450,6 +509,42 @@ mod tests {
         }
         out.sort();
         out
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn rescanning_a_folder_counts_outside_clones_once() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        fs::create_dir_all(r.join("a")).unwrap();
+        fs::create_dir_all(r.join("b")).unwrap();
+        let data: Vec<u8> = (0..2_000_000u32)
+            .map(|i| (i.wrapping_mul(2654435761) >> 11) as u8)
+            .collect();
+        fs::write(r.join("a/orig.bin"), &data).unwrap();
+        fs::copy(r.join("a/orig.bin"), r.join("b/clone.bin")).unwrap();
+
+        let mut res = run(r);
+        if res
+            .tree
+            .clone_of(child(&res.tree, child(&res.tree, ROOT, "a"), "orig.bin"))
+            .is_none()
+        {
+            eprintln!("not an APFS volume; skipping");
+            return;
+        }
+        // Rescan each folder in turn: the other one holds the clone's twin.
+        for name in ["a", "b"] {
+            let d = child(&res.tree, ROOT, name);
+            let sub = scan(&res.tree.path_of(d), Vec::new(), &Arc::default(), |_| {}).unwrap();
+            res.tree.replace_children(d, &sub.tree);
+            let fresh = run(r);
+            assert_eq!(
+                res.tree.node(ROOT).size.disk,
+                fresh.tree.node(ROOT).size.disk,
+                "after rescanning {name}"
+            );
+        }
     }
 
     #[test]

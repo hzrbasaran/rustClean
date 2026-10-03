@@ -1533,6 +1533,7 @@ dependencies = [
  "crossterm",
  "dirs",
  "flate2",
+ "libc",
  "plist",
  "ratatui",
  "rayon",

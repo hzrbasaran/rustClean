@@ -4,6 +4,7 @@ mod i18n;
 mod app;
 mod apps;
 mod basket;
+mod clones;
 mod delete;
 mod disks;
 mod duplicates;

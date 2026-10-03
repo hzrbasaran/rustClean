@@ -14,6 +14,11 @@ follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 - Dependencies: ratatui 0.30, sysinfo 0.39; release workflow actions updated.
+- On APFS, pure clones (`cp -c`, Finder duplicates) are counted once in the
+  on-disk size, so a folder of clones no longer looks many times larger than
+  it is. The duplicates report shows how many copies are clones, since
+  deleting them frees nothing
+  ([#6](https://github.com/hzrbasaran/rustClean/issues/6)).
 
 ## [0.1.0] - 2026-10-03
 

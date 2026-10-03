@@ -40,7 +40,7 @@ The list shows the current folder's entries with:
 | `Enter` / `→` | open a folder |
 | `⌫` / `←` / `Esc` | back to the parent folder |
 | `s` | sort: size → name → file count → oldest change first |
-| `a` | apparent size (file length) ↔ size on disk (what `du` reports) |
+| `a` | apparent size (file length) ↔ size on disk (what `du` reports; on APFS, pure clones are counted once) |
 | `R` | rescan only the current folder (e.g. after a cleanup), in the background; `Esc` cancels |
 | `r` | rescan everything from the root |
 | `d` | back to the disk list |
@@ -132,8 +132,10 @@ bundle identifiers. The report excludes shared and system folders and
 anything that looks like it belongs to an installed app. Still, look inside
 (`Enter`) before deleting.
 
-**Duplicates and APFS.** Copies that are APFS clones share their blocks, so
-deleting them may free nothing.
+**Duplicates and APFS.** Copies that are APFS clones (made by `cp -c`, Finder's
+Duplicate and many apps) share their blocks. The group's detail says how many
+copies are clones, and deleting them frees nothing. In disk size mode the
+group's size already leaves them out.
 
 ## Tools
 
