@@ -5,6 +5,7 @@
 **Hızlı bir terminal disk kullanım analizcisi — ve güvenli bir temizlik yardımcısı.**
 
 [![CI](https://github.com/hzrbasaran/rustClean/actions/workflows/ci.yml/badge.svg)](https://github.com/hzrbasaran/rustClean/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/rustclean.svg)](https://crates.io/crates/rustclean)
 [![Lisans: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#lisans)
 ![Platformlar](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)
 
@@ -83,20 +84,34 @@ rustClean kendiliğinden hiçbir şey silmez:
 
 ## Kurulum
 
+### Cargo ile
+
+```bash
+cargo install rustclean
+```
+
+Güncel bir kararlı [Rust](https://rustup.rs) sürümü gerekir (Rust 1.99 ile
+geliştirildi ve test edildi; 1.79 gibi eski sürümler bağımlılıkları
+derleyemez). Derleme başarısız olursa `rustup update` çalıştırın.
+
 ### Hazır derlemeler
 
 Her [GitHub sürümü](https://github.com/hzrbasaran/rustClean/releases) CI
 tarafından otomatik derlenen macOS (Apple Silicon ve Intel), Linux (x86_64) ve
-Windows (x86_64) dosyalarıyla gelir.
+Windows (x86_64) dosyalarıyla gelir. Arşivi açıp `rustclean` dosyasını
+`PATH` içindeki bir klasöre koyun.
+
+macOS dosyaları Apple tarafından imzalı değildir. macOS indirilen dosyayı
+açmayı reddederse ("geliştirici doğrulanamadı"), karantina işaretini bir kez
+kaldırın:
+
+```bash
+xattr -d com.apple.quarantine rustclean
+```
 
 ### Kaynaktan
 
-Güncel bir kararlı [Rust](https://rustup.rs) sürümü gerekir (Rust 1.99 ile
-geliştirildi ve test edildi).
-
 ```bash
-cargo install --git https://github.com/hzrbasaran/rustClean
-# ya da
 git clone https://github.com/hzrbasaran/rustClean
 cd rustClean
 cargo build --release   # çalıştırılabilir dosya: target/release/rustclean

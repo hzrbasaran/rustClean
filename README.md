@@ -5,6 +5,7 @@
 **A fast terminal disk usage analyzer that also helps you clean up — safely.**
 
 [![CI](https://github.com/hzrbasaran/rustClean/actions/workflows/ci.yml/badge.svg)](https://github.com/hzrbasaran/rustClean/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/rustclean.svg)](https://crates.io/crates/rustclean)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 ![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)
 
@@ -81,20 +82,34 @@ Note that moving to the trash does not free space until the trash is emptied.
 
 ## Installation
 
+### With Cargo
+
+```bash
+cargo install rustclean
+```
+
+This needs a recent stable [Rust toolchain](https://rustup.rs) (developed and
+tested with Rust 1.99; older ones such as 1.79 cannot build the dependencies).
+Run `rustup update` if the build fails.
+
 ### Pre-built binaries
 
 Each [GitHub release](https://github.com/hzrbasaran/rustClean/releases) comes
 with pre-built binaries for macOS (Apple Silicon and Intel), Linux (x86_64)
-and Windows (x86_64), built automatically by CI.
+and Windows (x86_64), built automatically by CI. Unpack the archive and put
+`rustclean` somewhere on your `PATH`.
+
+The macOS binaries are not signed by Apple. If macOS refuses to open a
+downloaded binary ("developer cannot be verified"), remove the quarantine flag
+once:
+
+```bash
+xattr -d com.apple.quarantine rustclean
+```
 
 ### From source
 
-You need a recent stable [Rust toolchain](https://rustup.rs) (developed and
-tested with Rust 1.99).
-
 ```bash
-cargo install --git https://github.com/hzrbasaran/rustClean
-# or
 git clone https://github.com/hzrbasaran/rustClean
 cd rustClean
 cargo build --release   # binary: target/release/rustclean
