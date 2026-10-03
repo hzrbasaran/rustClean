@@ -7,6 +7,9 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- "Installers and archives in Downloads" report: disk images, installers
+  and archives in Downloads folders, largest first, with the age filter
+  ([#10](https://github.com/hzrbasaran/rustClean/issues/10)).
 - Uninstall an app with its data (macOS): `u` in "Applications and their
   data" lists the bundle, its data folders and preference files, all checked
   and each one can be unchecked, then moves them to the trash. System apps
