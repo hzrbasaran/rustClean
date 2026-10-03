@@ -41,7 +41,8 @@ The list shows the current folder's entries with:
 | `⌫` / `←` / `Esc` | back to the parent folder |
 | `s` | sort: size → name → file count → oldest change first |
 | `a` | apparent size (file length) ↔ size on disk (what `du` reports) |
-| `r` | rescan |
+| `R` | rescan only the current folder (e.g. after a cleanup), in the background; `Esc` cancels |
+| `r` | rescan everything from the root |
 | `d` | back to the disk list |
 
 ## Treemap

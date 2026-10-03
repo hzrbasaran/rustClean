@@ -137,6 +137,7 @@ Every screen lists its keys at the bottom. The most important ones:
 | `Space` · `S` · `x` | add to basket · show basket · move to trash |
 | `f` | age filter (in reports) |
 | `s` · `a` | sort · apparent / on-disk size |
+| `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
 | `q` | quit |
 

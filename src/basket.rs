@@ -74,6 +74,20 @@ impl Basket {
         }
     }
 
+    /// Drops entries strictly below `dir` (e.g. before `dir` is rescanned and
+    /// its old entries stop existing).
+    pub fn remove_below(&mut self, tree: &Tree, dir: NodeId) {
+        let gone: Vec<NodeId> = self
+            .items
+            .iter()
+            .copied()
+            .filter(|&item| is_below(tree, item, dir))
+            .collect();
+        for item in gone {
+            self.remove(item);
+        }
+    }
+
     pub fn clear(&mut self) {
         self.items.clear();
         self.set.clear();
@@ -139,6 +153,9 @@ mod tests {
         assert_eq!(b.len(), 2);
 
         b.remove(a);
+        assert_eq!(b.items(), &[other]);
+        b.add(&t, f2);
+        b.remove_below(&t, a);
         assert_eq!(b.items(), &[other]);
         assert!(!b.covers(&t, f2));
         b.clear();

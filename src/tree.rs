@@ -156,6 +156,40 @@ impl Tree {
         }
     }
 
+    /// Replaces everything below `dir` with the entries of `sub`, a fresh
+    /// (finalized) scan of the same directory. Old entries are detached as
+    /// with `remove`; sizes and file counts of `dir` and its ancestors are
+    /// updated. Newest-change times only move forward, as with `remove`.
+    pub fn replace_children(&mut self, dir: NodeId, sub: &Tree) {
+        let old: Vec<NodeId> = self.children(dir).collect();
+        for child in old {
+            self.remove(child);
+        }
+        // `sub` lists parents before children, so one pass maps every id.
+        let mut map = vec![NONE; sub.nodes.len()];
+        map[ROOT as usize] = dir;
+        for sid in 1..sub.nodes.len() {
+            let n = &sub.nodes[sid];
+            let parent = map[n.parent as usize];
+            let id = self.push(parent, sub.name(sid as NodeId), n.is_dir, n.size);
+            let new = &mut self.nodes[id as usize];
+            new.file_count = n.file_count;
+            new.modified = n.modified;
+            new.created = n.created;
+            map[sid] = id;
+        }
+        let total = sub.node(ROOT);
+        let (size, count, modified) = (total.size, total.file_count, total.modified);
+        let mut ancestor = Some(dir);
+        while let Some(a) = ancestor {
+            let n = &mut self.nodes[a as usize];
+            n.size += size;
+            n.file_count += count;
+            n.modified = n.modified.max(modified);
+            ancestor = self.parent(a);
+        }
+    }
+
     pub fn set_times(&mut self, id: NodeId, modified: u32, created: u32) {
         let n = &mut self.nodes[id as usize];
         n.modified = modified;
@@ -325,6 +359,43 @@ mod tests {
 
         t.remove(ROOT);
         assert_eq!(t.node(ROOT).size, sz(10, 100));
+    }
+
+    #[test]
+    fn replace_children_matches_a_fresh_tree() {
+        // Before: /r/a/{old: 100, keep/ (f: 5)}, /r/b (10).
+        let mut t = Tree::new(Path::new("/r"));
+        let a = t.push(ROOT, "a", true, sz(0, 1));
+        t.push(a, "old", false, sz(100, 100));
+        let keep = t.push(a, "keep", true, sz(0, 1));
+        t.push(keep, "f", false, sz(5, 5));
+        t.push(ROOT, "b", false, sz(10, 10));
+        t.finalize();
+
+        // A fresh scan of /r/a: "old" is gone, "keep" grew, "new" appeared.
+        let mut sub = Tree::new(Path::new("/r/a"));
+        let keep2 = sub.push(ROOT, "keep", true, sz(0, 1));
+        let f = sub.push(keep2, "f", false, sz(7, 7));
+        sub.set_times(f, 500, 400);
+        sub.push(ROOT, "new", false, sz(20, 20));
+        sub.finalize();
+
+        t.replace_children(a, &sub);
+
+        // a: own block 1 + keep (1 + 7) + new 20.
+        assert_eq!(t.node(a).size, sz(27, 29));
+        assert_eq!(t.node(a).file_count, 2);
+        assert_eq!(t.node(ROOT).size, sz(37, 39));
+        assert_eq!(t.node(ROOT).file_count, 3);
+        assert_eq!(t.node(ROOT).modified, 500);
+        let mut names: Vec<&str> = t.children(a).map(|c| t.name(c)).collect();
+        names.sort();
+        assert_eq!(names, vec!["keep", "new"]);
+        let keep = t.children(a).find(|&c| t.name(c) == "keep").unwrap();
+        let f = t.children(keep).next().unwrap();
+        assert_eq!(t.node(f).size, sz(7, 7));
+        assert_eq!(t.node(f).created, 400);
+        assert_eq!(t.path_of(f), PathBuf::from("/r/a/keep/f"));
     }
 
     #[test]
