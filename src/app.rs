@@ -12,6 +12,7 @@ use crate::apps;
 use crate::delete::{self, Deletion};
 use crate::disks::{self, DiskInfo};
 use crate::duplicates::{self, DupJob};
+use crate::history;
 use crate::lists::{ResultList, Row, RowSize};
 use crate::reports::{self, ReportKind};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
@@ -149,6 +150,8 @@ pub struct Browser {
     pending_report: Option<(ReportKind, u8)>,
     /// Running duplicate search.
     pub dup_job: Option<DupJob>,
+    /// History time stamp of this scan, so it is not compared with itself.
+    snapshot_time: Option<u64>,
     /// Entries awaiting a yes/no answer before being moved to the trash.
     pub confirm: Option<Vec<NodeId>>,
     pub deleting: Option<Deletion>,
@@ -179,6 +182,7 @@ impl Browser {
             report_menu: None,
             pending_report: None,
             dup_job: None,
+            snapshot_time: None,
             confirm: None,
             deleting: None,
             status: None,
@@ -371,6 +375,31 @@ impl Browser {
                 self.results = Some(list);
             }
         }
+    }
+
+    /// Saves this scan to the history (in the background) and tells how much
+    /// changed since the previous one.
+    fn record_history(&mut self) {
+        let Some(dir) = history::dir_for(self.tree.root_path()) else {
+            return;
+        };
+        let now = crate::ui::now_secs();
+        if let Some(prev) = history::list(&dir).first() {
+            let total = self.tree.node(ROOT).size.disk;
+            self.set_status(
+                format!(
+                    "Son taramadan beri ({}): {} · m → Değişenler",
+                    crate::ui::fmt_ago(now.saturating_sub(prev.header.time)),
+                    crate::ui::fmt_delta(total, prev.header.total.disk)
+                ),
+                false,
+            );
+        }
+        self.snapshot_time = Some(now);
+        let snap = history::capture(&self.tree, now);
+        std::thread::spawn(move || {
+            let _ = history::save(&dir, &snap);
+        });
     }
 
     /// Turns a finished duplicate search into a report.
@@ -828,7 +857,9 @@ impl App {
                 Ok(ScanMsg::Progress(p)) => self.progress = p,
                 Ok(ScanMsg::Done(res)) => {
                     self.scan = None;
-                    self.browser = Some(Browser::new(res));
+                    let mut browser = Browser::new(res);
+                    browser.record_history();
+                    self.browser = Some(browser);
                     self.screen = Screen::Browser;
                     return;
                 }

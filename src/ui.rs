@@ -913,6 +913,25 @@ fn bar(ratio: f64, width: usize) -> String {
     s
 }
 
+/// Signed size difference: "+1.2 GiB", "−300.0 MiB", "değişmedi".
+pub fn fmt_delta(now: u64, then: u64) -> String {
+    match now.cmp(&then) {
+        std::cmp::Ordering::Greater => format!("+{}", fmt_size(now - then)),
+        std::cmp::Ordering::Less => format!("−{}", fmt_size(then - now)),
+        std::cmp::Ordering::Equal => "değişmedi".into(),
+    }
+}
+
+/// "az önce", "5 dakika önce", "3 saat önce", "2 gün önce".
+pub fn fmt_ago(secs: u64) -> String {
+    match secs {
+        s if s < 60 => "az önce".into(),
+        s if s < 3600 => format!("{} dakika önce", s / 60),
+        s if s < 86_400 => format!("{} saat önce", s / 3600),
+        s => format!("{} gün önce", s / 86_400),
+    }
+}
+
 /// Human readable size, 1024-based.
 pub fn fmt_size(bytes: u64) -> String {
     const UNITS: [&str; 6] = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"];
@@ -963,6 +982,17 @@ mod tests {
         assert_eq!(fmt_size(1023), "1023 B");
         assert_eq!(fmt_size(1536), "1.5 KiB");
         assert_eq!(fmt_size(5 * 1024 * 1024 * 1024), "5.0 GiB");
+    }
+
+    #[test]
+    fn formats_deltas_and_ages() {
+        assert_eq!(fmt_delta(3072, 1024), "+2.0 KiB");
+        assert_eq!(fmt_delta(1024, 3072), "−2.0 KiB");
+        assert_eq!(fmt_delta(5, 5), "değişmedi");
+        assert_eq!(fmt_ago(30), "az önce");
+        assert_eq!(fmt_ago(600), "10 dakika önce");
+        assert_eq!(fmt_ago(7200), "2 saat önce");
+        assert_eq!(fmt_ago(3 * 86_400 + 5), "3 gün önce");
     }
 
     #[test]

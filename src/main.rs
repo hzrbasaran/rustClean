@@ -3,6 +3,7 @@ mod apps;
 mod delete;
 mod disks;
 mod duplicates;
+mod history;
 mod lists;
 mod reports;
 mod scanner;
