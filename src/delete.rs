@@ -32,6 +32,82 @@ pub fn check(path: &Path, mount_points: &[PathBuf]) -> Result<(), String> {
     Ok(())
 }
 
+/// An entry that could not be moved to the trash.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Failure {
+    pub path: String,
+    pub error: String,
+    /// What the user can do about it, when the error is recognized.
+    pub hint: Option<&'static str>,
+}
+
+impl Failure {
+    pub fn new(path: String, raw_error: &str) -> Self {
+        Self {
+            path,
+            error: tidy(raw_error),
+            hint: explain(raw_error),
+        }
+    }
+}
+
+/// Makes the trash library's error readable: unwraps `Unknown {
+/// description: "..." }` and undoes its escaping.
+pub fn tidy(raw: &str) -> String {
+    let inner = raw
+        .split_once("description: \"")
+        .and_then(|(_, rest)| rest.rsplit_once('"').map(|(d, _)| d))
+        .unwrap_or(raw);
+    let text = inner
+        .replace("\\\"", "\"")
+        .replace("\\'", "'")
+        .replace("\\n", " ")
+        .replace("\\\\", "\\");
+    // The path is shown separately; keep only the reason.
+    let text = match text.strip_prefix("While deleting '") {
+        // `While deleting '"<path>"', reason` (or `': reason`).
+        Some(rest) => match rest.find("\"'") {
+            Some(end) => rest[end + 2..].trim_start_matches([',', ':']).to_string(),
+            None => rest.to_string(),
+        },
+        None => text,
+    };
+    text.trim()
+        .trim_start_matches("`trashItemAtURL` failed: ")
+        .trim()
+        .to_string()
+}
+
+/// A hint for errors the user can fix.
+pub fn explain(raw: &str) -> Option<&'static str> {
+    let e = raw.to_lowercase();
+    let permission = [
+        "not permitted",
+        "permission",
+        "code=513",
+        "code=257",
+        "eperm",
+        "eacces",
+    ]
+    .iter()
+    .any(|k| e.contains(k));
+    if permission {
+        return Some(
+            "macOS izin vermedi. Öğe kilitli olabilir (Finder → Bilgi Al → Kilitli) ya da \
+             korumalı bir konumdadır (ör. Library/Containers). Korumalı konumlar için \
+             Sistem Ayarları → Gizlilik ve Güvenlik → Tam Disk Erişimi'nden terminal \
+             uygulamanızı ekleyip terminali yeniden açın.",
+        );
+    }
+    if e.contains("no such file") || e.contains("code=4") || e.contains("couldn’t be found") {
+        return Some("Öğe artık yerinde değil; başka bir program silmiş ya da taşımış olabilir.");
+    }
+    if e.contains("in use") || e.contains("busy") {
+        return Some("Öğe kullanımda. İlgili uygulamayı kapatıp yeniden deneyin.");
+    }
+    None
+}
+
 /// Moves a batch of entries to the trash, one after another.
 pub struct Deletion {
     rx: Receiver<(NodeId, Result<(), String>)>,
@@ -96,6 +172,30 @@ pub(crate) fn trash_context() -> trash::TrashContext {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn tidies_and_explains_errors() {
+        let raw = r#"Unknown { description: "While deleting '\"/Users/me/Library/Containers/llc.x\"': Error Domain=NSCocoaErrorDomain Code=513 \"“llc.x” couldn’t be moved to the trash because you don’t have permission to access it.\"" }"#;
+        let text = tidy(raw);
+        assert!(
+            text.starts_with("Error Domain=NSCocoaErrorDomain Code=513"),
+            "{text}"
+        );
+        assert!(!text.contains("\\\""));
+        // The real format: the path is dropped, the reason kept.
+        let real = r#"Unknown { description: "While deleting '\"/tmp/a b/x.bin\"', `trashItemAtURL` failed: “x.bin” couldn’t be moved to the trash because you don’t have permission to access it." }"#;
+        assert_eq!(
+            tidy(real),
+            "“x.bin” couldn’t be moved to the trash because you don’t have permission to access it."
+        );
+        assert!(explain(raw).unwrap().contains("Tam Disk Erişimi"));
+        assert!(explain("Operation not permitted (os error 1)").is_some());
+        assert!(explain("No such file or directory")
+            .unwrap()
+            .contains("yerinde değil"));
+        assert_eq!(explain("something else"), None);
+        assert_eq!(tidy("plain message"), "plain message");
+    }
 
     #[test]
     fn allows_regular_entries() {

@@ -141,6 +141,16 @@ pub enum MapColor {
     Age,
 }
 
+/// Entries a deletion could not move to the trash, with the full errors.
+pub struct FailureDialog {
+    pub items: Vec<delete::Failure>,
+    /// How many entries were moved, and their size, for the summary line.
+    pub moved: usize,
+    pub size: String,
+    /// First visible line.
+    pub scroll: u16,
+}
+
 /// What the browser asks the app to do after a key press.
 pub enum Action {
     None,
@@ -191,7 +201,9 @@ pub struct Browser {
     pub trashed: Size,
     /// Outcome of the running deletion batch.
     batch_trashed: Size,
-    batch_failures: Vec<String>,
+    batch_failures: Vec<delete::Failure>,
+    /// Entries that could not be trashed, shown in a dialog until dismissed.
+    pub failures: Option<FailureDialog>,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
 }
@@ -227,6 +239,7 @@ impl Browser {
             trashed: Size::default(),
             batch_trashed: Size::default(),
             batch_failures: Vec::new(),
+            failures: None,
             history: Vec::new(),
         };
         b.load(ROOT, 0);
@@ -872,9 +885,10 @@ impl Browser {
                         r.remove_nodes(&HashSet::from([id]));
                     }
                 }
-                Err(err) => self
-                    .batch_failures
-                    .push(format!("{}: {err}", self.tree.name(id))),
+                Err(err) => self.batch_failures.push(delete::Failure::new(
+                    self.tree.path_of(id).display().to_string(),
+                    &err,
+                )),
             }
         }
         if !finished {
@@ -897,12 +911,17 @@ impl Browser {
         } else {
             self.set_status(
                 format!(
-                    "✗ {} öğe taşınamadı, {moved} öğe taşındı ({size}). İlk hata — {}",
-                    self.batch_failures.len(),
-                    self.batch_failures[0]
+                    "✗ {} öğe taşınamadı, {moved} öğe taşındı ({size}).",
+                    self.batch_failures.len()
                 ),
                 true,
             );
+            self.failures = Some(FailureDialog {
+                items: std::mem::take(&mut self.batch_failures),
+                moved,
+                size,
+                scroll: 0,
+            });
         }
     }
 
@@ -913,6 +932,18 @@ impl Browser {
             } else {
                 Action::None
             };
+        }
+        if let Some(dialog) = &mut self.failures {
+            match code {
+                KeyCode::Up | KeyCode::Char('k') => dialog.scroll = dialog.scroll.saturating_sub(1),
+                KeyCode::Down | KeyCode::Char('j') => {
+                    dialog.scroll = dialog.scroll.saturating_add(1)
+                }
+                KeyCode::PageUp => dialog.scroll = dialog.scroll.saturating_sub(10),
+                KeyCode::PageDown => dialog.scroll = dialog.scroll.saturating_add(10),
+                _ => self.failures = None,
+            }
+            return Action::None;
         }
         if self.confirm.is_some() {
             match code {
