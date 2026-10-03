@@ -1,0 +1,676 @@
+//! Cleaning up after developer tools with their own commands (Docker,
+//! Xcode simulators, package manager caches).
+//!
+//! Measuring only reads: it runs listing commands (`docker system df`,
+//! `simctl list`, `brew cleanup -n`, `npm config get cache`…) and sizes
+//! cache folders. Cleaning runs only the actions the user confirmed.
+
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+use std::sync::mpsc::{self, Receiver};
+use std::sync::Arc;
+use std::thread;
+use std::time::{Duration, Instant};
+
+use crate::scanner;
+use crate::ui::fmt_size;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Risk {
+    /// Nothing of value is lost.
+    Safe,
+    /// Comes back by downloading or building again.
+    Redownload,
+    /// Can delete user data.
+    DataLoss,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Step {
+    /// A program (by full path) and its arguments.
+    Command(Vec<String>),
+    /// Move everything inside this folder to the trash.
+    TrashContents(PathBuf),
+}
+
+impl Step {
+    /// How the step is shown to the user before it runs.
+    pub fn describe(&self) -> String {
+        match self {
+            Step::Command(args) => {
+                let mut args = args.clone();
+                if let Some(first) = args.first_mut() {
+                    // Show the program name, not its full path.
+                    if let Some(name) = Path::new(first.as_str()).file_name() {
+                        *first = name.to_string_lossy().into_owned();
+                    }
+                }
+                args.join(" ")
+            }
+            Step::TrashContents(dir) => format!("{}/* → çöp kutusu", dir.display()),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CleanAction {
+    pub label: String,
+    pub risk: Risk,
+    pub steps: Vec<Step>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Status {
+    Measuring,
+    /// Not installed / nothing to clean; the text says why.
+    Missing(String),
+    /// Installed but not usable right now (e.g. Docker not running).
+    Unavailable(String),
+    Ready {
+        reclaimable: u64,
+        detail: String,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ToolKind {
+    Docker,
+    Simulators,
+    XcodeData,
+    Npm,
+    Pnpm,
+    Yarn,
+    Pip,
+    Gradle,
+    CocoaPods,
+    Homebrew,
+    Cargo,
+}
+
+impl ToolKind {
+    /// Tools that make sense on this platform.
+    pub fn available() -> Vec<ToolKind> {
+        use ToolKind::*;
+        let mut all = vec![Docker, Npm, Pnpm, Yarn, Pip, Gradle, Cargo];
+        if cfg!(target_os = "macos") {
+            all.splice(1..1, [Simulators, XcodeData]);
+            all.extend([CocoaPods, Homebrew]);
+        } else if cfg!(target_os = "linux") {
+            all.push(Homebrew);
+        }
+        all
+    }
+
+    pub fn label(self) -> &'static str {
+        match self {
+            ToolKind::Docker => "Docker",
+            ToolKind::Simulators => "Xcode simülatörleri",
+            ToolKind::XcodeData => "Xcode DerivedData / DeviceSupport",
+            ToolKind::Npm => "npm önbelleği",
+            ToolKind::Pnpm => "pnpm deposu",
+            ToolKind::Yarn => "Yarn önbelleği",
+            ToolKind::Pip => "pip önbelleği",
+            ToolKind::Gradle => "Gradle önbelleği",
+            ToolKind::CocoaPods => "CocoaPods önbelleği",
+            ToolKind::Homebrew => "Homebrew",
+            ToolKind::Cargo => "Cargo indirme önbelleği",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Tool {
+    pub kind: ToolKind,
+    pub status: Status,
+    pub actions: Vec<CleanAction>,
+}
+
+/// A finished measurement of one tool.
+pub type Measurement = (ToolKind, Status, Vec<CleanAction>);
+
+/// Measures every tool on its own thread; results arrive as they finish.
+pub fn measure_all() -> (Vec<Tool>, Receiver<Measurement>) {
+    let kinds = ToolKind::available();
+    let (tx, rx) = mpsc::channel();
+    for &kind in &kinds {
+        let tx = tx.clone();
+        thread::spawn(move || {
+            let (status, actions) = measure(kind);
+            let _ = tx.send((kind, status, actions));
+        });
+    }
+    let tools = kinds
+        .into_iter()
+        .map(|kind| Tool {
+            kind,
+            status: Status::Measuring,
+            actions: Vec::new(),
+        })
+        .collect();
+    (tools, rx)
+}
+
+pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
+    match kind {
+        ToolKind::Docker => docker(),
+        ToolKind::Simulators => simulators(),
+        ToolKind::XcodeData => xcode_data(),
+        ToolKind::Npm => cache_command(
+            "npm",
+            &["config", "get", "cache"],
+            &["cache", "clean", "--force"],
+            Risk::Redownload,
+            "npm önbelleğini temizle",
+        ),
+        ToolKind::Pnpm => cache_command(
+            "pnpm",
+            &["store", "path"],
+            &["store", "prune"],
+            Risk::Safe,
+            "Kullanılmayan paketleri depodan sil (store prune)",
+        ),
+        ToolKind::Yarn => cache_command(
+            "yarn",
+            &["cache", "dir"],
+            &["cache", "clean"],
+            Risk::Redownload,
+            "Yarn önbelleğini temizle",
+        ),
+        ToolKind::Pip => {
+            let pip = if which("pip3").is_some() {
+                "pip3"
+            } else {
+                "pip"
+            };
+            cache_command(
+                pip,
+                &["cache", "dir"],
+                &["cache", "purge"],
+                Risk::Redownload,
+                "pip önbelleğini boşalt",
+            )
+        }
+        ToolKind::Gradle => gradle(),
+        ToolKind::CocoaPods => cocoapods(),
+        ToolKind::Homebrew => homebrew(),
+        ToolKind::Cargo => trash_folder(
+            home().map(|h| h.join(".cargo/registry/cache")),
+            Risk::Redownload,
+            "İndirilmiş .crate dosyalarını çöpe taşı",
+        ),
+    }
+}
+
+// ---------------------------------------------------------------- helpers
+
+fn home() -> Option<PathBuf> {
+    dirs::home_dir()
+}
+
+/// Full path of a program found in PATH.
+pub fn which(program: &str) -> Option<PathBuf> {
+    let path = std::env::var_os("PATH")?;
+    std::env::split_paths(&path)
+        .flat_map(|dir| {
+            let base = dir.join(program);
+            [base.with_extension("exe"), base]
+        })
+        .find(|p| p.is_file())
+}
+
+/// Runs a command and returns its standard output, or `None` on failure or
+/// when it takes longer than `timeout`.
+fn output(program: &Path, args: &[&str], timeout: Duration) -> Option<String> {
+    let mut child = Command::new(program)
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .ok()?;
+    let mut stdout = child.stdout.take()?;
+    let reader = thread::spawn(move || {
+        let mut s = String::new();
+        std::io::Read::read_to_string(&mut stdout, &mut s).ok();
+        s
+    });
+    let deadline = Instant::now() + timeout;
+    loop {
+        if let Some(status) = child.try_wait().ok()? {
+            let text = reader.join().ok()?;
+            return status.success().then_some(text);
+        }
+        if Instant::now() > deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return None;
+        }
+        thread::sleep(Duration::from_millis(50));
+    }
+}
+
+/// Size on disk of a folder, using the same scanner as the main view.
+fn dir_size(dir: &Path) -> Option<u64> {
+    if !dir.is_dir() {
+        return None;
+    }
+    scanner::scan(dir, Vec::new(), &Arc::default(), |_| {})
+        .ok()
+        .map(|r| r.tree.node(crate::tree::ROOT).size.disk)
+}
+
+fn command(program: &Path, args: &[&str]) -> Step {
+    let mut v = vec![program.to_string_lossy().into_owned()];
+    v.extend(args.iter().map(|a| a.to_string()));
+    Step::Command(v)
+}
+
+fn action(label: impl Into<String>, risk: Risk, steps: Vec<Step>) -> CleanAction {
+    CleanAction {
+        label: label.into(),
+        risk,
+        steps,
+    }
+}
+
+fn ready(
+    reclaimable: u64,
+    detail: impl Into<String>,
+    actions: Vec<CleanAction>,
+) -> (Status, Vec<CleanAction>) {
+    (
+        Status::Ready {
+            reclaimable,
+            detail: detail.into(),
+        },
+        actions,
+    )
+}
+
+fn missing(why: &str) -> (Status, Vec<CleanAction>) {
+    (Status::Missing(why.to_string()), Vec::new())
+}
+
+/// Tools whose cache folder is reported by a command and cleaned by another.
+fn cache_command(
+    program: &str,
+    where_args: &[&str],
+    clean_args: &[&str],
+    risk: Risk,
+    label: &str,
+) -> (Status, Vec<CleanAction>) {
+    let Some(exe) = which(program) else {
+        return missing("kurulu değil");
+    };
+    let Some(dir) = output(&exe, where_args, Duration::from_secs(20))
+        .map(|s| PathBuf::from(s.trim()))
+        .filter(|p| p.is_dir())
+    else {
+        return missing("önbellek klasörü yok");
+    };
+    let size = dir_size(&dir).unwrap_or(0);
+    ready(
+        size,
+        dir.display().to_string(),
+        vec![action(label, risk, vec![command(&exe, clean_args)])],
+    )
+}
+
+fn trash_folder(dir: Option<PathBuf>, risk: Risk, label: &str) -> (Status, Vec<CleanAction>) {
+    let Some(dir) = dir.filter(|d| d.is_dir()) else {
+        return missing("klasör yok");
+    };
+    let size = dir_size(&dir).unwrap_or(0);
+    ready(
+        size,
+        dir.display().to_string(),
+        vec![action(label, risk, vec![Step::TrashContents(dir)])],
+    )
+}
+
+// ------------------------------------------------------------------ tools
+
+fn docker() -> (Status, Vec<CleanAction>) {
+    let Some(exe) = which("docker") else {
+        return missing("kurulu değil");
+    };
+    let Some(out) = output(
+        &exe,
+        &["system", "df", "--format", "{{json .}}"],
+        Duration::from_secs(15),
+    ) else {
+        return (Status::Unavailable("Docker çalışmıyor".into()), Vec::new());
+    };
+    let parts = parse_docker_df(&out);
+    let total = parts.iter().map(|p| p.1).sum();
+    let detail = parts
+        .iter()
+        .map(|(kind, size)| format!("{kind} {}", fmt_size(*size)))
+        .collect::<Vec<_>>()
+        .join(" · ");
+    let actions = vec![
+        action(
+            "Durmuş container'lar, sahipsiz imajlar ve derleme önbelleği",
+            Risk::Safe,
+            vec![
+                command(&exe, &["container", "prune", "-f"]),
+                command(&exe, &["image", "prune", "-f"]),
+                command(&exe, &["builder", "prune", "-f"]),
+            ],
+        ),
+        action(
+            "Kullanılmayan TÜM imajlar (gerekince yeniden indirilir)",
+            Risk::Redownload,
+            vec![command(&exe, &["image", "prune", "-a", "-f"])],
+        ),
+        action(
+            "Kullanılmayan volume'lar — İÇİNDEKİ VERİLER SİLİNİR",
+            Risk::DataLoss,
+            vec![command(&exe, &["volume", "prune", "-a", "-f"])],
+        ),
+    ];
+    ready(total, detail, actions)
+}
+
+/// `(type, reclaimable bytes)` per line of `docker system df --format '{{json .}}'`.
+pub fn parse_docker_df(out: &str) -> Vec<(String, u64)> {
+    out.lines()
+        .filter_map(|line| {
+            let v: serde_json::Value = serde_json::from_str(line).ok()?;
+            let kind = match v.get("Type")?.as_str()? {
+                "Images" => "imaj",
+                "Containers" => "container",
+                "Local Volumes" => "volume",
+                "Build Cache" => "build cache",
+                other => other,
+            };
+            let reclaimable = v.get("Reclaimable")?.as_str()?;
+            let size = parse_human(reclaimable.split_whitespace().next()?)?;
+            Some((kind.to_string(), size))
+        })
+        .collect()
+}
+
+/// Sizes like "18.38GB", "835.9MB", "0B", "1.2kB" (Docker uses powers of
+/// 1000), or "1GiB".
+pub fn parse_human(s: &str) -> Option<u64> {
+    let s = s.trim();
+    let split = s.find(|c: char| c.is_ascii_alphabetic())?;
+    let (num, unit) = s.split_at(split);
+    let num: f64 = num.trim().parse().ok()?;
+    let mult: f64 = match unit.to_ascii_lowercase().as_str() {
+        "b" => 1.0,
+        "kb" => 1e3,
+        "mb" => 1e6,
+        "gb" => 1e9,
+        "tb" => 1e12,
+        "kib" => 1024.0,
+        "mib" => 1024f64.powi(2),
+        "gib" => 1024f64.powi(3),
+        "tib" => 1024f64.powi(4),
+        _ => return None,
+    };
+    Some((num * mult) as u64)
+}
+
+fn simulators() -> (Status, Vec<CleanAction>) {
+    let Some(xcrun) = which("xcrun") else {
+        return missing("Xcode kurulu değil");
+    };
+    let devices = output(
+        &xcrun,
+        &["simctl", "list", "devices", "-j"],
+        Duration::from_secs(30),
+    );
+    let runtimes = output(
+        &xcrun,
+        &["simctl", "runtime", "list", "-j"],
+        Duration::from_secs(30),
+    );
+    let Some(devices) = devices else {
+        return missing("simctl çalıştırılamadı");
+    };
+    let (count, size) = parse_unavailable_devices(&devices);
+    let runtimes = runtimes.map(|r| parse_runtimes(&r)).unwrap_or_default();
+    let runtime_total: u64 = runtimes.iter().map(|r| r.size).sum();
+
+    let mut actions = Vec::new();
+    if count > 0 {
+        actions.push(action(
+            format!("Kullanılamayan {count} simülatörü sil ({})", fmt_size(size)),
+            Risk::Safe,
+            vec![command(&xcrun, &["simctl", "delete", "unavailable"])],
+        ));
+    }
+    for r in &runtimes {
+        actions.push(action(
+            format!("{} çalışma zamanını sil ({})", r.name, fmt_size(r.size)),
+            Risk::Redownload,
+            vec![command(&xcrun, &["simctl", "runtime", "delete", &r.id])],
+        ));
+    }
+    let detail = format!(
+        "kullanılamayan cihaz {count} ({}) · çalışma zamanı {} ({})",
+        fmt_size(size),
+        runtimes.len(),
+        fmt_size(runtime_total)
+    );
+    ready(size, detail, actions)
+}
+
+/// Count and data size of simulator devices whose runtime is gone.
+pub fn parse_unavailable_devices(json: &str) -> (usize, u64) {
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(json) else {
+        return (0, 0);
+    };
+    let Some(by_runtime) = v.get("devices").and_then(|d| d.as_object()) else {
+        return (0, 0);
+    };
+    by_runtime
+        .values()
+        .filter_map(|list| list.as_array())
+        .flatten()
+        .filter(|d| d.get("isAvailable").and_then(|a| a.as_bool()) == Some(false))
+        .fold((0, 0), |(n, size), d| {
+            let s = d.get("dataPathSize").and_then(|s| s.as_u64()).unwrap_or(0);
+            (n + 1, size + s)
+        })
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Runtime {
+    pub id: String,
+    pub name: String,
+    pub size: u64,
+}
+
+/// Deletable simulator runtimes, largest first.
+pub fn parse_runtimes(json: &str) -> Vec<Runtime> {
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(json) else {
+        return Vec::new();
+    };
+    let Some(map) = v.as_object() else {
+        return Vec::new();
+    };
+    let mut out: Vec<Runtime> = map
+        .values()
+        .filter(|r| r.get("deletable").and_then(|d| d.as_bool()) != Some(false))
+        .filter_map(|r| {
+            let id = r.get("identifier")?.as_str()?.to_string();
+            let version = r.get("version").and_then(|v| v.as_str()).unwrap_or("?");
+            let platform = r
+                .get("runtimeIdentifier")
+                .and_then(|p| p.as_str())
+                .and_then(|p| p.rsplit('.').next())
+                .and_then(|p| p.split('-').next())
+                .unwrap_or("Simulator");
+            Some(Runtime {
+                id,
+                name: format!("{platform} {version}"),
+                size: r.get("sizeBytes").and_then(|s| s.as_u64()).unwrap_or(0),
+            })
+        })
+        .collect();
+    out.sort_by_key(|r| std::cmp::Reverse(r.size));
+    out
+}
+
+fn xcode_data() -> (Status, Vec<CleanAction>) {
+    let Some(base) = home().map(|h| h.join("Library/Developer/Xcode")) else {
+        return missing("klasör yok");
+    };
+    let mut total = 0;
+    let mut details = Vec::new();
+    let mut actions = Vec::new();
+    for (name, label) in [
+        (
+            "DerivedData",
+            "DerivedData içeriğini çöpe taşı (projeler yeniden derlenir)",
+        ),
+        (
+            "iOS DeviceSupport",
+            "iOS DeviceSupport içeriğini çöpe taşı (cihaz bağlanınca yeniden oluşur)",
+        ),
+    ] {
+        let dir = base.join(name);
+        if let Some(size) = dir_size(&dir) {
+            total += size;
+            details.push(format!("{name} {}", fmt_size(size)));
+            actions.push(action(label, Risk::Safe, vec![Step::TrashContents(dir)]));
+        }
+    }
+    if actions.is_empty() {
+        return missing("klasör yok");
+    }
+    ready(total, details.join(" · "), actions)
+}
+
+fn gradle() -> (Status, Vec<CleanAction>) {
+    let (status, mut actions) = trash_folder(
+        home().map(|h| h.join(".gradle/caches")),
+        Risk::Redownload,
+        "Gradle önbelleğini çöpe taşı (bağımlılıklar yeniden indirilir)",
+    );
+    // Running daemons hold files in the cache; stop them first.
+    if let (Some(gradle), Some(a)) = (which("gradle"), actions.first_mut()) {
+        a.steps.insert(0, command(&gradle, &["--stop"]));
+    }
+    (status, actions)
+}
+
+fn cocoapods() -> (Status, Vec<CleanAction>) {
+    let Some(dir) = home()
+        .map(|h| h.join("Library/Caches/CocoaPods"))
+        .filter(|d| d.is_dir())
+    else {
+        return missing("klasör yok");
+    };
+    let size = dir_size(&dir).unwrap_or(0);
+    let step = match which("pod") {
+        Some(pod) => command(&pod, &["cache", "clean", "--all"]),
+        None => Step::TrashContents(dir.clone()),
+    };
+    ready(
+        size,
+        dir.display().to_string(),
+        vec![action(
+            "CocoaPods önbelleğini temizle",
+            Risk::Redownload,
+            vec![step],
+        )],
+    )
+}
+
+fn homebrew() -> (Status, Vec<CleanAction>) {
+    let Some(brew) = which("brew") else {
+        return missing("kurulu değil");
+    };
+    let Some(out) = output(&brew, &["cleanup", "-n"], Duration::from_secs(120)) else {
+        return (
+            Status::Unavailable("brew cleanup -n başarısız".into()),
+            Vec::new(),
+        );
+    };
+    let size = parse_brew_cleanup(&out).unwrap_or(0);
+    ready(
+        size,
+        "eski sürümler, indirme önbelleği",
+        vec![action(
+            "Eski sürümleri ve önbelleği temizle (brew cleanup)",
+            Risk::Safe,
+            vec![command(&brew, &["cleanup", "--prune=all"])],
+        )],
+    )
+}
+
+/// "==> This operation would free approximately 1GB of disk space."
+pub fn parse_brew_cleanup(out: &str) -> Option<u64> {
+    let rest = out.split("free approximately ").nth(1)?;
+    let size = rest.split_whitespace().next()?;
+    // Homebrew prints binary sizes with decimal-looking units ("1GB").
+    let bin = size
+        .replace("KB", "KiB")
+        .replace("MB", "MiB")
+        .replace("GB", "GiB");
+    parse_human(&bin)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn human_sizes() {
+        assert_eq!(parse_human("18.38GB"), Some(18_380_000_000));
+        assert_eq!(parse_human("835.9MB"), Some(835_900_000));
+        assert_eq!(parse_human("0B"), Some(0));
+        assert_eq!(parse_human("1.5kB"), Some(1500));
+        assert_eq!(parse_human("2GiB"), Some(2 << 30));
+        assert_eq!(parse_human("abc"), None);
+    }
+
+    #[test]
+    fn docker_df_fixture() {
+        let out = include_str!("../tests/fixtures/docker_df.jsonl");
+        let parts = parse_docker_df(out);
+        let kinds: Vec<&str> = parts.iter().map(|p| p.0.as_str()).collect();
+        assert_eq!(kinds, vec!["imaj", "container", "volume", "build cache"]);
+        assert_eq!(parts[0].1, 18_380_000_000);
+        assert_eq!(parts[3].1, 21_270_000_000);
+    }
+
+    #[test]
+    fn brew_cleanup_line() {
+        let out = "Would remove: /x (1 file)\n==> This operation would free approximately 1GB of disk space.\n";
+        assert_eq!(parse_brew_cleanup(out), Some(1 << 30));
+        assert_eq!(
+            parse_brew_cleanup("==> This operation would free approximately 34.6MB of disk space."),
+            Some((34.6 * (1u64 << 20) as f64) as u64)
+        );
+        assert_eq!(parse_brew_cleanup("nothing to do"), None);
+    }
+
+    #[test]
+    fn simulator_fixtures() {
+        let (count, size) =
+            parse_unavailable_devices(include_str!("../tests/fixtures/simctl_devices.json"));
+        assert_eq!(count, 80);
+        assert!(size > 0);
+        let runtimes = parse_runtimes(include_str!("../tests/fixtures/simctl_runtimes.json"));
+        assert_eq!(runtimes.len(), 4);
+        assert!(runtimes.windows(2).all(|w| w[0].size >= w[1].size));
+        assert!(runtimes.iter().all(|r| r.name.starts_with("iOS ")));
+        assert_eq!(parse_unavailable_devices("not json"), (0, 0));
+    }
+
+    #[test]
+    fn describes_steps_without_full_paths() {
+        let step = command(
+            Path::new("/usr/local/bin/docker"),
+            &["image", "prune", "-f"],
+        );
+        assert_eq!(step.describe(), "docker image prune -f");
+        let step = Step::TrashContents(PathBuf::from("/h/.gradle/caches"));
+        assert_eq!(step.describe(), "/h/.gradle/caches/* → çöp kutusu");
+    }
+}

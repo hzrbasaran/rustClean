@@ -8,11 +8,12 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Browser, Dashboard, Pane, Screen};
+use crate::app::{App, Browser, Dashboard, Pane, Screen, ToolsView};
 use crate::lists::ResultList;
 use crate::reports::MenuItem;
 use crate::stats;
 use crate::system::{self, SystemInfo};
+use crate::tools::{Risk, Status as ToolStatus};
 use crate::tree::{NodeId, SizeMode, Tree};
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -169,7 +170,17 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         SizeMode::Apparent => "görünen",
     };
 
-    let heading = if b.system.is_some() {
+    let heading = if let Some(view) = &b.tools {
+        format!(
+            "Geliştirici araçları temizliği  │  geri kazanılabilir: {}{}",
+            fmt_size(view.reclaimable()),
+            if view.measuring() {
+                " (ölçülüyor…)"
+            } else {
+                ""
+            }
+        )
+    } else if b.system.is_some() {
         "Sistem verileri".to_string()
     } else if let Some(d) = &b.dashboard {
         format!(
@@ -202,7 +213,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     let [table_area, status_area] =
         Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(body);
 
-    if let Some(sys) = &b.system {
+    if let Some(view) = &mut b.tools {
+        render_tools(f, view, app.tick, table_area);
+    } else if let Some(sys) = &b.system {
         render_system(f, b, sys, table_area);
     } else if let Some(d) = &mut b.dashboard {
         render_dashboard(f, &b.tree, d, mode, b.errors, table_area);
@@ -248,6 +261,8 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             Style::new().fg(Color::Green)
         };
         Line::from(Span::styled(st.text.clone(), style))
+    } else if b.tools.is_some() {
+        Line::from("Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.").gray()
     } else if b.system.is_some() {
         Line::from("Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.").gray()
     } else if b.dashboard.is_some() {
@@ -300,6 +315,14 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         &[("q", "çık")]
     } else if b.input.is_some() {
         &[("Enter", "ara"), ("Esc", "vazgeç")]
+    } else if b.tools.is_some() {
+        &[
+            ("↑↓", "seç"),
+            ("r", "yeniden ölç"),
+            ("m", "menü"),
+            ("Esc", "geri"),
+            ("q", "çık"),
+        ]
     } else if b.system.is_some() {
         &[
             ("r", "yenile"),
@@ -884,6 +907,108 @@ fn render_dashboard(
         table
     };
     f.render_stateful_widget(table, dirs, &mut d.dirs);
+}
+
+fn risk_style(risk: Risk) -> (Style, &'static str) {
+    match risk {
+        Risk::Safe => (Style::new().fg(Color::Black).bg(Color::Green), " güvenli "),
+        Risk::Redownload => (
+            Style::new().fg(Color::Black).bg(Color::Yellow),
+            " yeniden indirilir ",
+        ),
+        Risk::DataLoss => (
+            Style::new().fg(Color::White).bg(Color::Red).bold(),
+            " VERİ KAYBI ",
+        ),
+    }
+}
+
+fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
+    let action_rows: u16 = view.selected().map_or(1, |t| {
+        t.actions
+            .iter()
+            .map(|a| 1 + a.steps.len() as u16)
+            .sum::<u16>()
+            .max(1)
+    });
+    let [list_area, detail_area] = Layout::vertical([
+        Constraint::Min(6),
+        Constraint::Length((action_rows + 2).min(area.height / 2)),
+    ])
+    .areas(area);
+
+    let spin = SPINNER[tick % SPINNER.len()];
+    let rows = view.tools.iter().map(|t| {
+        let (size, info) = match &t.status {
+            ToolStatus::Measuring => (
+                Line::from(format!("{spin}")).cyan(),
+                Span::raw("ölçülüyor…").cyan(),
+            ),
+            ToolStatus::Missing(why) => (Line::from("—").gray(), Span::raw(why.clone()).gray()),
+            ToolStatus::Unavailable(why) => {
+                (Line::from("—").yellow(), Span::raw(why.clone()).yellow())
+            }
+            ToolStatus::Ready {
+                reclaimable,
+                detail,
+            } => (
+                Line::from(fmt_size(*reclaimable)).right_aligned().bold(),
+                Span::raw(detail.clone()),
+            ),
+        };
+        let name_style = match t.status {
+            ToolStatus::Missing(_) => Style::new().fg(Color::Gray),
+            _ => Style::new().fg(Color::White).bold(),
+        };
+        Row::new(vec![
+            Cell::from(Span::styled(t.kind.label(), name_style)),
+            Cell::from(size),
+            Cell::from(info),
+        ])
+    });
+    let table = Table::new(
+        rows,
+        [
+            Constraint::Length(34),
+            Constraint::Length(12),
+            Constraint::Min(10),
+        ],
+    )
+    .header(
+        Row::new(["Araç", "Kazanılır", "Ayrıntı"])
+            .bold()
+            .underlined(),
+    )
+    .row_highlight_style(HIGHLIGHT)
+    .highlight_symbol("▶ ")
+    .block(table_block_plain());
+    f.render_stateful_widget(table, list_area, &mut view.table);
+
+    let mut lines = Vec::new();
+    match view.selected() {
+        Some(t) if !t.actions.is_empty() => {
+            for a in &t.actions {
+                let (style, text) = risk_style(a.risk);
+                lines.push(Line::from(vec![
+                    Span::styled(text, style),
+                    Span::raw(format!(" {}", a.label)).white().bold(),
+                ]));
+                for step in &a.steps {
+                    lines.push(Line::from(format!("    $ {}", step.describe())).gray());
+                }
+            }
+        }
+        Some(t) if t.status == ToolStatus::Measuring => lines.push(Line::from("Ölçülüyor…").cyan()),
+        _ => lines.push(Line::from("Bu araç için yapılacak bir şey yok.").gray()),
+    }
+    f.render_widget(
+        Paragraph::new(lines).block(panel(" İşlemler ", false)),
+        detail_area,
+    );
+}
+
+fn table_block_plain() -> Block<'static> {
+    Block::new().borders(Borders::TOP | Borders::BOTTOM)
 }
 
 fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {

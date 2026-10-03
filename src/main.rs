@@ -10,6 +10,7 @@ mod scanner;
 mod search;
 mod stats;
 mod system;
+mod tools;
 mod tree;
 mod ui;
 

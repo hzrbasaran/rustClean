@@ -2,7 +2,7 @@
 
 use std::collections::HashSet;
 use std::path::PathBuf;
-use std::sync::mpsc::TryRecvError;
+use std::sync::mpsc::{Receiver, TryRecvError};
 use std::time::Duration;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
@@ -19,6 +19,7 @@ use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::search;
 use crate::stats::{self, Stats};
 use crate::system::{self, SystemInfo};
+use crate::tools::{self, Status as ToolStatus, Tool};
 use crate::tree::{NodeId, Size, SizeMode, Tree, ROOT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -123,6 +124,53 @@ fn oldest(tree: &Tree, ids: &[NodeId]) -> Option<usize> {
     (0..ids.len()).min_by_key(|&i| (age(ids[i]), i))
 }
 
+/// The developer tools cleanup screen.
+pub struct ToolsView {
+    pub tools: Vec<Tool>,
+    pub table: TableState,
+    measurements: Receiver<tools::Measurement>,
+}
+
+impl ToolsView {
+    fn open() -> Self {
+        let (tools, measurements) = tools::measure_all();
+        let mut table = TableState::default();
+        table.select(Some(0));
+        Self {
+            tools,
+            table,
+            measurements,
+        }
+    }
+
+    fn poll(&mut self) {
+        while let Ok((kind, status, actions)) = self.measurements.try_recv() {
+            if let Some(t) = self.tools.iter_mut().find(|t| t.kind == kind) {
+                t.status = status;
+                t.actions = actions;
+            }
+        }
+    }
+
+    pub fn selected(&self) -> Option<&Tool> {
+        self.table.selected().and_then(|i| self.tools.get(i))
+    }
+
+    pub fn reclaimable(&self) -> u64 {
+        self.tools
+            .iter()
+            .map(|t| match t.status {
+                ToolStatus::Ready { reclaimable, .. } => reclaimable,
+                _ => 0,
+            })
+            .sum()
+    }
+
+    pub fn measuring(&self) -> bool {
+        self.tools.iter().any(|t| t.status == ToolStatus::Measuring)
+    }
+}
+
 /// What the browser asks the app to do after a key press.
 pub enum Action {
     None,
@@ -151,6 +199,8 @@ pub struct Browser {
     pub snapshot_picker: Option<(Vec<history::Saved>, usize)>,
     /// Open "system data" panel.
     pub system: Option<SystemInfo>,
+    /// Open developer tools cleanup screen.
+    pub tools: Option<ToolsView>,
     /// Report to run once the "preparing" message has been drawn.
     pending_report: Option<(ReportKind, u8)>,
     /// Running duplicate search.
@@ -187,6 +237,7 @@ impl Browser {
             report_menu: None,
             snapshot_picker: None,
             system: None,
+            tools: None,
             pending_report: None,
             dup_job: None,
             snapshot_time: None,
@@ -348,10 +399,13 @@ impl Browser {
             MenuItem::Changes => self.open_snapshot_picker(),
             MenuItem::System => {
                 self.dashboard = None;
+                self.tools = None;
                 self.system = Some(system::collect());
             }
             MenuItem::Tools => {
-                self.set_status(format!("{}: henüz hazır değil.", item.label()), true);
+                self.dashboard = None;
+                self.system = None;
+                self.tools = Some(ToolsView::open());
             }
         }
     }
@@ -753,6 +807,18 @@ impl Browser {
             }
             return Action::None;
         }
+        if let Some(view) = &mut self.tools {
+            match code {
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Up | KeyCode::Char('k') => view.table.select_previous(),
+                KeyCode::Down | KeyCode::Char('j') => view.table.select_next(),
+                KeyCode::Char('r') => self.tools = Some(ToolsView::open()),
+                KeyCode::Char('m') => self.report_menu = Some(0),
+                KeyCode::Esc | KeyCode::Backspace | KeyCode::Left => self.tools = None,
+                _ => {}
+            }
+            return Action::None;
+        }
         if self.system.is_some() {
             match code {
                 KeyCode::Char('q') => return Action::Quit,
@@ -936,6 +1002,9 @@ impl App {
             b.poll_delete();
             b.poll_report();
             b.poll_dups();
+            if let Some(view) = &mut b.tools {
+                view.poll();
+            }
         }
         let Some(handle) = &self.scan else { return };
         loop {
