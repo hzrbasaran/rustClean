@@ -276,7 +276,20 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         render_entries(f, b, table_area);
     }
 
-    let status = if let Some(job) = &b.dup_job {
+    let status = if let Some(r) = &b.rescan {
+        let spin = SPINNER[app.tick % SPINNER.len()];
+        let p = &r.progress;
+        Line::from(vec![
+            Span::raw(tf!(
+                "{spin} Klasör yeniden taranıyor — {} dosya, {}",
+                "{spin} Rescanning the folder — {} files, {}",
+                fmt_count(p.files),
+                fmt_size(p.bytes)
+            ))
+            .cyan(),
+            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).gray(),
+        ])
+    } else if let Some(job) = &b.dup_job {
         use std::sync::atomic::Ordering::Relaxed;
         let p = &job.progress;
         let (done, total) = (p.done.load(Relaxed), p.total.load(Relaxed));
@@ -397,7 +410,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     };
     f.render_widget(status, status_area);
 
-    let footer_keys: &[(&str, &str)] = if b.failures.is_some() {
+    let footer_keys: &[(&str, &str)] = if b.rescan.is_some() {
+        &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
+    } else if b.failures.is_some() {
         &[
             ("↑↓", t!("kaydır", "scroll")),
             ("Esc", t!("kapat", "close")),
@@ -479,6 +494,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Space", t!("sepete", "to basket")),
             ("x", t!("çöpe taşı", "move to trash")),
             ("S", t!("sepet", "basket")),
+            ("R", t!("klasörü yenile", "refresh folder")),
             ("m", t!("raporlar", "reports")),
             ("q", t!("çık", "quit")),
         ]
@@ -496,7 +512,8 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Space", t!("sepete", "to basket")),
             ("x", t!("çöpe taşı", "move to trash")),
             ("S", t!("sepet", "basket")),
-            ("r", t!("yeniden tara", "rescan")),
+            ("R", t!("klasörü yenile", "refresh folder")),
+            ("r", t!("tümünü tara", "rescan all")),
             ("d", t!("diskler", "disks")),
             ("q", t!("çık", "quit")),
         ]

@@ -6,11 +6,19 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `R` rescans only the current folder in the background and updates the
+  tree in place (sizes, counts and dates of the folder and its parents), so
+  refreshing after a cleanup no longer needs a full rescan
+  ([#5](https://github.com/hzrbasaran/rustClean/issues/5)).
+
 ### Changed
+- Dependencies: ratatui 0.30, sysinfo 0.39; release workflow actions updated.
 - On APFS, pure clones (`cp -c`, Finder duplicates) are counted once in the
   on-disk size, so a folder of clones no longer looks many times larger than
   it is. The duplicates report shows how many copies are clones, since
-  deleting them frees nothing (#6).
+  deleting them frees nothing
+  ([#6](https://github.com/hzrbasaran/rustClean/issues/6)).
 
 ## [0.1.0] - 2026-10-03
 

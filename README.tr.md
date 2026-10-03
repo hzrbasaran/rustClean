@@ -139,6 +139,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `Space` · `S` · `x` | sepete ekle · sepeti göster · çöpe taşı |
 | `f` | yaş filtresi (raporlarda) |
 | `s` · `a` | sırala · görünen / diskte boyut |
+| `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `q` | çık |
 
