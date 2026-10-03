@@ -6,30 +6,35 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-03
+
 ### Added
-- "Installers and archives in Downloads" report: disk images, installers
-  and archives in Downloads folders, largest first, with the age filter
-  ([#10](https://github.com/hzrbasaran/rustClean/issues/10)).
 - Uninstall an app with its data (macOS): `u` in "Applications and their
   data" lists the bundle, its data folders and preference files, all checked
   and each one can be unchecked, then moves them to the trash. System apps
   are refused, a running app is flagged, and the report is refreshed
   ([#7](https://github.com/hzrbasaran/rustClean/issues/7)).
+- "Installers and archives in Downloads" report: disk images, installers
+  and archives in Downloads folders, largest first, with the age filter
+  ([#10](https://github.com/hzrbasaran/rustClean/issues/10)).
 - `R` rescans only the current folder in the background and updates the
   tree in place (sizes, counts and dates of the folder and its parents), so
   refreshing after a cleanup no longer needs a full rescan
   ([#5](https://github.com/hzrbasaran/rustClean/issues/5)).
-
-### Changed
 - Install with Homebrew: `brew install hzrbasaran/tap/rustclean`. The
   release workflow updates the formula
   ([#28](https://github.com/hzrbasaran/rustClean/issues/28)).
-- Dependencies: ratatui 0.30, sysinfo 0.39; release workflow actions updated.
+
+### Changed
 - On APFS, pure clones (`cp -c`, Finder duplicates) are counted once in the
   on-disk size, so a folder of clones no longer looks many times larger than
   it is. The duplicates report shows how many copies are clones, since
   deleting them frees nothing
   ([#6](https://github.com/hzrbasaran/rustClean/issues/6)).
+- The apps report includes preference files (`Library/Preferences`, matched
+  by bundle id).
+- English confirmation footers show `y` / `n`, like the dialogs.
+- Dependencies: ratatui 0.30, sysinfo 0.39; release workflow actions updated.
 
 ## [0.1.0] - 2026-10-03
 
@@ -74,5 +79,6 @@ First public release.
 - Turkish and English interface (`L`, `--lang`).
 - `--list-disks` and `--summary` command line modes.
 
-[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/hzrbasaran/rustClean/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/hzrbasaran/rustClean/releases/tag/v0.1.0
