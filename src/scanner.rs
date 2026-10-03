@@ -432,6 +432,52 @@ mod tests {
         assert!(now - fresh.created < 3600, "created: {}", fresh.created);
     }
 
+    /// Sizes and file counts of every entry, by relative path.
+    fn snapshot(tree: &Tree) -> Vec<(String, u64, u64, u32)> {
+        let root = tree.path_of(ROOT);
+        let mut out = Vec::new();
+        let mut stack = vec![ROOT];
+        while let Some(id) = stack.pop() {
+            let n = tree.node(id);
+            let rel = tree.path_of(id);
+            let rel = rel
+                .strip_prefix(&root)
+                .unwrap()
+                .to_string_lossy()
+                .replace('\\', "/");
+            out.push((rel, n.size.apparent, n.size.disk, n.file_count));
+            stack.extend(tree.children(id));
+        }
+        out.sort();
+        out
+    }
+
+    #[test]
+    fn rescanning_a_folder_matches_a_full_rescan() {
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        fs::create_dir_all(r.join("proj/src")).unwrap();
+        fs::create_dir_all(r.join("other")).unwrap();
+        write(&r.join("proj/src/a.rs"), 1000);
+        write(&r.join("proj/old.bin"), 5000);
+        write(&r.join("other/x"), 300);
+
+        let mut res = run(r);
+        let proj = child(&res.tree, ROOT, "proj");
+
+        // Change the folder: delete, grow, add a subfolder.
+        fs::remove_file(r.join("proj/old.bin")).unwrap();
+        write(&r.join("proj/src/a.rs"), 4000);
+        fs::create_dir(r.join("proj/new")).unwrap();
+        write(&r.join("proj/new/b.bin"), 2500);
+
+        let sub = scan(&res.tree.path_of(proj), Vec::new(), &Arc::default(), |_| {}).unwrap();
+        res.tree.replace_children(proj, &sub.tree);
+
+        let fresh = run(r);
+        assert_eq!(snapshot(&res.tree), snapshot(&fresh.tree));
+    }
+
     #[test]
     fn rejects_missing_root() {
         let dir = tempfile::tempdir().unwrap();

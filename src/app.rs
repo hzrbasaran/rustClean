@@ -154,6 +154,13 @@ pub struct FailureDialog {
     pub scroll: u16,
 }
 
+/// A rescan of one folder running in the background.
+pub struct Rescan {
+    pub dir: NodeId,
+    pub handle: ScanHandle,
+    pub progress: ScanProgress,
+}
+
 /// What the browser asks the app to do after a key press.
 pub enum Action {
     None,
@@ -188,6 +195,8 @@ pub struct Browser {
     pending_report: Option<(ReportKind, u8)>,
     /// Running duplicate search.
     pub dup_job: Option<DupJob>,
+    /// Folder being rescanned (`R`), with its progress.
+    pub rescan: Option<Rescan>,
     /// History time stamp of this scan, so it is not compared with itself.
     snapshot_time: Option<u64>,
     /// Entries awaiting a yes/no answer before being moved to the trash.
@@ -231,6 +240,7 @@ impl Browser {
             tools: None,
             pending_report: None,
             dup_job: None,
+            rescan: None,
             snapshot_time: None,
             confirm: None,
             deleting: None,
@@ -539,6 +549,88 @@ impl Browser {
     }
 
     /// Turns a finished duplicate search into a report.
+    /// `R`: rescans the folder being browsed in the background.
+    fn start_rescan(&mut self) {
+        let dir = self.current;
+        let path = self.tree.path_of(dir);
+        self.set_status(
+            tf!("Yeniden taranıyor: {}", "Rescanning: {}", path.display()),
+            false,
+        );
+        self.rescan = Some(Rescan {
+            dir,
+            handle: scanner::start(path, disks::all_mount_points()),
+            progress: ScanProgress::default(),
+        });
+    }
+
+    /// Puts a finished folder rescan into the tree.
+    fn poll_rescan(&mut self) {
+        let Some(rescan) = &mut self.rescan else {
+            return;
+        };
+        let mut finished = None;
+        loop {
+            match rescan.handle.rx.try_recv() {
+                Ok(ScanMsg::Progress(p)) => rescan.progress = p,
+                Ok(ScanMsg::Done(res)) => {
+                    finished = Some(Ok(res));
+                    break;
+                }
+                Ok(ScanMsg::Failed(err)) => {
+                    finished = Some(Err(err));
+                    break;
+                }
+                Err(TryRecvError::Empty) => break,
+                Err(TryRecvError::Disconnected) => {
+                    finished = Some(Err(t!("tarama durdu", "the scan stopped").to_string()));
+                    break;
+                }
+            }
+        }
+        let Some(result) = finished else {
+            return;
+        };
+        let dir = rescan.dir;
+        self.rescan = None;
+        match result {
+            Ok(res) => self.apply_rescan(dir, res),
+            Err(err) => self.set_status(
+                tf!("Yeniden tarama başarısız: {}", "Rescan failed: {}", err),
+                true,
+            ),
+        }
+    }
+
+    fn apply_rescan(&mut self, dir: NodeId, res: ScanResult) {
+        let mode = self.size_mode;
+        let before = self.tree.node(dir).size.get(mode);
+        // Keep the cursor on the same name; ids below `dir` change.
+        let selected_name = self.selected().map(|id| self.tree.name(id).to_string());
+        self.basket.remove_below(&self.tree, dir);
+        self.tree.replace_children(dir, &res.tree);
+        let row = self.table.selected().unwrap_or(0);
+        self.load(self.current, row);
+        if let Some(name) = selected_name {
+            if let Some(pos) = self.entries.iter().position(|&e| self.tree.name(e) == name) {
+                self.table.select(Some(pos));
+            }
+        }
+        self.refresh_dashboard();
+        let after = self.tree.node(dir).size.get(mode);
+        self.set_status(
+            tf!(
+                "✓ Yeniden tarandı ({:.1} sn): {} → {} ({})",
+                "✓ Rescanned ({:.1} s): {} → {} ({})",
+                res.elapsed.as_secs_f64(),
+                crate::ui::fmt_size(before),
+                crate::ui::fmt_size(after),
+                crate::ui::fmt_delta(after, before)
+            ),
+            false,
+        );
+    }
+
     fn poll_dups(&mut self) {
         let Some(job) = &self.dup_job else {
             return;
@@ -1030,6 +1122,20 @@ impl Browser {
         if self.pending_report.is_some() {
             return Action::None;
         }
+        if self.rescan.is_some() {
+            match code {
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Esc => {
+                    self.rescan = None; // dropping the handle cancels the scan
+                    self.set_status(
+                        t!("Yeniden tarama iptal edildi.", "Rescan cancelled."),
+                        true,
+                    );
+                }
+                _ => {}
+            }
+            return Action::None;
+        }
         if self.dup_job.is_some() {
             match code {
                 KeyCode::Char('q') => return Action::Quit,
@@ -1192,6 +1298,7 @@ impl Browser {
             }
             KeyCode::Char('S') => self.open_basket(),
             KeyCode::Char('r') => return Action::Rescan,
+            KeyCode::Char('R') => self.start_rescan(),
             KeyCode::Char('d') => return Action::Disks,
             _ => {}
         }
@@ -1344,6 +1451,7 @@ impl App {
             b.poll_delete();
             b.poll_report();
             b.poll_dups();
+            b.poll_rescan();
             if let Some(view) = &mut b.tools {
                 view.poll();
             }

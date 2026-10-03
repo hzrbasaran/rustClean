@@ -6,6 +6,15 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `R` rescans only the current folder in the background and updates the
+  tree in place (sizes, counts and dates of the folder and its parents), so
+  refreshing after a cleanup no longer needs a full rescan
+  ([#5](https://github.com/hzrbasaran/rustClean/issues/5)).
+
+### Changed
+- Dependencies: ratatui 0.30, sysinfo 0.39; release workflow actions updated.
+
 ## [0.1.0] - 2026-10-03
 
 First public release.
