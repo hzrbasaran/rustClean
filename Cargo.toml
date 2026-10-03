@@ -2,6 +2,15 @@
 name = "rustclean"
 version = "0.1.0"
 edition = "2021"
+description = "Fast terminal disk usage analyzer and cleaner: reports, duplicates, app leftovers, developer caches, treemap"
+authors = ["hzrbasaran <hzrbasaran@hotmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/hzrbasaran/rustClean"
+homepage = "https://github.com/hzrbasaran/rustClean"
+readme = "README.md"
+keywords = ["disk-usage", "cleaner", "tui", "duplicates", "treemap"]
+categories = ["command-line-utilities", "filesystem"]
+exclude = ["docs/screenshots/*", ".github/*"]
 
 [dependencies]
 anyhow = "1.0.104"
@@ -20,3 +29,7 @@ xxhash-rust = { version = "0.8.19", features = ["xxh3"] }
 
 [dev-dependencies]
 tempfile = "3.27.0"
+
+[profile.release]
+lto = "thin"
+strip = true

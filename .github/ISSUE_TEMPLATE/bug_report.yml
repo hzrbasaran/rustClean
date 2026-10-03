@@ -1,0 +1,47 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! If rustClean offered to delete something it should not have,
+        please consider reporting it privately instead (see SECURITY.md).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. rustclean ~/Projects
+        2. press m, choose "Developer junk"
+        3. ...
+  - type: input
+    id: version
+    attributes:
+      label: rustClean version or commit
+      placeholder: "rustclean --version"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS, Linux, Windows]
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: OS version and terminal
+      placeholder: "macOS 26.0, Terminal.app"
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or other details

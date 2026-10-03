@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security issue
+    url: https://github.com/hzrbasaran/rustClean/security/advisories/new
+    about: Report security problems (e.g. unexpected deletions) privately.
