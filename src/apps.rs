@@ -1,7 +1,6 @@
 //! "Applications and their data" report.
 //!
-//! Applications are found below the browsed directory; their data folders
-//! anywhere in the scan (an app in /Applications keeps its data in
+//! Applications and their data folders are found anywhere in the scan (an app in /Applications keeps its data in
 //! ~/Library). Matching data to apps is by name and bundle identifier, so
 //! it is a best guess; the report says so.
 
@@ -21,7 +20,10 @@ struct App {
     bundle: Option<String>,
 }
 
-pub fn run(tree: &Tree, base: NodeId, mode: SizeMode) -> ResultList {
+/// Apps are listed from the whole scan, wherever the user is browsing:
+/// "which programs take the most space" is a question about the disk.
+pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
+    let base = ROOT;
     let platform = Platform::current();
     let mut apps = find_apps(tree, base, platform);
     // When the same app exists more than once (an updater's or installer's
@@ -86,7 +88,8 @@ pub fn run(tree: &Tree, base: NodeId, mode: SizeMode) -> ResultList {
     let mut list = ResultList::new(ReportKind::Apps.label().to_string(), base, rows, false);
     list.truncated = truncated;
     list.note = if apps.is_empty() {
-        "Bu klasörde uygulama bulunamadı (macOS: /Applications ya da diskin kökünden açın).".into()
+        "Bu taramada uygulama yok. Uygulamalar için diski tarayın: d → Macintosh HD (Windows: C:\\, Linux: /)."
+            .into()
     } else if data_dirs.is_empty() {
         "Uygulama verileri taranmamış: ev klasörünü ya da diski tarayın.".into()
     } else {

@@ -155,7 +155,7 @@ fn render_scanning(f: &mut Frame, app: &mut App, header: Rect, body: Rect, foote
 
 fn stat_line(label: &str, value: &str) -> Line<'static> {
     Line::from(vec![
-        Span::raw(format!("  {label:<13}")).dark_gray(),
+        Span::raw(format!("  {label:<13}")).gray(),
         Span::raw(value.to_string()),
     ])
 }
@@ -227,14 +227,14 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         };
         Line::from(vec![
             Span::raw(format!("{spin} Kopyalar aranıyor — {step}")).cyan(),
-            Span::raw("   Esc: iptal").dark_gray(),
+            Span::raw("   Esc: iptal").gray(),
         ])
     } else if let Some(input) = &b.input {
         Line::from(vec![
             Span::raw(" Ara: ").black().on_yellow().bold(),
             Span::raw(format!(" {input}")),
             Span::raw("█").slow_blink(),
-            Span::raw("   örn: deneme · deneme* · *.log").dark_gray(),
+            Span::raw("   örn: deneme · deneme* · *.log").gray(),
         ])
     } else if let Some(st) = &b.status {
         let style = if st.error {
@@ -247,21 +247,21 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         Line::from(
             "„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.",
         )
-        .dark_gray()
+        .gray()
     } else if let Some(r) = &b.results {
         let text = if r.rows.is_empty() {
             "Sonuç yok."
         } else {
             r.note.as_str()
         };
-        Line::from(text).dark_gray()
+        Line::from(text).gray()
     } else {
         let mut spans = vec![Span::raw(format!(
             "{} öğe tarandı, {:.1} sn",
             fmt_count(b.tree.len() as u64),
             b.elapsed.as_secs_f64()
         ))
-        .dark_gray()];
+        .gray()];
         if b.errors > 0 {
             spans.push(
                 Span::raw(format!("   ⚠ {} öğeye erişilemedi", fmt_count(b.errors))).yellow(),
@@ -277,7 +277,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             );
         }
         if b.entries.is_empty() {
-            spans.push(Span::raw("   (klasör boş)").dark_gray());
+            spans.push(Span::raw("   (klasör boş)").gray());
         }
         Line::from(spans)
     };
@@ -354,15 +354,18 @@ fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
         lines.push(
             Line::from(vec![
                 Span::raw(marker),
-                Span::raw(format!("{}. ", i + 1)).dark_gray(),
+                Span::raw(format!("{}. ", i + 1)).gray(),
                 Span::raw(kind.label()).white().bold(),
             ])
             .style(style),
         );
-        lines.push(Line::from(format!("       {}", kind.description())).dark_gray());
+        lines.push(Line::from(format!("       {}", kind.description())).gray());
     }
     lines.push(Line::from(""));
-    lines.push(Line::from(" Raporlar bulunduğunuz klasörün altında çalışır.").dark_gray());
+    lines.push(
+        Line::from(" Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama).")
+            .gray(),
+    );
 
     let height = (lines.len() as u16 + 2).min(area.height);
     let popup = Rect {
@@ -415,7 +418,7 @@ fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
                 Span::styled(bar(ratio, 12), Style::new().fg(Color::Cyan)),
                 Span::raw(format!(" {:>5.1}%", ratio * 100.0)),
             ])),
-            Cell::from(Line::from(count).right_aligned().dark_gray()),
+            Cell::from(Line::from(count).right_aligned().gray()),
             date_cell(n.modified, now),
         ];
         if wide {
@@ -462,7 +465,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
         let check = if r.checked[i] {
             Span::raw("[✓]").green().bold()
         } else {
-            Span::raw("[ ]").dark_gray()
+            Span::raw("[ ]").gray()
         };
         // Groups show their member count and newest member; single entries
         // their file count (directories) and own dates.
@@ -490,7 +493,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
         let mut cells = vec![
             Cell::from(check),
             Cell::from(Line::from(fmt_size(row.size())).right_aligned()),
-            Cell::from(Line::from(count).right_aligned().dark_gray()),
+            Cell::from(Line::from(count).right_aligned().gray()),
             date_cell(modified, now),
         ];
         if wide {
@@ -498,7 +501,7 @@ fn render_results(f: &mut Frame, tree: &Tree, r: &mut ResultList, area: Rect) {
         }
         cells.push(Cell::from(Span::styled(row.label.clone(), label_style)));
         if has_detail {
-            cells.push(Cell::from(Span::raw(row.detail.clone()).dark_gray()));
+            cells.push(Cell::from(Span::raw(row.detail.clone()).gray()));
         }
         Row::new(cells)
     });
@@ -549,7 +552,7 @@ const AGE_COLORS: [Color; 5] = [
     Color::Cyan,
     Color::Yellow,
     Color::Red,
-    Color::DarkGray,
+    Color::Gray,
 ];
 
 /// Color for a timestamp of the given age in seconds.
@@ -680,7 +683,7 @@ fn render_dashboard(
             ]),
         ]
     } else {
-        vec![Line::from("Disk bilgisi bulunamadı.").dark_gray()]
+        vec![Line::from("Disk bilgisi bulunamadı.").gray()]
     };
     let disk_title = d
         .disk
@@ -707,7 +710,7 @@ fn render_dashboard(
                     Style::new().fg(CATEGORY_COLORS[cat as usize]),
                 ),
                 Span::raw(format!(" {:>10}", fmt_size(b.size))),
-                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).dark_gray(),
+                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).gray(),
             ])
         })
         .collect();
@@ -727,7 +730,7 @@ fn render_dashboard(
                 Span::raw(format!("{:<11}", stats::AGE_LABELS[i])).white(),
                 Span::styled(bar(ratio, bar_w), Style::new().fg(AGE_COLORS[i])),
                 Span::raw(format!(" {:>10}", fmt_size(b.size))),
-                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).dark_gray(),
+                Span::raw(format!(" {:>4.0}%", ratio * 100.0)).gray(),
             ])
         })
         .collect();
@@ -824,7 +827,7 @@ fn usage_color(ratio: f64) -> Color {
 
 fn date_span(secs: u32, now: u64) -> Span<'static> {
     if secs == 0 {
-        return Span::raw("—").dark_gray();
+        return Span::raw("—").gray();
     }
     let age = now.saturating_sub(u64::from(secs));
     Span::styled(fmt_date(secs), Style::new().fg(age_color(age)))
@@ -847,7 +850,7 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
         lines.push(Line::from(format!("{} öğe", fmt_count(ids.len() as u64))).bold());
         lines.push(Line::from(""));
         for &id in ids.iter().take(LISTED) {
-            lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).dark_gray());
+            lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).gray());
         }
         if ids.len() > LISTED {
             lines.push(
@@ -855,7 +858,7 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
                     "… ve {} öğe daha",
                     fmt_count((ids.len() - LISTED) as u64)
                 ))
-                .dark_gray(),
+                .gray(),
             );
         }
     }
@@ -866,7 +869,7 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
     }
     lines.extend([
         Line::from(""),
-        Line::from("Çöp kutusuna taşınacak.").dark_gray(),
+        Line::from("Çöp kutusuna taşınacak.").gray(),
         Line::from(""),
         Line::from(vec![
             Span::raw(" e ").black().on_red().bold(),

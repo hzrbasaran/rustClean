@@ -107,6 +107,20 @@ impl Dashboard {
     }
 }
 
+/// Index of the entry that has existed longest (by creation date, else
+/// modification date): the copy kept when removing duplicates.
+fn oldest(tree: &Tree, ids: &[NodeId]) -> Option<usize> {
+    let age = |id: NodeId| {
+        let n = tree.node(id);
+        if n.created != 0 {
+            n.created
+        } else {
+            n.modified
+        }
+    };
+    (0..ids.len()).min_by_key(|&i| (age(ids[i]), i))
+}
+
 /// What the browser asks the app to do after a key press.
 pub enum Action {
     None,
@@ -338,7 +352,7 @@ impl Browser {
         self.status = None;
         match kind {
             ReportKind::Apps => {
-                self.results = Some(apps::run(&self.tree, self.current, self.size_mode));
+                self.results = Some(apps::run(&self.tree, self.size_mode));
             }
             ReportKind::Duplicates => {
                 let cands = duplicates::candidates(&self.tree, self.current);
@@ -410,6 +424,49 @@ impl Browser {
         self.results = Some(list);
     }
 
+    /// What `x` removes in a result list: the checked rows, or the row under
+    /// the cursor when nothing is checked. Duplicate groups always keep their
+    /// oldest copy.
+    fn result_targets(&self) -> Result<Vec<NodeId>, &'static str> {
+        let Some(r) = &self.results else {
+            return Ok(Vec::new());
+        };
+        let rows: Vec<&Row> = if r.checked.iter().any(|&c| c) {
+            r.rows
+                .iter()
+                .zip(&r.checked)
+                .filter(|(_, &c)| c)
+                .map(|(row, _)| row)
+                .collect()
+        } else {
+            match r.selected_row() {
+                Some(row) if row.group && !r.keep_one => {
+                    return Err(
+                        "Bu bir grup: içine girmek için Enter, tamamını seçmek için Space.",
+                    );
+                }
+                Some(row) => vec![row],
+                None => return Ok(Vec::new()),
+            }
+        };
+        let mut ids = Vec::new();
+        for row in rows {
+            let keep = if r.keep_one && row.group {
+                oldest(&self.tree, &row.nodes)
+            } else {
+                None
+            };
+            ids.extend(
+                row.nodes
+                    .iter()
+                    .enumerate()
+                    .filter(|&(i, _)| Some(i) != keep)
+                    .map(|(_, &id)| id),
+            );
+        }
+        Ok(ids)
+    }
+
     /// Opens the members of the selected group row.
     fn drill_down(&mut self) {
         let Some(r) = &self.results else {
@@ -428,15 +485,7 @@ impl Browser {
         let mut list = ResultList::new(format!("{} › {}", r.title, row.label), r.base, rows, false);
         if r.keep_one {
             // Keep the copy that has existed longest; check the rest.
-            let age = |id: NodeId| {
-                let n = tree.node(id);
-                if n.created != 0 {
-                    n.created
-                } else {
-                    n.modified
-                }
-            };
-            if let Some(keep) = (0..ids.len()).min_by_key(|&i| (age(ids[i]), i)) {
+            if let Some(keep) = oldest(tree, &ids) {
                 list.checked = (0..ids.len()).map(|i| i != keep).collect();
                 list.note = format!(
                     "En eski kopya ({}) korunuyor; diğerleri seçili.",
@@ -687,10 +736,10 @@ impl Browser {
             KeyCode::End | KeyCode::Char('G') => r.table.select_last(),
             KeyCode::Char(' ') => r.toggle_selected(),
             KeyCode::Char('t') => r.toggle_all(),
-            KeyCode::Char('x') | KeyCode::Delete => {
-                let ids = r.checked_nodes();
-                self.request_delete(ids);
-            }
+            KeyCode::Char('x') | KeyCode::Delete => match self.result_targets() {
+                Ok(ids) => self.request_delete(ids),
+                Err(msg) => self.set_status(msg, true),
+            },
             KeyCode::Char('/') => self.input = Some(r.pattern.clone().unwrap_or_default()),
             KeyCode::Char('m') => self.report_menu = Some(0),
             KeyCode::Char('a') => self.toggle_size_mode(),
@@ -855,5 +904,70 @@ impl App {
                 self.screen = Screen::DiskSelect;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::lists::RowSize;
+    use crate::tree::Size;
+    use std::path::Path;
+
+    fn browser_with(rows: Vec<Row>, keep_one: bool) -> (Browser, [NodeId; 3]) {
+        let mut t = Tree::new(Path::new("/r"));
+        let s = Size::default();
+        let a = t.push(ROOT, "a", false, s);
+        t.set_times(a, 300, 300);
+        let b = t.push(ROOT, "b", false, s);
+        t.set_times(b, 100, 100); // oldest
+        let c = t.push(ROOT, "c", false, s);
+        t.set_times(c, 200, 200);
+        t.finalize();
+        let mut br = Browser::new(ScanResult {
+            tree: t,
+            errors: 0,
+            elapsed: Duration::ZERO,
+        });
+        let rows = rows
+            .into_iter()
+            .map(|mut r| {
+                r.nodes = r.nodes.iter().map(|&i| [a, b, c][i as usize]).collect();
+                r
+            })
+            .collect();
+        let mut list = ResultList::new("t".into(), ROOT, rows, false);
+        list.keep_one = keep_one;
+        br.results = Some(list);
+        (br, [a, b, c])
+    }
+
+    fn group(members: &[NodeId]) -> Row {
+        let members = members.iter().map(|&i| (i, 1)).collect();
+        Row::group("g".into(), String::new(), members, RowSize::Sum, 2)
+    }
+
+    #[test]
+    fn x_without_checks_uses_the_cursor_row() {
+        let single = Row::group("s".into(), String::new(), vec![(2, 1)], RowSize::Sum, 1);
+        let (mut br, [_, _, c]) = browser_with(vec![single], false);
+        br.results.as_mut().unwrap().rows[0].group = false;
+        assert_eq!(br.result_targets(), Ok(vec![c]));
+    }
+
+    #[test]
+    fn unchecked_name_group_is_not_deleted_whole() {
+        let (br, _) = browser_with(vec![group(&[0, 1, 2])], false);
+        assert!(br.result_targets().is_err());
+    }
+
+    #[test]
+    fn duplicate_groups_keep_the_oldest_copy() {
+        // Under the cursor…
+        let (mut br, [a, _, c]) = browser_with(vec![group(&[0, 1, 2])], true);
+        assert_eq!(br.result_targets(), Ok(vec![a, c]));
+        // …and when checked.
+        br.results.as_mut().unwrap().checked = vec![true];
+        assert_eq!(br.result_targets(), Ok(vec![a, c]));
     }
 }

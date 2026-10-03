@@ -139,16 +139,6 @@ impl ResultList {
         self.table.selected().and_then(|i| self.rows.get(i))
     }
 
-    /// All entries of the checked rows.
-    pub fn checked_nodes(&self) -> Vec<NodeId> {
-        self.rows
-            .iter()
-            .zip(&self.checked)
-            .filter(|(_, &c)| c)
-            .flat_map(|(r, _)| r.nodes.iter().copied())
-            .collect()
-    }
-
     pub fn checked_size(&self) -> u64 {
         self.rows
             .iter()
@@ -264,15 +254,15 @@ mod tests {
             group("b", &[(2, 20), (3, 5)], RowSize::Sum),
         ];
         let mut l = ResultList::new("t".into(), 0, rows, false);
-        assert!(l.checked_nodes().is_empty());
+        assert_eq!(l.checked, vec![false, false]);
         l.table.select(Some(1));
         l.toggle_selected();
-        assert_eq!(l.checked_nodes(), vec![2, 3]);
+        assert_eq!(l.checked, vec![false, true]);
         assert_eq!(l.checked_size(), 25);
         l.toggle_all();
-        assert_eq!(l.checked_nodes(), vec![1, 2, 3]);
+        assert_eq!(l.checked, vec![true, true]);
         l.toggle_all();
-        assert!(l.checked_nodes().is_empty());
+        assert_eq!(l.checked, vec![false, false]);
     }
 
     #[test]
