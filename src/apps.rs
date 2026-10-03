@@ -39,7 +39,12 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
         (!installed, tree.path_of(a.id).components().count())
     });
     let (data_dirs, unreadable) = data_folders(tree, platform);
-    let matched = match_data(&apps, &data_dirs, &|id| vendor_children(tree, id));
+    let mut matched = match_data(&apps, &data_dirs, &|id| vendor_children(tree, id));
+    if platform == Platform::MacOs {
+        for (m, prefs) in matched.iter_mut().zip(preference_files(tree, &apps)) {
+            m.extend(prefs);
+        }
+    }
     let mut name_counts: HashMap<&str, usize> = HashMap::new();
     for app in &apps {
         *name_counts.entry(app.name.as_str()).or_default() += 1;
@@ -87,6 +92,7 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
 
     let mut list = ResultList::new(ReportKind::Apps.label().to_string(), base, rows);
     list.truncated = truncated;
+    list.report = Some(ReportKind::Apps);
     list.note = if apps.is_empty() {
         t!(
             "Bu taramada uygulama yok. Uygulamalar için diski tarayın: d → Macintosh HD (Windows: C:\\, Linux: /).",
@@ -115,6 +121,44 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
         note
     };
     list
+}
+
+/// Whether the app at `path` may be uninstalled (moved to the trash with
+/// its data). macOS only; the caller checks the platform.
+pub fn uninstall_check(path: &Path) -> Result<(), &'static str> {
+    let is_bundle = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .and_then(|n| strip_suffix_ci(n, ".app"))
+        .is_some();
+    if !is_bundle {
+        return Err(t!(
+            "Bu satır bir uygulama değil.",
+            "This row is not an application."
+        ));
+    }
+    if path.starts_with("/System") {
+        return Err(t!(
+            "Sistem uygulaması kaldırılamaz.",
+            "System applications cannot be removed."
+        ));
+    }
+    Ok(())
+}
+
+/// Whether a running process was started from inside the app bundle.
+pub fn is_running(app: &Path) -> bool {
+    use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System, UpdateKind};
+    let mut sys = System::new();
+    sys.refresh_processes_specifics(
+        ProcessesToUpdate::All,
+        true,
+        ProcessRefreshKind::nothing().with_exe(UpdateKind::OnlyIfNotSet),
+    );
+    sys.processes()
+        .values()
+        .filter_map(|p| p.exe())
+        .any(|exe| exe.starts_with(app))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -287,19 +331,7 @@ fn data_folders(tree: &Tree, platform: Platform) -> (Vec<DataDir>, usize) {
                 "WebKit",
                 "Saved Application State",
             ];
-            // ~/Library and /Library: a "Library" with "Application Support".
-            let libraries = shallow_dirs(tree, 4).into_iter().filter(|&d| {
-                let name = if d == ROOT {
-                    tree.root_path()
-                        .file_name()
-                        .and_then(|n| n.to_str())
-                        .unwrap_or("")
-                } else {
-                    tree.name(d)
-                };
-                name == "Library" && child_named(tree, d, "Application Support").is_some()
-            });
-            for lib in libraries {
+            for lib in libraries(tree) {
                 for kind in KINDS {
                     if let Some(dir) = child_named(tree, lib, kind) {
                         add_children(dir, &mut out);
@@ -357,6 +389,24 @@ fn data_folders(tree: &Tree, platform: Platform) -> (Vec<DataDir>, usize) {
         }
     }
     (out, unreadable)
+}
+
+/// ~/Library and /Library: a "Library" with "Application Support".
+fn libraries(tree: &Tree) -> Vec<NodeId> {
+    shallow_dirs(tree, 4)
+        .into_iter()
+        .filter(|&d| {
+            let name = if d == ROOT {
+                tree.root_path()
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("")
+            } else {
+                tree.name(d)
+            };
+            name == "Library" && child_named(tree, d, "Application Support").is_some()
+        })
+        .collect()
 }
 
 fn looks_like_uuid(name: &str) -> bool {
@@ -684,20 +734,7 @@ fn match_all(
     let mut out = vec![Vec::new(); apps.len()];
     let mut unmatched = Vec::new();
     for (di, d) in data.iter().enumerate() {
-        let core = container_core(&d.key);
-        let by_bundle = apps
-            .iter()
-            .enumerate()
-            .filter_map(|(i, a)| a.bundle.as_deref().map(|b| (i, b)))
-            .filter(|(_, b)| {
-                core == *b
-                    || (core.len() > b.len()
-                        && core.starts_with(b)
-                        && core.as_bytes()[b.len()] == b'.')
-            })
-            // Most specific bundle id; among equals, the earliest (preferred) app.
-            .max_by_key(|&(i, b)| (b.len(), std::cmp::Reverse(i)))
-            .map(|(i, _)| i);
+        let by_bundle = bundle_owner(apps, container_core(&d.key));
         if let Some(i) = by_bundle.or_else(|| by_name.get(&d.key).copied()) {
             out[i].push(d.id);
             continue;
@@ -714,6 +751,46 @@ fn match_all(
         }
     }
     (out, unmatched)
+}
+
+/// The app whose bundle identifier `key` is, or extends at a dot
+/// (`com.foo.app.helper` belongs to `com.foo.app`, `com.foo.application`
+/// does not). The most specific bundle id wins; among equals, the earliest
+/// (preferred) app.
+fn bundle_owner(apps: &[App], key: &str) -> Option<usize> {
+    apps.iter()
+        .enumerate()
+        .filter_map(|(i, a)| a.bundle.as_deref().map(|b| (i, b)))
+        .filter(|(_, b)| {
+            key == *b
+                || (key.len() > b.len() && key.starts_with(b) && key.as_bytes()[b.len()] == b'.')
+        })
+        .max_by_key(|&(i, b)| (b.len(), std::cmp::Reverse(i)))
+        .map(|(i, _)| i)
+}
+
+/// Preference files (`Library/Preferences/<bundle id>….plist`, also in
+/// `ByHost`) of each app. Matched by bundle id only: names are too vague for
+/// loose files.
+fn preference_files(tree: &Tree, apps: &[App]) -> Vec<Vec<NodeId>> {
+    let mut out = vec![Vec::new(); apps.len()];
+    for lib in libraries(tree) {
+        let Some(prefs) = child_named(tree, lib, "Preferences") else {
+            continue;
+        };
+        let by_host = child_named(tree, prefs, "ByHost");
+        for dir in std::iter::once(prefs).chain(by_host) {
+            for f in tree.children(dir).filter(|&c| !tree.node(c).is_dir) {
+                let Some(stem) = strip_suffix_ci(tree.name(f), ".plist") else {
+                    continue;
+                };
+                if let Some(i) = bundle_owner(apps, &stem.to_lowercase()) {
+                    out[i].push(f);
+                }
+            }
+        }
+    }
+    out
 }
 
 /// The app a folder `vendor/sub` belongs to, if any.
@@ -929,6 +1006,54 @@ mod tests {
         let m = match_data(&apps, &dirs, &|_| Vec::new());
         assert_eq!(m[1], vec![foo_data, foo_cache]);
         assert!(m[0].is_empty());
+    }
+
+    #[test]
+    fn preference_files_match_by_bundle_id_only() {
+        let mut t = Tree::new(Path::new("/Users/me"));
+        let lib = t.push(ROOT, "Library", true, Size::default());
+        t.push(lib, "Application Support", true, Size::default());
+        let prefs = t.push(lib, "Preferences", true, Size::default());
+        let by_host = t.push(prefs, "ByHost", true, Size::default());
+        let file = |t: &mut Tree, dir, name: &str| t.push(dir, name, false, Size::default());
+        let own = file(&mut t, prefs, "com.foo.app.plist");
+        let helper = file(&mut t, prefs, "com.foo.app.Helper.plist");
+        let host = file(
+            &mut t,
+            by_host,
+            "com.foo.app.0A1B2C3D-0000-1111-2222-333344445555.plist",
+        );
+        file(&mut t, prefs, "com.foo.application.plist"); // another app
+        file(&mut t, prefs, "Foo.plist"); // names are not enough
+        file(&mut t, prefs, "com.foo.app.lockfile"); // not a plist
+        let other = file(&mut t, prefs, "com.bar.plist");
+        t.finalize();
+
+        let apps = [
+            app(1, "Foo", Some("com.foo.app")),
+            app(2, "Bar", Some("com.bar")),
+            app(3, "NoId", None),
+        ];
+        let mut found = preference_files(&t, &apps);
+        found[0].sort();
+        let mut want = vec![own, helper, host];
+        want.sort();
+        assert_eq!(found, vec![want, vec![other], vec![]]);
+    }
+
+    #[test]
+    fn uninstall_refuses_system_apps_and_non_apps() {
+        assert!(uninstall_check(Path::new("/Applications/Foo.app")).is_ok());
+        assert!(uninstall_check(Path::new("/Users/me/Applications/Foo.APP")).is_ok());
+        assert!(uninstall_check(Path::new("/System/Applications/Chess.app")).is_err());
+        assert!(uninstall_check(Path::new("/Users/me/Library/Caches/foo")).is_err());
+    }
+
+    #[test]
+    fn running_apps_are_detected_by_executable_path() {
+        let exe = std::env::current_exe().unwrap();
+        assert!(is_running(exe.parent().unwrap()));
+        assert!(!is_running(Path::new("/no/such/Thing.app")));
     }
 
     #[test]

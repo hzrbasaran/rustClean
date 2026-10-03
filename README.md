@@ -33,7 +33,8 @@ from anywhere and move them to the trash in one go.
 - **Reports** (`m`)
   - largest files and folders
   - most repeated file names
-  - applications **with their data** (`~/Library`, containers, caches…)
+  - applications **with their data** (`~/Library`, containers, caches,
+    preferences…); `u` uninstalls an app with its data in one step (macOS)
   - **orphaned app leftovers** of apps that are no longer installed
   - **developer junk**: `node_modules`, Cargo `target`, `build`/`dist`,
     `Pods`, `DerivedData`, `.venv`… (only when the project's marker file is

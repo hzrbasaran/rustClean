@@ -425,10 +425,18 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Enter", t!("çalıştır", "run")),
             ("Esc", t!("kapat", "close")),
         ]
+    } else if b.uninstall.is_some() {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("Space", t!("işaretle", "check")),
+            ("t", t!("tümü", "all")),
+            (t!("e", "y"), t!("kaldır", "uninstall")),
+            (t!("h / Esc", "n / Esc"), t!("vazgeç", "cancel")),
+        ]
     } else if b.confirm.is_some() {
         &[
-            ("e", t!("evet, çöpe taşı", "yes, move to trash")),
-            ("h / Esc", t!("vazgeç", "cancel")),
+            (t!("e", "y"), t!("evet, çöpe taşı", "yes, move to trash")),
+            (t!("h / Esc", "n / Esc"), t!("vazgeç", "cancel")),
         ]
     } else if b.deleting.is_some() {
         &[("q", t!("çık", "quit"))]
@@ -467,6 +475,18 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Space", t!("sepete", "to basket")),
             ("x", t!("çöpe taşı", "move to trash")),
             ("a", t!("görünen/diskte", "apparent/on disk")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else if b.apps_report().is_some() {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("u", t!("uygulamayı kaldır", "uninstall app")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("Enter", t!("aç / konuma git", "open / go to")),
+            ("m", t!("raporlar", "reports")),
             ("Esc", t!("geri", "back")),
             ("q", t!("çık", "quit")),
         ]
@@ -529,6 +549,9 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     }
     if let Some(ids) = &b.confirm {
         render_confirm(f, &b.tree, ids, mode, f.area());
+    }
+    if let Some(d) = &b.uninstall {
+        render_uninstall(f, &b.tree, d, mode, f.area());
     }
     if let Some(dialog) = &mut b.failures {
         render_failures(f, dialog, f.area());
@@ -1979,6 +2002,120 @@ fn render_confirm(f: &mut Frame, tree: &Tree, ids: &[NodeId], mode: SizeMode, ar
             ),
         popup,
     );
+}
+
+/// The app and its data to uninstall, each with a check box.
+fn render_uninstall(
+    f: &mut Frame,
+    tree: &Tree,
+    d: &crate::app::UninstallDialog,
+    mode: SizeMode,
+    area: Rect,
+) {
+    let width = area.width.saturating_sub(4).min(100);
+    let inner = width.saturating_sub(4) as usize;
+    let size_of = |id: NodeId| tree.node(id).size.get(mode);
+    let chosen: Vec<NodeId> = d.chosen();
+    let total: u64 = chosen.iter().map(|&id| size_of(id)).sum();
+
+    let mut tail = vec![
+        Line::from(""),
+        Line::from(tf!(
+            "Seçili: {} / {} öğe · {}",
+            "Selected: {} of {} items · {}",
+            chosen.len(),
+            d.items.len(),
+            fmt_size(total)
+        ))
+        .bold(),
+        Line::from(t!(
+            "Veriler ad ve paket kimliğiyle eşleştirildi (tahmin): listeyi kontrol edin.",
+            "Data was matched by name and bundle id (a guess): check the list.",
+        ))
+        .gray(),
+    ];
+    if d.running {
+        tail.push(
+            Line::from(t!(
+                "⚠ Uygulama şu an açık: önce kapatın.",
+                "⚠ The app is running: quit it first.",
+            ))
+            .red()
+            .bold(),
+        );
+    }
+    tail.extend([
+        Line::from(t!("Çöp kutusuna taşınacak.", "Will be moved to the trash.")).gray(),
+        Line::from(""),
+        Line::from(vec![
+            Span::raw(t!(" e ", " y ")).black().on_red().bold(),
+            Span::raw(t!(" kaldır     ", " uninstall     ")),
+            Span::raw(" Space ").black().on_gray(),
+            Span::raw(t!(" işaretle     ", " check     ")),
+            Span::raw(t!(" h ", " n ")).black().on_gray(),
+            Span::raw(t!(" vazgeç", " cancel")),
+        ]),
+    ]);
+
+    // Borders, a blank line on top, the tail; the rest lists the items.
+    let room = (area.height as usize).saturating_sub(tail.len() + 4).max(3);
+    let shown = d.items.len().min(room);
+    let offset = (d.cursor + 1).saturating_sub(shown);
+    let mut lines = vec![Line::from("")];
+    for (i, &(id, checked)) in d.items.iter().enumerate().skip(offset).take(shown) {
+        let mark = if checked { "[✓] " } else { "[ ] " };
+        let size = fmt_size(size_of(id));
+        let room = inner.saturating_sub(4 + size.len() + 2);
+        let path = truncate_path(&tilde(&tree.path_of(id)), room);
+        let pad = inner.saturating_sub(4 + path.chars().count() + size.chars().count());
+        let mut line = Line::from(format!("{mark}{path}{}{size}", " ".repeat(pad)));
+        if !checked {
+            line = line.gray();
+        }
+        if i == d.cursor {
+            line = line.reversed();
+        }
+        lines.push(line);
+    }
+    if d.items.len() > shown {
+        lines.push(
+            Line::from(tf!(
+                "{}–{} / {} (↑↓ kaydır)",
+                "{}–{} of {} (↑↓ to scroll)",
+                offset + 1,
+                offset + shown,
+                d.items.len()
+            ))
+            .gray(),
+        );
+    }
+    lines.extend(tail);
+
+    let height = (lines.len() as u16 + 2).min(area.height);
+    let popup = Rect {
+        x: area.x + (area.width.saturating_sub(width)) / 2,
+        y: area.y + (area.height.saturating_sub(height)) / 2,
+        width,
+        height,
+    };
+    f.render_widget(Clear, popup);
+    f.render_widget(
+        Paragraph::new(lines).block(
+            Block::bordered()
+                .padding(ratatui::widgets::Padding::horizontal(1))
+                .title(tf!(" Kaldır: {} ", " Uninstall: {} ", d.label))
+                .border_style(Style::new().fg(Color::Red)),
+        ),
+        popup,
+    );
+}
+
+/// The path with the home folder shortened to `~`.
+fn tilde(path: &Path) -> std::path::PathBuf {
+    match dirs::home_dir().and_then(|h| path.strip_prefix(h).ok().map(Path::to_path_buf)) {
+        Some(rest) => Path::new("~").join(rest),
+        None => path.to_path_buf(),
+    }
 }
 
 /// Horizontal bar of `width` cells using eighth-block characters.
