@@ -25,6 +25,7 @@ pub enum ReportKind {
     LargestDirs,
     RepeatedNames,
     Apps,
+    Orphans,
     DevJunk,
     Caches,
     OldBig,
@@ -38,6 +39,7 @@ impl ReportKind {
             ReportKind::LargestDirs => "En büyük klasörler",
             ReportKind::RepeatedNames => "En çok tekrar eden dosya adları",
             ReportKind::Apps => "Uygulamalar ve verileri",
+            ReportKind::Orphans => "Sahipsiz uygulama artıkları",
             ReportKind::DevJunk => "Geliştirici çöpleri",
             ReportKind::Caches => "Önbellek klasörleri",
             ReportKind::OldBig => "Eski ve büyük dosyalar",
@@ -54,6 +56,7 @@ impl ReportKind {
                 | ReportKind::RepeatedNames
                 | ReportKind::DevJunk
                 | ReportKind::Caches
+                | ReportKind::Orphans
         )
     }
 
@@ -65,6 +68,9 @@ impl ReportKind {
             }
             ReportKind::RepeatedNames => "Aynı adı taşıyan dosyalar, adet sırasıyla",
             ReportKind::Apps => "Uygulama paketi + Library'deki verileri (önbellek, destek…)",
+            ReportKind::Orphans => {
+                "Silinmiş uygulamalardan kalan veriler (Library: destek, önbellek, kapsayıcılar)"
+            }
             ReportKind::DevJunk => "node_modules, target, build, Pods, DerivedData, .venv…",
             ReportKind::Caches => "Caches ve .cache içindeki uygulama önbellekleri",
             ReportKind::OldBig => "100 MiB'tan büyük, 1 yıldır değişmemiş dosyalar",
@@ -85,11 +91,12 @@ pub enum MenuItem {
 }
 
 impl MenuItem {
-    pub const ALL: [MenuItem; 11] = [
+    pub const ALL: [MenuItem; 12] = [
         MenuItem::Report(ReportKind::LargestFiles),
         MenuItem::Report(ReportKind::LargestDirs),
         MenuItem::Report(ReportKind::RepeatedNames),
         MenuItem::Report(ReportKind::Apps),
+        MenuItem::Report(ReportKind::Orphans),
         MenuItem::Report(ReportKind::DevJunk),
         MenuItem::Report(ReportKind::Caches),
         MenuItem::Report(ReportKind::OldBig),
@@ -168,7 +175,7 @@ pub fn run(
         ReportKind::DevJunk => dev_junk(tree, base, mode, age),
         ReportKind::Caches => caches(tree, base, mode, age),
         ReportKind::OldBig => old_big(tree, base, mode, now),
-        ReportKind::Apps | ReportKind::Duplicates => {
+        ReportKind::Apps | ReportKind::Orphans | ReportKind::Duplicates => {
             unreachable!("{kind:?} is computed elsewhere")
         }
     };

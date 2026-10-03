@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use crate::lists::{ResultList, Row, RowSize};
-use crate::reports::{ReportKind, LIMIT};
+use crate::reports::{AgeFilter, ReportKind, LIMIT};
 use crate::tree::{NodeId, SizeMode, Tree, ROOT};
 use crate::ui::fmt_size;
 
@@ -18,6 +18,9 @@ struct App {
     name: String,
     /// Lowercased bundle identifier (macOS).
     bundle: Option<String>,
+    /// Other lowercased names its data may use: CFBundleName and
+    /// CFBundleExecutable ("Code" for Visual Studio Code).
+    aliases: Vec<String>,
 }
 
 /// Apps are listed from the whole scan, wherever the user is browsing:
@@ -36,15 +39,7 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
         (!installed, tree.path_of(a.id).components().count())
     });
     let (data_dirs, unreadable) = data_folders(tree, platform);
-    let vendor_children = |id: NodeId| {
-        child_dirs(tree, id)
-            .map(|c| DataDir {
-                id: c,
-                key: tree.name(c).to_lowercase(),
-            })
-            .collect()
-    };
-    let matched = match_data(&apps, &data_dirs, &vendor_children);
+    let matched = match_data(&apps, &data_dirs, &|id| vendor_children(tree, id));
     let mut name_counts: HashMap<&str, usize> = HashMap::new();
     for app in &apps {
         *name_counts.entry(app.name.as_str()).or_default() += 1;
@@ -155,10 +150,12 @@ fn find_apps(tree: &Tree, base: NodeId, platform: Platform) -> Vec<App> {
             match platform {
                 Platform::MacOs => {
                     if let Some(stem) = strip_suffix_ci(name, ".app") {
+                        let (bundle, aliases) = bundle_info(&tree.path_of(c));
                         apps.push(App {
                             id: c,
                             name: stem.to_string(),
-                            bundle: bundle_id(&tree.path_of(c)),
+                            bundle,
+                            aliases,
                         });
                         continue; // never look inside bundles
                     }
@@ -171,6 +168,7 @@ fn find_apps(tree: &Tree, base: NodeId, platform: Platform) -> Vec<App> {
                             id: a,
                             name: tree.name(a).to_string(),
                             bundle: None,
+                            aliases: Vec::new(),
                         }));
                         continue;
                     }
@@ -181,6 +179,7 @@ fn find_apps(tree: &Tree, base: NodeId, platform: Platform) -> Vec<App> {
                             id: a,
                             name: tree.name(a).to_string(),
                             bundle: None,
+                            aliases: Vec::new(),
                         }));
                         continue;
                     }
@@ -200,6 +199,7 @@ fn find_apps(tree: &Tree, base: NodeId, platform: Platform) -> Vec<App> {
                     id: base,
                     name: tree.name(base).to_string(),
                     bundle: None,
+                    aliases: Vec::new(),
                 });
             }
         }
@@ -213,8 +213,25 @@ fn strip_suffix_ci<'a>(name: &'a str, suffix: &str) -> Option<&'a str> {
         .then(|| &name[..cut])
 }
 
-fn bundle_id(app: &Path) -> Option<String> {
-    plist_string(&app.join("Contents/Info.plist"), "CFBundleIdentifier")
+/// Bundle identifier and alternative names from the app's Info.plist.
+fn bundle_info(app: &Path) -> (Option<String>, Vec<String>) {
+    let Some(dict) = plist::Value::from_file(app.join("Contents/Info.plist"))
+        .ok()
+        .and_then(|v| v.into_dictionary())
+    else {
+        return (None, Vec::new());
+    };
+    let get = |k: &str| {
+        dict.get(k)
+            .and_then(|v| v.as_string())
+            .map(str::to_lowercase)
+    };
+    let aliases = ["CFBundleName", "CFBundleExecutable"]
+        .iter()
+        .filter_map(|k| get(k))
+        .filter(|a| a.len() > 2)
+        .collect();
+    (get("CFBundleIdentifier"), aliases)
 }
 
 fn plist_string(path: &Path, key: &str) -> Option<String> {
@@ -354,6 +371,191 @@ fn container_core(key: &str) -> &str {
     key
 }
 
+/// Subfolders of a possible vendor folder ("Google/Chrome").
+fn vendor_children(tree: &Tree, id: NodeId) -> Vec<DataDir> {
+    child_dirs(tree, id)
+        .map(|c| DataDir {
+            id: c,
+            key: tree.name(c).to_lowercase(),
+        })
+        .collect()
+}
+
+/// Folders smaller than this are not worth listing as leftovers.
+const ORPHAN_MIN: u64 = 1024 * 1024;
+
+/// Data folders of the system or shared by many apps, never leftovers.
+fn is_system_data(key: &str) -> bool {
+    const SYSTEM: &[&str] = &[
+        "accessibility",
+        "addressbook",
+        "animoji",
+        "appstore",
+        "assistant",
+        "cache",
+        "caches",
+        "callhistorydb",
+        "callhistorytransactions",
+        "cef",
+        "clouddocs",
+        "cloudkit",
+        "coresimulator",
+        "crashpad",
+        "crashreporter",
+        "desktop pictures",
+        "diagnosticreports",
+        "diskimages",
+        "dock",
+        "familycircle",
+        "fileprovider",
+        "geoservices",
+        "homekit",
+        "icdd",
+        "icloud",
+        "identityservices",
+        "ilifemediabrowser",
+        "knowledge",
+        "logs",
+        "metadata",
+        "mobile documents",
+        "mobilesync",
+        "networkserviceproxy",
+        "passkit",
+        "privacypreservingmeasurement",
+        "quick look",
+        "siritts",
+        "spotlight",
+        "syncservices",
+        "temp",
+        "tmp",
+    ];
+    let core = container_core(key);
+    // macOS services are named like "askpermissiond", "familycircled".
+    let daemon =
+        core.len() >= 6 && core.ends_with('d') && core.chars().all(|c| c.is_ascii_lowercase());
+    core.starts_with("com.apple.") || core == "apple" || daemon || SYSTEM.contains(&core)
+}
+
+/// A reverse-DNS identifier ("com.vendor.app"), not a plain name.
+fn is_bundle_like(core: &str) -> bool {
+    core.matches('.').count() >= 2
+}
+
+/// Looser checks than `match_all`, used only before calling something a
+/// leftover: when in doubt, it belongs to an installed app.
+fn loosely_claimed(apps: &[App], key: &str) -> bool {
+    let core = container_core(key);
+    let norm = normalize(core);
+    apps.iter().any(|app| {
+        let by_name = std::iter::once(normalize(&app.name))
+            .chain(app.aliases.iter().map(|a| normalize(a)))
+            .any(|n| norm == n || (n.len() >= 5 && norm.starts_with(&n)));
+        // "dev.warp" for "dev.warp.Warp-Stable", and helpers sharing a
+        // product prefix: "com.microsoft.autoupdate.fba" for
+        // "com.microsoft.autoupdate2" (at least three components in common).
+        let product = core
+            .rsplit_once('.')
+            .map(|(p, _)| p)
+            .filter(|p| p.matches('.').count() >= 2);
+        let by_prefix = app.bundle.as_deref().is_some_and(|b| {
+            b.starts_with(&format!("{core}.")) || product.is_some_and(|p| b.starts_with(p))
+        });
+        // The vendor folder of an installed app ("Microsoft" for Excel).
+        let vendor_of_app = app
+            .bundle
+            .as_deref()
+            .and_then(|b| b.split('.').nth(1))
+            .is_some_and(|v| v == norm)
+            || (app.name.contains(' ')
+                && app
+                    .name
+                    .split_whitespace()
+                    .next()
+                    .is_some_and(|w| normalize(w) == norm));
+        by_name || by_prefix || vendor_of_app
+    })
+}
+
+/// Whether an unclaimed data folder should be reported as a leftover.
+fn is_leftover_candidate(apps: &[App], place: &str, key: &str) -> bool {
+    let core = container_core(key);
+    if is_system_data(key) || loosely_claimed(apps, key) {
+        return false;
+    }
+    match place {
+        // Shared group containers ("TEAMID.Office") carry no app identity.
+        "Group Containers" => is_bundle_like(core),
+        // Plain names here are mostly command line tools' caches; the
+        // caches report covers them.
+        "Caches" | "Logs" | "HTTPStorages" | "WebKit" => is_bundle_like(core),
+        // A command of the same name in PATH means the tool is installed.
+        _ => is_bundle_like(core) || crate::tools::which(core).is_none(),
+    }
+}
+
+/// Data folders that belong to no installed app: leftovers of removed apps.
+pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> ResultList {
+    let kind = ReportKind::Orphans;
+    let age = AgeFilter::new(now, min_age_days);
+    let platform = Platform::current();
+    let apps = find_apps(tree, ROOT, platform);
+    let mut title = kind.label().to_string();
+    if min_age_days > 0 {
+        title.push_str(&format!(" · ≥ {min_age_days} gündür dokunulmamış"));
+    }
+    let finish = |rows: Vec<Row>, truncated: bool, note: String| {
+        let mut list = ResultList::new(title.clone(), ROOT, rows);
+        list.truncated = truncated;
+        list.note = note;
+        list.report = Some(kind);
+        list.min_age_days = min_age_days;
+        list
+    };
+    if apps.is_empty() {
+        return finish(
+            Vec::new(),
+            false,
+            "Bu taramada uygulama yok, bu yüzden sahipsiz veri belirlenemez. Diski tarayın: d → Macintosh HD."
+                .into(),
+        );
+    }
+    let (data, _) = data_folders(tree, platform);
+    let (_, unmatched) = match_all(&apps, &data, &|id| vendor_children(tree, id));
+    let mut found: Vec<(NodeId, String)> = unmatched
+        .into_iter()
+        .map(|i| &data[i])
+        .filter(|d| {
+            let place = tree.parent(d.id).map_or("", |p| tree.name(p));
+            is_leftover_candidate(&apps, place, &d.key)
+        })
+        .filter(|d| {
+            let n = tree.node(d.id);
+            n.size.get(mode) >= ORPHAN_MIN && age.ok(n.modified)
+        })
+        .map(|d| {
+            let place = tree.parent(d.id).map_or("", |p| tree.name(p));
+            let reason = if is_bundle_like(container_core(&d.key)) {
+                "paket kimliği: yüklü uygulama yok"
+            } else {
+                "ad: yüklü uygulama yok (araç olabilir)"
+            };
+            (d.id, format!("{place} · {reason}"))
+        })
+        .collect();
+    found.sort_by_key(|(id, _)| std::cmp::Reverse(tree.node(*id).size.get(mode)));
+    let truncated = found.len() > LIMIT;
+    found.truncate(LIMIT);
+    let rows = found
+        .into_iter()
+        .map(|(id, detail)| Row::single(tree, ROOT, id, mode, detail))
+        .collect();
+    finish(
+        rows,
+        truncated,
+        "Komut satırı araçları da veri tutabilir; silmeden önce Enter ile içine bakın.".into(),
+    )
+}
+
 /// Lowercase name without spaces, dashes and underscores.
 fn normalize(name: &str) -> String {
     name.chars()
@@ -372,12 +574,28 @@ fn match_data(
     data: &[DataDir],
     children: &dyn Fn(NodeId) -> Vec<DataDir>,
 ) -> Vec<Vec<NodeId>> {
+    match_all(apps, data, children).0
+}
+
+/// Like `match_data`, also returning the data folders no app claimed
+/// (neither the folder itself nor anything inside it as a vendor folder).
+fn match_all(
+    apps: &[App],
+    data: &[DataDir],
+    children: &dyn Fn(NodeId) -> Vec<DataDir>,
+) -> (Vec<Vec<NodeId>>, Vec<usize>) {
     let mut by_name: HashMap<String, usize> = HashMap::new();
     for (i, app) in apps.iter().enumerate() {
         by_name.entry(app.name.to_lowercase()).or_insert(i);
     }
+    for (i, app) in apps.iter().enumerate() {
+        for alias in &app.aliases {
+            by_name.entry(alias.clone()).or_insert(i);
+        }
+    }
     let mut out = vec![Vec::new(); apps.len()];
-    for d in data {
+    let mut unmatched = Vec::new();
+    for (di, d) in data.iter().enumerate() {
         let core = container_core(&d.key);
         let by_bundle = apps
             .iter()
@@ -396,13 +614,18 @@ fn match_data(
             out[i].push(d.id);
             continue;
         }
+        let mut claimed = false;
         for sub in children(d.id) {
             if let Some(i) = vendor_match(apps, &d.key, &sub.key) {
                 out[i].push(sub.id);
+                claimed = true;
             }
         }
+        if !claimed {
+            unmatched.push(di);
+        }
     }
-    out
+    (out, unmatched)
 }
 
 /// The app a folder `vendor/sub` belongs to, if any.
@@ -432,6 +655,7 @@ mod tests {
             id,
             name: name.into(),
             bundle: bundle.map(str::to_string),
+            aliases: Vec::new(),
         }
     }
 
@@ -486,6 +710,62 @@ mod tests {
         assert_eq!(m[0], vec![11]);
         assert_eq!(m[1], vec![12]);
         assert_eq!(m[2], vec![21]);
+    }
+
+    #[test]
+    fn aliases_and_unmatched() {
+        let mut code = app(1, "Visual Studio Code", Some("com.microsoft.vscode"));
+        code.aliases = vec!["code".into(), "electron".into()];
+        let apps = [code];
+        let dirs = [
+            data(10, "Code"),
+            data(11, "OldTool"),
+            data(12, "com.removed.app"),
+            data(13, "Google"),
+        ];
+        let children = |id: NodeId| match id {
+            13 => vec![data(14, "Chrome")], // no Chrome installed
+            _ => Vec::new(),
+        };
+        let (matched, unmatched) = match_all(&apps, &dirs, &children);
+        assert_eq!(matched[0], vec![10]);
+        assert_eq!(unmatched, vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn leftover_candidates_err_on_the_safe_side() {
+        let apps = [
+            app(1, "Microsoft Excel", Some("com.microsoft.excel")),
+            app(2, "Docker", Some("com.docker.docker")),
+            app(3, "Warp", Some("dev.warp.warp-stable")),
+            app(4, "HTTP Toolkit", None),
+            app(5, "Microsoft AutoUpdate", Some("com.microsoft.autoupdate2")),
+        ];
+        let c = |place: &str, key: &str| is_leftover_candidate(&apps, place, &key.to_lowercase());
+        // Shared or vendor folders of installed apps.
+        assert!(!c("Group Containers", "UBF8T346G9.Office"));
+        assert!(!c("Application Support", "Microsoft"));
+        assert!(!c("Group Containers", "2BBY89MBSN.dev.warp"));
+        assert!(!c("Application Support", "Docker Desktop"));
+        assert!(!c("Application Support", "httptoolkit"));
+        assert!(!c("HTTPStorages", "com.microsoft.autoupdate.fba"));
+        // Tool caches with plain names and macOS services.
+        assert!(!c("Caches", "typescript"));
+        assert!(!c("Caches", "askpermissiond"));
+        // Real leftovers.
+        assert!(c("Containers", "com.tinyspeck.slackmacgap"));
+        assert!(c("Group Containers", "S8EX82NJP6.com.macpaw.CleanMyMac5"));
+        assert!(c("Application Support", "zz-removed-app-zz"));
+    }
+
+    #[test]
+    fn system_folders_are_never_leftovers() {
+        assert!(is_system_data("com.apple.notes"));
+        assert!(is_system_data("abcde12345.com.apple.foo"));
+        assert!(is_system_data("mobilesync"));
+        assert!(is_system_data("crashreporter"));
+        assert!(!is_system_data("com.spotify.client"));
+        assert!(!is_system_data("oldtool"));
     }
 
     #[test]

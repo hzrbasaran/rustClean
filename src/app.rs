@@ -427,6 +427,10 @@ impl Browser {
             ReportKind::Apps => {
                 self.results = Some(apps::run(&self.tree, self.size_mode));
             }
+            ReportKind::Orphans => {
+                let now = crate::ui::now_secs();
+                self.results = Some(apps::orphans(&self.tree, self.size_mode, now, 0));
+            }
             ReportKind::Duplicates => {
                 let cands = duplicates::candidates(&self.tree, self.current);
                 if cands.is_empty() {
@@ -658,7 +662,11 @@ impl Browser {
             .map_or(0, |i| (i + 1) % steps.len());
         let base = r.base;
         let now = crate::ui::now_secs();
-        let list = reports::run(&self.tree, base, self.size_mode, now, kind, steps[next]);
+        let list = if kind == ReportKind::Orphans {
+            apps::orphans(&self.tree, self.size_mode, now, steps[next])
+        } else {
+            reports::run(&self.tree, base, self.size_mode, now, kind, steps[next])
+        };
         self.results = Some(list);
     }
 
