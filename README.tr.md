@@ -41,6 +41,7 @@ harekete geçmenizi sağlar:
     `Pods`, `DerivedData`, `.venv`… (yalnızca projenin işaret dosyası yanındaysa)
   - önbellek klasörleri
   - eski ve büyük dosyalar
+  - **İndirilenlerdeki kurulum dosyaları ve arşivler** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - içeriği aynı **kopya dosyalar** (en eski kopya korunur)
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık

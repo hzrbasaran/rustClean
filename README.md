@@ -40,6 +40,7 @@ from anywhere and move them to the trash in one go.
     next to it)
   - cache folders
   - old and large files
+  - **installers and archives in Downloads** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - **duplicate files** with identical content, keeping the oldest copy
 - **Age filter** (`f`) on reports: show only what has not been touched for
   30 / 90 / 180 / 365 days. For developer junk, the age is the *project's*,

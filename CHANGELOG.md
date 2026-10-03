@@ -7,6 +7,9 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- "Installers and archives in Downloads" report: disk images, installers
+  and archives in Downloads folders, largest first, with the age filter
+  ([#10](https://github.com/hzrbasaran/rustClean/issues/10)).
 - `R` rescans only the current folder in the background and updates the
   tree in place (sizes, counts and dates of the folder and its parents), so
   refreshing after a cleanup no longer needs a full rescan

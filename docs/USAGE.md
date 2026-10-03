@@ -120,6 +120,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Developer junk | `node_modules`, Cargo `target`, `build`, `dist`, `Pods`, `.build`, `DerivedData`, `.gradle`, `.venv`, `__pycache__`, `vendor`, .NET `bin`/`obj`… only when the project's marker file is present |
 | Cache folders | entries of `Caches` / `.cache`, and `GPUCache`, `Code Cache`… |
 | Old and large files | ≥ 100 MiB and unchanged for over a year |
+| Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
 | Duplicate files | files with identical content (≥ 1 MiB); `Space` on a group adds all but the oldest copy |
 
 **Age filter.** In most reports `f` cycles a minimum age: none → 30 → 90 → 180
