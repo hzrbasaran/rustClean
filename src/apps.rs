@@ -5,7 +5,7 @@
 //! it is a best guess; the report says so.
 
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::lists::{ResultList, Row, RowSize};
 use crate::reports::{AgeFilter, ReportKind, LIMIT};
@@ -498,7 +498,17 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
     let kind = ReportKind::Orphans;
     let age = AgeFilter::new(now, min_age_days);
     let platform = Platform::current();
-    let apps = find_apps(tree, ROOT, platform);
+    // Installed apps come from the scan and, on macOS, straight from the
+    // usual application folders, so scanning just the home folder is enough.
+    let mut apps = find_apps(tree, ROOT, platform);
+    if platform == Platform::MacOs {
+        let mut dirs = vec![
+            PathBuf::from("/Applications"),
+            PathBuf::from("/System/Applications"),
+        ];
+        dirs.extend(dirs::home_dir().map(|h| h.join("Applications")));
+        apps.extend(installed_on_disk(&dirs));
+    }
     let mut title = kind.label().to_string();
     if min_age_days > 0 {
         title.push_str(&format!(" · ≥ {min_age_days} gündür dokunulmamış"));
@@ -515,11 +525,17 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
         return finish(
             Vec::new(),
             false,
-            "Bu taramada uygulama yok, bu yüzden sahipsiz veri belirlenemez. Diski tarayın: d → Macintosh HD."
-                .into(),
+            "Kurulu uygulama bulunamadı, bu yüzden sahipsiz veri belirlenemez.".into(),
         );
     }
     let (data, _) = data_folders(tree, platform);
+    if data.is_empty() {
+        return finish(
+            Vec::new(),
+            false,
+            "Bu taramada Library klasörü yok. Ev klasörünüzü (~) ya da diski tarayın.".into(),
+        );
+    }
     let (_, unmatched) = match_all(&apps, &data, &|id| vendor_children(tree, id));
     let mut found: Vec<(NodeId, String)> = unmatched
         .into_iter()
@@ -554,6 +570,41 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
         truncated,
         "Komut satırı araçları da veri tutabilir; silmeden önce Enter ile içine bakın.".into(),
     )
+}
+
+/// Apps installed in `dirs` (and their subfolders, e.g. Utilities), read
+/// from disk: only names and bundle ids are needed, not sizes. They are not
+/// in the tree, so their `id` is a placeholder.
+fn installed_on_disk(dirs: &[PathBuf]) -> Vec<App> {
+    const DEPTH: usize = 3;
+    let mut out = Vec::new();
+    let mut stack: Vec<(PathBuf, usize)> = dirs.iter().map(|d| (d.clone(), 0)).collect();
+    while let Some((dir, depth)) = stack.pop() {
+        let Ok(read) = std::fs::read_dir(&dir) else {
+            continue;
+        };
+        for entry in read.flatten() {
+            let Ok(kind) = entry.file_type() else {
+                continue;
+            };
+            if !kind.is_dir() {
+                continue;
+            }
+            let name = entry.file_name().to_string_lossy().into_owned();
+            if let Some(stem) = strip_suffix_ci(&name, ".app") {
+                let (bundle, aliases) = bundle_info(&entry.path());
+                out.push(App {
+                    id: ROOT,
+                    name: stem.to_string(),
+                    bundle,
+                    aliases,
+                });
+            } else if depth + 1 < DEPTH {
+                stack.push((entry.path(), depth + 1));
+            }
+        }
+    }
+    out
 }
 
 /// Lowercase name without spaces, dashes and underscores.
@@ -766,6 +817,31 @@ mod tests {
         assert!(is_system_data("crashreporter"));
         assert!(!is_system_data("com.spotify.client"));
         assert!(!is_system_data("oldtool"));
+    }
+
+    #[test]
+    fn reads_installed_apps_from_disk() {
+        let dir = tempfile::tempdir().unwrap();
+        let apps = dir.path();
+        let foo = apps.join("Foo.app/Contents");
+        std::fs::create_dir_all(&foo).unwrap();
+        std::fs::write(
+            foo.join("Info.plist"),
+            r#"<?xml version="1.0"?><plist version="1.0"><dict>
+            <key>CFBundleIdentifier</key><string>com.example.Foo</string>
+            <key>CFBundleName</key><string>FooApp</string></dict></plist>"#,
+        )
+        .unwrap();
+        std::fs::create_dir_all(apps.join("Utilities/Bar.app/Contents")).unwrap();
+        // Bundles are not entered: an app inside an app is not listed.
+        std::fs::create_dir_all(apps.join("Foo.app/Contents/Helpers/Inner.app")).unwrap();
+
+        let mut found = installed_on_disk(&[apps.to_path_buf(), apps.join("missing")]);
+        found.sort_by(|a, b| a.name.cmp(&b.name));
+        let names: Vec<&str> = found.iter().map(|a| a.name.as_str()).collect();
+        assert_eq!(names, vec!["Bar", "Foo"]);
+        assert_eq!(found[1].bundle.as_deref(), Some("com.example.foo"));
+        assert_eq!(found[1].aliases, vec!["fooapp".to_string()]);
     }
 
     #[test]

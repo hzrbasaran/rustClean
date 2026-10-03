@@ -375,6 +375,7 @@ impl Browser {
     fn open_menu_item(&mut self, item: MenuItem) {
         match item {
             MenuItem::Report(kind) => self.request_report(kind),
+            MenuItem::Leftovers => self.request_report(ReportKind::Orphans),
             MenuItem::Changes => self.open_snapshot_picker(),
             MenuItem::System => {
                 self.dashboard = None;

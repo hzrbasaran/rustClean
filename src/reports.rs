@@ -86,12 +86,14 @@ impl ReportKind {
 pub enum MenuItem {
     Report(ReportKind),
     Changes,
+    /// The orphaned leftovers report, listed again among the tools.
+    Leftovers,
     Tools,
     System,
 }
 
 impl MenuItem {
-    pub const ALL: [MenuItem; 12] = [
+    pub const ALL: [MenuItem; 13] = [
         MenuItem::Report(ReportKind::LargestFiles),
         MenuItem::Report(ReportKind::LargestDirs),
         MenuItem::Report(ReportKind::RepeatedNames),
@@ -102,6 +104,7 @@ impl MenuItem {
         MenuItem::Report(ReportKind::OldBig),
         MenuItem::Report(ReportKind::Duplicates),
         MenuItem::Changes,
+        MenuItem::Leftovers,
         MenuItem::Tools,
         MenuItem::System,
     ];
@@ -110,6 +113,7 @@ impl MenuItem {
         match self {
             MenuItem::Report(k) => k.label(),
             MenuItem::Changes => "Son taramadan bu yana değişenler",
+            MenuItem::Leftovers => "Silinmiş uygulama artıkları",
             MenuItem::Tools => "Geliştirici araçları temizliği",
             MenuItem::System => "Sistem verileri",
         }
@@ -120,6 +124,9 @@ impl MenuItem {
             MenuItem::Report(k) => k.description(),
             MenuItem::Changes => {
                 "Kayıtlı bir taramayla karşılaştırır: büyüyen, yeni ve silinen klasörler"
+            }
+            MenuItem::Leftovers => {
+                "Kaldırılmış uygulamalardan kalan veriler; ev klasörü taraması yeterli"
             }
             MenuItem::Tools => {
                 "Docker, Xcode, npm, Gradle… önbelleklerini aracın kendi komutuyla temizler"
