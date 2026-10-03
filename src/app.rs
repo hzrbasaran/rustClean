@@ -440,7 +440,7 @@ impl Browser {
             }
             _ => {
                 let now = crate::ui::now_secs();
-                let list = reports::run(&self.tree, self.current, self.size_mode, now, kind);
+                let list = reports::run(&self.tree, self.current, self.size_mode, now, kind, 0);
                 self.results = Some(list);
             }
         }
@@ -640,6 +640,26 @@ impl Browser {
             Ok(ids) => self.request_delete(ids),
             Err(msg) => self.set_status(msg, true),
         }
+    }
+
+    /// `f` in a report: re-runs it with the next minimum age.
+    fn cycle_age_filter(&mut self) {
+        let Some(r) = &self.results else {
+            return;
+        };
+        let Some(kind) = r.report.filter(|k| k.supports_age()) else {
+            self.set_status("Bu listede yaş filtresi yok.", true);
+            return;
+        };
+        let steps = reports::AGE_STEPS;
+        let next = steps
+            .iter()
+            .position(|&d| d == r.min_age_days)
+            .map_or(0, |i| (i + 1) % steps.len());
+        let base = r.base;
+        let now = crate::ui::now_secs();
+        let list = reports::run(&self.tree, base, self.size_mode, now, kind, steps[next]);
+        self.results = Some(list);
     }
 
     /// Shows the basket as a result list.
@@ -997,6 +1017,7 @@ impl Browser {
             KeyCode::Char('t') => self.toggle_all_rows(),
             KeyCode::Char('x') | KeyCode::Delete => self.delete_key(),
             KeyCode::Char('S') => self.open_basket(),
+            KeyCode::Char('f') => self.cycle_age_filter(),
             KeyCode::Char('c') if r.basket_view => {
                 self.basket.clear();
                 self.refresh_basket_view();

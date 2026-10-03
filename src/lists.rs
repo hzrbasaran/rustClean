@@ -116,6 +116,10 @@ pub struct ResultList {
     pub keep: Option<NodeId>,
     /// This list shows the basket itself.
     pub basket_view: bool,
+    /// The report this list came from, to run it again with another filter.
+    pub report: Option<crate::reports::ReportKind>,
+    /// Minimum age filter applied to the report, in days.
+    pub min_age_days: u32,
     /// The group list this list was drilled down from.
     pub parent: Option<Box<ResultList>>,
 }
@@ -135,6 +139,8 @@ impl ResultList {
             keep_one: false,
             keep: None,
             basket_view: false,
+            report: None,
+            min_age_days: 0,
             parent: None,
         }
     }

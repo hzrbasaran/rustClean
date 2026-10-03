@@ -45,6 +45,18 @@ impl ReportKind {
         }
     }
 
+    /// Whether `f` (minimum age) applies to this report.
+    pub fn supports_age(self) -> bool {
+        matches!(
+            self,
+            ReportKind::LargestFiles
+                | ReportKind::LargestDirs
+                | ReportKind::RepeatedNames
+                | ReportKind::DevJunk
+                | ReportKind::Caches
+        )
+    }
+
     pub fn description(self) -> &'static str {
         match self {
             ReportKind::LargestFiles => "Bu klasörün altındaki en büyük 200 dosya",
@@ -115,23 +127,60 @@ impl MenuItem {
     }
 }
 
+/// Steps of the `f` key, in days (0 = no filter).
+pub const AGE_STEPS: [u32; 5] = [0, 30, 90, 180, 365];
+
+/// Keeps entries untouched for at least `min_days`.
+#[derive(Debug, Clone, Copy)]
+pub struct AgeFilter {
+    now: u64,
+    min_days: u32,
+}
+
+impl AgeFilter {
+    pub fn new(now: u64, min_days: u32) -> Self {
+        Self { now, min_days }
+    }
+
+    /// Entries with an unknown date only pass when there is no filter.
+    pub fn ok(&self, modified: u32) -> bool {
+        self.min_days == 0
+            || (modified != 0
+                && self.now.saturating_sub(u64::from(modified)) >= u64::from(self.min_days) * DAY)
+    }
+}
+
 /// Runs one of the reports that only need the tree. Apps and duplicates
-/// have their own modules.
-pub fn run(tree: &Tree, base: NodeId, mode: SizeMode, now: u64, kind: ReportKind) -> ResultList {
+/// have their own modules. `min_age_days` applies where `supports_age`.
+pub fn run(
+    tree: &Tree,
+    base: NodeId,
+    mode: SizeMode,
+    now: u64,
+    kind: ReportKind,
+    min_age_days: u32,
+) -> ResultList {
+    let age = AgeFilter::new(now, if kind.supports_age() { min_age_days } else { 0 });
     let (rows, truncated, note) = match kind {
-        ReportKind::LargestFiles => largest_files(tree, base, mode),
-        ReportKind::LargestDirs => largest_dirs(tree, base, mode),
-        ReportKind::RepeatedNames => repeated_names(tree, base, mode),
-        ReportKind::DevJunk => dev_junk(tree, base, mode),
-        ReportKind::Caches => caches(tree, base, mode),
+        ReportKind::LargestFiles => largest_files(tree, base, mode, age),
+        ReportKind::LargestDirs => largest_dirs(tree, base, mode, age),
+        ReportKind::RepeatedNames => repeated_names(tree, base, mode, age),
+        ReportKind::DevJunk => dev_junk(tree, base, mode, age),
+        ReportKind::Caches => caches(tree, base, mode, age),
         ReportKind::OldBig => old_big(tree, base, mode, now),
         ReportKind::Apps | ReportKind::Duplicates => {
             unreachable!("{kind:?} is computed elsewhere")
         }
     };
-    let mut list = ResultList::new(kind.label().to_string(), base, rows);
+    let mut title = kind.label().to_string();
+    if age.min_days > 0 {
+        title.push_str(&format!(" · ≥ {} gündür dokunulmamış", age.min_days));
+    }
+    let mut list = ResultList::new(title, base, rows);
     list.truncated = truncated;
     list.note = note.to_string();
+    list.report = Some(kind);
+    list.min_age_days = age.min_days;
     list
 }
 
@@ -206,11 +255,11 @@ fn by_size(
     (items, truncated)
 }
 
-fn largest_files(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
+fn largest_files(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
     let mut top = Top::default();
     walk(tree, base, |id| {
         let n = tree.node(id);
-        if !n.is_dir {
+        if !n.is_dir && age.ok(n.modified) {
             top.push(n.size.get(mode), id);
         }
         true
@@ -225,7 +274,7 @@ fn largest_files(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     (rows, truncated, "Enter: dosyanın bulunduğu klasörü aç")
 }
 
-fn largest_dirs(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
+fn largest_dirs(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
     let mut top = Top::default();
     walk(tree, base, |id| {
         let n = tree.node(id);
@@ -240,7 +289,7 @@ fn largest_dirs(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
             .max()
             .unwrap_or(0);
         let wrapper = total > 0 && biggest_child as f64 > total as f64 * WRAPPER_SHARE;
-        if total > 0 && !wrapper {
+        if total > 0 && !wrapper && age.ok(n.modified) {
             top.push(total, id);
         }
         true
@@ -311,7 +360,22 @@ fn dev_junk_kind(tree: &Tree, id: NodeId) -> Option<&'static str> {
     Some(kind)
 }
 
-fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
+/// When the project around a junk folder was last touched: the newest
+/// change among its other entries. Reinstalling dependencies refreshes
+/// `node_modules` but says nothing about whether the project is in use.
+fn project_modified(tree: &Tree, junk: NodeId) -> u32 {
+    tree.parent(junk)
+        .map(|p| {
+            tree.children(p)
+                .filter(|&c| c != junk)
+                .map(|c| tree.node(c).modified)
+                .max()
+                .unwrap_or(0)
+        })
+        .unwrap_or(0)
+}
+
+fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
     let mut found = Vec::new();
     walk(tree, base, |id| {
         if !tree.node(id).is_dir {
@@ -319,7 +383,15 @@ fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
         }
         match dev_junk_kind(tree, id) {
             Some(kind) => {
-                found.push((id, kind.to_string()));
+                let project = project_modified(tree, id);
+                if age.ok(project) {
+                    let detail = if project == 0 {
+                        kind.to_string()
+                    } else {
+                        format!("{kind} · proje: {}", crate::ui::fmt_date(project))
+                    };
+                    found.push((id, detail));
+                }
                 false
             }
             None => true,
@@ -334,7 +406,7 @@ fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     )
 }
 
-fn caches(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
+fn caches(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
     const CONTAINERS: [&str; 2] = ["caches", ".cache"];
     const SELF: [&str; 6] = [
         "cache",
@@ -367,7 +439,7 @@ fn caches(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     if visit_dir(base) {
         walk(tree, base, &mut visit_dir);
     }
-    found.retain(|(id, _)| tree.node(*id).size.get(mode) > 0);
+    found.retain(|(id, _)| tree.node(*id).size.get(mode) > 0 && age.ok(tree.node(*id).modified));
     let (items, truncated) = by_size(tree, mode, found);
     let rows = singles(tree, base, mode, items);
     (
@@ -411,12 +483,12 @@ impl Hasher for IdentityHasher {
 
 type HashKeyed<V> = HashMap<u64, V, BuildHasherDefault<IdentityHasher>>;
 
-fn repeated_names(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
+fn repeated_names(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {
     // Pass 1: count per name (by hash, to keep memory small on big disks).
     let mut counts: HashKeyed<(u32, u64)> = HashKeyed::default();
     walk(tree, base, |id| {
         let n = tree.node(id);
-        if !n.is_dir {
+        if !n.is_dir && age.ok(n.modified) {
             let e = counts.entry(name_hash(tree.name(id))).or_default();
             e.0 += 1;
             e.1 += n.size.get(mode);
@@ -441,7 +513,7 @@ fn repeated_names(tree: &Tree, base: NodeId, mode: SizeMode) -> Report {
     let mut members: Vec<Vec<(NodeId, u64)>> = vec![Vec::new(); repeated.len()];
     walk(tree, base, |id| {
         let n = tree.node(id);
-        if !n.is_dir {
+        if !n.is_dir && age.ok(n.modified) {
             if let Some(&i) = order.get(&name_hash(tree.name(id))) {
                 members[i].push((id, n.size.get(mode)));
             }
@@ -478,7 +550,7 @@ mod tests {
     }
 
     fn report(t: &Tree, kind: ReportKind) -> ResultList {
-        run(t, ROOT, SizeMode::Disk, 1000 * DAY, kind)
+        run(t, ROOT, SizeMode::Disk, 1000 * DAY, kind, 0)
     }
 
     #[test]
@@ -529,7 +601,7 @@ mod tests {
         t.set_times(old_small, (now - 400 * DAY) as u32, 0);
         t.push(ROOT, "unknown_date", false, sz(OLD_BIG_SIZE * 3));
         t.finalize();
-        let l = run(&t, ROOT, SizeMode::Disk, now, ReportKind::OldBig);
+        let l = run(&t, ROOT, SizeMode::Disk, now, ReportKind::OldBig, 0);
         assert_eq!(labels(&l), vec!["old_big"]);
     }
 
@@ -562,7 +634,7 @@ mod tests {
             labels(&l),
             vec!["rust/target/", "web/node_modules/", "app/bin/", "py/.venv/"]
         );
-        assert_eq!(l.rows[0].detail, "Rust derleme çıktısı");
+        assert!(l.rows[0].detail.starts_with("Rust derleme çıktısı"));
     }
 
     #[test]
@@ -590,8 +662,47 @@ mod tests {
         );
 
         // Opened directly on a cache container, its entries are listed.
-        let l = run(&t, caches, SizeMode::Disk, 0, ReportKind::Caches);
+        let l = run(&t, caches, SizeMode::Disk, 0, ReportKind::Caches, 0);
         assert_eq!(labels(&l), vec!["com.a/", "com.b/"]);
+    }
+
+    #[test]
+    fn age_filter_uses_project_age_for_dev_junk() {
+        let now = 1000 * DAY;
+        let ago = |d: u64| (now - d * DAY) as u32;
+        let mut t = Tree::new(Path::new("/r"));
+        // Old project whose node_modules was reinstalled yesterday.
+        let old = t.push(ROOT, "eski", true, sz(0));
+        let pkg = t.push(old, "package.json", false, sz(1));
+        t.set_times(pkg, ago(400), 0);
+        let nm = t.push(old, "node_modules", true, sz(0));
+        let lib = t.push(nm, "lib.js", false, sz(500));
+        t.set_times(lib, ago(1), 0);
+        // Project in active use.
+        let new = t.push(ROOT, "yeni", true, sz(0));
+        let pkg = t.push(new, "package.json", false, sz(1));
+        t.set_times(pkg, ago(3), 0);
+        let nm = t.push(new, "node_modules", true, sz(0));
+        let lib = t.push(nm, "lib.js", false, sz(900));
+        t.set_times(lib, ago(3), 0);
+        t.finalize();
+
+        let all = run(&t, ROOT, SizeMode::Disk, now, ReportKind::DevJunk, 0);
+        assert_eq!(
+            labels(&all),
+            vec!["yeni/node_modules/", "eski/node_modules/"]
+        );
+        let stale = run(&t, ROOT, SizeMode::Disk, now, ReportKind::DevJunk, 90);
+        assert_eq!(labels(&stale), vec!["eski/node_modules/"]);
+        assert!(stale.title.contains("≥ 90 gün"));
+        assert_eq!(stale.min_age_days, 90);
+
+        // Files: the date of the file itself.
+        let files = run(&t, ROOT, SizeMode::Disk, now, ReportKind::LargestFiles, 180);
+        assert_eq!(labels(&files), vec!["eski/package.json"]);
+        // Not supported: the filter is ignored.
+        let old_big = run(&t, ROOT, SizeMode::Disk, now, ReportKind::OldBig, 90);
+        assert_eq!(old_big.min_age_days, 0);
     }
 
     #[test]

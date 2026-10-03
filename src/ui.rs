@@ -372,6 +372,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("↑↓", "gez"),
             ("Space", "sepete"),
             ("t", "tümü"),
+            ("f", "yaş filtresi"),
             ("x", "çöpe taşı"),
             ("S", "sepet"),
             ("Enter", "aç / konuma git"),
