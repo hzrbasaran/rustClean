@@ -15,7 +15,12 @@ use flate2::write::DeflateEncoder;
 use flate2::Compression;
 use xxhash_rust::xxh3::xxh3_64;
 
-use crate::tree::{NodeId, Size, Tree, ROOT};
+use std::collections::{HashMap, HashSet};
+
+use crate::lists::Row;
+use crate::reports::LIMIT;
+use crate::tree::{NodeId, Size, SizeMode, Tree, ROOT};
+use crate::ui::{fmt_delta, fmt_size};
 
 pub const MIN_DIR: u64 = 1024 * 1024;
 pub const MIN_FILE: u64 = 100 * 1024 * 1024;
@@ -171,6 +176,141 @@ pub fn load(file: &Path) -> io::Result<Snapshot> {
     Ok(Snapshot { header, entries })
 }
 
+/// A directory is skipped when one subdirectory carries more than this
+/// share of its change: growth shows up in every parent otherwise.
+const WRAPPER_SHARE: f64 = 0.9;
+
+/// What changed below `base` since `snap`: rows for entries that grew,
+/// shrank or appeared by at least `MIN_DIR`, largest growth first, plus a
+/// note about what disappeared.
+pub fn changes(
+    tree: &Tree,
+    base: NodeId,
+    snap: &Snapshot,
+    mode: SizeMode,
+) -> (Vec<Row>, bool, String) {
+    let base_rel = rel_path(tree, base);
+    let under_base =
+        |p: &str| base_rel.is_empty() || p == base_rel || p.starts_with(&format!("{base_rel}/"));
+    let old: HashMap<&str, u64> = snap
+        .entries
+        .iter()
+        .filter(|e| under_base(&e.path))
+        .map(|e| (e.path.as_str(), e.size.get(mode)))
+        .collect();
+
+    // Walk the current tree where anything could have changed by MIN_DIR.
+    struct Change {
+        id: NodeId,
+        delta: i128,
+        is_new: bool,
+    }
+    let mut found: Vec<Change> = Vec::new();
+    let mut delta_of: HashMap<NodeId, i128> = HashMap::new();
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut stack: Vec<(NodeId, String)> = vec![(base, base_rel.clone())];
+    while let Some((dir, prefix)) = stack.pop() {
+        for id in tree.children(dir) {
+            let n = tree.node(id);
+            let path = if prefix.is_empty() {
+                tree.name(id).to_string()
+            } else {
+                format!("{prefix}/{}", tree.name(id))
+            };
+            let now = n.size.get(mode);
+            let then = old.get(path.as_str()).copied();
+            let tracked = if n.is_dir { MIN_DIR } else { MIN_FILE };
+            if now < tracked && then.is_none() {
+                continue;
+            }
+            let delta = i128::from(now) - i128::from(then.unwrap_or(0));
+            delta_of.insert(id, delta);
+            if delta.unsigned_abs() >= u128::from(MIN_DIR) {
+                found.push(Change {
+                    id,
+                    delta,
+                    is_new: then.is_none(),
+                });
+            }
+            if n.is_dir {
+                stack.push((id, path.clone()));
+            }
+            seen.insert(path);
+        }
+    }
+
+    // Drop directories whose change sits almost entirely in one child.
+    found.retain(|c| {
+        let biggest_child = tree
+            .children(c.id)
+            .filter_map(|ch| delta_of.get(&ch))
+            .filter(|d| d.signum() == c.delta.signum())
+            .map(|d| d.unsigned_abs())
+            .max()
+            .unwrap_or(0);
+        biggest_child as f64 <= c.delta.unsigned_abs() as f64 * WRAPPER_SHARE
+    });
+    found.sort_by_key(|c| std::cmp::Reverse(c.delta));
+    let truncated = found.len() > LIMIT;
+    found.truncate(LIMIT);
+    let rows = found
+        .iter()
+        .map(|c| {
+            let now = tree.node(c.id).size.get(mode);
+            let detail = if c.is_new {
+                format!("yeni (+{})", fmt_size(now))
+            } else {
+                fmt_delta(now, (i128::from(now) - c.delta) as u64)
+            };
+            Row::single(tree, base, c.id, mode, detail)
+        })
+        .collect();
+
+    // Entries that are gone; only the topmost of a removed subtree.
+    let mut gone: Vec<(&str, u64)> = old
+        .iter()
+        .filter(|(p, _)| !seen.contains(**p) && **p != base_rel)
+        .filter(|(p, _)| {
+            p.rsplit_once('/')
+                .is_none_or(|(parent, _)| seen.contains(parent) || parent == base_rel)
+        })
+        .map(|(p, s)| (*p, *s))
+        .collect();
+    gone.sort_by_key(|&(p, s)| (std::cmp::Reverse(s), p));
+    let note = if gone.is_empty() {
+        String::from("Silinen büyük öğe yok.")
+    } else {
+        let total: u64 = gone.iter().map(|g| g.1).sum();
+        let names: Vec<String> = gone
+            .iter()
+            .take(3)
+            .map(|(p, s)| {
+                let p = p.strip_prefix(&format!("{base_rel}/")).unwrap_or(p);
+                format!("{p} ({})", fmt_size(*s))
+            })
+            .collect();
+        format!(
+            "Silinenler: {} öğe, {} — {}",
+            gone.len(),
+            fmt_size(total),
+            names.join(", ")
+        )
+    };
+    (rows, truncated, note)
+}
+
+/// Path of `id` relative to the root, '/'-joined (empty for the root).
+fn rel_path(tree: &Tree, id: NodeId) -> String {
+    let mut names = Vec::new();
+    let mut cur = id;
+    while let Some(parent) = tree.parent(cur) {
+        names.push(tree.name(cur));
+        cur = parent;
+    }
+    names.reverse();
+    names.join("/")
+}
+
 fn prune(dir: &Path) -> io::Result<()> {
     for old in list(dir).into_iter().skip(KEEP) {
         fs::remove_file(old.file)?;
@@ -314,6 +454,53 @@ mod tests {
         fs::write(dir.path().join("junk.rcs"), b"not deflate data").unwrap();
         fs::write(dir.path().join("notes.txt"), b"hello").unwrap();
         assert!(list(dir.path()).is_empty());
+    }
+
+    #[test]
+    fn changes_since_snapshot() {
+        // Then: big/ (150 MiB film), old/ (5 MiB), stable/ (2 MiB).
+        let mut then = Tree::new(Path::new("/data"));
+        let big = then.push(ROOT, "big", true, sz(0));
+        let inner = then.push(big, "iç klasör", true, sz(0));
+        then.push(inner, "film.mkv", false, sz(150 * MIB));
+        let old = then.push(ROOT, "old", true, sz(0));
+        let old_sub = then.push(old, "sub", true, sz(0));
+        then.push(old_sub, "x", false, sz(5 * MIB));
+        let stable = then.push(ROOT, "stable", true, sz(0));
+        then.push(stable, "s", false, sz(2 * MIB));
+        then.finalize();
+        let snap = capture(&then, 100);
+
+        // Now: the film's folder grew by 40 MiB, old/ is gone, new/ appeared.
+        let mut now = Tree::new(Path::new("/data"));
+        let big = now.push(ROOT, "big", true, sz(0));
+        let inner = now.push(big, "iç klasör", true, sz(0));
+        now.push(inner, "film.mkv", false, sz(150 * MIB));
+        now.push(inner, "film2.mkv", false, sz(40 * MIB));
+        let new = now.push(ROOT, "new", true, sz(0));
+        now.push(new, "n", false, sz(3 * MIB));
+        let stable = now.push(ROOT, "stable", true, sz(0));
+        now.push(stable, "s", false, sz(2 * MIB));
+        now.finalize();
+
+        let (rows, truncated, note) = changes(&now, ROOT, &snap, SizeMode::Disk);
+        let got: Vec<(&str, &str)> = rows
+            .iter()
+            .map(|r| (r.label.as_str(), r.detail.as_str()))
+            .collect();
+        // "big/" only wraps "big/iç klasör/", so it is not listed.
+        assert_eq!(
+            got,
+            vec![("big/iç klasör/", "+40.0 MiB"), ("new/", "yeni (+3.0 MiB)")]
+        );
+        assert!(!truncated);
+        assert_eq!(note, "Silinenler: 1 öğe, 5.0 MiB — old (5.0 MiB)");
+
+        // Below "big" only.
+        let (rows, _, note) = changes(&now, big, &snap, SizeMode::Disk);
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].label, "iç klasör/");
+        assert_eq!(note, "Silinen büyük öğe yok.");
     }
 
     #[test]

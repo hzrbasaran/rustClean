@@ -14,7 +14,7 @@ use crate::disks::{self, DiskInfo};
 use crate::duplicates::{self, DupJob};
 use crate::history;
 use crate::lists::{ResultList, Row, RowSize};
-use crate::reports::{self, ReportKind};
+use crate::reports::{self, MenuItem, ReportKind};
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::search;
 use crate::stats::{self, Stats};
@@ -146,6 +146,8 @@ pub struct Browser {
     pub dashboard: Option<Dashboard>,
     /// Selected row of the open report menu.
     pub report_menu: Option<usize>,
+    /// Saved scans to compare with, and the selected one.
+    pub snapshot_picker: Option<(Vec<history::Saved>, usize)>,
     /// Report to run once the "preparing" message has been drawn.
     pending_report: Option<(ReportKind, u8)>,
     /// Running duplicate search.
@@ -180,6 +182,7 @@ impl Browser {
             results: None,
             dashboard: None,
             report_menu: None,
+            snapshot_picker: None,
             pending_report: None,
             dup_job: None,
             snapshot_time: None,
@@ -332,6 +335,54 @@ impl Browser {
         let mut list = ResultList::new(format!("Arama „{pattern}”"), base, rows, true);
         list.note = "Eşleşen klasörlerin içi ayrıca listelenmez; klasörle birlikte taşınır.".into();
         list.pattern = Some(pattern);
+        self.results = Some(list);
+    }
+
+    fn open_menu_item(&mut self, item: MenuItem) {
+        match item {
+            MenuItem::Report(kind) => self.request_report(kind),
+            MenuItem::Changes => self.open_snapshot_picker(),
+            MenuItem::Tools | MenuItem::System => {
+                self.set_status(format!("{}: henüz hazır değil.", item.label()), true);
+            }
+        }
+    }
+
+    fn open_snapshot_picker(&mut self) {
+        let saved: Vec<history::Saved> = history::dir_for(self.tree.root_path())
+            .map(|d| history::list(&d))
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|s| Some(s.header.time) != self.snapshot_time)
+            .collect();
+        if saved.is_empty() {
+            self.set_status(
+                "Bu klasörün kayıtlı eski bir taraması yok; bir sonraki taramadan sonra karşılaştırabilirsiniz.",
+                true,
+            );
+        } else {
+            self.snapshot_picker = Some((saved, 0));
+        }
+    }
+
+    fn compare_with(&mut self, file: &std::path::Path) {
+        let snap = match history::load(file) {
+            Ok(s) => s,
+            Err(e) => {
+                self.set_status(format!("Kayıt okunamadı: {e}"), true);
+                return;
+            }
+        };
+        self.dashboard = None;
+        let (rows, truncated, note) =
+            history::changes(&self.tree, self.current, &snap, self.size_mode);
+        let title = format!(
+            "Değişenler ({} taramasına göre)",
+            crate::ui::fmt_date(snap.header.time.min(u64::from(u32::MAX)) as u32)
+        );
+        let mut list = ResultList::new(title, self.current, rows, false);
+        list.truncated = truncated;
+        list.note = note;
         self.results = Some(list);
     }
 
@@ -663,16 +714,33 @@ impl Browser {
         }
         self.status = None;
         if let Some(sel) = &mut self.report_menu {
-            let n = ReportKind::ALL.len();
+            let n = MenuItem::ALL.len();
             match code {
                 KeyCode::Up | KeyCode::Char('k') => *sel = (*sel + n - 1) % n,
                 KeyCode::Down | KeyCode::Char('j') => *sel = (*sel + 1) % n,
                 KeyCode::Enter => {
-                    let kind = ReportKind::ALL[*sel];
-                    self.request_report(kind);
+                    let item = MenuItem::ALL[*sel];
+                    self.report_menu = None;
+                    self.open_menu_item(item);
                 }
                 KeyCode::Char('q') => return Action::Quit,
                 KeyCode::Esc | KeyCode::Char('m') => self.report_menu = None,
+                _ => {}
+            }
+            return Action::None;
+        }
+        if let Some((saved, sel)) = &mut self.snapshot_picker {
+            let n = saved.len();
+            match code {
+                KeyCode::Up | KeyCode::Char('k') => *sel = (*sel + n - 1) % n,
+                KeyCode::Down | KeyCode::Char('j') => *sel = (*sel + 1) % n,
+                KeyCode::Enter => {
+                    let file = saved[*sel].file.clone();
+                    self.snapshot_picker = None;
+                    self.compare_with(&file);
+                }
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Esc => self.snapshot_picker = None,
                 _ => {}
             }
             return Action::None;

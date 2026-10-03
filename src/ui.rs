@@ -10,7 +10,7 @@ use ratatui::Frame;
 
 use crate::app::{App, Browser, Dashboard, Pane, Screen};
 use crate::lists::ResultList;
-use crate::reports::ReportKind;
+use crate::reports::MenuItem;
 use crate::stats;
 use crate::tree::{NodeId, SizeMode, Tree};
 
@@ -285,7 +285,7 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
 
     let footer_keys: &[(&str, &str)] = if b.dup_job.is_some() {
         &[("Esc", "iptal"), ("q", "çık")]
-    } else if b.report_menu.is_some() {
+    } else if b.report_menu.is_some() || b.snapshot_picker.is_some() {
         &[("↑↓", "seç"), ("Enter", "çalıştır"), ("Esc", "kapat")]
     } else if b.confirm.is_some() {
         &[("e", "evet, çöpe taşı"), ("h / Esc", "vazgeç")]
@@ -336,15 +336,86 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
     if let Some(sel) = b.report_menu {
         render_report_menu(f, sel, f.area());
     }
+    if let Some((saved, sel)) = &b.snapshot_picker {
+        let total = b.tree.node(crate::tree::ROOT).size.disk;
+        render_snapshot_picker(f, saved, *sel, total, f.area());
+    }
     if let Some(ids) = &b.confirm {
         render_confirm(f, &b.tree, ids, mode, f.area());
     }
 }
 
+fn render_snapshot_picker(
+    f: &mut Frame,
+    saved: &[crate::history::Saved],
+    selected: usize,
+    total_now: u64,
+    area: Rect,
+) {
+    let width = area.width.saturating_sub(4).min(84);
+    let now = now_secs();
+    let mut lines = vec![Line::from("")];
+    for (i, s) in saved.iter().enumerate() {
+        let h = &s.header;
+        let style = if i == selected {
+            HIGHLIGHT
+        } else {
+            Style::new()
+        };
+        lines.push(
+            Line::from(vec![
+                Span::raw(if i == selected { "▶ " } else { "  " }),
+                Span::raw(fmt_date(h.time.min(u64::from(u32::MAX)) as u32))
+                    .white()
+                    .bold(),
+                Span::raw(format!("  {:<16}", fmt_ago(now.saturating_sub(h.time)))).gray(),
+                Span::raw(format!("toplam {:>10}", fmt_size(h.total.disk))),
+                Span::raw(format!(
+                    "   şimdiye göre {}",
+                    fmt_delta(total_now, h.total.disk)
+                ))
+                .yellow(),
+            ])
+            .style(style),
+        );
+    }
+    lines.push(Line::from(""));
+    lines.push(Line::from(" Karşılaştırma bulunduğunuz klasörün altında yapılır.").gray());
+    let height = (lines.len() as u16 + 2).min(area.height);
+    let popup = Rect {
+        x: area.x + (area.width.saturating_sub(width)) / 2,
+        y: area.y + (area.height.saturating_sub(height)) / 2,
+        width,
+        height,
+    };
+    f.render_widget(Clear, popup);
+    f.render_widget(
+        Paragraph::new(lines).block(
+            Block::bordered()
+                .title(
+                    Span::raw(" Hangi taramayla karşılaştırılsın? ")
+                        .white()
+                        .bold(),
+                )
+                .border_style(Style::new().fg(Color::Cyan)),
+        ),
+        popup,
+    );
+}
+
 fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
     let width = area.width.saturating_sub(4).min(84);
-    let mut lines = vec![Line::from("")];
-    for (i, kind) in ReportKind::ALL.iter().enumerate() {
+    let mut lines = Vec::new();
+    for (i, item) in MenuItem::ALL.iter().enumerate() {
+        if i == 0 || item.is_tool() != MenuItem::ALL[i - 1].is_tool() {
+            let heading = if item.is_tool() {
+                " Araçlar"
+            } else {
+                " Raporlar"
+            };
+            lines.push(Line::from(""));
+            lines.push(Line::from(heading).cyan().bold());
+        }
         let marker = if i == selected { "▶ " } else { "  " };
         let style = if i == selected {
             HIGHLIGHT
@@ -354,14 +425,14 @@ fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
         lines.push(
             Line::from(vec![
                 Span::raw(marker),
-                Span::raw(format!("{}. ", i + 1)).gray(),
-                Span::raw(kind.label()).white().bold(),
+                Span::raw(format!("{:>2}. ", i + 1)).gray(),
+                Span::raw(item.label()).white().bold(),
             ])
             .style(style),
         );
-        lines.push(Line::from(format!("       {}", kind.description())).gray());
     }
     lines.push(Line::from(""));
+    lines.push(Line::from(format!(" {}", MenuItem::ALL[selected].description())).yellow());
     lines.push(
         Line::from(" Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama).")
             .gray(),
@@ -378,7 +449,7 @@ fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
     f.render_widget(
         Paragraph::new(lines).block(
             Block::bordered()
-                .title(Span::raw(" Raporlar ").white().bold())
+                .title(Span::raw(" Menü ").white().bold())
                 .border_style(Style::new().fg(Color::Cyan)),
         ),
         popup,
@@ -571,7 +642,7 @@ pub fn now_secs() -> u64 {
 }
 
 /// Local date and time, e.g. "03.10.2026 14:22".
-fn fmt_date(secs: u32) -> String {
+pub fn fmt_date(secs: u32) -> String {
     chrono::DateTime::from_timestamp(i64::from(secs), 0)
         .map(|t| {
             t.with_timezone(&chrono::Local)

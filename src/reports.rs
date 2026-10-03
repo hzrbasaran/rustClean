@@ -32,17 +32,6 @@ pub enum ReportKind {
 }
 
 impl ReportKind {
-    pub const ALL: [ReportKind; 8] = [
-        ReportKind::LargestFiles,
-        ReportKind::LargestDirs,
-        ReportKind::RepeatedNames,
-        ReportKind::Apps,
-        ReportKind::DevJunk,
-        ReportKind::Caches,
-        ReportKind::OldBig,
-        ReportKind::Duplicates,
-    ];
-
     pub fn label(self) -> &'static str {
         match self {
             ReportKind::LargestFiles => "En büyük dosyalar",
@@ -71,6 +60,58 @@ impl ReportKind {
                 "İçeriği birebir aynı dosyalar (≥ 1 MiB); dosyalar okunur, sürebilir"
             }
         }
+    }
+}
+
+/// An entry of the `m` menu.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MenuItem {
+    Report(ReportKind),
+    Changes,
+    Tools,
+    System,
+}
+
+impl MenuItem {
+    pub const ALL: [MenuItem; 11] = [
+        MenuItem::Report(ReportKind::LargestFiles),
+        MenuItem::Report(ReportKind::LargestDirs),
+        MenuItem::Report(ReportKind::RepeatedNames),
+        MenuItem::Report(ReportKind::Apps),
+        MenuItem::Report(ReportKind::DevJunk),
+        MenuItem::Report(ReportKind::Caches),
+        MenuItem::Report(ReportKind::OldBig),
+        MenuItem::Report(ReportKind::Duplicates),
+        MenuItem::Changes,
+        MenuItem::Tools,
+        MenuItem::System,
+    ];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            MenuItem::Report(k) => k.label(),
+            MenuItem::Changes => "Son taramadan bu yana değişenler",
+            MenuItem::Tools => "Geliştirici araçları temizliği",
+            MenuItem::System => "Sistem verileri",
+        }
+    }
+
+    pub fn description(self) -> &'static str {
+        match self {
+            MenuItem::Report(k) => k.description(),
+            MenuItem::Changes => {
+                "Kayıtlı bir taramayla karşılaştırır: büyüyen, yeni ve silinen klasörler"
+            }
+            MenuItem::Tools => {
+                "Docker, Xcode, npm, Gradle… önbelleklerini aracın kendi komutuyla temizler"
+            }
+            MenuItem::System => "APFS bölümleri, Time Machine anlık görüntüleri, takas dosyası",
+        }
+    }
+
+    /// Items after the reports form the "Araçlar" section.
+    pub fn is_tool(self) -> bool {
+        !matches!(self, MenuItem::Report(_))
     }
 }
 
