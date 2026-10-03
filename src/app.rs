@@ -1,6 +1,6 @@
 //! Application state and key handling.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::mpsc::TryRecvError;
 use std::time::Duration;
@@ -128,6 +128,36 @@ fn oldest(tree: &Tree, ids: &[NodeId]) -> Option<usize> {
         }
     };
     (0..ids.len()).min_by_key(|&i| (age(ids[i]), i))
+}
+
+/// Sizes of a duplicate group's members, and how many are APFS clones of
+/// another member. Of each set of clones only one keeps its full size; the
+/// others count their private bytes, which is all deleting them would free.
+/// (In disk mode the scan already gave the full size to whichever clone it
+/// met first, which need not be the group's first member.)
+fn member_sizes(tree: &Tree, ids: &[NodeId], mode: SizeMode) -> (Vec<(NodeId, u64)>, usize) {
+    let mut members: Vec<(NodeId, u64)> = ids
+        .iter()
+        .map(|&id| (id, tree.node(id).size.get(mode)))
+        .collect();
+    let mut first_of: HashMap<u64, usize> = HashMap::new();
+    let mut clones = 0;
+    for i in 0..members.len() {
+        let Some((clone_id, private)) = tree.clone_of(members[i].0) else {
+            continue;
+        };
+        match first_of.get(&clone_id) {
+            None => {
+                first_of.insert(clone_id, i);
+            }
+            Some(&f) => {
+                clones += 1;
+                members[f].1 = members[f].1.max(members[i].1);
+                members[i].1 = members[i].1.min(private);
+            }
+        }
+    }
+    (members, clones)
 }
 
 /// How the current directory is shown.
@@ -553,16 +583,17 @@ impl Browser {
             .into_iter()
             .map(|ids| {
                 let first = ids[0];
-                let detail = tf!(
+                let (members, clones) = member_sizes(tree, &ids, mode);
+                let each = members.iter().map(|m| m.1).max().unwrap_or(0);
+                let mut detail = tf!(
                     "{} kopya · her biri {}",
                     "{} copies · {} each",
                     ids.len(),
-                    crate::ui::fmt_size(tree.node(first).size.get(mode))
+                    crate::ui::fmt_size(each)
                 );
-                let members = ids
-                    .iter()
-                    .map(|&id| (id, tree.node(id).size.get(mode)))
-                    .collect();
+                if clones > 0 {
+                    detail += &tf!(" · {} APFS klonu", " · {} APFS clones", clones);
+                }
                 Row::group(
                     tree.name(first).to_string(),
                     detail,
@@ -580,9 +611,11 @@ impl Browser {
         list.keep_one = true;
         list.note = t!(
             "Boyut: kopyalar silinince açılacak yer. Space: en eski kopya hariç sepete ekle · \
-             Enter: kopyaları gör. APFS klonları blok paylaştığından silmek yer açmayabilir.",
+             Enter: kopyaları gör. APFS klonları blok paylaşır: disk boyutunda bir kez sayılır, \
+             silmek yer açmaz.",
             "Size: space freed by deleting the copies. Space: add all but the oldest copy to the \
-             basket · Enter: see the copies. APFS clones share blocks, so deleting them may free nothing.",
+             basket · Enter: see the copies. APFS clones share blocks: on disk they count once, and \
+             deleting them frees nothing.",
         )
         .into();
         self.results = Some(list);
@@ -1501,6 +1534,38 @@ mod tests {
     fn group(members: &[NodeId]) -> Row {
         let members = members.iter().map(|&i| (i, 1)).collect();
         Row::group("g".into(), String::new(), members, RowSize::Sum, 2)
+    }
+
+    #[test]
+    fn clones_count_once_in_duplicate_groups() {
+        let mut t = Tree::new(Path::new("/r"));
+        let ids: Vec<NodeId> = [1, 100, 1, 100, 100]
+            .iter()
+            .enumerate()
+            .map(|(i, &disk)| {
+                t.push(
+                    ROOT,
+                    &format!("f{i}"),
+                    false,
+                    Size {
+                        apparent: 100,
+                        disk,
+                    },
+                )
+            })
+            .collect();
+        // f0..f2 are clones; the scan gave the full disk size to f1 and only
+        // the private bytes to the others.
+        for &id in &ids[..3] {
+            t.set_clone(id, 7, 1);
+        }
+        t.set_clone(ids[3], 9, 2); // a clone of a file outside the group
+        for mode in [SizeMode::Disk, SizeMode::Apparent] {
+            let (members, clones) = member_sizes(&t, &ids, mode);
+            assert_eq!(clones, 2);
+            let sizes: Vec<u64> = members.iter().map(|m| m.1).collect();
+            assert_eq!(sizes, [100, 1, 1, 100, 100], "{mode:?}");
+        }
     }
 
     #[test]

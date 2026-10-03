@@ -6,6 +6,7 @@
 //! are `u32`, children form a sibling-linked list and all names share one
 //! byte buffer.
 
+use std::collections::HashMap;
 use std::ops::{AddAssign, SubAssign};
 use std::path::{Path, PathBuf};
 
@@ -76,6 +77,9 @@ pub struct Tree {
     nodes: Vec<Node>,
     names: String,
     root_path: PathBuf,
+    /// APFS clones: `(clone id, private size)` of files sharing blocks.
+    /// Few files are clones, so this stays small.
+    clones: HashMap<NodeId, (u64, u64)>,
 }
 
 impl Tree {
@@ -84,6 +88,7 @@ impl Tree {
             nodes: Vec::new(),
             names: String::new(),
             root_path: root_path.to_path_buf(),
+            clones: HashMap::new(),
         };
         tree.add(
             NONE,
@@ -154,6 +159,15 @@ impl Tree {
             n.file_count = n.file_count.saturating_sub(count);
             ancestor = self.parent(a);
         }
+    }
+
+    pub fn set_clone(&mut self, id: NodeId, clone_id: u64, private: u64) {
+        self.clones.insert(id, (clone_id, private));
+    }
+
+    /// `(clone id, private size)` when the file is an APFS clone.
+    pub fn clone_of(&self, id: NodeId) -> Option<(u64, u64)> {
+        self.clones.get(&id).copied()
     }
 
     pub fn set_times(&mut self, id: NodeId, modified: u32, created: u32) {

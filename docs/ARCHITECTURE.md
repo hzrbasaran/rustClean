@@ -15,6 +15,7 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │
    ├─ scanner.rs ─ parallel scan → tree.rs
    ├─ tree.rs ──── compact arena tree of the scan
+   ├─ clones.rs ── APFS clone ids and private sizes (getattrlistat)
    │
    ├─ reports.rs ─ tree-based reports, age filter, menu items
    ├─ apps.rs ──── apps and their data, orphaned leftovers
@@ -47,6 +48,13 @@ Rules applied while scanning:
   matters on macOS, where `/` and `/System/Volumes/Data` share a device id.
 - Hard-linked files count once, by `(dev, inode)`.
 - Both the apparent size and the allocated size are recorded.
+- APFS pure clones count once on disk (macOS). For files of at least 64 KiB,
+  `clones::Dir` asks `getattrlistat` for the clone id and share count, and
+  only for shared files for the private size, which is slow: the kernel walks
+  the file's extents. The first file of a clone id keeps its allocated size;
+  later ones count only their private bytes. The tree remembers clone ids so
+  the duplicates report can mark them. Asking every file made scans about 5×
+  slower; with the threshold the cost is not measurable.
 
 ## The tree
 
