@@ -6,6 +6,7 @@ use std::sync::mpsc::TryRecvError;
 use std::time::Duration;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use ratatui::layout::Rect;
 use ratatui::widgets::TableState;
 
 use crate::apps;
@@ -22,6 +23,7 @@ use crate::stats::{self, Stats};
 use crate::system::{self, SystemInfo};
 use crate::toolsview::{ToolsKey, ToolsView};
 use crate::tree::{NodeId, Size, SizeMode, Tree, ROOT};
+use crate::treemap::{self, Slot};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SortMode {
@@ -125,6 +127,20 @@ fn oldest(tree: &Tree, ids: &[NodeId]) -> Option<usize> {
     (0..ids.len()).min_by_key(|&i| (age(ids[i]), i))
 }
 
+/// How the current directory is shown.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum View {
+    List,
+    Map,
+}
+
+/// What the treemap's colors mean.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MapColor {
+    Kind,
+    Age,
+}
+
 /// What the browser asks the app to do after a key press.
 pub enum Action {
     None,
@@ -167,6 +183,10 @@ pub struct Browser {
     pub status: Option<Status>,
     /// Entries collected for deletion.
     pub basket: Basket,
+    pub view: View,
+    pub map_color: MapColor,
+    /// Where the treemap was last drawn; key handling lays it out again.
+    pub map_area: Rect,
     /// Total moved to the trash during this session.
     pub trashed: Size,
     /// Outcome of the running deletion batch.
@@ -201,6 +221,9 @@ impl Browser {
             deleting: None,
             status: None,
             basket: Basket::default(),
+            view: View::List,
+            map_color: MapColor::Kind,
+            map_area: Rect::default(),
             trashed: Size::default(),
             batch_trashed: Size::default(),
             batch_failures: Vec::new(),
@@ -646,6 +669,56 @@ impl Browser {
         }
     }
 
+    /// Treemap blocks of the current directory; items index `entries`.
+    pub fn map_blocks(&self) -> Vec<(Slot, Rect)> {
+        let sizes: Vec<u64> = self
+            .entries
+            .iter()
+            .map(|&id| self.tree.node(id).size.get(self.size_mode))
+            .collect();
+        treemap::layout(&sizes, self.map_area)
+    }
+
+    /// The block holding the selected entry ("other" for small ones).
+    pub fn selected_block(&self) -> Option<Slot> {
+        let sel = self.table.selected()?;
+        let blocks = self.map_blocks();
+        blocks
+            .iter()
+            .map(|(s, _)| *s)
+            .find(|s| *s == Slot::Item(sel))
+            .or_else(|| {
+                blocks
+                    .iter()
+                    .map(|(s, _)| *s)
+                    .find(|s| matches!(s, Slot::Other { .. }))
+            })
+    }
+
+    fn map_move(&mut self, dir: treemap::Dir) {
+        let blocks = self.map_blocks();
+        let Some(current) = self.selected_block() else {
+            return;
+        };
+        let Some(from) = blocks.iter().position(|(s, _)| *s == current) else {
+            return;
+        };
+        let rects: Vec<Rect> = blocks.iter().map(|(_, r)| *r).collect();
+        match treemap::neighbor(&rects, from, dir).map(|i| blocks[i].0) {
+            Some(Slot::Item(i)) => self.table.select(Some(i)),
+            Some(Slot::Other { .. }) => {
+                // The first entry too small for its own block.
+                let shown = blocks
+                    .iter()
+                    .filter(|(s, _)| matches!(s, Slot::Item(_)))
+                    .count();
+                self.table
+                    .select(Some(shown.min(self.entries.len().saturating_sub(1))));
+            }
+            None => {}
+        }
+    }
+
     /// `f` in a report: re-runs it with the next minimum age.
     fn cycle_age_filter(&mut self) {
         let Some(r) = &self.results else {
@@ -935,8 +1008,53 @@ impl Browser {
         if self.results.is_some() {
             return self.on_key_results(code);
         }
+        if self.view == View::Map {
+            let dir = match code {
+                KeyCode::Left | KeyCode::Char('h') => Some(treemap::Dir::Left),
+                KeyCode::Right | KeyCode::Char('l') => Some(treemap::Dir::Right),
+                KeyCode::Up | KeyCode::Char('k') => Some(treemap::Dir::Up),
+                KeyCode::Down | KeyCode::Char('j') => Some(treemap::Dir::Down),
+                _ => None,
+            };
+            if let Some(dir) = dir {
+                self.map_move(dir);
+                return Action::None;
+            }
+            match code {
+                KeyCode::Char('c') => {
+                    self.map_color = match self.map_color {
+                        MapColor::Kind => MapColor::Age,
+                        MapColor::Age => MapColor::Kind,
+                    };
+                    return Action::None;
+                }
+                KeyCode::Enter
+                    if self
+                        .selected_block()
+                        .is_some_and(|s| matches!(s, Slot::Other { .. })) =>
+                {
+                    // Small entries are only reachable from the list.
+                    self.view = View::List;
+                    let shown = self
+                        .map_blocks()
+                        .iter()
+                        .filter(|(s, _)| matches!(s, Slot::Item(_)))
+                        .count();
+                    self.table
+                        .select(Some(shown.min(self.entries.len().saturating_sub(1))));
+                    return Action::None;
+                }
+                _ => {}
+            }
+        }
         match code {
             KeyCode::Char('q') => return Action::Quit,
+            KeyCode::Char('t') => {
+                self.view = match self.view {
+                    View::List => View::Map,
+                    View::Map => View::List,
+                };
+            }
             KeyCode::Up | KeyCode::Char('k') => self.table.select_previous(),
             KeyCode::Down | KeyCode::Char('j') => self.table.select_next(),
             KeyCode::PageUp => self.table.scroll_up_by(20),

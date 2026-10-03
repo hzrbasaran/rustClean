@@ -33,7 +33,7 @@ pub enum Category {
 }
 
 impl Category {
-    const ALL: [Category; 8] = [
+    pub const ALL: [Category; 8] = [
         Category::Video,
         Category::Audio,
         Category::Image,

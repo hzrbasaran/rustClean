@@ -8,7 +8,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
-use crate::app::{App, Browser, Dashboard, Pane, Screen};
+use crate::app::{App, Browser, Dashboard, MapColor, Pane, Screen, View};
 use crate::lists::ResultList;
 use crate::reports::MenuItem;
 use crate::stats;
@@ -16,6 +16,7 @@ use crate::system::{self, SystemInfo};
 use crate::tools::{Risk, Status as ToolStatus};
 use crate::toolsview::{ToolsView, CONFIRM_WORD};
 use crate::tree::{NodeId, SizeMode, Tree};
+use crate::treemap::Slot;
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 const HIGHLIGHT: Style = Style::new()
@@ -233,6 +234,8 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
         if let Some(r) = &mut b.results {
             render_results(f, &b.tree, r, &checks, table_area);
         }
+    } else if b.view == View::Map {
+        render_map(f, b, table_area);
     } else {
         render_entries(f, b, table_area);
     }
@@ -381,11 +384,25 @@ fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer
             ("Esc", "geri"),
             ("q", "çık"),
         ]
+    } else if b.view == View::Map {
+        &[
+            ("←↑↓→", "blok seç"),
+            ("Enter", "gir"),
+            ("⌫", "geri"),
+            ("c", "renk"),
+            ("t", "liste"),
+            ("Space", "sepete"),
+            ("x", "çöpe taşı"),
+            ("S", "sepet"),
+            ("m", "raporlar"),
+            ("q", "çık"),
+        ]
     } else {
         &[
             ("↑↓", "gez"),
             ("Enter", "gir"),
             ("⌫", "geri"),
+            ("t", "harita"),
             ("/", "ara"),
             ("m", "raporlar"),
             ("i", "özet"),
@@ -725,6 +742,136 @@ pub fn fmt_date(secs: u32) -> String {
                 .to_string()
         })
         .unwrap_or_else(|| "—".into())
+}
+
+/// Text color that stays readable on `bg`.
+fn text_on(bg: Color) -> Color {
+    match bg {
+        Color::Blue | Color::Magenta | Color::Red | Color::DarkGray | Color::Black => Color::White,
+        _ => Color::Black,
+    }
+}
+
+/// Cuts `s` to at most `width` characters.
+fn clip(s: &str, width: usize) -> String {
+    if s.chars().count() <= width {
+        s.to_string()
+    } else if width <= 1 {
+        s.chars().take(width).collect()
+    } else {
+        let mut out: String = s.chars().take(width - 1).collect();
+        out.push('…');
+        out
+    }
+}
+
+fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
+    let [map_area, legend_area] =
+        Layout::vertical([Constraint::Min(3), Constraint::Length(1)]).areas(area);
+    b.map_area = map_area;
+    let blocks = b.map_blocks();
+    let selected = b.selected_block();
+    let (tree, mode) = (&b.tree, b.size_mode);
+    let total = tree.node(b.current).size.get(mode).max(1);
+    let now = now_secs();
+
+    for (slot, rect) in &blocks {
+        let (bg, name, size, in_basket) = match *slot {
+            Slot::Item(i) => {
+                let id = b.entries[i];
+                let n = tree.node(id);
+                let bg = match b.map_color {
+                    MapColor::Age => age_color(now.saturating_sub(u64::from(n.modified))),
+                    MapColor::Kind if n.is_dir => {
+                        if i % 2 == 0 {
+                            Color::Blue
+                        } else {
+                            Color::LightBlue
+                        }
+                    }
+                    MapColor::Kind => CATEGORY_COLORS[stats::Category::of(tree.name(id)) as usize],
+                };
+                let mut name = tree.name(id).to_string();
+                if n.is_dir {
+                    name.push('/');
+                }
+                (bg, name, n.size.get(mode), b.basket.covers(tree, id))
+            }
+            Slot::Other { count } => {
+                let shown: Vec<usize> = blocks
+                    .iter()
+                    .filter_map(|(s, _)| match s {
+                        Slot::Item(i) => Some(*i),
+                        _ => None,
+                    })
+                    .collect();
+                let size: u64 = (0..b.entries.len())
+                    .filter(|i| !shown.contains(i))
+                    .map(|i| tree.node(b.entries[i]).size.get(mode))
+                    .sum();
+                (
+                    Color::DarkGray,
+                    format!("diğer ({count} küçük öğe — Enter: listede gör)"),
+                    size,
+                    false,
+                )
+            }
+        };
+        let fg = text_on(bg);
+        let is_selected = selected == Some(*slot);
+        let style = Style::new().bg(bg).fg(fg);
+        let mut inner = *rect;
+        if is_selected && rect.width >= 3 && rect.height >= 3 {
+            f.render_widget(
+                Block::bordered()
+                    .border_type(ratatui::widgets::BorderType::Thick)
+                    .border_style(Style::new().fg(Color::White).bg(bg).bold())
+                    .style(style),
+                *rect,
+            );
+            inner = rect.inner(ratatui::layout::Margin::new(1, 1));
+        } else {
+            f.render_widget(Block::new().style(style), *rect);
+        }
+        let width = usize::from(inner.width);
+        let mark = if in_basket { "✓ " } else { "" };
+        let mut lines = vec![Line::from(clip(&format!("{mark}{name}"), width)).bold()];
+        if inner.height >= 2 {
+            let pct = size as f64 / total as f64 * 100.0;
+            lines.push(Line::from(clip(
+                &format!("{} · %{pct:.1}", fmt_size(size)),
+                width,
+            )));
+        }
+        let text_style = if is_selected && inner == *rect {
+            // Too small for a border: show the selection by inverting.
+            Style::new().bg(Color::White).fg(Color::Black)
+        } else {
+            style
+        };
+        f.render_widget(Paragraph::new(lines).style(text_style), inner);
+    }
+
+    let mut legend = vec![Span::raw(" Renk: ").white().bold()];
+    match b.map_color {
+        MapColor::Kind => {
+            legend.push(Span::styled("██", Style::new().fg(Color::Blue)));
+            legend.push(Span::raw(" klasör  ").white());
+            for (cat, color) in stats::Category::ALL.iter().zip(CATEGORY_COLORS) {
+                legend.push(Span::styled("██", Style::new().fg(color)));
+                legend.push(Span::raw(format!(" {}  ", cat.label())).white());
+            }
+            legend.push(Span::raw("  (c: yaşa göre)").gray());
+        }
+        MapColor::Age => {
+            for (color, text) in AGE_COLORS.iter().zip(stats::AGE_LABELS).take(4) {
+                legend.push(Span::styled("██", Style::new().fg(*color)));
+                legend.push(Span::raw(format!(" {text}  ")).white());
+            }
+            legend.push(Span::raw("  (c: türe göre)").gray());
+        }
+    }
+    f.render_widget(Line::from(legend), legend_area);
 }
 
 const CATEGORY_COLORS: [Color; 8] = [

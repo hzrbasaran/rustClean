@@ -14,6 +14,7 @@ mod system;
 mod tools;
 mod toolsview;
 mod tree;
+mod treemap;
 mod ui;
 
 use std::path::PathBuf;
