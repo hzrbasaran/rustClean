@@ -59,10 +59,18 @@ impl Browser {
                 .count();
             if covered > 0 {
                 self.set_status(
-                    tf!(
-                        "{covered} öğenin üst klasörü zaten sepette.",
-                        "The parent folder of {covered} items is already in the basket.",
-                    ),
+                    if covered == 1 {
+                        t!(
+                            "1 öğenin üst klasörü zaten sepette.",
+                            "The parent folder of 1 item is already in the basket.",
+                        )
+                        .to_string()
+                    } else {
+                        tf!(
+                            "{covered} öğenin üst klasörü zaten sepette.",
+                            "The parent folders of {covered} items are already in the basket.",
+                        )
+                    },
                     false,
                 );
             }

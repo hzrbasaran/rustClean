@@ -290,9 +290,9 @@ pub fn changes(
             })
             .collect();
         tf!(
-            "Silinenler: {} öğe, {} — {}",
-            "Removed: {} items, {} — {}",
-            gone.len(),
+            "Silinenler: {}, {} — {}",
+            "Removed: {}, {} — {}",
+            crate::i18n::count(gone.len() as u64, "öğe", "item", "items"),
             fmt_size(total),
             names.join(", ")
         )

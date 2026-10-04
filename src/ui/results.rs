@@ -42,7 +42,7 @@ pub(super) fn render_results(
         let (count, modified, created) = if row.group {
             let newest = row.nodes.iter().map(|&id| tree.node(id).modified).max();
             (
-                tf!("{} adet", "{} items", fmt_count(row.nodes.len() as u64)),
+                crate::i18n::count(row.nodes.len() as u64, "adet", "item", "items"),
                 newest.unwrap_or(0),
                 0,
             )

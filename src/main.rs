@@ -116,17 +116,22 @@ fn print_summary(path: &std::path::Path) -> Result<()> {
             root.size.apparent
         )
     );
-    println!(
-        "{}",
-        tf!(
-            "  {} dosya, {} öğe, {} erişilemeyen, {:.1} sn",
-            "  {} files, {} entries, {} inaccessible, {:.1} s",
-            root.file_count,
-            t.len() - 1,
-            res.errors,
-            res.elapsed.as_secs_f64()
-        )
+    // Raw numbers, as scripts may read them.
+    let (files, entries) = (root.file_count, t.len() - 1);
+    let secs = res.elapsed.as_secs_f64();
+    let counts = i18n::pick(
+        format!(
+            "  {files} dosya, {entries} öğe, {} erişilemeyen, {secs:.1} sn",
+            res.errors
+        ),
+        format!(
+            "  {files} {}, {entries} {}, {} inaccessible, {secs:.1} s",
+            if files == 1 { "file" } else { "files" },
+            if entries == 1 { "entry" } else { "entries" },
+            res.errors
+        ),
     );
+    println!("{counts}");
     Ok(())
 }
 

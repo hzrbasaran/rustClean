@@ -79,6 +79,18 @@ pub fn set_lang(lang: Lang) {
     TEST_LANG.set(Some(lang));
 }
 
+/// A count with its noun: "5 öğe" in Turkish, "1 item" / "5 items" in
+/// English. With an empty Turkish noun, Turkish gets the number alone, for
+/// sentences where the noun takes a case ending ("5 öğeye erişilemedi").
+pub fn count(n: u64, tr: &str, one: &str, many: &str) -> String {
+    let num = crate::ui::fmt_count(n);
+    match lang() {
+        Lang::Tr if tr.is_empty() => num,
+        Lang::Tr => format!("{num} {tr}"),
+        Lang::En => format!("{num} {}", if n == 1 { one } else { many }),
+    }
+}
+
 /// Picks the text for the current language.
 pub fn pick<T>(tr: T, en: T) -> T {
     match lang() {
@@ -155,6 +167,19 @@ pub fn init(cli: Option<&str>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn counts_take_the_singular_in_english() {
+        set_lang(Lang::En);
+        assert_eq!(count(1, "öğe", "item", "items"), "1 item");
+        assert_eq!(count(0, "öğe", "item", "items"), "0 items");
+        assert_eq!(count(1234, "öğe", "item", "items"), "1,234 items");
+        set_lang(Lang::Tr);
+        assert_eq!(count(1, "öğe", "item", "items"), "1 öğe");
+        assert_eq!(count(1234, "öğe", "item", "items"), "1.234 öğe");
+        // A Turkish noun with a case ending is written by the sentence.
+        assert_eq!(count(5, "", "item", "items"), "5");
+    }
 
     #[test]
     fn parses_codes() {

@@ -65,21 +65,21 @@ pub(super) fn render_browser(
             ""
         };
         tf!(
-            "{} — {}  │  {shown}{} satır, {} ({mode_label})",
-            "{} — {}  │  {shown}{} rows, {} ({mode_label})",
+            "{} — {}  │  {shown}{}, {} ({mode_label})",
+            "{} — {}  │  {shown}{}, {} ({mode_label})",
             r.title,
             b.tree.path_of(r.base).display(),
-            fmt_count(r.rows.len() as u64),
+            crate::i18n::count(r.rows.len() as u64, "satır", "row", "rows"),
             fmt_size(r.total_size()),
         )
     } else {
         let cur = b.tree.node(b.current);
         tf!(
-            "{}  │  {} ({mode_label})  │  {} dosya  │  sıralama: {}",
-            "{}  │  {} ({mode_label})  │  {} files  │  sort: {}",
+            "{}  │  {} ({mode_label})  │  {}  │  sıralama: {}",
+            "{}  │  {} ({mode_label})  │  {}  │  sort: {}",
             b.tree.path_of(b.current).display(),
             fmt_size(cur.size.get(mode)),
-            fmt_count(cur.file_count.into()),
+            crate::i18n::count(cur.file_count.into(), "dosya", "file", "files"),
             b.sort.label()
         )
     };
@@ -88,9 +88,9 @@ pub(super) fn render_browser(
     } else {
         // First, so long paths cannot push it off screen.
         tf!(
-            "🧺 {} öğe, {} (S)  │  {heading}",
-            "🧺 {} items, {} (S)  │  {heading}",
-            fmt_count(b.basket.len() as u64),
+            "🧺 {}, {} (S)  │  {heading}",
+            "🧺 {}, {} (S)  │  {heading}",
+            crate::i18n::count(b.basket.len() as u64, "öğe", "item", "items"),
             fmt_size(b.basket.size(&b.tree, mode))
         )
     };
@@ -123,9 +123,9 @@ pub(super) fn render_browser(
         let p = &r.progress;
         Line::from(vec![
             Span::raw(tf!(
-                "{spin} Klasör yeniden taranıyor — {} dosya, {}",
-                "{spin} Rescanning the folder — {} files, {}",
-                fmt_count(p.files),
+                "{spin} Klasör yeniden taranıyor — {}, {}",
+                "{spin} Rescanning the folder — {}, {}",
+                crate::i18n::count(p.files, "dosya", "file", "files"),
                 fmt_size(p.bytes)
             ))
             .accent(),
@@ -216,9 +216,9 @@ pub(super) fn render_browser(
         Line::from(text).muted()
     } else {
         let mut spans = vec![Span::raw(tf!(
-            "{} öğe tarandı, {:.1} sn",
-            "{} items scanned, {:.1} s",
-            fmt_count(b.tree.len() as u64),
+            "{} tarandı, {:.1} sn",
+            "{} scanned, {:.1} s",
+            crate::i18n::count(b.tree.len() as u64, "öğe", "item", "items"),
             b.elapsed.as_secs_f64()
         ))
         .muted()];
@@ -226,8 +226,8 @@ pub(super) fn render_browser(
             spans.push(
                 Span::raw(tf!(
                     "   ⚠ {} öğeye erişilemedi",
-                    "   ⚠ {} items inaccessible",
-                    fmt_count(b.errors)
+                    "   ⚠ {} inaccessible",
+                    crate::i18n::count(b.errors, "", "item", "items")
                 ))
                 .warn(),
             );
