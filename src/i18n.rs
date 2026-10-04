@@ -47,8 +47,9 @@ thread_local! {
     static TEST_LANG: std::cell::Cell<Option<Lang>> = const { std::cell::Cell::new(None) };
 }
 
-/// Runs `f` with this thread's texts in `lang` (test builds only).
-#[cfg(test)]
+/// Runs `f` with this thread's texts in `lang` (test builds only; the
+/// screen snapshots, which run on Unix, use it).
+#[cfg(all(test, unix))]
 pub fn with_lang<R>(lang: Lang, f: impl FnOnce() -> R) -> R {
     let before = TEST_LANG.replace(Some(lang));
     let out = f();

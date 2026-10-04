@@ -57,8 +57,8 @@ pub fn confirm_word() -> &'static str {
 
 impl ToolsView {
     /// A screen showing `tools` as they are, without measuring anything
-    /// (test builds only).
-    #[cfg(test)]
+    /// (test builds only; the screen snapshots, which run on Unix, use it).
+    #[cfg(all(test, unix))]
     pub fn with_tools(tools: Vec<Tool>) -> Self {
         let mut table = TableState::default();
         table.select(Some(0));

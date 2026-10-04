@@ -11,8 +11,9 @@ thread_local! {
 }
 
 /// Runs `f` with this thread's clock fixed at `now`, and dates shown in UTC
-/// instead of the local time zone (test builds only).
-#[cfg(test)]
+/// instead of the local time zone (test builds only; the screen snapshots,
+/// which run on Unix, use it).
+#[cfg(all(test, unix))]
 pub fn with_fixed_now<R>(now: u64, f: impl FnOnce() -> R) -> R {
     let before = FIXED_NOW.replace(Some(now));
     let out = f();
