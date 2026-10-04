@@ -322,7 +322,12 @@ mod tests {
             .iter()
             .map(|&id| {
                 let p = t.path_of(id);
-                p.strip_prefix("/Users/demo").unwrap().display().to_string()
+                // `/` on every platform.
+                p.strip_prefix("/Users/demo")
+                    .unwrap()
+                    .display()
+                    .to_string()
+                    .replace('\\', "/")
             })
             .collect();
         out.sort();
