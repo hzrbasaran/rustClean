@@ -54,7 +54,7 @@ self.set_status(t!("Sepet boş.", "The basket is empty."), false);
 let title = tf!("{n} öğe taşındı", "{n} items moved");
 ```
 
-Use `fmt_count`, `fmt_size`, `fmt_date` and `fmt_pct` from `ui.rs` for
+Use `fmt_count`, `fmt_size`, `fmt_date` and `fmt_pct` from `ui/format.rs` for
 numbers, so they follow the language. If you do not speak Turkish, write the
 English text and leave a note in the pull request; we will help with the
 translation.
