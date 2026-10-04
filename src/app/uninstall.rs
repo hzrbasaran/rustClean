@@ -105,7 +105,7 @@ impl Browser {
         match code {
             KeyCode::Up | KeyCode::Char('k') => d.cursor = d.cursor.saturating_sub(1),
             KeyCode::Down | KeyCode::Char('j') => {
-                d.cursor = (d.cursor + 1).min(d.items.len().saturating_sub(1))
+                d.cursor = (d.cursor + 1).min(d.items.len().saturating_sub(1));
             }
             KeyCode::Char(' ') => d.toggle(),
             KeyCode::Char('t') => d.toggle_all(),
@@ -118,7 +118,7 @@ impl Browser {
                 self.uninstall = None;
                 let ok = self.deletable(ids);
                 if !ok.is_empty() {
-                    self.start_deletion(ok);
+                    self.start_deletion(&ok);
                 }
             }
             KeyCode::Esc | KeyCode::Char('h' | 'H' | 'n' | 'N' | 'q') => self.uninstall = None,

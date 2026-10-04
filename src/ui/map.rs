@@ -13,7 +13,7 @@ use crate::treemap::Slot;
 use super::format::{clip, fmt_pct, fmt_size, now_secs};
 use super::style::{age_color, text_on, AGE_COLORS, CATEGORY_COLORS, DIR_COLORS};
 
-pub(super) fn render_map(f: &mut Frame, b: &mut Browser, area: Rect) {
+pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
     let [map_area, legend_area] =
         Layout::vertical([Constraint::Min(3), Constraint::Length(1)]).areas(area);
     b.map_area = map_area;

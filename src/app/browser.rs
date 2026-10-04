@@ -19,7 +19,7 @@ impl Browser {
         let mut entries: Vec<NodeId> = tree.children(dir).collect();
         match self.sort {
             SortMode::Size => {
-                entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).size.get(mode)))
+                entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).size.get(mode)));
             }
             SortMode::Name => entries.sort_by_cached_key(|&a| tree.name(a).to_lowercase()),
             SortMode::Count => entries.sort_by_key(|&a| std::cmp::Reverse(tree.node(a).file_count)),
@@ -171,7 +171,7 @@ impl Browser {
             match code {
                 KeyCode::Up | KeyCode::Char('k') => dialog.scroll = dialog.scroll.saturating_sub(1),
                 KeyCode::Down | KeyCode::Char('j') => {
-                    dialog.scroll = dialog.scroll.saturating_add(1)
+                    dialog.scroll = dialog.scroll.saturating_add(1);
                 }
                 KeyCode::PageUp => dialog.scroll = dialog.scroll.saturating_sub(10),
                 KeyCode::PageDown => dialog.scroll = dialog.scroll.saturating_add(10),

@@ -21,9 +21,10 @@ fn fmt_date_in(lang: Lang, secs: u32) -> String {
         Lang::Tr => "%d.%m.%Y %H:%M",
         Lang::En => "%Y-%m-%d %H:%M",
     };
-    chrono::DateTime::from_timestamp(i64::from(secs), 0)
-        .map(|t| t.with_timezone(&chrono::Local).format(pattern).to_string())
-        .unwrap_or_else(|| "—".into())
+    chrono::DateTime::from_timestamp(i64::from(secs), 0).map_or_else(
+        || "—".into(),
+        |t| t.with_timezone(&chrono::Local).format(pattern).to_string(),
+    )
 }
 
 /// A percentage: "%51.0" in Turkish, "51.0%" in English.

@@ -30,7 +30,10 @@ impl CloneInfo {
     }
 }
 
+// The only unsafe code in the crate: libc calls for getattrlistat(2). Each
+// block carries a SAFETY comment.
 #[cfg(target_os = "macos")]
+#[allow(unsafe_code)]
 mod imp {
     use super::CloneInfo;
     use std::ffi::{CString, OsStr};
@@ -114,7 +117,7 @@ mod imp {
                 libc::getattrlistat(
                     self.fd,
                     name.as_ptr(),
-                    (&mut list as *mut libc::attrlist).cast(),
+                    std::ptr::from_mut(&mut list).cast(),
                     buf.as_mut_ptr().cast(),
                     buf.len(),
                     libc::c_ulong::from(options),

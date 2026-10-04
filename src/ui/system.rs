@@ -14,7 +14,7 @@ use super::format::{fmt_count, fmt_size};
 use super::style::usage_color;
 use super::{bar, halves, panel};
 
-pub(super) fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: Rect) {
+pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, area: Rect) {
     let vol_rows = sys.main.as_ref().map_or(1, |c| c.volumes.len()) as u16;
     let [top, mid, bottom] = Layout::vertical([
         Constraint::Length(vol_rows + 4),
@@ -196,7 +196,7 @@ pub(super) fn render_system(f: &mut Frame, b: &Browser, sys: &SystemInfo, area: 
     // Simulator runtimes and problems
     let mut lines = Vec::new();
     if !sys.simulators.is_empty() {
-        let total: u64 = sys.simulators.iter().map(|c| c.used()).sum();
+        let total: u64 = sys.simulators.iter().map(system::Container::used).sum();
         lines.push(line(
             t!("Simülatör çalışma zamanları", "Simulator runtimes"),
             tf!(

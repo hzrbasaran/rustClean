@@ -77,7 +77,7 @@ pub(super) fn find_apps(tree: &Tree, base: NodeId, platform: Platform) -> Vec<Ap
 fn bundle_info(app: &Path) -> (Option<String>, Vec<String>) {
     let Some(dict) = plist::Value::from_file(app.join("Contents/Info.plist"))
         .ok()
-        .and_then(|v| v.into_dictionary())
+        .and_then(plist::Value::into_dictionary)
     else {
         return (None, Vec::new());
     };

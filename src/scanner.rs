@@ -246,12 +246,9 @@ fn read_dir(job: Job, ctx: &Ctx) -> Listing {
     if ctx.cancel.load(Ordering::Relaxed) {
         return listing;
     }
-    let read = match fs::read_dir(&listing.dir) {
-        Ok(r) => r,
-        Err(_) => {
-            listing.errors = 1;
-            return listing;
-        }
+    let Ok(read) = fs::read_dir(&listing.dir) else {
+        listing.errors = 1;
+        return listing;
     };
     // Opened on the first file: clone lookups go through it.
     let mut clone_dir: Option<Option<clones::Dir>> = None;

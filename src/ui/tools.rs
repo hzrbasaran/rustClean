@@ -13,7 +13,7 @@ use super::format::fmt_size;
 use super::style::{risk_style, HIGHLIGHT};
 use super::{panel, popup, table_block_plain, SPINNER};
 
-pub(super) fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, area: Rect) {
+pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize, area: Rect) {
     let action_rows: u16 = if view.run.is_some() {
         area.height / 2
     } else {
@@ -97,7 +97,7 @@ pub(super) fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, are
             }
         }
         Some(t) if t.status == ToolStatus::Measuring => {
-            lines.push(Line::from(t!("Ölçülüyor…", "Measuring…")).cyan())
+            lines.push(Line::from(t!("Ölçülüyor…", "Measuring…")).cyan());
         }
         _ => lines.push(
             Line::from(t!(
@@ -111,7 +111,7 @@ pub(super) fn render_tools(f: &mut Frame, view: &mut ToolsView, tick: usize, are
         // Show the end of the log.
         let visible = detail_area.height.saturating_sub(2) as usize;
         let start = run.log.len().saturating_sub(visible);
-        let lines: Vec<Line> = run.log[start..]
+        let lines: Vec<Line<'_>> = run.log[start..]
             .iter()
             .map(|l| {
                 if l.starts_with('$') {

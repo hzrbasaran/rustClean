@@ -35,6 +35,33 @@ cargo clippy --all-targets -- -D warnings
 cargo test
 ```
 
+### Lint policy
+
+The lints live in `Cargo.toml` (`[lints]`), so your editor shows the same
+warnings as CI, where `-D warnings` turns them into errors. On top of the
+default clippy set:
+
+- `unsafe_code` is denied. The only exception is the `getattrlistat(2)` code
+  in `clones.rs`, and every `unsafe` block needs a `// SAFETY:` comment
+  (`clippy::undocumented_unsafe_blocks`).
+- `rust_2018_idioms`, `unused_qualifications` and `trivial_casts`.
+- A few `clippy::pedantic` lints that catch real mistakes or keep the code
+  uniform: `needless_pass_by_value`, `cast_lossless`, `manual_let_else`,
+  `map_unwrap_or`, `redundant_closure_for_method_calls`,
+  `semicolon_if_nothing_returned`, `doc_markdown`, `items_after_statements`.
+
+Left out on purpose: the `cast_possible_truncation` / `cast_sign_loss` /
+`cast_precision_loss` group (layout math casts on purpose), `match_same_arms`
+(the leftover rules in `apps/orphans.rs` keep one arm per case so they are
+easy to review), and the style-only `too_many_lines`, `similar_names` and
+`single_match_else`.
+
+A `Dependencies` workflow runs [cargo-deny](https://github.com/EmbarkStudios/cargo-deny)
+(`deny.toml`) on every pull request and once a week. It checks security
+advisories, licenses compatible with MIT OR Apache-2.0, banned crates and
+sources. A new dependency with a license not in `deny.toml` needs a note in
+the pull request.
+
 ## Guidelines
 
 **Safety comes first.** rustClean deletes files, so changes that touch

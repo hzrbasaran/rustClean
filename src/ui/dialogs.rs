@@ -12,7 +12,7 @@ use crate::tree::{NodeId, SizeMode, Tree};
 use super::format::{fmt_count, fmt_size, tilde, truncate_path};
 
 /// The entries a deletion could not move, with full, wrapped errors.
-pub(super) fn render_failures(f: &mut Frame, d: &mut FailureDialog, area: Rect) {
+pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Rect) {
     let width = area.width.saturating_sub(6).min(110);
     let height = area.height.saturating_sub(4).max(8);
     let rect = Rect {
@@ -97,7 +97,7 @@ pub(super) fn render_failures(f: &mut Frame, d: &mut FailureDialog, area: Rect) 
 }
 
 pub(super) fn render_confirm(
-    f: &mut Frame,
+    f: &mut Frame<'_>,
     tree: &Tree,
     ids: &[NodeId],
     mode: SizeMode,
@@ -180,7 +180,7 @@ pub(super) fn render_confirm(
 
 /// The app and its data to uninstall, each with a check box.
 pub(super) fn render_uninstall(
-    f: &mut Frame,
+    f: &mut Frame<'_>,
     tree: &Tree,
     d: &crate::app::UninstallDialog,
     mode: SizeMode,

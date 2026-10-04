@@ -33,7 +33,7 @@ use style::AGE_COLORS;
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
-pub fn render(f: &mut Frame, app: &mut App) {
+pub fn render(f: &mut Frame<'_>, app: &mut App) {
     let [header, body, footer] = Layout::vertical([
         Constraint::Length(1),
         Constraint::Min(1),
@@ -84,7 +84,7 @@ fn table_block() -> Block<'static> {
 }
 
 /// A centered bordered box sized to its lines.
-fn popup(f: &mut Frame, title: &str, color: Color, lines: Vec<Line>, max_width: u16) {
+fn popup(f: &mut Frame<'_>, title: &str, color: Color, lines: Vec<Line<'_>>, max_width: u16) {
     let area = f.area();
     let width = area.width.saturating_sub(4).min(max_width);
     let height = (lines.len() as u16 + 2).min(area.height);
