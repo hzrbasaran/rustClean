@@ -36,6 +36,6 @@ Enter: bu adı taşıyan dosyaları listele
  0: 0+11 Black/Cyan BOLD
  1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
  2: 0+100 -/- BOLD | UNDERLINED
- 3: 0+2 -/DarkGray BOLD | 2+3 Gray/DarkGray BOLD | 5+13 -/DarkGray BOLD | 18+10 Gray/DarkGray BOLD | 28+1 -/DarkGray BOLD | 29+16 Green/DarkGray BOLD | 45+1 -/DarkGray BOLD | 46+9 LightBlue/DarkGray BOLD | 55+45 -/DarkGray BOLD
+ 3: 0+100 White/Indexed(238) BOLD
 28: 0+100 Gray/-
 29: 0+4 Black/Gray | 10+7 Black/Gray | 26+3 Black/Gray | 36+3 Black/Gray | 54+3 Black/Gray | 69+3 Black/Gray | 80+7 Black/Gray

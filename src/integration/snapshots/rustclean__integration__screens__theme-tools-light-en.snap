@@ -1,0 +1,48 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer tools cleanup  │  reclaimable: 6.8 GiB (measuring…)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Tool                               Reclaimable  Details
+▶ Docker                                  6.0 GiB 3 images, 2 volumes
+  npm cache                             800.0 MiB ~/.npm
+  Cargo download cache               ⠋            measuring…
+  pip cache                          —            not installed
+  Gradle cache                       —            daemon not running
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
+│ re-downloaded  docker system prune                                                               │
+│    $ docker system prune                                                                         │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Measuring only reads. No command runs without your confirmation.
+ ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Indexed(231)/Indexed(25) BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 -/Indexed(253) BOLD
+ 4: 2+9 -/- BOLD | 37+12 -/- BOLD
+ 5: 2+20 -/- BOLD | 37+12 Indexed(25)/- | 50+10 Indexed(25)/-
+ 6: 2+9 Indexed(242)/- | 37+12 Indexed(242)/- | 50+13 Indexed(242)/-
+ 7: 2+12 -/- BOLD | 37+12 Indexed(130)/- | 50+18 Indexed(130)/-
+24: 0+1 Indexed(248)/- | 1+9 -/- BOLD | 10+90 Indexed(248)/-
+25: 0+1 Indexed(248)/- | 1+15 Indexed(16)/Indexed(220) | 16+20 -/- BOLD | 99+1 Indexed(248)/-
+26: 0+1 Indexed(248)/- | 1+25 Indexed(242)/- | 99+1 Indexed(248)/-
+27: 0+100 Indexed(248)/-
+28: 0+100 Indexed(242)/-
+29: 0+4 Indexed(231)/Indexed(242) | 13+7 Indexed(231)/Indexed(242) | 28+3 Indexed(231)/Indexed(242) | 47+3 Indexed(231)/Indexed(242) | 57+5 Indexed(231)/Indexed(242) | 69+3 Indexed(231)/Indexed(242)

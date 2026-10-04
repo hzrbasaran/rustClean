@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (diskte)  │  17 dosya  │  sıralama: boyut
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓Movies/                              Projects/
+┃Downloads/                             ┃3.2 GiB · %36.7                      1.1 GiB · %12.8
+┃3.6 GiB · %41.2                        ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃                                     Library/          App…
+┃                                       ┃                                     665.0 MiB · %7.5  150…
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+diğer (1 küçük öğe — Enter: listede gör)
+ t / Esc  listeye dön   Renk: ████ klasörler (her biri ayrı)  ██ Video  ██ Ses  ██ Resim  ██ Arşiv /
+37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
+ ←↑↓→  blok seç   Enter  gir   ⌫  geri   c  renk   t/Esc  liste   Space  sepete   x  çöpe taşı   S
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Indexed(74) BOLD
+ 1: 0+41 White/Indexed(25) BOLD | 41+7 White/Indexed(130) BOLD | 48+30 White/Indexed(130) | 78+9 White/Indexed(30) BOLD | 87+13 White/Indexed(30)
+ 2: 0+11 White/Indexed(25) BOLD | 11+29 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 3: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 4: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 5: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 6: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 7: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 8: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+ 9: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+10: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+11: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+12: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+13: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+14: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+15: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+22 White/Indexed(30)
+16: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+8 White/Indexed(96) BOLD | 86+10 White/Indexed(96) | 96+4 White/Indexed(24) BOLD
+17: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+18: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+19: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+20: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+21: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+22: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+23: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+24: 0+1 White/Indexed(25) BOLD | 1+39 White/Indexed(25) | 40+1 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+25: 0+41 White/Indexed(25) BOLD | 41+37 White/Indexed(130) | 78+18 White/Indexed(96) | 96+4 White/Indexed(24)
+26: 0+40 White/DarkGray BOLD | 40+60 White/DarkGray
+27: 0+9 Black/Gray | 9+15 White/- | 24+6 White/- BOLD | 30+1 Indexed(25)/- | 31+1 Indexed(130)/- | 32+1 Indexed(30)/- | 33+1 Indexed(96)/- | 34+28 White/- | 62+2 Indexed(175)/- | 64+8 White/- | 72+2 Indexed(214)/- | 74+6 White/- | 80+2 Indexed(74)/- | 82+8 White/- | 90+2 Indexed(227)/- | 92+8 White/-
+28: 0+22 Gray/- | 22+24 Indexed(214)/-
+29: 0+6 Black/Gray | 17+7 Black/Gray | 30+3 Black/Gray | 40+3 Black/Gray | 50+7 Black/Gray | 65+7 Black/Gray | 81+3 Black/Gray | 96+3 Black/Gray

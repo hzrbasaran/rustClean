@@ -32,6 +32,7 @@ use crate::system::{Container, SystemInfo, Volume};
 use crate::tools::{CleanAction, Risk, Status, Step, Tool, ToolKind};
 use crate::toolsview::ToolsView;
 use crate::tree::{NodeId, Size, Tree, ROOT};
+use crate::ui::theme::{with_theme, ThemeKind};
 use crate::ui::with_fixed_now;
 
 const WIDTH: u16 = 100;
@@ -245,15 +246,74 @@ fn style_name(fg: Color, bg: Color, m: Modifier) -> String {
 /// Draws the screen `build` sets up, in both languages, and compares each
 /// with its stored snapshot.
 fn snap(name: &str, build: impl Fn() -> App) {
+    snap_in(ThemeKind::Dark, name, &build);
+}
+
+fn snap_in(theme: ThemeKind, name: &str, build: &impl Fn() -> App) {
     for (lang, code) in [(Lang::Tr, "tr"), (Lang::En, "en")] {
-        let screen = with_lang(lang, || {
-            with_fixed_now(NOW, || {
-                let mut app = build();
-                render(&mut app)
+        let screen = with_theme(theme, || {
+            with_lang(lang, || {
+                with_fixed_now(NOW, || {
+                    let mut app = build();
+                    render(&mut app)
+                })
             })
         });
         insta::assert_snapshot!(format!("{name}-{code}"), screen);
     }
+}
+
+/// The same screen in the light, color-blind and no-color themes (the dark
+/// one is covered by `snap`).
+fn snap_themes(name: &str, build: impl Fn() -> App) {
+    for theme in [ThemeKind::Light, ThemeKind::ColorBlind, ThemeKind::Mono] {
+        snap_in(theme, &format!("{name}-{}", theme.code()), &build);
+    }
+}
+
+#[test]
+fn themes() {
+    snap_themes("theme-browser", app);
+    snap_themes("theme-treemap", || {
+        let mut app = app();
+        press(&mut app, KeyCode::Char('t'));
+        app
+    });
+    snap_themes("theme-report", || {
+        let mut app = app();
+        menu(&mut app, 0);
+        app
+    });
+    snap_themes("theme-dashboard", || {
+        let mut app = app();
+        press(&mut app, KeyCode::Char('i'));
+        browser(&mut app).dashboard.as_mut().unwrap().disk = None;
+        app
+    });
+    snap_themes("theme-tools", tools_app);
+}
+
+/// `T` cycles dark → light → color-blind → dark and says so.
+#[test]
+fn t_switches_the_theme() {
+    use crate::ui::theme;
+    let mut app = app();
+    with_lang(Lang::En, || {
+        press(&mut app, KeyCode::Char('T'));
+        assert_eq!(theme::current(), ThemeKind::Light);
+        let status = &browser(&mut app).status.as_ref().unwrap().text;
+        assert_eq!(status, "Theme: Light (T: change)");
+        press(&mut app, KeyCode::Char('T'));
+        assert_eq!(theme::current(), ThemeKind::ColorBlind);
+        press(&mut app, KeyCode::Char('T'));
+        assert_eq!(theme::current(), ThemeKind::Dark);
+        // Without colors, T leaves them off.
+        theme::set(ThemeKind::Mono);
+        press(&mut app, KeyCode::Char('T'));
+        assert_eq!(theme::current(), ThemeKind::Mono);
+        let status = &browser(&mut app).status.as_ref().unwrap().text;
+        assert!(status.starts_with("Colors are off"), "{status}");
+    });
 }
 
 #[test]
@@ -500,48 +560,51 @@ fn saved_scan_picker() {
 
 #[test]
 fn developer_tools() {
-    snap("tools", || {
-        let mut app = app();
-        let tool = |kind, status| Tool {
-            kind,
-            status,
-            actions: Vec::new(),
-        };
-        let mut docker = tool(
-            ToolKind::Docker,
+    snap("tools", tools_app);
+}
+
+/// The tools screen with made-up measurements.
+fn tools_app() -> App {
+    let mut app = app();
+    let tool = |kind, status| Tool {
+        kind,
+        status,
+        actions: Vec::new(),
+    };
+    let mut docker = tool(
+        ToolKind::Docker,
+        Status::Ready {
+            reclaimable: 6 * GIB,
+            detail: "3 images, 2 volumes".into(),
+        },
+    );
+    docker.actions = vec![CleanAction {
+        label: "docker system prune".into(),
+        risk: Risk::Redownload,
+        steps: vec![Step::Command(vec![
+            "/usr/local/bin/docker".into(),
+            "system".into(),
+            "prune".into(),
+        ])],
+    }];
+    let tools = vec![
+        docker,
+        tool(
+            ToolKind::Npm,
             Status::Ready {
-                reclaimable: 6 * GIB,
-                detail: "3 images, 2 volumes".into(),
+                reclaimable: 800 * MIB,
+                detail: "~/.npm".into(),
             },
-        );
-        docker.actions = vec![CleanAction {
-            label: "docker system prune".into(),
-            risk: Risk::Redownload,
-            steps: vec![Step::Command(vec![
-                "/usr/local/bin/docker".into(),
-                "system".into(),
-                "prune".into(),
-            ])],
-        }];
-        let tools = vec![
-            docker,
-            tool(
-                ToolKind::Npm,
-                Status::Ready {
-                    reclaimable: 800 * MIB,
-                    detail: "~/.npm".into(),
-                },
-            ),
-            tool(ToolKind::Cargo, Status::Measuring),
-            tool(ToolKind::Pip, Status::Missing("not installed".into())),
-            tool(
-                ToolKind::Gradle,
-                Status::Unavailable("daemon not running".into()),
-            ),
-        ];
-        browser(&mut app).tools = Some(ToolsView::with_tools(tools));
-        app
-    });
+        ),
+        tool(ToolKind::Cargo, Status::Measuring),
+        tool(ToolKind::Pip, Status::Missing("not installed".into())),
+        tool(
+            ToolKind::Gradle,
+            Status::Unavailable("daemon not running".into()),
+        ),
+    ];
+    browser(&mut app).tools = Some(ToolsView::with_tools(tools));
+    app
 }
 
 #[test]
@@ -573,4 +636,162 @@ fn system_data() {
         });
         app
     });
+}
+
+/// Sets up a screen to draw.
+type Builder = fn() -> App;
+
+/// Writes every theme of a few screens as a colored HTML page, to compare
+/// themes in a browser:
+/// `RUSTCLEAN_PREVIEW=preview.html cargo test theme_preview -- --ignored`
+#[test]
+#[ignore = "writes a file; run on demand"]
+fn theme_preview() {
+    let out = std::env::var("RUSTCLEAN_PREVIEW").unwrap_or_else(|_| "theme-preview.html".into());
+    let screens: [(&str, Builder); 5] = [
+        ("browser", app),
+        ("treemap", || {
+            let mut app = app();
+            press(&mut app, KeyCode::Char('t'));
+            app
+        }),
+        ("report", || {
+            let mut app = app();
+            menu(&mut app, 0);
+            app
+        }),
+        ("dashboard", || {
+            let mut app = app();
+            press(&mut app, KeyCode::Char('i'));
+            browser(&mut app).dashboard.as_mut().unwrap().disk = None;
+            app
+        }),
+        ("tools", tools_app),
+    ];
+    let themes = [
+        ThemeKind::Dark,
+        ThemeKind::Light,
+        ThemeKind::ColorBlind,
+        ThemeKind::Mono,
+    ];
+    let mut html = String::from(
+        "<!doctype html><meta charset=utf-8><title>rustClean themes</title><style>\
+         body{font-family:system-ui;margin:16px;background:#888}\
+         h2{margin:24px 0 8px}.row{display:flex;gap:16px;flex-wrap:wrap}\
+         figure{margin:0}figcaption{font-weight:600;margin:4px 0}\
+         pre{font:12px/1.25 Menlo,monospace;margin:0;padding:6px;white-space:pre}\
+         </style><h1>rustClean themes</h1>",
+    );
+    for (name, build) in screens {
+        html.push_str(&format!("<h2>{name}</h2><div class=row>"));
+        for theme in themes {
+            let light = theme == ThemeKind::Light;
+            let buf = with_theme(theme, || {
+                with_lang(Lang::Tr, || {
+                    with_fixed_now(NOW, || {
+                        let mut app = build();
+                        let mut term = Terminal::new(TestBackend::new(WIDTH, HEIGHT)).unwrap();
+                        term.draw(|f| crate::ui::render(f, &mut app)).unwrap();
+                        term.backend().buffer().clone()
+                    })
+                })
+            });
+            html.push_str(&format!(
+                "<figure><figcaption>{}</figcaption>{}</figure>",
+                theme.code(),
+                buffer_html(&buf, light)
+            ));
+        }
+        html.push_str("</div>");
+    }
+    std::fs::write(&out, html).unwrap();
+    println!("wrote {out}");
+}
+
+/// The buffer as a `<pre>` with colored spans, on a dark or light terminal.
+fn buffer_html(buf: &Buffer, light: bool) -> String {
+    let (default_fg, default_bg) = if light {
+        ("#1d1d1f", "#ffffff")
+    } else {
+        ("#e5e5e5", "#1e1e1e")
+    };
+    let mut out = format!("<pre style=\"color:{default_fg};background:{default_bg}\">");
+    for y in 0..buf.area.height {
+        // Neighbouring cells of the same style share a span.
+        let mut runs: Vec<(String, String)> = Vec::new();
+        for x in 0..buf.area.width {
+            let c = &buf[(x, y)];
+            let mut fg = css(c.fg).unwrap_or(default_fg.into());
+            let mut bg = css(c.bg).unwrap_or(default_bg.into());
+            if c.modifier.contains(Modifier::REVERSED) {
+                std::mem::swap(&mut fg, &mut bg);
+            }
+            let bold = if c.modifier.contains(Modifier::BOLD) {
+                ";font-weight:bold"
+            } else {
+                ""
+            };
+            let style = format!("color:{fg};background:{bg}{bold}");
+            let sym = match c.symbol() {
+                "<" => "&lt;",
+                ">" => "&gt;",
+                "&" => "&amp;",
+                s => s,
+            };
+            match runs.last_mut() {
+                Some((last, text)) if *last == style => text.push_str(sym),
+                _ => runs.push((style, sym.to_string())),
+            }
+        }
+        for (style, text) in runs {
+            out.push_str(&format!("<span style=\"{style}\">{text}</span>"));
+        }
+        out.push('\n');
+    }
+    out.push_str("</pre>");
+    out
+}
+
+/// A terminal color as CSS (xterm's palette); `None` for the default.
+fn css(c: Color) -> Option<String> {
+    const NAMED: [&str; 16] = [
+        "#000000", "#cd0000", "#00cd00", "#cdcd00", "#0000ee", "#cd00cd", "#00cdcd", "#e5e5e5",
+        "#7f7f7f", "#ff0000", "#00ff00", "#ffff00", "#5c5cff", "#ff00ff", "#00ffff", "#ffffff",
+    ];
+    let named = |i: usize| Some(NAMED[i].to_string());
+    match c {
+        Color::Reset => None,
+        Color::Black => named(0),
+        Color::Red => named(1),
+        Color::Green => named(2),
+        Color::Yellow => named(3),
+        Color::Blue => named(4),
+        Color::Magenta => named(5),
+        Color::Cyan => named(6),
+        Color::Gray => named(7),
+        Color::DarkGray => named(8),
+        Color::LightRed => named(9),
+        Color::LightGreen => named(10),
+        Color::LightYellow => named(11),
+        Color::LightBlue => named(12),
+        Color::LightMagenta => named(13),
+        Color::LightCyan => named(14),
+        Color::White => named(15),
+        Color::Indexed(n @ 0..=15) => named(usize::from(n)),
+        Color::Indexed(n @ 16..=231) => {
+            let i = n - 16;
+            let level = |v: u8| if v == 0 { 0 } else { 55 + 40 * u32::from(v) };
+            Some(format!(
+                "#{:02x}{:02x}{:02x}",
+                level(i / 36),
+                level((i / 6) % 6),
+                level(i % 6)
+            ))
+        }
+        Color::Indexed(n) => {
+            let v = 8 + 10 * u32::from(n - 232);
+            Some(format!("#{v:02x}{v:02x}{v:02x}"))
+        }
+        Color::Rgb(r, g, b) => Some(format!("#{r:02x}{g:02x}{b:02x}")),
+    }
 }

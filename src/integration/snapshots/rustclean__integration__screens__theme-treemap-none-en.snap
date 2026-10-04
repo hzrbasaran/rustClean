@@ -1,0 +1,64 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌───────────────────────────────────┐┌────────────────────┐
+┃Downloads/                             ┃│Movies/                            ││Projects/           │
+┃3.6 GiB · 41.2%                        ┃│3.2 GiB · 36.7%                    ││1.1 GiB · 12.8%     │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   ││                    │
+┃                                       ┃│                                   │└────────────────────┘
+┃                                       ┃│                                   │┌────────────────┐┌──┐
+┃                                       ┃│                                   ││Library/        ││A…│
+┃                                       ┃│                                   ││665.0 MiB · 7.5%││1…│
+┃                                       ┃│                                   ││                ││  │
+┃                                       ┃│                                   ││                ││  │
+┃                                       ┃│                                   ││                ││  │
+┃                                       ┃│                                   ││                ││  │
+┃                                       ┃│                                   ││                ││  │
+┃                                       ┃│                                   ││                ││  │
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└───────────────────────────────────┘└────────────────┘└──┘
+other (1 small items — Enter: show in list)
+ t / Esc  back to list   Color: ████ folders (each its own)  ██ Video  ██ Audio  ██ Images  ██ Archi
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket   x  move to
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 -/- BOLD | REVERSED
+ 1: 0+41 -/- BOLD
+ 2: 0+11 -/- BOLD | 40+1 -/- BOLD | 42+7 -/- BOLD | 79+9 -/- BOLD
+ 3: 0+1 -/- BOLD | 40+1 -/- BOLD
+ 4: 0+1 -/- BOLD | 40+1 -/- BOLD
+ 5: 0+1 -/- BOLD | 40+1 -/- BOLD
+ 6: 0+1 -/- BOLD | 40+1 -/- BOLD
+ 7: 0+1 -/- BOLD | 40+1 -/- BOLD
+ 8: 0+1 -/- BOLD | 40+1 -/- BOLD
+ 9: 0+1 -/- BOLD | 40+1 -/- BOLD
+10: 0+1 -/- BOLD | 40+1 -/- BOLD
+11: 0+1 -/- BOLD | 40+1 -/- BOLD
+12: 0+1 -/- BOLD | 40+1 -/- BOLD
+13: 0+1 -/- BOLD | 40+1 -/- BOLD
+14: 0+1 -/- BOLD | 40+1 -/- BOLD
+15: 0+1 -/- BOLD | 40+1 -/- BOLD
+16: 0+1 -/- BOLD | 40+1 -/- BOLD
+17: 0+1 -/- BOLD | 40+1 -/- BOLD | 79+8 -/- BOLD | 97+2 -/- BOLD
+18: 0+1 -/- BOLD | 40+1 -/- BOLD
+19: 0+1 -/- BOLD | 40+1 -/- BOLD
+20: 0+1 -/- BOLD | 40+1 -/- BOLD
+21: 0+1 -/- BOLD | 40+1 -/- BOLD
+22: 0+1 -/- BOLD | 40+1 -/- BOLD
+23: 0+1 -/- BOLD | 40+1 -/- BOLD
+24: 0+1 -/- BOLD | 40+1 -/- BOLD
+25: 0+41 -/- BOLD
+26: 0+43 -/- BOLD
+27: 0+9 -/- REVERSED | 25+7 -/- BOLD
+29: 0+6 -/- REVERSED | 21+7 -/- REVERSED | 35+3 -/- REVERSED | 45+3 -/- REVERSED | 56+7 -/- REVERSED | 70+7 -/- REVERSED | 89+3 -/- REVERSED

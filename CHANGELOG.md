@@ -6,6 +6,15 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Themes: `T` switches between dark (the default), light (for white
+  terminal backgrounds) and a color-blind friendly palette (Okabe–Ito: blue
+  and orange instead of green and red). The choice is saved;
+  `--theme dark|light|colorblind` overrides it
+  ([#25](https://github.com/hzrbasaran/rustClean/issues/25)).
+- `--no-color` and the `NO_COLOR` environment variable turn colors off; the
+  selection is shown reversed and treemap blocks get borders.
+
 ### Changed
 - `L` now rebuilds the open result list in the new language: a report (with
   its age filter), search results, a comparison with an earlier scan, the
@@ -14,6 +23,8 @@ follows [Semantic Versioning](https://semver.org/).
   ([#8](https://github.com/hzrbasaran/rustClean/issues/8)).
 
 ### Fixed
+- The selected row of lists in the dark theme is white on dark gray: colored
+  dates and folder names were hard to read on the old gray.
 - Summary: the file types column fits the longest label in the current
   language ("Archives / disk images" ran into its bar), and on narrow
   terminals labels are cut instead of the numbers.

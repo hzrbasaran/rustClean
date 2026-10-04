@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Özet — /Users/demo  │  diskte
+┌ Genel ─────────────────────────────────────────┐┌ Disk ──────────────────────────────────────────┐
+│Toplam boyut   8.6 GiB                          ││Disk bilgisi bulunamadı.                        │
+│İçerik         17 dosya · 19 klasör             ││                                                │
+│En yeni değişiklik  30.09.2026 12:00            ││                                                │
+│⚠ Taramada 2 öğeye erişilemedi                  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ Dosya türleri ─────────────────────────────────┐┌ Yaş (son değişiklik) ──────────────────────────┐
+│Arşiv / disk imajı ████▏         3.6 GiB   %41  ││≤ 7 gün    █▉                  923.0 MiB   %10  │
+│Video              ███▋          3.2 GiB   %37  ││≤ 30 gün   ▍                   175.0 MiB    %2  │
+│Diğer              █▉            1.6 GiB   %18  ││≤ 1 yıl    ████▊                 2.3 GiB   %26  │
+│Kod                ▍           310.0 MiB    %4  ││> 1 yıl    ███████████           5.3 GiB   %61  │
+│Belge                            7.0 MiB    %0  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ En büyük dosyalar ─────────────────────────────┐┌ En dolu klasörler (doğrudan içerik) ───────────┐
+│▶    3.0 GiB 27.08.2025 12:00 Downloads/Xcode_16││   3.6 GiB Downloads/                           │
+│     2.3 GiB 28.02.2025 12:00 Movies/holiday-202││   3.2 GiB Movies/                              │
+│   900.0 MiB 22.08.2026 12:00 Movies/screen-reco││ 820.0 MiB Projects/api/target/debug/           │
+│   820.0 MiB 03.06.2026 12:00 Projects/api/targe││ 610.0 MiB Library/Caches/com.example.browser/  │
+│   610.0 MiB 30.09.2026 12:00 Library/Caches/com││ 310.0 MiB Projects/web/node_modules/react/     │
+│   450.0 MiB 15.03.2026 12:00 Downloads/setup.dm││ 150.0 MiB Applications/Sketchpad.app/Contents/M│
+│   310.0 MiB 28.09.2026 12:00 Projects/web/node_││  55.0 MiB Library/Application Support/com.examp│
+│   150.0 MiB 02.08.2026 12:00 Applications/Sketc││   4.0 MiB Documents/                           │
+│   120.0 MiB 19.09.2026 12:00 Downloads/photos.z││   8.0 KiB Projects/web/                        │
+│    55.0 MiB 11.09.2026 12:00 Library/Applicatio││   4.0 KiB Projects/api/                        │
+│                                                ││                                                │
+│                                                ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.
+ Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  görünen/diskt
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Indexed(74) BOLD
+ 1: 0+1 DarkGray/- | 1+7 White/- BOLD | 8+43 DarkGray/- | 51+6 White/- BOLD | 57+43 DarkGray/-
+ 2: 0+1 DarkGray/- | 1+15 White/- | 16+7 -/- BOLD | 49+2 DarkGray/- | 51+24 Gray/- | 99+1 DarkGray/-
+ 3: 0+1 DarkGray/- | 1+15 White/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+ 4: 0+1 DarkGray/- | 1+20 White/- | 21+16 Indexed(33)/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+ 5: 0+1 DarkGray/- | 1+30 Indexed(214)/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+ 6: 0+100 DarkGray/-
+ 7: 0+1 DarkGray/- | 1+15 White/- BOLD | 16+35 DarkGray/- | 51+22 White/- BOLD | 73+27 DarkGray/-
+ 8: 0+1 DarkGray/- | 1+19 White/- | 20+10 Indexed(227)/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Indexed(33)/- | 91+6 Gray/- | 99+1 DarkGray/-
+ 9: 0+1 DarkGray/- | 1+19 White/- | 20+10 Indexed(175)/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Indexed(117)/- | 91+6 Gray/- | 99+1 DarkGray/-
+10: 0+1 DarkGray/- | 1+19 White/- | 20+10 Gray/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Indexed(227)/- | 91+6 Gray/- | 99+1 DarkGray/-
+11: 0+1 DarkGray/- | 1+19 White/- | 20+10 Indexed(33)/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Indexed(202)/- | 91+6 Gray/- | 99+1 DarkGray/-
+12: 0+1 DarkGray/- | 1+19 White/- | 20+10 Indexed(36)/- | 41+6 Gray/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+13: 0+100 DarkGray/-
+14: 0+1 Indexed(74)/- | 1+19 White/- BOLD | 20+30 Indexed(74)/- | 50+1 DarkGray/- | 51+37 White/- BOLD | 88+12 DarkGray/-
+15: 0+1 Indexed(74)/- | 1+48 White/Indexed(238) BOLD | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+10 Indexed(117)/- BOLD | 99+1 DarkGray/-
+16: 0+1 Indexed(74)/- | 14+16 Indexed(202)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+7 Indexed(117)/- BOLD | 99+1 DarkGray/-
+17: 0+1 Indexed(74)/- | 14+16 Indexed(227)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+26 Indexed(117)/- BOLD | 99+1 DarkGray/-
+18: 0+1 Indexed(74)/- | 14+16 Indexed(227)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+35 Indexed(117)/- BOLD | 99+1 DarkGray/-
+19: 0+1 Indexed(74)/- | 14+16 Indexed(33)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+32 Indexed(117)/- BOLD | 99+1 DarkGray/-
+20: 0+1 Indexed(74)/- | 14+16 Indexed(227)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+37 Indexed(117)/- BOLD | 99+1 DarkGray/-
+21: 0+1 Indexed(74)/- | 14+16 Indexed(33)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+37 Indexed(117)/- BOLD | 99+1 DarkGray/-
+22: 0+1 Indexed(74)/- | 14+16 Indexed(227)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+10 Indexed(117)/- BOLD | 99+1 DarkGray/-
+23: 0+1 Indexed(74)/- | 14+16 Indexed(117)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+13 Indexed(117)/- BOLD | 99+1 DarkGray/-
+24: 0+1 Indexed(74)/- | 14+16 Indexed(117)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 62+13 Indexed(117)/- BOLD | 99+1 DarkGray/-
+25: 0+1 Indexed(74)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 99+1 DarkGray/-
+26: 0+1 Indexed(74)/- | 49+1 Indexed(74)/- | 50+1 DarkGray/- | 99+1 DarkGray/-
+27: 0+50 Indexed(74)/- | 50+50 DarkGray/-
+28: 0+100 Gray/-
+29: 0+5 Black/Gray | 22+4 Black/Gray | 32+7 Black/Gray | 52+7 Black/Gray | 68+3 Black/Gray | 83+3 Black/Gray

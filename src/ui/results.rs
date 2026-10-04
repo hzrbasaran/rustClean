@@ -1,7 +1,7 @@
 //! Result lists: reports, search results, the basket.
 
 use ratatui::layout::{Constraint, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Row, Table};
 use ratatui::Frame;
@@ -10,7 +10,8 @@ use crate::lists::ResultList;
 use crate::tree::Tree;
 
 use super::format::{fmt_count, fmt_size, now_secs};
-use super::style::{date_cell, HIGHLIGHT};
+use super::style::{date_cell, highlight, Themed};
+use super::theme::theme;
 use super::{table_block, DATE_WIDTH, WIDE};
 
 pub(super) fn render_results(
@@ -32,9 +33,9 @@ pub(super) fn render_results(
     let has_detail = detail_width > 0;
     let rows = r.rows.iter().enumerate().map(|(i, row)| {
         let check = if checks[i] {
-            Span::raw("[✓]").green().bold()
+            Span::raw("[✓]").success().bold()
         } else {
-            Span::raw("[ ]").gray()
+            Span::raw("[ ]").muted()
         };
         // Groups show their member count and newest member; single entries
         // their file count (directories) and own dates.
@@ -55,14 +56,14 @@ pub(super) fn render_results(
             (count, n.modified, n.created)
         };
         let label_style = if row.group || tree.node(row.nodes[0]).is_dir {
-            Style::new().fg(Color::LightBlue).bold()
+            Style::new().fg(theme().folder).bold()
         } else {
             Style::new()
         };
         let mut cells = vec![
             Cell::from(check),
             Cell::from(Line::from(fmt_size(row.size())).right_aligned()),
-            Cell::from(Line::from(count).right_aligned().gray()),
+            Cell::from(Line::from(count).right_aligned().muted()),
             date_cell(modified, now),
         ];
         if wide {
@@ -70,7 +71,7 @@ pub(super) fn render_results(
         }
         cells.push(Cell::from(Span::styled(row.label.clone(), label_style)));
         if has_detail {
-            cells.push(Cell::from(Span::raw(row.detail.clone()).gray()));
+            cells.push(Cell::from(Span::raw(row.detail.clone()).muted()));
         }
         Row::new(cells)
     });
@@ -102,7 +103,7 @@ pub(super) fn render_results(
 
     let table = Table::new(rows, widths)
         .header(Row::new(header).bold().underlined())
-        .row_highlight_style(HIGHLIGHT)
+        .row_highlight_style(highlight())
         .highlight_symbol("▶ ")
         .block(table_block());
     f.render_stateful_widget(table, area, &mut r.table);

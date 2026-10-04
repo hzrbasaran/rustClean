@@ -5,7 +5,6 @@
 //! for formatted text. The language is global: background threads (tool
 //! measurements) build texts too.
 
-use std::path::PathBuf;
 use std::sync::atomic::{AtomicU8, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -107,26 +106,16 @@ macro_rules! tf {
     };
 }
 
-fn settings_file() -> Option<PathBuf> {
-    Some(crate::paths::data_dir()?.join("settings"))
-}
-
 /// The saved choice, if any.
 fn saved() -> Option<Lang> {
-    let text = std::fs::read_to_string(settings_file()?).ok()?;
-    text.lines()
-        .find_map(|l| l.strip_prefix("lang="))
+    crate::settings::get("lang")
+        .as_deref()
         .and_then(Lang::parse)
 }
 
 /// Remembers the choice for the next start.
 pub fn save(lang: Lang) {
-    if let Some(file) = settings_file() {
-        if let Some(dir) = file.parent() {
-            let _ = std::fs::create_dir_all(dir);
-        }
-        let _ = std::fs::write(file, format!("lang={}\n", lang.code()));
-    }
+    crate::settings::set("lang", lang.code());
 }
 
 /// The system's preferred language.

@@ -77,3 +77,20 @@ fn help_and_version() {
         format!("rustclean {}", env!("CARGO_PKG_VERSION"))
     );
 }
+
+#[test]
+fn theme_options() {
+    let help = stdout(&rustclean(&["--help"]));
+    assert!(
+        help.contains("--theme") && help.contains("--no-color"),
+        "{help}"
+    );
+    let bad = rustclean(&["--theme", "pink", "--list-disks"]);
+    assert_eq!(bad.status.code(), Some(2));
+    assert!(
+        String::from_utf8_lossy(&bad.stderr).contains("colorblind"),
+        "{bad:?}"
+    );
+    let ok = rustclean(&["--theme", "light", "--no-color", "--list-disks"]);
+    assert!(ok.status.success(), "{ok:?}");
+}

@@ -9,6 +9,7 @@ use ratatui::Frame;
 use crate::app::App;
 
 use super::format::{fmt_count, fmt_size, truncate_path};
+use super::style::Themed;
 use super::{keys, title, SPINNER};
 
 pub(super) fn render_scanning(
@@ -38,7 +39,7 @@ pub(super) fn render_scanning(
     let lines = vec![
         Line::from(""),
         Line::from(tf!("  {spin} Taranıyor…", "  {spin} Scanning…"))
-            .cyan()
+            .accent()
             .bold(),
         Line::from(""),
         stat_line(t!("Dosya", "Files"), &fmt_count(p.files)),
@@ -61,7 +62,7 @@ pub(super) fn render_scanning(
 
 fn stat_line(label: &str, value: &str) -> Line<'static> {
     Line::from(vec![
-        Span::raw(format!("  {label:<13}")).gray(),
+        Span::raw(format!("  {label:<13}")).muted(),
         Span::raw(value.to_string()),
     ])
 }

@@ -9,7 +9,7 @@ use ratatui::Frame;
 use crate::app::App;
 
 use super::format::{fmt_pct, fmt_size};
-use super::style::{usage_color, HIGHLIGHT};
+use super::style::{highlight, usage_color, Themed};
 use super::{bar, keys, title};
 
 pub(super) fn render_disks(
@@ -78,16 +78,16 @@ pub(super) fn render_disks(
         .bold()
         .underlined(),
     )
-    .row_highlight_style(HIGHLIGHT)
+    .row_highlight_style(highlight())
     .highlight_symbol("▶ ")
     .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
     f.render_stateful_widget(table, table_area, &mut app.disk_table);
 
     if let Some(msg) = &app.message {
-        f.render_widget(Line::from(msg.clone()).yellow(), msg_area);
+        f.render_widget(Line::from(msg.clone()).warn(), msg_area);
     } else if app.disks.is_empty() {
         f.render_widget(
-            Line::from(t!("Hiç disk bulunamadı.", "No disks found.")).yellow(),
+            Line::from(t!("Hiç disk bulunamadı.", "No disks found.")).warn(),
             msg_area,
         );
     }
@@ -98,6 +98,7 @@ pub(super) fn render_disks(
             ("Enter", t!("tara", "scan")),
             ("r", t!("yenile", "refresh")),
             ("L", t!("English", "Türkçe")),
+            ("T", t!("tema", "theme")),
             ("q", t!("çık", "quit")),
         ]),
         footer,

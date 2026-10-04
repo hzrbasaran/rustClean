@@ -1,0 +1,44 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer tools cleanup  │  reclaimable: 6.8 GiB (measuring…)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Tool                               Reclaimable  Details
+▶ Docker                                  6.0 GiB 3 images, 2 volumes
+  npm cache                             800.0 MiB ~/.npm
+  Cargo download cache               ⠋            measuring…
+  pip cache                          —            not installed
+  Gradle cache                       —            daemon not running
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
+│ re-downloaded  docker system prune                                                               │
+│    $ docker system prune                                                                         │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Measuring only reads. No command runs without your confirmation.
+ ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 -/- BOLD | REVERSED
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 -/- BOLD | REVERSED
+ 4: 2+9 -/- BOLD | 37+12 -/- BOLD
+ 5: 2+20 -/- BOLD
+ 7: 2+12 -/- BOLD
+24: 1+9 -/- BOLD
+25: 1+15 -/- REVERSED | 16+20 -/- BOLD
+29: 0+4 -/- REVERSED | 13+7 -/- REVERSED | 28+3 -/- REVERSED | 47+3 -/- REVERSED | 57+5 -/- REVERSED | 69+3 -/- REVERSED

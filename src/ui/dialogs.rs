@@ -1,7 +1,7 @@
 //! Dialogs: delete confirmation, uninstall, failures.
 
 use ratatui::layout::Rect;
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Clear, Paragraph, Wrap};
 use ratatui::Frame;
@@ -10,6 +10,8 @@ use crate::app::FailureDialog;
 use crate::tree::{NodeId, SizeMode, Tree};
 
 use super::format::{fmt_count, fmt_size, tilde, truncate_path, wrap_indented};
+use super::style::Themed;
+use super::theme::theme;
 
 /// The entries a deletion could not move, with full, wrapped errors.
 pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Rect) {
@@ -29,7 +31,7 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
                 " ✗ {} items could not be moved",
                 d.items.len()
             ))
-            .red()
+            .danger()
             .bold(),
             Span::raw(tf!(
                 "   ·   ✓ {} öğe taşındı ({})",
@@ -37,7 +39,7 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
                 d.moved,
                 d.size
             ))
-            .green(),
+            .success(),
         ]),
         Line::from(""),
     ];
@@ -53,13 +55,13 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
         let number = format!(" {}. ", i + 1);
         let indent = " ".repeat(number.chars().count());
         for l in wrap(&name, &number, &indent) {
-            lines.push(Line::from(l).white().bold());
+            lines.push(Line::from(l).normal().bold());
         }
         for l in wrap(&item.path, "    ", "    ") {
-            lines.push(Line::from(l).gray());
+            lines.push(Line::from(l).muted());
         }
         for l in wrap(&item.error, "    ", "    ") {
-            lines.push(Line::from(l).white());
+            lines.push(Line::from(l).normal());
         }
         let next_hint = d.items.get(i + 1).and_then(|n| n.hint);
         if let Some(hint) = item.hint.filter(|h| Some(*h) != next_hint) {
@@ -67,10 +69,10 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
             for (n, l) in wrap(hint, ARROW, "      ").into_iter().enumerate() {
                 lines.push(match l.strip_prefix(ARROW) {
                     Some(text) if n == 0 => Line::from(vec![
-                        Span::raw(ARROW).yellow().bold(),
-                        Span::raw(text.to_string()).yellow(),
+                        Span::raw(ARROW).warn().bold(),
+                        Span::raw(text.to_string()).warn(),
                     ]),
-                    _ => Line::from(l).yellow(),
+                    _ => Line::from(l).warn(),
                 });
             }
         }
@@ -103,11 +105,11 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
                 Block::bordered()
                     .title(
                         Span::raw(t!(" Taşınamayan öğeler ", " Items not moved "))
-                            .white()
+                            .normal()
                             .bold(),
                     )
-                    .title_bottom(Line::from(footer).centered().gray())
-                    .border_style(Style::new().fg(Color::Red)),
+                    .title_bottom(Line::from(footer).centered().muted())
+                    .border_style(Style::new().fg(theme().danger)),
             ),
         rect,
     );
@@ -136,7 +138,7 @@ pub(super) fn render_confirm(
         lines.push(Line::from(tf!("{} öğe", "{} items", fmt_count(ids.len() as u64))).bold());
         lines.push(Line::from(""));
         for &id in ids.iter().take(LISTED) {
-            lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).gray());
+            lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).muted());
         }
         if ids.len() > LISTED {
             lines.push(
@@ -145,7 +147,7 @@ pub(super) fn render_confirm(
                     "… and {} more",
                     fmt_count((ids.len() - LISTED) as u64)
                 ))
-                .gray(),
+                .muted(),
             );
         }
     }
@@ -164,12 +166,12 @@ pub(super) fn render_confirm(
     }
     lines.extend([
         Line::from(""),
-        Line::from(t!("Çöp kutusuna taşınacak.", "Will be moved to the trash.")).gray(),
+        Line::from(t!("Çöp kutusuna taşınacak.", "Will be moved to the trash.")).muted(),
         Line::from(""),
         Line::from(vec![
-            Span::raw(t!(" e ", " y ")).black().on_red().bold(),
+            Span::raw(t!(" e ", " y ")).key_danger(),
             Span::raw(t!(" evet, taşı     ", " yes, move     ")),
-            Span::raw(t!(" h ", " n ")).black().on_gray(),
+            Span::raw(t!(" h ", " n ")).key(),
             Span::raw(t!(" vazgeç", " cancel")),
         ]),
     ]);
@@ -189,7 +191,7 @@ pub(super) fn render_confirm(
             .block(
                 Block::bordered()
                     .title(t!(" Çöp kutusuna taşınsın mı? ", " Move to the trash? "))
-                    .border_style(Style::new().fg(Color::Red)),
+                    .border_style(Style::new().fg(theme().danger)),
             ),
         popup,
     );
@@ -223,7 +225,7 @@ pub(super) fn render_uninstall(
             "Veriler ad ve paket kimliğiyle eşleştirildi (tahmin): listeyi kontrol edin.",
             "Data was matched by name and bundle id (a guess): check the list.",
         ))
-        .gray(),
+        .muted(),
     ];
     if d.running {
         tail.push(
@@ -231,19 +233,19 @@ pub(super) fn render_uninstall(
                 "⚠ Uygulama şu an açık: önce kapatın.",
                 "⚠ The app is running: quit it first.",
             ))
-            .red()
+            .danger()
             .bold(),
         );
     }
     tail.extend([
-        Line::from(t!("Çöp kutusuna taşınacak.", "Will be moved to the trash.")).gray(),
+        Line::from(t!("Çöp kutusuna taşınacak.", "Will be moved to the trash.")).muted(),
         Line::from(""),
         Line::from(vec![
-            Span::raw(t!(" e ", " y ")).black().on_red().bold(),
+            Span::raw(t!(" e ", " y ")).key_danger(),
             Span::raw(t!(" kaldır     ", " uninstall     ")),
-            Span::raw(" Space ").black().on_gray(),
+            Span::raw(" Space ").key(),
             Span::raw(t!(" işaretle     ", " check     ")),
-            Span::raw(t!(" h ", " n ")).black().on_gray(),
+            Span::raw(t!(" h ", " n ")).key(),
             Span::raw(t!(" vazgeç", " cancel")),
         ]),
     ]);
@@ -261,7 +263,7 @@ pub(super) fn render_uninstall(
         let pad = inner.saturating_sub(4 + path.chars().count() + size.chars().count());
         let mut line = Line::from(format!("{mark}{path}{}{size}", " ".repeat(pad)));
         if !checked {
-            line = line.gray();
+            line = line.muted();
         }
         if i == d.cursor {
             line = line.reversed();
@@ -277,7 +279,7 @@ pub(super) fn render_uninstall(
                 offset + shown,
                 d.items.len()
             ))
-            .gray(),
+            .muted(),
         );
     }
     lines.extend(tail);
@@ -295,7 +297,7 @@ pub(super) fn render_uninstall(
             Block::bordered()
                 .padding(ratatui::widgets::Padding::horizontal(1))
                 .title(tf!(" Kaldır: {} ", " Uninstall: {} ", d.label))
-                .border_style(Style::new().fg(Color::Red)),
+                .border_style(Style::new().fg(theme().danger)),
         ),
         popup,
     );

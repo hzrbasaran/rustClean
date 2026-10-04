@@ -35,7 +35,7 @@ Measuring only reads. No command runs without your confirmation.
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  2: 0+100 -/- BOLD | UNDERLINED
- 3: 0+2 -/DarkGray BOLD | 2+6 White/DarkGray BOLD | 8+92 -/DarkGray BOLD
+ 3: 0+100 White/Indexed(238) BOLD
  4: 2+9 White/- BOLD | 37+12 -/- BOLD
  5: 2+20 White/- BOLD | 37+12 Cyan/- | 50+10 Cyan/-
  6: 2+9 Gray/- | 37+12 Gray/- | 50+13 Gray/-

@@ -1,7 +1,7 @@
 //! The developer tools cleanup screen.
 
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Paragraph, Row, Table};
 use ratatui::Frame;
@@ -10,7 +10,8 @@ use crate::tools::Status as ToolStatus;
 use crate::toolsview::{confirm_word, ToolsView};
 
 use super::format::fmt_size;
-use super::style::{risk_style, HIGHLIGHT};
+use super::style::{highlight, risk_style, Themed};
+use super::theme::theme;
 use super::{panel, popup, table_block_plain, SPINNER};
 
 pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize, area: Rect) {
@@ -35,13 +36,11 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
     let rows = view.tools.iter().map(|t| {
         let (size, info) = match &t.status {
             ToolStatus::Measuring => (
-                Line::from(format!("{spin}")).cyan(),
-                Span::raw(t!("ölçülüyor…", "measuring…")).cyan(),
+                Line::from(format!("{spin}")).accent(),
+                Span::raw(t!("ölçülüyor…", "measuring…")).accent(),
             ),
-            ToolStatus::Missing(why) => (Line::from("—").gray(), Span::raw(why.clone()).gray()),
-            ToolStatus::Unavailable(why) => {
-                (Line::from("—").yellow(), Span::raw(why.clone()).yellow())
-            }
+            ToolStatus::Missing(why) => (Line::from("—").muted(), Span::raw(why.clone()).muted()),
+            ToolStatus::Unavailable(why) => (Line::from("—").warn(), Span::raw(why.clone()).warn()),
             ToolStatus::Ready {
                 reclaimable,
                 detail,
@@ -51,8 +50,8 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
             ),
         };
         let name_style = match t.status {
-            ToolStatus::Missing(_) => Style::new().fg(Color::Gray),
-            _ => Style::new().fg(Color::White).bold(),
+            ToolStatus::Missing(_) => Style::new().fg(theme().muted),
+            _ => Style::new().fg(theme().text).bold(),
         };
         Row::new(vec![
             Cell::from(Span::styled(t.kind.label(), name_style)),
@@ -77,7 +76,7 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
         .bold()
         .underlined(),
     )
-    .row_highlight_style(HIGHLIGHT)
+    .row_highlight_style(highlight())
     .highlight_symbol("▶ ")
     .block(table_block_plain());
     f.render_stateful_widget(table, list_area, &mut view.table);
@@ -89,22 +88,22 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                 let (style, text) = risk_style(a.risk);
                 lines.push(Line::from(vec![
                     Span::styled(text, style),
-                    Span::raw(format!(" {}", a.label)).white().bold(),
+                    Span::raw(format!(" {}", a.label)).normal().bold(),
                 ]));
                 for step in &a.steps {
-                    lines.push(Line::from(format!("    $ {}", step.describe())).gray());
+                    lines.push(Line::from(format!("    $ {}", step.describe())).muted());
                 }
             }
         }
         Some(t) if t.status == ToolStatus::Measuring => {
-            lines.push(Line::from(t!("Ölçülüyor…", "Measuring…")).cyan());
+            lines.push(Line::from(t!("Ölçülüyor…", "Measuring…")).accent());
         }
         _ => lines.push(
             Line::from(t!(
                 "Bu araç için yapılacak bir şey yok.",
                 "Nothing to do for this tool."
             ))
-            .gray(),
+            .muted(),
         ),
     }
     if let Some(run) = &view.run {
@@ -115,13 +114,13 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
             .iter()
             .map(|l| {
                 if l.starts_with('$') {
-                    Line::from(l.clone()).white().bold()
+                    Line::from(l.clone()).normal().bold()
                 } else if l.contains('✗') {
-                    Line::from(l.clone()).red()
+                    Line::from(l.clone()).danger()
                 } else if l.contains('✓') {
-                    Line::from(l.clone()).green()
+                    Line::from(l.clone()).success()
                 } else {
-                    Line::from(l.clone()).gray()
+                    Line::from(l.clone()).muted()
                 }
             })
             .collect();
@@ -161,10 +160,10 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                 Span::raw(if i == p.cursor { "▶ " } else { "  " }),
                 Span::raw(check).bold(),
                 Span::styled(text, style),
-                Span::raw(format!(" {}", a.label)).white(),
+                Span::raw(format!(" {}", a.label)).normal(),
             ]);
             lines.push(if i == p.cursor {
-                row.style(HIGHLIGHT)
+                row.style(highlight())
             } else {
                 row
             });
@@ -175,7 +174,7 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                 " Space: seç   Enter: devam   Esc: vazgeç",
                 " Space: select   Enter: continue   Esc: cancel",
             ))
-            .gray(),
+            .muted(),
         );
         popup(
             f,
@@ -184,7 +183,7 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                 " {} — what to clean? ",
                 tool.kind.label()
             ),
-            Color::Cyan,
+            theme().accent,
             lines,
             90,
         );
@@ -198,16 +197,16 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                 "Şu komutlar sırayla çalışacak:",
                 "These commands will run in order:"
             ))
-            .white(),
+            .normal(),
         ];
         for a in &c.actions {
             let (style, text) = risk_style(a.risk);
             lines.push(Line::from(vec![
                 Span::styled(text, style),
-                Span::raw(format!(" {}", a.label)).white().bold(),
+                Span::raw(format!(" {}", a.label)).normal().bold(),
             ]));
             for step in &a.steps {
-                lines.push(Line::from(format!("    $ {}", step.describe())).gray());
+                lines.push(Line::from(format!("    $ {}", step.describe())).muted());
             }
         }
         lines.push(Line::from(""));
@@ -218,33 +217,33 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                         "Seçimde VERİ KAYBI olan bir işlem var. Onaylamak için „evet” yazıp Enter'a basın:",
                         "The selection includes a DATA LOSS action. Type “yes” and press Enter to confirm:",
                     ))
-                        .red()
+                        .danger()
                         .bold(),
                 );
                 let ok = typed.trim() == confirm_word();
                 lines.push(Line::from(vec![
                     Span::raw(" > "),
-                    Span::raw(format!("{typed}█")).white().bold(),
+                    Span::raw(format!("{typed}█")).normal().bold(),
                     Span::raw(if ok {
                         t!("   Enter: çalıştır", "   Enter: run")
                     } else {
                         ""
                     })
-                    .green(),
+                    .success(),
                 ]));
-                lines.push(Line::from(t!(" Esc: vazgeç", " Esc: cancel")).gray());
+                lines.push(Line::from(t!(" Esc: vazgeç", " Esc: cancel")).muted());
             }
             None => lines.push(Line::from(vec![
-                Span::raw(t!(" e ", " y ")).black().on_red().bold(),
+                Span::raw(t!(" e ", " y ")).key_danger(),
                 Span::raw(t!(" evet, çalıştır     ", " yes, run     ")),
-                Span::raw(t!(" h ", " n ")).black().on_gray(),
+                Span::raw(t!(" h ", " n ")).key(),
                 Span::raw(t!(" vazgeç", " cancel")),
             ])),
         }
         popup(
             f,
             &tf!(" {} — onay ", " {} — confirm ", tool.kind.label()),
-            Color::Red,
+            theme().danger,
             lines,
             100,
         );

@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Özet — /Users/demo  │  diskte
+┌ Genel ─────────────────────────────────────────┐┌ Disk ──────────────────────────────────────────┐
+│Toplam boyut   8.6 GiB                          ││Disk bilgisi bulunamadı.                        │
+│İçerik         17 dosya · 19 klasör             ││                                                │
+│En yeni değişiklik  30.09.2026 12:00            ││                                                │
+│⚠ Taramada 2 öğeye erişilemedi                  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ Dosya türleri ─────────────────────────────────┐┌ Yaş (son değişiklik) ──────────────────────────┐
+│Arşiv / disk imajı ████▏         3.6 GiB   %41  ││≤ 7 gün    █▉                  923.0 MiB   %10  │
+│Video              ███▋          3.2 GiB   %37  ││≤ 30 gün   ▍                   175.0 MiB    %2  │
+│Diğer              █▉            1.6 GiB   %18  ││≤ 1 yıl    ████▊                 2.3 GiB   %26  │
+│Kod                ▍           310.0 MiB    %4  ││> 1 yıl    ███████████           5.3 GiB   %61  │
+│Belge                            7.0 MiB    %0  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ En büyük dosyalar ─────────────────────────────┐┌ En dolu klasörler (doğrudan içerik) ───────────┐
+│▶    3.0 GiB 27.08.2025 12:00 Downloads/Xcode_16││   3.6 GiB Downloads/                           │
+│     2.3 GiB 28.02.2025 12:00 Movies/holiday-202││   3.2 GiB Movies/                              │
+│   900.0 MiB 22.08.2026 12:00 Movies/screen-reco││ 820.0 MiB Projects/api/target/debug/           │
+│   820.0 MiB 03.06.2026 12:00 Projects/api/targe││ 610.0 MiB Library/Caches/com.example.browser/  │
+│   610.0 MiB 30.09.2026 12:00 Library/Caches/com││ 310.0 MiB Projects/web/node_modules/react/     │
+│   450.0 MiB 15.03.2026 12:00 Downloads/setup.dm││ 150.0 MiB Applications/Sketchpad.app/Contents/M│
+│   310.0 MiB 28.09.2026 12:00 Projects/web/node_││  55.0 MiB Library/Application Support/com.examp│
+│   150.0 MiB 02.08.2026 12:00 Applications/Sketc││   4.0 MiB Documents/                           │
+│   120.0 MiB 19.09.2026 12:00 Downloads/photos.z││   8.0 KiB Projects/web/                        │
+│    55.0 MiB 11.09.2026 12:00 Library/Applicatio││   4.0 KiB Projects/api/                        │
+│                                                ││                                                │
+│                                                ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.
+ Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  görünen/diskt
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Indexed(231)/Indexed(25) BOLD
+ 1: 0+1 Indexed(248)/- | 1+7 -/- BOLD | 8+43 Indexed(248)/- | 51+6 -/- BOLD | 57+43 Indexed(248)/-
+ 2: 0+1 Indexed(248)/- | 16+7 -/- BOLD | 49+2 Indexed(248)/- | 51+24 Indexed(242)/- | 99+1 Indexed(248)/-
+ 3: 0+1 Indexed(248)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+ 4: 0+1 Indexed(248)/- | 21+16 Indexed(28)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+ 5: 0+1 Indexed(248)/- | 1+30 Indexed(130)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+ 6: 0+100 Indexed(248)/-
+ 7: 0+1 Indexed(248)/- | 1+15 -/- BOLD | 16+35 Indexed(248)/- | 51+22 -/- BOLD | 73+27 Indexed(248)/-
+ 8: 0+1 Indexed(248)/- | 20+10 Indexed(178)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(28)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+ 9: 0+1 Indexed(248)/- | 20+10 Indexed(127)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(31)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+10: 0+1 Indexed(248)/- | 20+10 Indexed(245)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(130)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+11: 0+1 Indexed(248)/- | 20+10 Indexed(37)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(160)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+12: 0+1 Indexed(248)/- | 20+10 Indexed(70)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+13: 0+100 Indexed(248)/-
+14: 0+1 Indexed(25)/- | 1+19 -/- BOLD | 20+30 Indexed(25)/- | 50+1 Indexed(248)/- | 51+37 -/- BOLD | 88+12 Indexed(248)/-
+15: 0+1 Indexed(25)/- | 1+13 -/Indexed(253) BOLD | 14+16 Indexed(160)/Indexed(253) BOLD | 30+19 -/Indexed(253) BOLD | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+10 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+16: 0+1 Indexed(25)/- | 14+16 Indexed(160)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+7 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+17: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+26 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+18: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+35 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+19: 0+1 Indexed(25)/- | 14+16 Indexed(28)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+32 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+20: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+37 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+21: 0+1 Indexed(25)/- | 14+16 Indexed(28)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+37 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+22: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+10 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+23: 0+1 Indexed(25)/- | 14+16 Indexed(31)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+13 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+24: 0+1 Indexed(25)/- | 14+16 Indexed(31)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+13 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+25: 0+1 Indexed(25)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 99+1 Indexed(248)/-
+26: 0+1 Indexed(25)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 99+1 Indexed(248)/-
+27: 0+50 Indexed(25)/- | 50+50 Indexed(248)/-
+28: 0+100 Indexed(242)/-
+29: 0+5 Indexed(231)/Indexed(242) | 22+4 Indexed(231)/Indexed(242) | 32+7 Indexed(231)/Indexed(242) | 52+7 Indexed(231)/Indexed(242) | 68+3 Indexed(231)/Indexed(242) | 83+3 Indexed(231)/Indexed(242)

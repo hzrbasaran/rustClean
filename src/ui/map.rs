@@ -1,9 +1,9 @@
 //! The treemap view of a folder.
 
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Color, Modifier, Style, Stylize};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Paragraph};
+use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::Frame;
 
 use crate::app::{Browser, MapColor};
@@ -11,7 +11,8 @@ use crate::stats;
 use crate::treemap::Slot;
 
 use super::format::{clip, fmt_pct, fmt_size, now_secs};
-use super::style::{age_color, text_on, AGE_COLORS, CATEGORY_COLORS, DIR_COLORS};
+use super::style::{age_color, category_color, dir_color, text_on, Themed};
+use super::theme::theme;
 
 pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
     let [map_area, legend_area] =
@@ -31,8 +32,8 @@ pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
                 let bg = match b.map_color {
                     MapColor::Age => age_color(now.saturating_sub(u64::from(n.modified))),
                     // Entries are in size order, so neighbours get different colors.
-                    MapColor::Kind if n.is_dir => DIR_COLORS[i % DIR_COLORS.len()],
-                    MapColor::Kind => CATEGORY_COLORS[stats::Category::of(tree.name(id)) as usize],
+                    MapColor::Kind if n.is_dir => dir_color(i),
+                    MapColor::Kind => category_color(stats::Category::of(tree.name(id)) as usize),
                 };
                 let mut name = tree.name(id).to_string();
                 if n.is_dir {
@@ -53,7 +54,7 @@ pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
                     .map(|i| tree.node(b.entries[i]).size.get(mode))
                     .sum();
                 (
-                    Color::DarkGray,
+                    theme().other_block,
                     tf!(
                         "diğer ({count} küçük öğe — Enter: listede gör)",
                         "other ({count} small items — Enter: show in list)"
@@ -67,11 +68,19 @@ pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
         let is_selected = selected == Some(*slot);
         let style = Style::new().bg(bg).fg(fg);
         let mut inner = *rect;
-        if is_selected && rect.width >= 3 && rect.height >= 3 {
+        // Without colors every block gets a border, so blocks stay apart.
+        let framed = theme().framed_blocks;
+        if (is_selected || framed) && rect.width >= 3 && rect.height >= 3 {
+            let (kind, border) = if is_selected {
+                let white = if framed { Color::Reset } else { Color::White };
+                (BorderType::Thick, Style::new().fg(white).bg(bg).bold())
+            } else {
+                (BorderType::Plain, style)
+            };
             f.render_widget(
                 Block::bordered()
-                    .border_type(ratatui::widgets::BorderType::Thick)
-                    .border_style(Style::new().fg(Color::White).bg(bg).bold())
+                    .border_type(kind)
+                    .border_style(border)
                     .style(style),
                 *rect,
             );
@@ -91,7 +100,11 @@ pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
         }
         let text_style = if is_selected && inner == *rect {
             // Too small for a border: show the selection by inverting.
-            Style::new().bg(Color::White).fg(Color::Black)
+            if framed {
+                style.add_modifier(Modifier::REVERSED)
+            } else {
+                Style::new().bg(Color::White).fg(Color::Black)
+            }
         } else {
             style
         };
@@ -99,13 +112,13 @@ pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
     }
 
     let mut legend = vec![
-        Span::raw(" t / Esc ").black().on_gray(),
-        Span::raw(t!(" listeye dön   ", " back to list   ")).white(),
-        Span::raw(t!("Renk: ", "Color: ")).white().bold(),
+        Span::raw(" t / Esc ").key(),
+        Span::raw(t!(" listeye dön   ", " back to list   ")).normal(),
+        Span::raw(t!("Renk: ", "Color: ")).normal().bold(),
     ];
     match b.map_color {
         MapColor::Kind => {
-            for color in DIR_COLORS.iter().take(4) {
+            for color in theme().dirs.iter().take(4) {
                 legend.push(Span::styled("█", Style::new().fg(*color)));
             }
             legend.push(
@@ -113,20 +126,20 @@ pub(super) fn render_map(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
                     " klasörler (her biri ayrı)  ",
                     " folders (each its own)  "
                 ))
-                .white(),
+                .normal(),
             );
-            for (cat, color) in stats::Category::ALL.iter().zip(CATEGORY_COLORS) {
+            for (cat, color) in stats::Category::ALL.iter().zip(theme().categories) {
                 legend.push(Span::styled("██", Style::new().fg(color)));
-                legend.push(Span::raw(format!(" {}  ", cat.label())).white());
+                legend.push(Span::raw(format!(" {}  ", cat.label())).normal());
             }
-            legend.push(Span::raw(t!("  (c: yaşa göre)", "  (c: by age)")).gray());
+            legend.push(Span::raw(t!("  (c: yaşa göre)", "  (c: by age)")).muted());
         }
         MapColor::Age => {
-            for (color, text) in AGE_COLORS.iter().zip((0..4).map(stats::age_label)) {
+            for (color, text) in theme().ages.iter().zip((0..4).map(stats::age_label)) {
                 legend.push(Span::styled("██", Style::new().fg(*color)));
-                legend.push(Span::raw(format!(" {text}  ")).white());
+                legend.push(Span::raw(format!(" {text}  ")).normal());
             }
-            legend.push(Span::raw(t!("  (c: türe göre)", "  (c: by type)")).gray());
+            legend.push(Span::raw(t!("  (c: türe göre)", "  (c: by type)")).muted());
         }
     }
     f.render_widget(Line::from(legend), legend_area);

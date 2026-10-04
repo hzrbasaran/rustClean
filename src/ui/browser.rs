@@ -2,7 +2,7 @@
 //! It hands the body to the other views (map, results, dashboard, …).
 
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Row, Table};
 use ratatui::Frame;
@@ -16,8 +16,9 @@ use super::format::{fmt_count, fmt_pct, fmt_size, now_secs};
 use super::map::render_map;
 use super::menus::{render_report_menu, render_snapshot_picker};
 use super::results::render_results;
-use super::style::{date_cell, HIGHLIGHT};
+use super::style::{date_cell, highlight, Themed};
 use super::system::render_system;
+use super::theme::theme;
 use super::tools::render_tools;
 use super::{bar, keys, table_block, title, DATE_WIDTH, SPINNER, WIDE};
 
@@ -122,8 +123,8 @@ pub(super) fn render_browser(
                 fmt_count(p.files),
                 fmt_size(p.bytes)
             ))
-            .cyan(),
-            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).gray(),
+            .accent(),
+            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).muted(),
         ])
     } else if let Some(job) = &b.dup_job {
         use std::sync::atomic::Ordering::Relaxed;
@@ -154,28 +155,25 @@ pub(super) fn render_browser(
                 "{spin} Kopyalar aranıyor — {step}",
                 "{spin} Looking for duplicates — {step}"
             ))
-            .cyan(),
-            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).gray(),
+            .accent(),
+            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).muted(),
         ])
     } else if let Some(input) = &b.input {
         Line::from(vec![
-            Span::raw(t!(" Ara: ", " Find: "))
-                .black()
-                .on_yellow()
-                .bold(),
+            Span::raw(t!(" Ara: ", " Find: ")).key_warn().bold(),
             Span::raw(format!(" {input}")),
             Span::raw("█").slow_blink(),
             Span::raw(t!(
                 "   örn: deneme · deneme* · *.log",
                 "   e.g. test · test* · *.log"
             ))
-            .gray(),
+            .muted(),
         ])
     } else if let Some(st) = &b.status {
         let style = if st.error {
-            Style::new().fg(Color::Red)
+            Style::new().fg(theme().danger)
         } else {
-            Style::new().fg(Color::Green)
+            Style::new().fg(theme().ok)
         };
         Line::from(Span::styled(st.text.clone(), style))
     } else if let Some(view) = &b.tools {
@@ -184,33 +182,33 @@ pub(super) fn render_browser(
                 "Bitti. Araç yeniden ölçülüyor; ana listedeki boyutlar için gezginde r ile yeniden tarayın.",
                 "Done. Measuring the tool again; rescan with r in the browser to update the main list.",
             ))
-            .green(),
-            Some(_) => Line::from(t!("Komutlar çalışıyor, lütfen bekleyin…", "Commands are running, please wait…")).cyan(),
+            .success(),
+            Some(_) => Line::from(t!("Komutlar çalışıyor, lütfen bekleyin…", "Commands are running, please wait…")).accent(),
             None => Line::from(t!(
                 "Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.",
                 "Measuring only reads. No command runs without your confirmation.",
             ))
-            .gray(),
+            .muted(),
         }
     } else if b.system.is_some() {
         Line::from(t!(
             "Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.",
             "This screen only shows information; it changes nothing.",
         ))
-        .gray()
+        .muted()
     } else if b.dashboard.is_some() {
         Line::from(t!(
             "„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.",
             "“Fullest folders” ignores subfolders: it shows where the space actually sits.",
         ))
-        .gray()
+        .muted()
     } else if let Some(r) = &b.results {
         let text = if r.rows.is_empty() {
             t!("Sonuç yok.", "No results.")
         } else {
             r.note.as_str()
         };
-        Line::from(text).gray()
+        Line::from(text).muted()
     } else {
         let mut spans = vec![Span::raw(tf!(
             "{} öğe tarandı, {:.1} sn",
@@ -218,7 +216,7 @@ pub(super) fn render_browser(
             fmt_count(b.tree.len() as u64),
             b.elapsed.as_secs_f64()
         ))
-        .gray()];
+        .muted()];
         if b.errors > 0 {
             spans.push(
                 Span::raw(tf!(
@@ -226,7 +224,7 @@ pub(super) fn render_browser(
                     "   ⚠ {} items inaccessible",
                     fmt_count(b.errors)
                 ))
-                .yellow(),
+                .warn(),
             );
         }
         if b.trashed.get(mode) > 0 {
@@ -236,11 +234,11 @@ pub(super) fn render_browser(
                     "   🗑 moved to trash this session: {}",
                     fmt_size(b.trashed.get(mode))
                 ))
-                .green(),
+                .success(),
             );
         }
         if b.entries.is_empty() {
-            spans.push(Span::raw(t!("   (klasör boş)", "   (empty folder)")).gray());
+            spans.push(Span::raw(t!("   (klasör boş)", "   (empty folder)")).muted());
         }
         Line::from(spans)
     };
@@ -407,7 +405,7 @@ fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
         let name = if n.is_dir {
             Span::styled(
                 format!("{}/", tree.name(id)),
-                Style::new().fg(Color::LightBlue).bold(),
+                Style::new().fg(theme().folder).bold(),
             )
         } else {
             Span::raw(tree.name(id).to_string())
@@ -418,7 +416,7 @@ fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
             String::new()
         };
         let in_basket = if b.basket.covers(tree, id) {
-            Span::raw("✓").green().bold()
+            Span::raw("✓").success().bold()
         } else {
             Span::raw(" ")
         };
@@ -426,10 +424,10 @@ fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
             Cell::from(in_basket),
             Cell::from(Line::from(fmt_size(size)).right_aligned()),
             Cell::from(Line::from(vec![
-                Span::styled(bar(ratio, 12), Style::new().fg(Color::Cyan)),
+                Span::styled(bar(ratio, 12), Style::new().fg(theme().accent)),
                 Span::raw(format!(" {:>6}", fmt_pct(ratio * 100.0, 1))),
             ])),
-            Cell::from(Line::from(count).right_aligned().gray()),
+            Cell::from(Line::from(count).right_aligned().muted()),
             date_cell(n.modified, now),
         ];
         if wide {
@@ -462,7 +460,7 @@ fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
 
     let table = Table::new(rows, widths)
         .header(Row::new(header).bold().underlined())
-        .row_highlight_style(HIGHLIGHT)
+        .row_highlight_style(highlight())
         .highlight_symbol("▶ ")
         .block(table_block());
     f.render_stateful_widget(table, area, &mut b.table);

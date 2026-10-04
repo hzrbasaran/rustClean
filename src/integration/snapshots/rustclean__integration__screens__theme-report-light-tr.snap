@@ -1,0 +1,57 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  En büyük dosyalar — /Users/demo  │  17 satır, 8.6 GiB (diskte)
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+      Boyut       Adet       Son değişiklik   Konum
+▶ [ ]     3.0 GiB            27.08.2025 12:00 Downloads/Xcode_16.xip
+  [ ]     2.3 GiB            28.02.2025 12:00 Movies/holiday-2024.mp4
+  [ ]   900.0 MiB            22.08.2026 12:00 Movies/screen-recording.mov
+  [ ]   820.0 MiB            03.06.2026 12:00 Projects/api/target/debug/api
+  [ ]   610.0 MiB            30.09.2026 12:00 Library/Caches/com.example.browser/cache.db
+  [ ]   450.0 MiB            15.03.2026 12:00 Downloads/setup.dmg
+  [ ]   310.0 MiB            28.09.2026 12:00 Projects/web/node_modules/react/index.js
+  [ ]   150.0 MiB            02.08.2026 12:00 Applications/Sketchpad.app/Contents/MacOS/Sketchpad
+  [ ]   120.0 MiB            19.09.2026 12:00 Downloads/photos.zip
+  [ ]    55.0 MiB            11.09.2026 12:00 Library/Application Support/com.example.sketchpad/stat
+  [ ]     4.0 MiB            05.12.2025 12:00 Documents/taxes-2025.pdf
+  [ ]     3.0 MiB            29.09.2026 12:00 Downloads/report.pdf
+  [ ]    16.0 KiB            30.09.2026 12:00 Documents/notes.md
+  [ ]     4.0 KiB            03.07.2026 12:00 Documents/README.md
+  [ ]     4.0 KiB            03.06.2026 12:00 Projects/api/Cargo.toml
+  [ ]     4.0 KiB            28.09.2026 12:00 Projects/web/README.md
+  [ ]     4.0 KiB            28.09.2026 12:00 Projects/web/package.json
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Enter: dosyanın bulunduğu klasörü aç
+ ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter  aç / konuma
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Indexed(231)/Indexed(25) BOLD
+ 1: 39+8 -/- BOLD | 47+2 Indexed(28)/- | 60+2 Indexed(31)/- | 74+2 Indexed(130)/- | 87+2 Indexed(160)/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+2 -/Indexed(253) BOLD | 2+3 Indexed(242)/Indexed(253) BOLD | 5+24 -/Indexed(253) BOLD | 29+16 Indexed(160)/Indexed(253) BOLD | 45+55 -/Indexed(253) BOLD
+ 4: 2+3 Indexed(242)/- | 29+16 Indexed(160)/-
+ 5: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+ 6: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+ 7: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
+ 8: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+ 9: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
+10: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+11: 2+3 Indexed(242)/- | 29+16 Indexed(31)/-
+12: 2+3 Indexed(242)/- | 29+16 Indexed(31)/-
+13: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+14: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
+15: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
+16: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+17: 2+3 Indexed(242)/- | 29+16 Indexed(130)/-
+18: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
+19: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
+28: 0+100 Indexed(242)/-
+29: 0+4 Indexed(231)/Indexed(242) | 10+7 Indexed(231)/Indexed(242) | 26+3 Indexed(231)/Indexed(242) | 36+3 Indexed(231)/Indexed(242) | 54+3 Indexed(231)/Indexed(242) | 69+3 Indexed(231)/Indexed(242) | 80+7 Indexed(231)/Indexed(242)

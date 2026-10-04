@@ -1,0 +1,45 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+    Size        Share               Files      Modified         Name
+▶       3.6 GiB █████         41.2%          4 2026-09-29 12:00 Downloads/
+        3.2 GiB ████▍         36.7%          2 2026-09-21 12:00 Movies/
+        1.1 GiB █▌            12.8%          5 2026-09-28 12:00 Projects/
+      665.0 MiB ▉              7.5%          2 2026-09-30 12:00 Library/
+      150.0 MiB ▎              1.7%          1 2026-09-21 12:00 Applications/
+        4.0 MiB                0.0%          3 2026-09-30 12:00 Documents/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort   a  appare
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 -/- BOLD | REVERSED
+ 1: 36+7 -/- BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 -/- BOLD | REVERSED
+ 4: 64+7 -/- BOLD
+ 5: 64+9 -/- BOLD
+ 6: 64+8 -/- BOLD
+ 7: 64+13 -/- BOLD
+ 8: 64+10 -/- BOLD
+29: 0+4 -/- REVERSED | 11+7 -/- REVERSED | 25+3 -/- REVERSED | 35+3 -/- REVERSED | 44+3 -/- REVERSED | 54+3 -/- REVERSED | 67+3 -/- REVERSED | 80+3 -/- REVERSED | 90+3 -/- REVERSED

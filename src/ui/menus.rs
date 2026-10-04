@@ -1,7 +1,7 @@
 //! The report menu and the saved scan picker.
 
 use ratatui::layout::Rect;
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::Frame;
@@ -9,7 +9,8 @@ use ratatui::Frame;
 use crate::reports::MenuItem;
 
 use super::format::{fmt_ago, fmt_date, fmt_delta, fmt_size, now_secs};
-use super::style::HIGHLIGHT;
+use super::style::{highlight, Themed};
+use super::theme::theme;
 
 pub(super) fn render_snapshot_picker(
     f: &mut Frame<'_>,
@@ -24,7 +25,7 @@ pub(super) fn render_snapshot_picker(
     for (i, s) in saved.iter().enumerate() {
         let h = &s.header;
         let style = if i == selected {
-            HIGHLIGHT
+            highlight()
         } else {
             Style::new()
         };
@@ -32,16 +33,16 @@ pub(super) fn render_snapshot_picker(
             Line::from(vec![
                 Span::raw(if i == selected { "▶ " } else { "  " }),
                 Span::raw(fmt_date(h.time.min(u64::from(u32::MAX)) as u32))
-                    .white()
+                    .normal()
                     .bold(),
-                Span::raw(format!("  {:<16}", fmt_ago(now.saturating_sub(h.time)))).gray(),
+                Span::raw(format!("  {:<16}", fmt_ago(now.saturating_sub(h.time)))).muted(),
                 Span::raw(tf!("toplam {:>10}", "total {:>10}", fmt_size(h.total.disk))),
                 Span::raw(tf!(
                     "   şimdiye göre {}",
                     "   vs. now {}",
                     fmt_delta(total_now, h.total.disk)
                 ))
-                .yellow(),
+                .warn(),
             ])
             .style(style),
         );
@@ -52,7 +53,7 @@ pub(super) fn render_snapshot_picker(
             " Karşılaştırma bulunduğunuz klasörün altında yapılır.",
             " The comparison covers the folder you are in.",
         ))
-        .gray(),
+        .muted(),
     );
     let height = (lines.len() as u16 + 2).min(area.height);
     let popup = Rect {
@@ -70,10 +71,10 @@ pub(super) fn render_snapshot_picker(
                         " Hangi taramayla karşılaştırılsın? ",
                         " Compare with which scan? "
                     ))
-                    .white()
+                    .normal()
                     .bold(),
                 )
-                .border_style(Style::new().fg(Color::Cyan)),
+                .border_style(Style::new().fg(theme().accent)),
         ),
         popup,
     );
@@ -90,31 +91,31 @@ pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect)
                 t!(" Raporlar", " Reports")
             };
             lines.push(Line::from(""));
-            lines.push(Line::from(heading).cyan().bold());
+            lines.push(Line::from(heading).accent().bold());
         }
         let marker = if i == selected { "▶ " } else { "  " };
         let style = if i == selected {
-            HIGHLIGHT
+            highlight()
         } else {
             Style::new()
         };
         lines.push(
             Line::from(vec![
                 Span::raw(marker),
-                Span::raw(format!("{:>2}. ", i + 1)).gray(),
-                Span::raw(item.label()).white().bold(),
+                Span::raw(format!("{:>2}. ", i + 1)).muted(),
+                Span::raw(item.label()).normal().bold(),
             ])
             .style(style),
         );
     }
     lines.push(Line::from(""));
-    lines.push(Line::from(format!(" {}", MenuItem::ALL[selected].description())).yellow());
+    lines.push(Line::from(format!(" {}", MenuItem::ALL[selected].description())).warn());
     lines.push(
         Line::from(t!(
             " Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama). L: English",
             " Reports cover the folder you are in (apps: the whole scan). L: Türkçe",
         ))
-        .gray(),
+        .muted(),
     );
 
     let height = (lines.len() as u16 + 2).min(area.height);
@@ -128,8 +129,8 @@ pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect)
     f.render_widget(
         Paragraph::new(lines).block(
             Block::bordered()
-                .title(Span::raw(t!(" Menü ", " Menu ")).white().bold())
-                .border_style(Style::new().fg(Color::Cyan)),
+                .title(Span::raw(t!(" Menü ", " Menu ")).normal().bold())
+                .border_style(Style::new().fg(theme().accent)),
         ),
         popup,
     );

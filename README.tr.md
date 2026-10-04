@@ -59,6 +59,8 @@ harekete geçmenizi sağlar:
 - **Sistem verileri paneli** (macOS): APFS bölümleri, Time Machine yerel anlık
   görüntüleri, takas ve taranan toplamın diskten neden farklı olduğu.
 - **Türkçe ve İngilizce** arayüz (`L` ile değişir).
+- Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
+  (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 
 ## Ekran görüntüleri
 
@@ -135,6 +137,8 @@ cargo build --release   # çalıştırılabilir dosya: target/release/rustclean
 rustclean                 # taranacak diski seçin
 rustclean ~/Projects      # bir klasörü doğrudan tarayın
 rustclean --lang tr       # arayüz dili: tr ya da en (programda: L)
+rustclean --theme light   # dark, light ya da colorblind (programda: T)
+rustclean --no-color      # renksiz; NO_COLOR=1 de olur
 rustclean --list-disks    # diskleri listeleyip çık
 rustclean --summary ~     # arayüz açmadan tarayıp toplamları yazdır
 ```
@@ -153,6 +157,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `s` · `a` | sırala · görünen / diskte boyut |
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
+| `T` | tema: koyu → açık → renk körü dostu |
 | `q` | çık |
 
 Tüm ekranlar ve raporlar için [kullanım kılavuzu](docs/USAGE.md) (İngilizce).
@@ -179,7 +184,7 @@ kullanımda daha az denenmiştir. Bazı özellikler yalnızca macOS'ta vardır:
 rustClean hiçbir ağ bağlantısı kurmaz. Yalnızca şunları yazar:
 
 - geçmiş özelliği için tarama özetleri (taranan her klasör için en yeni 10), ve
-- seçilen arayüz dili.
+- seçilen arayüz dili ve tema.
 
 Bunlar platformun veri klasöründe tutulur: macOS'ta
 `~/Library/Application Support/rustClean`, Linux'ta `~/.local/share/rustClean`,

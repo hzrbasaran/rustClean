@@ -21,6 +21,7 @@ mod results;
 mod scanning;
 mod style;
 mod system;
+pub mod theme;
 mod tools;
 
 // Formatting helpers used outside `ui`.
@@ -31,7 +32,8 @@ pub use format::{fmt_ago, fmt_date, fmt_delta, fmt_size, now_secs};
 use browser::render_browser;
 use disks::render_disks;
 use scanning::render_scanning;
-use style::AGE_COLORS;
+use style::Themed;
+use theme::theme;
 
 const SPINNER: &[char] = &['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
@@ -52,7 +54,7 @@ pub fn render(f: &mut Frame<'_>, app: &mut App) {
 
 fn title(text: String) -> Line<'static> {
     Line::from(vec![
-        Span::raw(" rustClean ").black().on_cyan().bold(),
+        Span::raw(" rustClean ").badge(),
         Span::raw(" "),
         Span::raw(text),
     ])
@@ -61,7 +63,7 @@ fn title(text: String) -> Line<'static> {
 fn keys(pairs: &[(&str, &str)]) -> Line<'static> {
     let mut spans = Vec::new();
     for (k, desc) in pairs {
-        spans.push(Span::raw(format!(" {k} ")).black().on_gray());
+        spans.push(Span::raw(format!(" {k} ")).key());
         spans.push(Span::raw(format!(" {desc}  ")));
     }
     Line::from(spans)
@@ -74,9 +76,9 @@ const DATE_WIDTH: u16 = 16;
 
 /// Top/bottom rule with the date color legend on the top edge.
 fn table_block() -> Block<'static> {
-    let label = Style::new().fg(Color::White);
+    let label = Style::new().fg(theme().text);
     let mut legend = vec![Span::styled(t!(" Tarih: ", " Date: "), label.bold())];
-    for (color, text) in AGE_COLORS.iter().zip((0..4).map(stats::age_label)) {
+    for (color, text) in theme().ages.iter().zip((0..4).map(stats::age_label)) {
         legend.push(Span::styled("██", Style::new().fg(*color)));
         legend.push(Span::styled(format!(" {text}   "), label));
     }
@@ -100,7 +102,7 @@ fn popup(f: &mut Frame<'_>, title: &str, color: Color, lines: Vec<Line<'_>>, max
     f.render_widget(
         Paragraph::new(lines).wrap(Wrap { trim: false }).block(
             Block::bordered()
-                .title(Span::raw(title.to_string()).white().bold())
+                .title(Span::raw(title.to_string()).normal().bold())
                 .border_style(Style::new().fg(color)),
         ),
         rect,
@@ -118,12 +120,12 @@ fn halves(area: Rect) -> [Rect; 2] {
 /// Bordered panel; the focused one gets a highlighted border.
 fn panel(title: &str, focused: bool) -> Block<'static> {
     let border = if focused {
-        Style::new().fg(Color::Cyan)
+        Style::new().fg(theme().accent)
     } else {
-        Style::new().fg(Color::DarkGray)
+        Style::new().fg(theme().dim)
     };
     Block::bordered()
-        .title(Span::raw(title.to_string()).white().bold())
+        .title(Span::raw(title.to_string()).normal().bold())
         .border_style(border)
 }
 

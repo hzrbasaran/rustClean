@@ -12,6 +12,7 @@ keys on the bottom line, so you rarely need to look anything up.
 - [Reports](#reports)
 - [Tools](#tools)
 - [Language](#language)
+- [Themes and colors](#themes-and-colors)
 - [Command line](#command-line)
 
 ## Starting
@@ -192,10 +193,23 @@ with the cursor on the same entry and an open group still open. The choice is
 saved. `--lang tr|en` overrides it for one run. Without either, the system
 language is used.
 
+## Themes and colors
+
+`T` switches the colors anywhere (except while typing): **dark** (the
+default), **light** for terminals with a white background, and
+**color-blind friendly**, which uses blue and orange instead of green and red
+(dates, disk usage, cleanup risks; each also has text beside it). The choice
+is saved. `--theme dark|light|colorblind` overrides it for one run.
+
+`--no-color`, or the `NO_COLOR` environment variable, turns colors off: the
+selected row is shown reversed, headings in bold, and treemap blocks get
+borders. `T` then leaves the colors off.
+
 ## Command line
 
 ```text
-rustclean [PATH] [--lang tr|en] [--list-disks] [--summary]
+rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
+          [--list-disks] [--summary]
 ```
 
 - `PATH`: scan this folder directly instead of choosing a disk.
