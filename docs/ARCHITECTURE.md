@@ -32,7 +32,11 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    │                walk / top-N helpers
    │    └─ one module per report group: size, downloads, dev_junk, caches,
    │       names
-   ├─ apps.rs ──── apps and their data, orphaned leftovers
+   ├─ apps/ ────── apps and their data, orphaned leftovers
+   │    ├─ mod.rs        App, DataDir, the Apps report, uninstall checks
+   │    ├─ find.rs       installed apps (in the scan and on disk)
+   │    ├─ data.rs       data folders and matching them to apps
+   │    └─ orphans.rs    leftovers of removed apps (errs on keeping data)
    ├─ duplicates.rs  identical-content search (background thread)
    ├─ stats.rs ─── summary statistics, age groups, file categories
    ├─ search.rs ── name patterns
