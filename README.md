@@ -44,11 +44,16 @@ one go.
   - old and large files
   - **installers and archives in Downloads** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - **duplicate files** with identical content, keeping the oldest copy
+  - **empty folders, broken links and temporary files** (`.DS_Store`,
+    `*.tmp`, Office locks, unfinished downloads), leaving alone hidden
+    folders, bundles, `Library`, build output and system folders
 - **Age filter** (`f`) on reports: show only what has not been touched for
   30 / 90 / 180 / 365 days. For developer junk, the age is the *project's*,
   not the dependency folder's.
 - **Basket** — collect entries with `Space` anywhere, review them with `S`,
   move them all to the trash with `x`.
+- **Deletion log** — everything moved to the trash, by day, with how it was
+  deleted (menu → Deletion log).
 - **Developer tools cleanup** — measures what Docker, Xcode simulators,
   DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew and Cargo
   could free, and runs **their own cleanup commands** after you confirm.
@@ -58,6 +63,7 @@ one go.
 - **Turkish and English** interface (`L` to switch).
 - **Themes** for dark and light terminals and a color-blind friendly palette
   (`T` to switch), or no colors at all (`--no-color`, `NO_COLOR`).
+- **Help** (`?`) — every key on one screen, the current screen's first.
 
 ## Screenshots
 
@@ -68,6 +74,12 @@ one go.
 | ![Reports](docs/screenshots/menu.svg) | ![Developer junk](docs/screenshots/dev-junk-stale.svg) |
 | **Duplicate files** | **Basket** |
 | ![Duplicates](docs/screenshots/duplicates.svg) | ![Basket](docs/screenshots/basket.svg) |
+| **Empty folders, broken links, temporary files** | **Deletion log** |
+| ![Clutter report](docs/screenshots/clutter.svg) | ![Deletion log](docs/screenshots/deletion-log.svg) |
+| **Light theme** | **Color-blind friendly theme** |
+| ![Light theme](docs/screenshots/theme-light.svg) | ![Color-blind friendly theme](docs/screenshots/theme-colorblind.svg) |
+| **Help (`?`)** | |
+| ![Help](docs/screenshots/help.svg) | |
 
 ## Safety first
 

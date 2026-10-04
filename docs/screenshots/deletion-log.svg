@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1104" height="594" viewBox="0 0 1104 594">
+<rect width="100%" height="100%" rx="8" fill="#11111b"/>
+<g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
+<rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#00cdcd"/>
+<text x="0.0" y="14.0" fill="#000000" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
+<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> Deletion log  │  last 30 days: 11.9 GiB  │  8 items in all, 14.9 GiB                                        </text>
+<text x="0.0" y="33.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> 2026-10-04</text>
+<text x="99.0" y="33.0" fill="#e5e5e5" xml:space="preserve" textLength="180.0" lengthAdjust="spacingAndGlyphs">   5 items, 10.0 GiB</text>
+<text x="0.0" y="52.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   21:17</text>
+<text x="72.0" y="52.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">   500.0 MiB</text>
+<text x="180.0" y="52.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  report: Developer junk  </text>
+<text x="414.0" y="52.0" fill="#ffffff" xml:space="preserve" textLength="333.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Projects/web-app/node_modules</text>
+<text x="0.0" y="71.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   19:27</text>
+<text x="72.0" y="71.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">     5.8 GiB</text>
+<text x="180.0" y="71.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  basket                  </text>
+<text x="414.0" y="71.0" fill="#ffffff" xml:space="preserve" textLength="432.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Downloads/ubuntu-24.04-desktop-amd64.iso</text>
+<text x="0.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   19:27</text>
+<text x="72.0" y="90.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">     3.5 GiB</text>
+<text x="180.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  basket                  </text>
+<text x="414.0" y="90.0" fill="#ffffff" xml:space="preserve" textLength="270.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Downloads/Xcode_16.xip</text>
+<text x="0.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   18:27</text>
+<text x="72.0" y="109.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">    55.0 MiB</text>
+<text x="180.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  uninstall: Sketchpad    </text>
+<text x="414.0" y="109.0" fill="#ffffff" xml:space="preserve" textLength="513.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Library/Application Support/com.example.sketchpad</text>
+<text x="0.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   18:27</text>
+<text x="72.0" y="128.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">   150.0 MiB</text>
+<text x="180.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  uninstall: Sketchpad    </text>
+<text x="414.0" y="128.0" fill="#ffffff" xml:space="preserve" textLength="306.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Applications/Sketchpad.app</text>
+<text x="0.0" y="147.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> 2026-10-03</text>
+<text x="99.0" y="147.0" fill="#e5e5e5" xml:space="preserve" textLength="171.0" lengthAdjust="spacingAndGlyphs">   2 items, 1.9 GiB</text>
+<text x="0.0" y="166.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   16:27</text>
+<text x="72.0" y="166.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">     1.2 GiB</text>
+<text x="180.0" y="166.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  tool: npm cache         </text>
+<text x="414.0" y="166.0" fill="#ffffff" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs"> ~/.npm/_cacache</text>
+<text x="0.0" y="185.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   16:27</text>
+<text x="72.0" y="185.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">   700.0 MiB</text>
+<text x="180.0" y="185.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  report: Cache folders   </text>
+<text x="414.0" y="185.0" fill="#ffffff" xml:space="preserve" textLength="369.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Library/Caches/com.spotify.client</text>
+<text x="0.0" y="204.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> 2026-08-25</text>
+<text x="99.0" y="204.0" fill="#e5e5e5" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">   1 item, 3.0 GiB</text>
+<text x="0.0" y="223.0" fill="#e5e5e5" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   21:27</text>
+<text x="72.0" y="223.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">     3.0 GiB</text>
+<text x="180.0" y="223.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">  list                    </text>
+<text x="414.0" y="223.0" fill="#ffffff" xml:space="preserve" textLength="279.0" lengthAdjust="spacingAndGlyphs"> ~/demo/Movies/holiday-2023.mov</text>
+<text x="0.0" y="261.0" fill="#e5e5e5" xml:space="preserve" textLength="756.0" lengthAdjust="spacingAndGlyphs">  The entries are in the trash: they can be restored from there until it is emptied.</text>
+<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="216.0" lengthAdjust="spacingAndGlyphs">156 items scanned, 0.0 s</text>
+<rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
+<text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> help  </text>
+<rect x="90.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
+<text x="90.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
+<text x="126.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> scroll  </text>
+<rect x="207.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="207.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> r </text>
+<text x="234.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs"> refresh  </text>
+<rect x="324.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="324.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> m </text>
+<text x="351.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> menu  </text>
+<rect x="414.0" y="551.0" width="45.0" height="19.0" fill="#e5e5e5"/>
+<text x="414.0" y="565.0" fill="#000000" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Esc </text>
+<text x="459.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> back  </text>
+<rect x="522.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="522.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> q </text>
+<text x="549.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="531.0" lengthAdjust="spacingAndGlyphs"> quit                                                      </text>
+</g></svg>

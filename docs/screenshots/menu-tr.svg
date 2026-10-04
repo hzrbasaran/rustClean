@@ -3,20 +3,20 @@
 <g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
 <rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#00cdcd"/>
 <text x="0.0" y="14.0" fill="#000000" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
-<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo  │  21.9 GiB (apparent)  │  105 files  │  sort: size                                                 </text>
-<text x="0.0" y="33.0" fill="#cdd6f4" xml:space="preserve" textLength="504.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────</text>
-<text x="504.0" y="33.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Date: </text>
-<text x="567.0" y="33.0" fill="#00cd00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
-<text x="585.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> ≤ 7 days   </text>
-<text x="693.0" y="33.0" fill="#00cdcd" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
-<text x="711.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs"> ≤ 30 days   </text>
-<text x="828.0" y="33.0" fill="#cdcd00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
-<text x="846.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> ≤ 1 year   </text>
-<text x="954.0" y="33.0" fill="#cd0000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
-<text x="972.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 year   </text>
-<text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">    Size        Sh</text>
+<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo  │  21.9 GiB (görünen)  │  105 dosya  │  sıralama: boyut                                             </text>
+<text x="0.0" y="33.0" fill="#cdd6f4" xml:space="preserve" textLength="531.0" lengthAdjust="spacingAndGlyphs">───────────────────────────────────────────────────────────</text>
+<text x="531.0" y="33.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> Tarih: </text>
+<text x="603.0" y="33.0" fill="#00cd00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
+<text x="621.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> ≤ 7 gün   </text>
+<text x="720.0" y="33.0" fill="#00cdcd" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
+<text x="738.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> ≤ 30 gün   </text>
+<text x="846.0" y="33.0" fill="#cdcd00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
+<text x="864.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> ≤ 1 yıl   </text>
+<text x="963.0" y="33.0" fill="#cd0000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
+<text x="981.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 yıl   </text>
+<text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">    Boyut       Or</text>
 <text x="162.0" y="52.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┌</text>
-<text x="171.0" y="52.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> Menu </text>
+<text x="171.0" y="52.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> Menü </text>
 <text x="225.0" y="52.0" fill="#00cdcd" xml:space="preserve" textLength="693.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────┐</text>
 <rect x="0.0" y="57.0" width="162.0" height="19.0" fill="#444444"/>
 <text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">▶       9.7 GiB ██</text>
@@ -25,7 +25,7 @@
 <rect x="918.0" y="57.0" width="162.0" height="19.0" fill="#444444"/>
 <text x="0.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.6 GiB </text>
 <text x="144.0" y="90.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">██│</text>
-<text x="171.0" y="90.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> Reports</text>
+<text x="171.0" y="90.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> Raporlar</text>
 <text x="909.0" y="90.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="0.0" y="109.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.2 GiB </text>
 <text x="144.0" y="109.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">█▊│</text>
@@ -33,99 +33,99 @@
 <text x="171.0" y="109.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">▶ </text>
 <rect x="189.0" y="95.0" width="36.0" height="19.0" fill="#444444"/>
 <text x="189.0" y="109.0" fill="#e5e5e5" font-weight="bold" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 1. </text>
-<rect x="225.0" y="95.0" width="117.0" height="19.0" fill="#444444"/>
-<text x="225.0" y="109.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">Largest files</text>
+<rect x="225.0" y="95.0" width="153.0" height="19.0" fill="#444444"/>
+<text x="225.0" y="109.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="153.0" lengthAdjust="spacingAndGlyphs">En büyük dosyalar</text>
 <text x="909.0" y="109.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="0.0" y="128.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.0 GiB </text>
 <text x="144.0" y="128.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">█▋│</text>
 <text x="189.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 2. </text>
-<text x="225.0" y="128.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs">Largest folders</text>
+<text x="225.0" y="128.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">En büyük klasörler</text>
 <text x="909.0" y="128.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="0.0" y="147.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        1.5 GiB </text>
 <text x="144.0" y="147.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">▊ │</text>
 <text x="189.0" y="147.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 3. </text>
-<text x="225.0" y="147.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="216.0" lengthAdjust="spacingAndGlyphs">Most repeated file names</text>
+<text x="225.0" y="147.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="279.0" lengthAdjust="spacingAndGlyphs">En çok tekrar eden dosya adları</text>
 <text x="909.0" y="147.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="0.0" y="166.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      950.0 MiB </text>
 <text x="144.0" y="166.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">▌ │</text>
 <text x="189.0" y="166.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 4. </text>
-<text x="225.0" y="166.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="243.0" lengthAdjust="spacingAndGlyphs">Applications and their data</text>
+<text x="225.0" y="166.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">Uygulamalar ve verileri</text>
 <text x="909.0" y="166.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="0.0" y="185.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      117.3 MiB </text>
 <text x="144.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">▏ │</text>
 <text x="189.0" y="185.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 5. </text>
-<text x="225.0" y="185.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="198.0" lengthAdjust="spacingAndGlyphs">Orphaned app leftovers</text>
+<text x="225.0" y="185.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="243.0" lengthAdjust="spacingAndGlyphs">Sahipsiz uygulama artıkları</text>
 <text x="909.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="204.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="204.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 6. </text>
-<text x="225.0" y="204.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="126.0" lengthAdjust="spacingAndGlyphs">Developer junk</text>
+<text x="225.0" y="204.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="171.0" lengthAdjust="spacingAndGlyphs">Geliştirici çöpleri</text>
 <text x="909.0" y="204.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="223.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="223.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 7. </text>
-<text x="225.0" y="223.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">Cache folders</text>
+<text x="225.0" y="223.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="171.0" lengthAdjust="spacingAndGlyphs">Önbellek klasörleri</text>
 <text x="909.0" y="223.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="242.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="242.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 8. </text>
-<text x="225.0" y="242.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="171.0" lengthAdjust="spacingAndGlyphs">Old and large files</text>
+<text x="225.0" y="242.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="198.0" lengthAdjust="spacingAndGlyphs">Eski ve büyük dosyalar</text>
 <text x="909.0" y="242.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="261.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="261.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> 9. </text>
-<text x="225.0" y="261.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="324.0" lengthAdjust="spacingAndGlyphs">Installers and archives in Downloads</text>
+<text x="225.0" y="261.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="351.0" lengthAdjust="spacingAndGlyphs">İndirilen kurulum dosyaları ve arşivler</text>
 <text x="909.0" y="261.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="280.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="280.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">10. </text>
-<text x="225.0" y="280.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="270.0" lengthAdjust="spacingAndGlyphs">Duplicate files (same content)</text>
+<text x="225.0" y="280.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="261.0" lengthAdjust="spacingAndGlyphs">Kopya dosyalar (içeriği aynı)</text>
 <text x="909.0" y="280.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="299.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="299.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">11. </text>
-<text x="225.0" y="299.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="396.0" lengthAdjust="spacingAndGlyphs">Empty folders, broken links, temporary files</text>
+<text x="225.0" y="299.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="441.0" lengthAdjust="spacingAndGlyphs">Boş klasörler, kırık bağlantılar, geçici dosyalar</text>
 <text x="909.0" y="299.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="318.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="909.0" y="318.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="337.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
-<text x="171.0" y="337.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> Tools</text>
+<text x="171.0" y="337.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> Araçlar</text>
 <text x="909.0" y="337.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="356.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="356.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">12. </text>
-<text x="225.0" y="356.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="243.0" lengthAdjust="spacingAndGlyphs">Changes since the last scan</text>
+<text x="225.0" y="356.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="288.0" lengthAdjust="spacingAndGlyphs">Son taramadan bu yana değişenler</text>
 <text x="909.0" y="356.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="375.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="375.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">13. </text>
-<text x="225.0" y="375.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="189.0" lengthAdjust="spacingAndGlyphs">Removed app leftovers</text>
+<text x="225.0" y="375.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="243.0" lengthAdjust="spacingAndGlyphs">Silinmiş uygulama artıkları</text>
 <text x="909.0" y="375.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="394.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="394.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">14. </text>
-<text x="225.0" y="394.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">Developer tools cleanup</text>
+<text x="225.0" y="394.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="270.0" lengthAdjust="spacingAndGlyphs">Geliştirici araçları temizliği</text>
 <text x="909.0" y="394.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="413.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="413.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">15. </text>
-<text x="225.0" y="413.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs">System data</text>
+<text x="225.0" y="413.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs">Sistem verileri</text>
 <text x="909.0" y="413.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="432.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="189.0" y="432.0" fill="#e5e5e5" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">16. </text>
-<text x="225.0" y="432.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">Deletion log</text>
+<text x="225.0" y="432.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs">Silme kaydı</text>
 <text x="909.0" y="432.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="451.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="909.0" y="451.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="470.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
-<text x="171.0" y="470.0" fill="#cdcd00" xml:space="preserve" textLength="360.0" lengthAdjust="spacingAndGlyphs"> The 200 largest files below this folder</text>
+<text x="171.0" y="470.0" fill="#cdcd00" xml:space="preserve" textLength="369.0" lengthAdjust="spacingAndGlyphs"> Bu klasörün altındaki en büyük 200 dosya</text>
 <text x="909.0" y="470.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="489.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
-<text x="171.0" y="489.0" fill="#e5e5e5" xml:space="preserve" textLength="630.0" lengthAdjust="spacingAndGlyphs"> Reports cover the folder you are in (apps: the whole scan). L: Türkçe</text>
+<text x="171.0" y="489.0" fill="#e5e5e5" xml:space="preserve" textLength="738.0" lengthAdjust="spacingAndGlyphs"> Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama). L: Engl</text>
 <text x="909.0" y="489.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
 <text x="162.0" y="508.0" fill="#00cdcd" xml:space="preserve" textLength="756.0" lengthAdjust="spacingAndGlyphs">└──────────────────────────────────────────────────────────────────────────────────┘</text>
 <text x="0.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
-<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="216.0" lengthAdjust="spacingAndGlyphs">156 items scanned, 0.0 s</text>
+<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">156 öğe tarandı, 0.0 sn</text>
 <rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
 <text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
-<text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> help  </text>
-<rect x="90.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
-<text x="90.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
-<text x="126.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> select  </text>
-<rect x="207.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="207.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
-<text x="270.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> run  </text>
-<rect x="324.0" y="551.0" width="45.0" height="19.0" fill="#e5e5e5"/>
-<text x="324.0" y="565.0" fill="#000000" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Esc </text>
-<text x="369.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="711.0" lengthAdjust="spacingAndGlyphs"> close                                                                         </text>
+<text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> yardım  </text>
+<rect x="108.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
+<text x="108.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
+<text x="144.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> seç  </text>
+<rect x="198.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="198.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
+<text x="261.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> çalıştır  </text>
+<rect x="360.0" y="551.0" width="45.0" height="19.0" fill="#e5e5e5"/>
+<text x="360.0" y="565.0" fill="#000000" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Esc </text>
+<text x="405.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="675.0" lengthAdjust="spacingAndGlyphs"> kapat                                                                     </text>
 </g></svg>

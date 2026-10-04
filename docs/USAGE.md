@@ -1,7 +1,8 @@
 # Usage guide
 
 This guide walks through every screen of rustClean. Each screen also lists its
-keys on the bottom line, so you rarely need to look anything up.
+most used keys on the bottom line, and `?` lists all of them, so you rarely
+need to look anything up.
 
 - [Starting](#starting)
 - [Browsing](#browsing)
@@ -29,6 +30,25 @@ or two on an SSD.
 that work everywhere, then the other screens. The bottom line always starts
 with `?  help` and shows the most used keys.
 
+![The help screen over the folder list](screenshots/help.svg)
+
+### Keys that work the same everywhere
+
+| Key | Action |
+|---|---|
+| `↑` `↓` or `j` `k` | move |
+| `PgUp` `PgDn` | move a page |
+| `Home` `End` or `g` `G` | first / last row |
+| `Enter`, `→` or `l` | open (a folder, a group, a report) |
+| `⌫`, `←`, `h` or `Esc` | back |
+| `x` or `Delete` | move to the trash; always asks first |
+| `e` or `y` | yes, in a question (Turkish *evet* / English *yes*; both work in either language) |
+| `h`, `n` or `Esc` | no |
+| `m` | the menu of reports and tools |
+| `?` | every key |
+| `L` · `T` | Türkçe ↔ English · theme |
+| `q` or `Ctrl-C` | quit |
+
 ## Browsing
 
 The list shows the current folder's entries with:
@@ -36,15 +56,17 @@ The list shows the current folder's entries with:
 - **Size** and a **share** bar relative to the folder.
 - **Files**: how many files a folder contains.
 - **Modified / Created**: for folders, *Modified* is the newest change of
-  anything inside, so long-untouched folders stand out. Dates are colored
-  green (≤ 7 days), cyan (≤ 30 days), yellow (≤ 1 year) and red (older).
+  anything inside, so long-untouched folders stand out. Dates are colored by
+  age (≤ 7 days, ≤ 30 days, ≤ 1 year, older), as the legend on the top line
+  shows: green, cyan, yellow and red in the dark theme, blue to vermilion in
+  the [color-blind friendly theme](#themes-and-colors).
 - **Name**: folders end with `/`; a `✓` marks entries in the basket.
 
 | Key | Action |
 |---|---|
 | `↑` `↓` `PgUp` `PgDn` `g` `G` | move |
-| `Enter` / `→` | open a folder |
-| `⌫` / `←` / `Esc` | back to the parent folder |
+| `Enter` / `→` / `l` | open a folder |
+| `⌫` / `←` / `h` / `Esc` | back to the parent folder |
 | `s` | sort: size → name → file count → oldest change first |
 | `a` | apparent size (file length) ↔ size on disk (what `du` reports; on APFS, pure clones are counted once) |
 | `R` | rescan only the current folder (e.g. after a cleanup), in the background; `Esc` cancels |
@@ -59,7 +81,7 @@ strip at the bottom ("other"). The selection is shared with the list.
 
 | Key | Action |
 |---|---|
-| arrow keys | move to the neighboring block |
+| arrow keys or `h` `j` `k` `l` | move to the neighboring block |
 | `Enter` / `⌫` | open a folder / go back |
 | `c` | color by type (folders each get their own color) or by age |
 | `t` / `Esc` | back to the list |
@@ -138,8 +160,8 @@ project's (the newest change next to the junk folder), so a freshly reinstalled
 **Uninstalling an app** (macOS). In "Applications and their data", `u` on an
 app (or inside its group) lists the bundle and every data folder and
 preference file matched to it, all checked. `Space` unchecks an entry, `t`
-toggles all, and `e` moves the checked ones to the trash. Apps under `/System`
-are refused. If the app is running, the dialog says so; quit it first. The
+toggles all, and `e` (or `y`) moves the checked ones to the trash. Apps under
+`/System` are refused. If the app is running, the dialog says so; quit it first. The
 report is listed again afterwards. Preference files
 (`~/Library/Preferences/<bundle id>….plist`, also `ByHost`) are matched by
 bundle id only.
@@ -161,6 +183,8 @@ empty. Temporary files changed in the last day may be in use (an open
 document's lock file, a running download) and are left out; `.DS_Store` and
 `Thumbs.db` are listed at any age, as the system writes them again.
 
+![The clutter report: temporary files, empty folders and broken links](screenshots/clutter.svg)
+
 **Duplicates and APFS.** Copies that are APFS clones (made by `cp -c`, Finder's
 Duplicate and many apps) share their blocks. The group's detail says how many
 copies are clones, and deleting them frees nothing. In disk size mode the
@@ -176,13 +200,15 @@ bottom.
 **Removed app leftovers.** The same report as "Orphaned app leftovers".
 
 **Developer tools cleanup.** Measures, read-only, what each installed tool
-could free, then lets you choose actions:
-- green: safe
-- yellow: will be downloaded or built again
-- red: may lose data
+could free, then lets you choose actions. Each one carries its risk as a
+label (and a color: green, yellow, red in the dark theme; blue, orange,
+vermilion in the color-blind friendly one):
+- **safe**: nothing of value is lost
+- **re-downloaded**: comes back by downloading or building again
+- **DATA LOSS**: may delete your data
 
-The confirmation shows the exact commands. Red actions require typing `yes`
-(`evet` in Turkish). Commands run one after another with their output in a
+The confirmation shows the exact commands. Data-loss actions require typing
+`yes` (`evet` in Turkish) and `Enter`. Commands run one after another with their output in a
 log. The tool is then measured again.
 
 | Tool | Actions |
@@ -202,6 +228,9 @@ log. The tool is then measured again.
   `sudo`, so rustClean does not run it)
 - swap and sleep image
 - simulator runtime images, which live outside the scanned volume
+
+**Deletion log.** Everything moved to the trash, by day; see
+[Deletion log](#deletion-log).
 
 ## Language
 
@@ -223,6 +252,8 @@ kept.
 each day's total, and the total of the last 30 days. The entries themselves
 are in the trash and can be restored from there until it is emptied.
 
+![The deletion log, by day](screenshots/deletion-log.svg)
+
 ## Themes and colors
 
 `T` switches the colors anywhere (except while typing): **dark** (the
@@ -234,6 +265,10 @@ is saved. `--theme dark|light|colorblind` overrides it for one run.
 `--no-color`, or the `NO_COLOR` environment variable, turns colors off: the
 selected row is shown reversed, headings in bold, and treemap blocks get
 borders. `T` then leaves the colors off.
+
+| Light | Color-blind friendly |
+|---|---|
+| ![Light theme](screenshots/theme-light.svg) | ![Color-blind friendly theme](screenshots/theme-colorblind.svg) |
 
 ## Command line
 

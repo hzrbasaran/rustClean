@@ -1,0 +1,934 @@
+{
+"about": "The demo folder of the screenshots: sizes in bytes (files are created sparse); age (modified) and created in seconds before the run.",
+"entries": [
+{
+"path": "Documents",
+"age": 1490,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Downloads",
+"age": 1490,
+"created": 1830210,
+"dir": true
+},
+{
+"path": "Library",
+"age": 188610,
+"created": 188610,
+"dir": true
+},
+{
+"path": "Movies",
+"age": 620610,
+"created": 620610,
+"dir": true
+},
+{
+"path": "Music",
+"age": 77862210,
+"created": 77862210,
+"dir": true
+},
+{
+"path": "Pictures",
+"age": 1490,
+"created": 2262210,
+"dir": true
+},
+{
+"path": "Projects",
+"age": 1490,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Documents/Scans",
+"age": 10876635,
+"created": 10876635,
+"dir": true
+},
+{
+"path": "Documents/misc",
+"age": 2694210,
+"created": 2694210,
+"dir": true
+},
+{
+"path": "Documents/.DS_Store",
+"age": 1286235,
+"created": 1286235,
+"size": 6148
+},
+{
+"path": "Documents/backup.zip",
+"age": 60582210,
+"created": 60582210,
+"size": 1572864000
+},
+{
+"path": "Documents/notes.md",
+"age": 275010,
+"created": 275010,
+"size": 10485
+},
+{
+"path": "Documents/taxes-2025.pdf",
+"age": 13062210,
+"created": 13062210,
+"size": 3145728
+},
+{
+"path": "Documents/~$budget-2026.xlsx",
+"age": 1286235,
+"created": 1286235,
+"size": 165
+},
+{
+"path": "Documents/misc/file1.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file10.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file11.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file12.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file13.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file14.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file15.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file16.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file17.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file18.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file19.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file2.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file20.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file21.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file22.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file23.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file24.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file25.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file26.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file27.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file28.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file29.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file3.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file4.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file5.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file6.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file7.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file8.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Documents/misc/file9.txt",
+"age": 2694210,
+"created": 2694210,
+"size": 2097
+},
+{
+"path": "Downloads/Xcode_16.xip",
+"age": 32934210,
+"created": 32934210,
+"size": 3565158400
+},
+{
+"path": "Downloads/report-draft.tmp",
+"age": 1286235,
+"created": 1286235,
+"size": 2048
+},
+{
+"path": "Downloads/report-final (1).pdf",
+"age": 1830210,
+"created": 1830210,
+"size": 12582912
+},
+{
+"path": "Downloads/report-final.pdf",
+"age": 1830210,
+"created": 1830210,
+"size": 12582912
+},
+{
+"path": "Downloads/setup.dmg",
+"age": 3558210,
+"created": 3558210,
+"size": 650117120
+},
+{
+"path": "Downloads/ubuntu-24.04-desktop-amd64.iso",
+"age": 43302210,
+"created": 43302210,
+"size": 6081740800
+},
+{
+"path": "Downloads/ubuntu-24.04.iso.part",
+"age": 1286235,
+"created": 1286235,
+"size": 48000000
+},
+{
+"path": "Library/Application Support",
+"age": 69222210,
+"created": 69222210,
+"dir": true
+},
+{
+"path": "Library/Caches",
+"age": 188610,
+"created": 188610,
+"dir": true
+},
+{
+"path": "Library/Application Support/OldEditor",
+"age": 69222210,
+"created": 69222210,
+"dir": true
+},
+{
+"path": "Library/Application Support/OldEditor/state.db",
+"age": 69222210,
+"created": 69222210,
+"size": 325058560
+},
+{
+"path": "Library/Caches/com.google.Chrome",
+"age": 188610,
+"created": 188610,
+"dir": true
+},
+{
+"path": "Library/Caches/com.spotify.client",
+"age": 188610,
+"created": 188610,
+"dir": true
+},
+{
+"path": "Library/Caches/com.google.Chrome/Cache",
+"age": 188610,
+"created": 188610,
+"dir": true
+},
+{
+"path": "Library/Caches/com.google.Chrome/Cache/data_1",
+"age": 188610,
+"created": 188610,
+"size": 671088640
+},
+{
+"path": "Library/Caches/com.spotify.client/Data",
+"age": 188610,
+"created": 188610,
+"dir": true
+},
+{
+"path": "Library/Caches/com.spotify.client/Data/cache.bin",
+"age": 188610,
+"created": 188610,
+"size": 2202009600
+},
+{
+"path": "Movies/holiday-2024.mp4",
+"age": 55398210,
+"created": 55398210,
+"size": 2516582400
+},
+{
+"path": "Movies/screen-recording.mov",
+"age": 620610,
+"created": 620610,
+"size": 922746880
+},
+{
+"path": "Music/Library",
+"age": 77862210,
+"created": 77862210,
+"dir": true
+},
+{
+"path": "Music/Library/album.flac",
+"age": 77862210,
+"created": 77862210,
+"size": 996147200
+},
+{
+"path": "Pictures/2024",
+"age": 10876635,
+"created": 10876635,
+"dir": true
+},
+{
+"path": "Pictures/2025",
+"age": 26022210,
+"created": 26022210,
+"dir": true
+},
+{
+"path": "Pictures/2026",
+"age": 2262210,
+"created": 2262210,
+"dir": true
+},
+{
+"path": "Pictures/2024/Exports",
+"age": 10876635,
+"created": 10876635,
+"dir": true
+},
+{
+"path": "Pictures/2025/IMG_1001.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1002.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1003.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1004.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1005.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1006.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1007.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1008.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1009.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1010.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1011.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1012.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1013.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1014.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1015.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1016.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1017.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1018.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1019.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1020.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1021.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1022.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1023.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2025/IMG_1024.HEIC",
+"age": 26022210,
+"created": 26022210,
+"size": 3355443
+},
+{
+"path": "Pictures/2026/IMG_2001.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2002.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2003.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2004.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2005.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2006.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2007.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2008.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Pictures/2026/IMG_2009.jpg",
+"age": 2262210,
+"created": 2262210,
+"size": 4718592
+},
+{
+"path": "Projects/api",
+"age": 1139010,
+"created": 1139010,
+"dir": true
+},
+{
+"path": "Projects/ml-notebook",
+"age": 17382210,
+"created": 17382210,
+"dir": true
+},
+{
+"path": "Projects/old-site",
+"age": 1490,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/web-app",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/legacy",
+"link": "/Volumes/OldDrive/Projects/legacy",
+"age": 1933
+},
+{
+"path": "Projects/api/src",
+"age": 1139010,
+"created": 1139010,
+"dir": true
+},
+{
+"path": "Projects/api/target",
+"age": 1139010,
+"created": 1139010,
+"dir": true
+},
+{
+"path": "Projects/api/Cargo.toml",
+"age": 1139010,
+"created": 1139010,
+"size": 10485
+},
+{
+"path": "Projects/api/src/main.rs",
+"age": 1139010,
+"created": 1139010,
+"size": 41943
+},
+{
+"path": "Projects/api/target/debug",
+"age": 1139010,
+"created": 1139010,
+"dir": true
+},
+{
+"path": "Projects/api/target/debug/deps",
+"age": 1139010,
+"created": 1139010,
+"dir": true
+},
+{
+"path": "Projects/api/target/debug/api",
+"age": 1139010,
+"created": 1139010,
+"size": 398458880
+},
+{
+"path": "Projects/api/target/debug/deps/libtokio.rlib",
+"age": 1139010,
+"created": 1139010,
+"size": 220200960
+},
+{
+"path": "Projects/ml-notebook/.venv",
+"age": 17382210,
+"created": 17382210,
+"dir": true
+},
+{
+"path": "Projects/ml-notebook/data",
+"age": 17382210,
+"created": 17382210,
+"dir": true
+},
+{
+"path": "Projects/ml-notebook/.venv/lib",
+"age": 17382210,
+"created": 17382210,
+"dir": true
+},
+{
+"path": "Projects/ml-notebook/.venv/pyvenv.cfg",
+"age": 17382210,
+"created": 17382210,
+"size": 1048
+},
+{
+"path": "Projects/ml-notebook/.venv/lib/torch.so",
+"age": 17382210,
+"created": 17382210,
+"size": 1363148800
+},
+{
+"path": "Projects/ml-notebook/data/train.parquet",
+"age": 17382210,
+"created": 17382210,
+"size": 943718400
+},
+{
+"path": "Projects/old-site/assets",
+"age": 10876635,
+"created": 10876635,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules",
+"age": 275010,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/old-site/index.html",
+"age": 36390210,
+"created": 36390210,
+"size": 20971
+},
+{
+"path": "Projects/old-site/package.json",
+"age": 36390210,
+"created": 36390210,
+"size": 10485
+},
+{
+"path": "Projects/old-site/assets/img",
+"age": 10876635,
+"created": 10876635,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules/lib1",
+"age": 275010,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules/lib2",
+"age": 275010,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules/lib3",
+"age": 275010,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules/lib4",
+"age": 275010,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules/lib5",
+"age": 275010,
+"created": 275010,
+"dir": true
+},
+{
+"path": "Projects/old-site/node_modules/lib1/dist.js",
+"age": 275010,
+"created": 275010,
+"size": 57671680
+},
+{
+"path": "Projects/old-site/node_modules/lib2/dist.js",
+"age": 275010,
+"created": 275010,
+"size": 57671680
+},
+{
+"path": "Projects/old-site/node_modules/lib3/dist.js",
+"age": 275010,
+"created": 275010,
+"size": 57671680
+},
+{
+"path": "Projects/old-site/node_modules/lib4/dist.js",
+"age": 275010,
+"created": 275010,
+"size": 57671680
+},
+{
+"path": "Projects/old-site/node_modules/lib5/dist.js",
+"age": 275010,
+"created": 275010,
+"size": 57671680
+},
+{
+"path": "Projects/web-app/node_modules",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/src",
+"age": 534210,
+"created": 534210,
+"dir": true
+},
+{
+"path": "Projects/web-app/package.json",
+"age": 534210,
+"created": 534210,
+"size": 10485
+},
+{
+"path": "Projects/web-app/node_modules/pkg1",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg2",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg3",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg4",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg5",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg6",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg7",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg8",
+"age": 361410,
+"created": 361410,
+"dir": true
+},
+{
+"path": "Projects/web-app/node_modules/pkg1/index.js",
+"age": 361410,
+"created": 361410,
+"size": 49283072
+},
+{
+"path": "Projects/web-app/node_modules/pkg2/index.js",
+"age": 361410,
+"created": 361410,
+"size": 56623104
+},
+{
+"path": "Projects/web-app/node_modules/pkg3/index.js",
+"age": 361410,
+"created": 361410,
+"size": 63963136
+},
+{
+"path": "Projects/web-app/node_modules/pkg4/index.js",
+"age": 361410,
+"created": 361410,
+"size": 71303168
+},
+{
+"path": "Projects/web-app/node_modules/pkg5/index.js",
+"age": 361410,
+"created": 361410,
+"size": 78643200
+},
+{
+"path": "Projects/web-app/node_modules/pkg6/index.js",
+"age": 361410,
+"created": 361410,
+"size": 85983232
+},
+{
+"path": "Projects/web-app/node_modules/pkg7/index.js",
+"age": 361410,
+"created": 361410,
+"size": 93323264
+},
+{
+"path": "Projects/web-app/node_modules/pkg8/index.js",
+"age": 361410,
+"created": 361410,
+"size": 100663296
+},
+{
+"path": "Projects/web-app/src/app.tsx",
+"age": 534210,
+"created": 534210,
+"size": 52428
+}
+]
+}

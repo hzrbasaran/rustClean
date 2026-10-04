@@ -3,7 +3,7 @@
 <g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
 <rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#00cdcd"/>
 <text x="0.0" y="14.0" fill="#000000" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
-<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo                                                                                                      </text>
+<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo  │  21.9 GiB (görünen)  │  105 dosya  │  sıralama: boyut                                             </text>
 <rect x="0.0" y="19.0" width="477.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="33.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="477.0" lengthAdjust="spacingAndGlyphs">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</text>
 <rect x="477.0" y="19.0" width="81.0" height="19.0" fill="#af5f00"/>
@@ -18,13 +18,13 @@
 <rect x="468.0" y="38.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="52.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="38.0" width="333.0" height="19.0" fill="#af5f00"/>
-<text x="477.0" y="52.0" fill="#ffffff" xml:space="preserve" textLength="333.0" lengthAdjust="spacingAndGlyphs">3.6 GiB · %16.3                      </text>
+<text x="477.0" y="52.0" fill="#ffffff" xml:space="preserve" textLength="333.0" lengthAdjust="spacingAndGlyphs">3.6 GiB · %16.2                      </text>
 <rect x="810.0" y="38.0" width="270.0" height="19.0" fill="#870087"/>
 <text x="810.0" y="52.0" fill="#ffffff" xml:space="preserve" textLength="270.0" lengthAdjust="spacingAndGlyphs">3.0 GiB · %13.6               </text>
 <rect x="0.0" y="57.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="57.0" width="459.0" height="19.0" fill="#005faf"/>
-<text x="9.0" y="71.0" fill="#ffffff" xml:space="preserve" textLength="459.0" lengthAdjust="spacingAndGlyphs">9.6 GiB · %44.0                                    </text>
+<text x="9.0" y="71.0" fill="#ffffff" xml:space="preserve" textLength="459.0" lengthAdjust="spacingAndGlyphs">9.7 GiB · %44.1                                    </text>
 <rect x="468.0" y="57.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="57.0" width="333.0" height="19.0" fill="#af5f00"/>
@@ -116,100 +116,100 @@
 <rect x="540.0" y="285.0" width="270.0" height="19.0" fill="#00875f"/>
 <rect x="810.0" y="285.0" width="90.0" height="19.0" fill="#0087af"/>
 <text x="810.0" y="299.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">Documents/</text>
-<rect x="900.0" y="285.0" width="63.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="285.0" width="54.0" height="19.0" fill="#af0000"/>
-<text x="963.0" y="299.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs">Music/</text>
-<rect x="1017.0" y="285.0" width="63.0" height="19.0" fill="#af0000"/>
+<rect x="900.0" y="285.0" width="72.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="285.0" width="54.0" height="19.0" fill="#af0000"/>
+<text x="972.0" y="299.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs">Music/</text>
+<rect x="1026.0" y="285.0" width="54.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="304.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="318.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="304.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="304.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="318.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="304.0" width="333.0" height="19.0" fill="#00875f"/>
-<text x="477.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="333.0" lengthAdjust="spacingAndGlyphs">3.2 GiB · %14.7                      </text>
-<rect x="810.0" y="304.0" width="153.0" height="19.0" fill="#0087af"/>
-<text x="810.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="153.0" lengthAdjust="spacingAndGlyphs">1.5 GiB · %6.7   </text>
-<rect x="963.0" y="304.0" width="117.0" height="19.0" fill="#af0000"/>
-<text x="963.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">950.0 MiB · …</text>
+<text x="477.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="333.0" lengthAdjust="spacingAndGlyphs">3.2 GiB · %14.6                      </text>
+<rect x="810.0" y="304.0" width="162.0" height="19.0" fill="#0087af"/>
+<text x="810.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">1.5 GiB · %6.7    </text>
+<rect x="972.0" y="304.0" width="108.0" height="19.0" fill="#af0000"/>
+<text x="972.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">950.0 MiB ·…</text>
 <rect x="0.0" y="323.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="337.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="323.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="323.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="337.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="323.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="323.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="323.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="323.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="323.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="342.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="356.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="342.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="342.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="356.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="342.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="342.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="342.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="342.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="342.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="361.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="375.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="361.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="361.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="375.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="361.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="361.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="361.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="361.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="361.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="380.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="394.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="380.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="380.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="394.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="380.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="380.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="380.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="380.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="380.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="399.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="413.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="399.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="399.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="413.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="399.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="399.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="399.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="399.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="399.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="418.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="432.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="418.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="418.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="432.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="418.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="418.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="418.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="418.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="418.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="437.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="451.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="437.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="437.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="451.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="437.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="437.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="437.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="437.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="437.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="456.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="470.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="456.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="456.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="470.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="456.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="456.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="456.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="456.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="456.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="475.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="489.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="9.0" y="475.0" width="459.0" height="19.0" fill="#005faf"/>
 <rect x="468.0" y="475.0" width="9.0" height="19.0" fill="#005faf"/>
 <text x="468.0" y="489.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┃</text>
 <rect x="477.0" y="475.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="475.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="475.0" width="117.0" height="19.0" fill="#af0000"/>
+<rect x="810.0" y="475.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="475.0" width="108.0" height="19.0" fill="#af0000"/>
 <rect x="0.0" y="494.0" width="477.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="508.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="477.0" lengthAdjust="spacingAndGlyphs">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</text>
 <rect x="477.0" y="494.0" width="333.0" height="19.0" fill="#00875f"/>
-<rect x="810.0" y="494.0" width="153.0" height="19.0" fill="#0087af"/>
-<rect x="963.0" y="494.0" width="81.0" height="19.0" fill="#5f5f87"/>
-<text x="963.0" y="508.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">Pictures/</text>
-<rect x="1044.0" y="494.0" width="36.0" height="19.0" fill="#5f5f87"/>
+<rect x="810.0" y="494.0" width="162.0" height="19.0" fill="#0087af"/>
+<rect x="972.0" y="494.0" width="81.0" height="19.0" fill="#5f5f87"/>
+<text x="972.0" y="508.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">Pictures/</text>
+<rect x="1053.0" y="494.0" width="27.0" height="19.0" fill="#5f5f87"/>
 <rect x="0.0" y="513.0" width="81.0" height="19.0" fill="#e5e5e5"/>
 <text x="0.0" y="527.0" fill="#000000" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> t / Esc </text>
 <text x="81.0" y="527.0" fill="#ffffff" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs"> listeye dön   </text>
@@ -229,32 +229,33 @@
 <text x="828.0" y="527.0" fill="#ffffff" xml:space="preserve" textLength="189.0" lengthAdjust="spacingAndGlyphs"> Arşiv / disk imajı  </text>
 <text x="1017.0" y="527.0" fill="#00ff00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
 <text x="1035.0" y="527.0" fill="#ffffff" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Belg</text>
-<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">146 öğe tarandı, 0.0 sn</text>
-<rect x="0.0" y="551.0" width="54.0" height="19.0" fill="#e5e5e5"/>
-<text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> ←↑↓→ </text>
-<text x="54.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> blok seç  </text>
-<rect x="153.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="153.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
-<text x="216.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> gir  </text>
-<rect x="270.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="270.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ⌫ </text>
-<text x="297.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> geri  </text>
-<rect x="360.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="360.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> c </text>
-<text x="387.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> renk  </text>
-<rect x="450.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="450.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> t/Esc </text>
-<text x="513.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> liste  </text>
-<rect x="585.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="585.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Space </text>
-<text x="648.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> sepete  </text>
-<rect x="729.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="729.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> x </text>
-<text x="756.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> çöpe taşı  </text>
-<rect x="864.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="864.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> S </text>
-<text x="891.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> sepet  </text>
-<rect x="963.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="963.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> m </text>
-<text x="990.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs"> raporlar </text>
+<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">156 öğe tarandı, 0.0 sn</text>
+<rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
+<text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> yardım  </text>
+<rect x="108.0" y="551.0" width="54.0" height="19.0" fill="#e5e5e5"/>
+<text x="108.0" y="565.0" fill="#000000" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> ←↑↓→ </text>
+<text x="162.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> blok seç  </text>
+<rect x="261.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="261.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
+<text x="324.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> gir  </text>
+<rect x="378.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="378.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ⌫ </text>
+<text x="405.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> geri  </text>
+<rect x="468.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="468.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> c </text>
+<text x="495.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> renk  </text>
+<rect x="558.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="558.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> t/Esc </text>
+<text x="621.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> liste  </text>
+<rect x="693.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="693.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Space </text>
+<text x="756.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> sepete  </text>
+<rect x="837.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="837.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> x </text>
+<text x="864.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> çöpe taşı  </text>
+<rect x="972.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="972.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> S </text>
+<text x="999.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> sepet  </text>
+<rect x="1071.0" y="551.0" width="9.0" height="19.0" fill="#e5e5e5"/>
 </g></svg>

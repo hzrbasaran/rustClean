@@ -46,11 +46,17 @@ harekete geçmenizi sağlar:
   - eski ve büyük dosyalar
   - **İndirilenlerdeki kurulum dosyaları ve arşivler** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - içeriği aynı **kopya dosyalar** (en eski kopya korunur)
+  - **boş klasörler, kırık bağlantılar ve geçici dosyalar** (`.DS_Store`,
+    `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
+    paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
+    dokunmaz
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık
   klasörünün değil *projenin* yaşıdır.
 - **Sepet:** `Space` ile her yerden öğe toplayın, `S` ile gözden geçirin, `x`
   ile hepsini çöp kutusuna taşıyın.
+- **Silme kaydı:** çöp kutusuna taşınan her şey, günlere göre ve nasıl
+  silindiğiyle (menü → Silme kaydı).
 - **Geliştirici araçları temizliği:** Docker, Xcode simülatörleri,
   DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew ve Cargo'nun ne
   kadar yer açabileceğini ölçer; onayınızdan sonra **araçların kendi temizlik
@@ -62,14 +68,23 @@ harekete geçmenizi sağlar:
 - **Türkçe ve İngilizce** arayüz (`L` ile değişir).
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
+- **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
 
 ## Ekran görüntüleri
 
-| Ağaç haritası | Sepet |
+| Ağaç haritası | Özet |
 |---|---|
-| ![Ağaç haritası](docs/screenshots/treemap-tr.svg) | ![Sepet](docs/screenshots/basket.svg) |
-
-Daha fazla görüntü için [İngilizce README](README.md#screenshots).
+| ![Ağaç haritası](docs/screenshots/treemap-tr.svg) | ![Özet](docs/screenshots/summary-tr.svg) |
+| **Rapor menüsü** | **90+ gündür dokunulmamış geliştirici çöpleri** |
+| ![Rapor menüsü](docs/screenshots/menu-tr.svg) | ![Geliştirici çöpleri](docs/screenshots/dev-junk-stale-tr.svg) |
+| **Kopya dosyalar** | **Sepet** |
+| ![Kopya dosyalar](docs/screenshots/duplicates-tr.svg) | ![Sepet](docs/screenshots/basket-tr.svg) |
+| **Boş klasörler, kırık bağlantılar, geçici dosyalar** | **Silme kaydı** |
+| ![Boş klasörler raporu](docs/screenshots/clutter-tr.svg) | ![Silme kaydı](docs/screenshots/deletion-log-tr.svg) |
+| **Açık tema** | **Renk körü dostu tema** |
+| ![Açık tema](docs/screenshots/theme-light-tr.svg) | ![Renk körü dostu tema](docs/screenshots/theme-colorblind-tr.svg) |
+| **Yardım (`?`)** | |
+| ![Yardım](docs/screenshots/help-tr.svg) | |
 
 ## Önce güvenlik
 
