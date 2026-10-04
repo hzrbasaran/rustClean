@@ -12,7 +12,13 @@ use super::format::{fmt_pct, fmt_size};
 use super::style::{usage_color, HIGHLIGHT};
 use super::{bar, keys, title};
 
-pub(super) fn render_disks(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: Rect) {
+pub(super) fn render_disks(
+    f: &mut Frame<'_>,
+    app: &mut App,
+    header: Rect,
+    body: Rect,
+    footer: Rect,
+) {
     f.render_widget(
         title(
             t!(

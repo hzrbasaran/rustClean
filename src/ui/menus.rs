@@ -12,7 +12,7 @@ use super::format::{fmt_ago, fmt_date, fmt_delta, fmt_size, now_secs};
 use super::style::HIGHLIGHT;
 
 pub(super) fn render_snapshot_picker(
-    f: &mut Frame,
+    f: &mut Frame<'_>,
     saved: &[crate::history::Saved],
     selected: usize,
     total_now: u64,
@@ -79,7 +79,7 @@ pub(super) fn render_snapshot_picker(
     );
 }
 
-pub(super) fn render_report_menu(f: &mut Frame, selected: usize, area: Rect) {
+pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect) {
     let width = area.width.saturating_sub(4).min(84);
     let mut lines = Vec::new();
     for (i, item) in MenuItem::ALL.iter().enumerate() {

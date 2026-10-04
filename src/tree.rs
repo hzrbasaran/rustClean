@@ -444,6 +444,6 @@ mod tests {
 
     #[test]
     fn node_stays_small() {
-        assert!(std::mem::size_of::<Node>() <= 56);
+        assert!(size_of::<Node>() <= 56);
     }
 }

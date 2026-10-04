@@ -48,15 +48,13 @@ fn dev_junk_kind(tree: &Tree, id: NodeId) -> Option<&'static str> {
 /// change among its other entries. Reinstalling dependencies refreshes
 /// `node_modules` but says nothing about whether the project is in use.
 fn project_modified(tree: &Tree, junk: NodeId) -> u32 {
-    tree.parent(junk)
-        .map(|p| {
-            tree.children(p)
-                .filter(|&c| c != junk)
-                .map(|c| tree.node(c).modified)
-                .max()
-                .unwrap_or(0)
-        })
-        .unwrap_or(0)
+    tree.parent(junk).map_or(0, |p| {
+        tree.children(p)
+            .filter(|&c| c != junk)
+            .map(|c| tree.node(c).modified)
+            .max()
+            .unwrap_or(0)
+    })
 }
 
 pub(super) fn dev_junk(tree: &Tree, base: NodeId, mode: SizeMode, age: AgeFilter) -> Report {

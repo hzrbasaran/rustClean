@@ -92,11 +92,11 @@ impl Browser {
 
     pub(super) fn confirm_delete(&mut self) {
         if let Some(ids) = self.confirm.take() {
-            self.start_deletion(ids);
+            self.start_deletion(&ids);
         }
     }
 
-    pub(super) fn start_deletion(&mut self, ids: Vec<NodeId>) {
+    pub(super) fn start_deletion(&mut self, ids: &[NodeId]) {
         let items: Vec<_> = ids.iter().map(|&id| (id, self.tree.path_of(id))).collect();
         self.batch_trashed = Size::default();
         self.batch_failures.clear();

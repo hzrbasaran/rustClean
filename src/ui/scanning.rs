@@ -12,7 +12,7 @@ use super::format::{fmt_count, fmt_size, truncate_path};
 use super::{keys, title, SPINNER};
 
 pub(super) fn render_scanning(
-    f: &mut Frame,
+    f: &mut Frame<'_>,
     app: &mut App,
     header: Rect,
     body: Rect,

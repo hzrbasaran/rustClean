@@ -62,7 +62,7 @@ impl Browser {
         let dir = rescan.dir;
         self.rescan = None;
         match result {
-            Ok(res) => self.apply_rescan(dir, res),
+            Ok(res) => self.apply_rescan(dir, &res),
             Err(err) => self.set_status(
                 tf!("Yeniden tarama başarısız: {}", "Rescan failed: {}", err),
                 true,
@@ -70,7 +70,7 @@ impl Browser {
         }
     }
 
-    fn apply_rescan(&mut self, dir: NodeId, res: ScanResult) {
+    fn apply_rescan(&mut self, dir: NodeId, res: &ScanResult) {
         let mode = self.size_mode;
         let before = self.tree.node(dir).size.get(mode);
         // Keep the cursor on the same name; ids below `dir` change.

@@ -31,8 +31,8 @@ struct App {
     name: String,
     /// Lowercased bundle identifier (macOS).
     bundle: Option<String>,
-    /// Other lowercased names its data may use: CFBundleName and
-    /// CFBundleExecutable ("Code" for Visual Studio Code).
+    /// Other lowercased names its data may use: `CFBundleName` and
+    /// `CFBundleExecutable` ("Code" for Visual Studio Code).
     aliases: Vec<String>,
 }
 

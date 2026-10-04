@@ -1,0 +1,23 @@
+name: Dependencies
+
+# Checks dependencies for security advisories, licenses, bans and sources.
+# Runs weekly too, so new advisories show up even when nothing changes here.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  cargo-deny:
+    name: cargo-deny
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check

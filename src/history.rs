@@ -189,6 +189,12 @@ pub fn changes(
     snap: &Snapshot,
     mode: SizeMode,
 ) -> (Vec<Row>, bool, String) {
+    struct Change {
+        id: NodeId,
+        delta: i128,
+        is_new: bool,
+    }
+
     let base_rel = rel_path(tree, base);
     let under_base =
         |p: &str| base_rel.is_empty() || p == base_rel || p.starts_with(&format!("{base_rel}/"));
@@ -200,11 +206,6 @@ pub fn changes(
         .collect();
 
     // Walk the current tree where anything could have changed by MIN_DIR.
-    struct Change {
-        id: NodeId,
-        delta: i128,
-        is_new: bool,
-    }
     let mut found: Vec<Change> = Vec::new();
     let mut delta_of: HashMap<NodeId, i128> = HashMap::new();
     let mut seen: HashSet<String> = HashSet::new();

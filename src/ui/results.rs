@@ -14,7 +14,7 @@ use super::style::{date_cell, HIGHLIGHT};
 use super::{table_block, DATE_WIDTH, WIDE};
 
 pub(super) fn render_results(
-    f: &mut Frame,
+    f: &mut Frame<'_>,
     tree: &Tree,
     r: &mut ResultList,
     checks: &[bool],

@@ -111,7 +111,7 @@ fn run(cmd: &[&str]) -> Option<String> {
 pub fn parse_apfs(bytes: &[u8]) -> Option<Vec<Container>> {
     let root = plist::Value::from_reader(std::io::Cursor::new(bytes)).ok()?;
     let containers = root.as_dictionary()?.get("Containers")?.as_array()?;
-    let int = |d: &plist::Dictionary, k: &str| d.get(k).and_then(|v| v.as_unsigned_integer());
+    let int = |d: &plist::Dictionary, k: &str| d.get(k).and_then(plist::Value::as_unsigned_integer);
     let text = |d: &plist::Dictionary, k: &str| {
         d.get(k)
             .and_then(|v| v.as_string())

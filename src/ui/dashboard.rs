@@ -15,7 +15,7 @@ use super::style::{date_cell, date_span, usage_color, AGE_COLORS, CATEGORY_COLOR
 use super::{bar, halves, panel, DATE_WIDTH};
 
 pub(super) fn render_dashboard(
-    f: &mut Frame,
+    f: &mut Frame<'_>,
     tree: &Tree,
     d: &mut Dashboard,
     mode: SizeMode,
@@ -123,7 +123,7 @@ pub(super) fn render_dashboard(
     let inner = types.width.saturating_sub(2) as usize;
     let bar_w = inner.saturating_sub(20 + 11 + 6 + 2).max(4);
     let total = s.size.max(1) as f64;
-    let lines: Vec<Line> = s
+    let lines: Vec<Line<'_>> = s
         .categories
         .iter()
         .map(|&(cat, b)| {
@@ -147,7 +147,7 @@ pub(super) fn render_dashboard(
     // Ages
     let inner = ages.width.saturating_sub(2) as usize;
     let bar_w = inner.saturating_sub(11 + 11 + 6 + 2).max(4);
-    let lines: Vec<Line> = (0..age_rows)
+    let lines: Vec<Line<'_>> = (0..age_rows)
         .map(|i| {
             let b = s.ages[i];
             let ratio = b.size as f64 / total;

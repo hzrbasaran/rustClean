@@ -21,7 +21,13 @@ use super::system::render_system;
 use super::tools::render_tools;
 use super::{bar, keys, table_block, title, DATE_WIDTH, SPINNER, WIDE};
 
-pub(super) fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: Rect, footer: Rect) {
+pub(super) fn render_browser(
+    f: &mut Frame<'_>,
+    app: &mut App,
+    header: Rect,
+    body: Rect,
+    footer: Rect,
+) {
     let Some(b) = &mut app.browser else { return };
     let mode = b.size_mode;
     let mode_label = match mode {
@@ -388,7 +394,7 @@ pub(super) fn render_browser(f: &mut Frame, app: &mut App, header: Rect, body: R
     }
 }
 
-fn render_entries(f: &mut Frame, b: &mut Browser, area: Rect) {
+fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
     let tree = &b.tree;
     let mode = b.size_mode;
     let now = now_secs();

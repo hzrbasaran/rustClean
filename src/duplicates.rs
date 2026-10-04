@@ -70,12 +70,12 @@ pub struct Progress {
 
 /// Groups of identical files (each with two or more members).
 pub fn find_groups(
-    cands: Vec<Candidate>,
+    cands: &[Candidate],
     cancel: &AtomicBool,
     progress: &Progress,
 ) -> Vec<Vec<NodeId>> {
     // Step 1: same size.
-    let groups = group_by(cands.iter().map(|c| (c, c.size as u128)));
+    let groups = group_by(cands.iter().map(|c| (c, u128::from(c.size))));
 
     // Step 2: first and last 64 KiB.
     progress.stage.store(1, Ordering::Relaxed);
@@ -92,7 +92,7 @@ pub fn find_groups(
             }
             let h = edge_hash(c);
             progress.done.fetch_add(1, Ordering::Relaxed);
-            h.map(|h| (c, h ^ (c.size as u128).rotate_left(64)))
+            h.map(|h| (c, h ^ u128::from(c.size).rotate_left(64)))
         })
         .collect();
     let groups = group_by(hashed.into_iter());
@@ -118,7 +118,7 @@ pub fn find_groups(
             } else {
                 edge_hash(c)?
             };
-            Some((c, h ^ (c.size as u128).rotate_left(64)))
+            Some((c, h ^ u128::from(c.size).rotate_left(64)))
         })
         .collect();
     if cancel.load(Ordering::Relaxed) {
@@ -188,7 +188,7 @@ impl DupJob {
         let progress = Arc::new(Progress::default());
         let (c, p) = (Arc::clone(&cancel), Arc::clone(&progress));
         thread::spawn(move || {
-            let groups = find_groups(cands, &c, &p);
+            let groups = find_groups(&cands, &c, &p);
             let _ = tx.send(groups);
         });
         Self {
@@ -230,11 +230,11 @@ mod tests {
             .collect()
     }
 
-    fn find(root: &Path) -> (Vec<Vec<String>>, crate::tree::Tree) {
+    fn find(root: &Path) -> (Vec<Vec<String>>, Tree) {
         let res = scanner::scan(root, Vec::new(), &Arc::default(), |_| {}).unwrap();
         let tree = res.tree;
         let cands = candidates(&tree, ROOT);
-        let groups = find_groups(cands, &AtomicBool::new(false), &Progress::default());
+        let groups = find_groups(&cands, &AtomicBool::new(false), &Progress::default());
         let mut named: Vec<Vec<String>> = groups
             .into_iter()
             .map(|g| {

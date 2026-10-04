@@ -264,8 +264,18 @@ fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
                     }
                 })
             };
-            let out = forward(child.stdout.take().map(|p| Box::new(p) as _));
-            let err = forward(child.stderr.take().map(|p| Box::new(p) as _));
+            let out = forward(
+                child
+                    .stdout
+                    .take()
+                    .map(|p| -> Box<dyn std::io::Read + Send> { Box::new(p) }),
+            );
+            let err = forward(
+                child
+                    .stderr
+                    .take()
+                    .map(|p| -> Box<dyn std::io::Read + Send> { Box::new(p) }),
+            );
             let status = child.wait();
             let _ = out.join();
             let _ = err.join();
@@ -364,7 +374,7 @@ fn dir_size(dir: &Path) -> Option<u64> {
 
 fn command(program: &Path, args: &[&str]) -> Step {
     let mut v = vec![program.to_string_lossy().into_owned()];
-    v.extend(args.iter().map(|a| a.to_string()));
+    v.extend(args.iter().map(ToString::to_string));
     Step::Command(v)
 }
 
@@ -595,9 +605,12 @@ pub fn parse_unavailable_devices(json: &str) -> (usize, u64) {
         .values()
         .filter_map(|list| list.as_array())
         .flatten()
-        .filter(|d| d.get("isAvailable").and_then(|a| a.as_bool()) == Some(false))
+        .filter(|d| d.get("isAvailable").and_then(serde_json::Value::as_bool) == Some(false))
         .fold((0, 0), |(n, size), d| {
-            let s = d.get("dataPathSize").and_then(|s| s.as_u64()).unwrap_or(0);
+            let s = d
+                .get("dataPathSize")
+                .and_then(serde_json::Value::as_u64)
+                .unwrap_or(0);
             (n + 1, size + s)
         })
 }
@@ -619,7 +632,7 @@ pub fn parse_runtimes(json: &str) -> Vec<Runtime> {
     };
     let mut out: Vec<Runtime> = map
         .values()
-        .filter(|r| r.get("deletable").and_then(|d| d.as_bool()) != Some(false))
+        .filter(|r| r.get("deletable").and_then(serde_json::Value::as_bool) != Some(false))
         .filter_map(|r| {
             let id = r.get("identifier")?.as_str()?.to_string();
             let version = r.get("version").and_then(|v| v.as_str()).unwrap_or("?");
@@ -632,7 +645,10 @@ pub fn parse_runtimes(json: &str) -> Vec<Runtime> {
             Some(Runtime {
                 id,
                 name: format!("{platform} {version}"),
-                size: r.get("sizeBytes").and_then(|s| s.as_u64()).unwrap_or(0),
+                size: r
+                    .get("sizeBytes")
+                    .and_then(serde_json::Value::as_u64)
+                    .unwrap_or(0),
             })
         })
         .collect();
@@ -804,7 +820,7 @@ mod tests {
     }
 
     #[cfg(unix)]
-    fn collect(rx: Receiver<RunEvent>) -> Vec<RunEvent> {
+    fn collect(rx: &Receiver<RunEvent>) -> Vec<RunEvent> {
         let mut out = Vec::new();
         while let Ok(ev) = rx.recv_timeout(Duration::from_secs(10)) {
             let end = ev == RunEvent::Finished;
@@ -819,7 +835,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn runs_steps_in_order_and_reports_failures() {
-        let events = collect(run(vec![
+        let events = collect(&run(vec![
             Step::Command(vec!["/bin/echo".into(), "merhaba; rm -rf /".into()]),
             Step::Command(vec!["/usr/bin/false".into()]),
             Step::Command(vec!["/nonexistent/tool".into()]),
