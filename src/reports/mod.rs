@@ -5,7 +5,7 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-use crate::lists::{ResultList, Row};
+use crate::lists::{ResultList, Row, Source};
 use crate::stats::DAY;
 use crate::tree::{NodeId, SizeMode, Tree};
 
@@ -256,8 +256,10 @@ pub fn run(
     let mut list = ResultList::new(title, base, rows);
     list.truncated = truncated;
     list.note = note.to_string();
-    list.report = Some(kind);
-    list.min_age_days = age.min_days;
+    list.source = Source::Report {
+        kind,
+        min_age_days: age.min_days,
+    };
     list
 }
 

@@ -17,7 +17,7 @@ fn downloads(f: &Fixture) -> App {
         browser(a)
             .results
             .as_ref()
-            .is_some_and(|r| r.report == Some(ReportKind::Downloads))
+            .is_some_and(|r| r.report() == Some(ReportKind::Downloads))
     });
     app
 }

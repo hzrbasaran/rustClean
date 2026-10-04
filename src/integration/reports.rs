@@ -112,7 +112,7 @@ fn reports_open_from_the_menu() {
         browser(a)
             .results
             .as_ref()
-            .is_some_and(|r| r.report == Some(ReportKind::Downloads))
+            .is_some_and(|r| r.report() == Some(ReportKind::Downloads))
     });
     assert_eq!(rows(&app), ["Downloads/setup.dmg", "Downloads/photos.zip"]);
 
@@ -122,7 +122,7 @@ fn reports_open_from_the_menu() {
         browser(a)
             .results
             .as_ref()
-            .is_some_and(|r| r.min_age_days == 30)
+            .is_some_and(|r| r.min_age_days() == 30)
     });
     assert_eq!(rows(&app), ["Downloads/setup.dmg"]);
 }

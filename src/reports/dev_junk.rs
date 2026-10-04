@@ -165,13 +165,13 @@ mod tests {
         let stale = run(&t, ROOT, SizeMode::Disk, now, ReportKind::DevJunk, 90);
         assert_eq!(labels(&stale), vec!["eski/node_modules/"]);
         assert!(stale.title.contains("≥ 90 gün"));
-        assert_eq!(stale.min_age_days, 90);
+        assert_eq!(stale.min_age_days(), 90);
 
         // Files: the date of the file itself.
         let files = run(&t, ROOT, SizeMode::Disk, now, ReportKind::LargestFiles, 180);
         assert_eq!(labels(&files), vec!["eski/package.json"]);
         // Not supported: the filter is ignored.
         let old_big = run(&t, ROOT, SizeMode::Disk, now, ReportKind::OldBig, 90);
-        assert_eq!(old_big.min_age_days, 0);
+        assert_eq!(old_big.min_age_days(), 0);
     }
 }

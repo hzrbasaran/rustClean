@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crossterm::event::KeyCode;
 
 use crate::duplicates::{self, DupJob};
-use crate::lists::{ResultList, Row, RowSize};
+use crate::lists::{ResultList, Row, RowSize, Source};
 use crate::reports::{self, MenuItem, ReportKind};
 use crate::system;
 use crate::toolsview::ToolsView;
@@ -58,13 +58,46 @@ fn member_sizes(tree: &Tree, ids: &[NodeId], mode: SizeMode) -> (Vec<(NodeId, u6
     (members, clones)
 }
 
-impl Browser {
-    pub(super) fn run_search(&mut self, pattern: String) {
-        let pat = search::Pattern::new(&pattern);
-        if pat.is_empty() {
+/// Where the cursor of a result list was, to put it back after a rebuild.
+struct Cursor {
+    row: Option<usize>,
+    nodes: Option<Vec<NodeId>>,
+}
+
+impl Cursor {
+    /// On the row with the same entries, else on the row holding the first
+    /// of them, else on the same row number.
+    fn apply(&self, list: &mut ResultList) {
+        if list.rows.is_empty() {
+            list.table.select(None);
             return;
         }
-        let (tree, base, mode) = (&self.tree, self.current, self.size_mode);
+        let same = self.nodes.as_ref().and_then(|nodes| {
+            let first = nodes.first()?;
+            list.rows
+                .iter()
+                .position(|r| r.nodes == *nodes)
+                .or_else(|| list.rows.iter().position(|r| r.nodes.contains(first)))
+        });
+        let row = same.or(self.row).unwrap_or(0).min(list.rows.len() - 1);
+        list.table.select(Some(row));
+    }
+}
+
+impl Browser {
+    pub(super) fn run_search(&mut self, pattern: &str) {
+        if let Some(list) = self.search_list(self.current, pattern) {
+            self.results = Some(list);
+        }
+    }
+
+    /// Entries below `base` matching `pattern`; `None` for an empty pattern.
+    fn search_list(&self, base: NodeId, pattern: &str) -> Option<ResultList> {
+        let pat = search::Pattern::new(pattern);
+        if pat.is_empty() {
+            return None;
+        }
+        let (tree, mode) = (&self.tree, self.size_mode);
         let mut items = search::find(tree, base, &pat);
         items.sort_by_key(|&id| std::cmp::Reverse(tree.node(id).size.get(mode)));
         let rows = items
@@ -77,8 +110,8 @@ impl Browser {
             "Contents of matching folders are not listed separately; they go with the folder.",
         )
         .into();
-        list.pattern = Some(pattern);
-        self.results = Some(list);
+        list.source = Source::Search(pattern.to_string());
+        Some(list)
     }
 
     pub(super) fn open_menu_item(&mut self, item: MenuItem) {
@@ -125,35 +158,38 @@ impl Browser {
         let kind = *kind;
         self.pending_report = None;
         self.status = None;
-        match kind {
-            ReportKind::Apps => {
-                self.results = Some(apps::run(&self.tree, self.size_mode));
+        if kind == ReportKind::Duplicates {
+            let cands = duplicates::candidates(&self.tree, self.current);
+            if cands.is_empty() {
+                self.results = Some(self.no_duplicates_list(self.current));
+            } else {
+                self.dup_job = Some(DupJob::start(self.current, cands));
             }
-            ReportKind::Orphans => {
-                let now = crate::ui::now_secs();
-                self.results = Some(apps::orphans(&self.tree, self.size_mode, now, 0));
-            }
-            ReportKind::Duplicates => {
-                let cands = duplicates::candidates(&self.tree, self.current);
-                if cands.is_empty() {
-                    let mut list =
-                        ResultList::new(kind.label().to_string(), self.current, Vec::new());
-                    list.note = t!(
-                        "1 MiB üzerinde aynı boyutta iki dosya yok.",
-                        "No two files of 1 MiB or more have the same size.",
-                    )
-                    .into();
-                    self.results = Some(list);
-                } else {
-                    self.dup_job = Some(DupJob::start(self.current, cands));
-                }
-            }
-            _ => {
-                let now = crate::ui::now_secs();
-                let list = reports::run(&self.tree, self.current, self.size_mode, now, kind, 0);
-                self.results = Some(list);
-            }
+        } else {
+            self.results = Some(self.report_list(kind, self.current, 0));
         }
+    }
+
+    /// Runs a report that needs only the tree (every report but duplicates).
+    fn report_list(&self, kind: ReportKind, base: NodeId, min_age_days: u32) -> ResultList {
+        let (tree, mode, now) = (&self.tree, self.size_mode, crate::ui::now_secs());
+        match kind {
+            ReportKind::Apps => apps::run(tree, mode),
+            ReportKind::Orphans => apps::orphans(tree, mode, now, min_age_days),
+            _ => reports::run(tree, base, mode, now, kind, min_age_days),
+        }
+    }
+
+    /// The duplicates report when no two large files share a size.
+    fn no_duplicates_list(&self, base: NodeId) -> ResultList {
+        let mut list = ResultList::new(ReportKind::Duplicates.label().into(), base, Vec::new());
+        list.note = t!(
+            "1 MiB üzerinde aynı boyutta iki dosya yok.",
+            "No two files of 1 MiB or more have the same size.",
+        )
+        .into();
+        list.source = Source::Duplicates;
+        list
     }
 
     pub(super) fn poll_dups(&mut self) {
@@ -165,6 +201,11 @@ impl Browser {
         };
         let base = job.base;
         self.dup_job = None;
+        self.results = Some(self.duplicates_list(base, groups));
+    }
+
+    /// The duplicates report for groups of identical files.
+    fn duplicates_list(&self, base: NodeId, groups: Vec<Vec<NodeId>>) -> ResultList {
         let (tree, mode) = (&self.tree, self.size_mode);
         let mut rows: Vec<Row> = groups
             .into_iter()
@@ -205,7 +246,8 @@ impl Browser {
              deleting them frees nothing.",
         )
         .into();
-        self.results = Some(list);
+        list.source = Source::Duplicates;
+        list
     }
 
     /// `f` in a report: re-runs it with the next minimum age.
@@ -213,7 +255,7 @@ impl Browser {
         let Some(r) = &self.results else {
             return;
         };
-        let Some(kind) = r.report.filter(|k| k.supports_age()) else {
+        let Some(kind) = r.report().filter(|k| k.supports_age()) else {
             self.set_status(
                 t!(
                     "Bu listede yaş filtresi yok.",
@@ -226,16 +268,77 @@ impl Browser {
         let steps = reports::AGE_STEPS;
         let next = steps
             .iter()
-            .position(|&d| d == r.min_age_days)
+            .position(|&d| d == r.min_age_days())
             .map_or(0, |i| (i + 1) % steps.len());
-        let base = r.base;
-        let now = crate::ui::now_secs();
-        let list = if kind == ReportKind::Orphans {
-            apps::orphans(&self.tree, self.size_mode, now, steps[next])
-        } else {
-            reports::run(&self.tree, base, self.size_mode, now, kind, steps[next])
+        self.results = Some(self.report_list(kind, r.base, steps[next]));
+    }
+
+    /// Builds the open result list again from its source: after the language
+    /// changed, or after the basket or the apps changed. The cursor stays on
+    /// the same entry, and a group that was open is opened again, where they
+    /// still exist.
+    pub(super) fn rebuild_results(&mut self) {
+        let Some(open) = &self.results else {
+            return;
         };
+        // The cursor of every level, the top list first.
+        let mut cursors = Vec::new();
+        let mut top = open;
+        loop {
+            cursors.push(Cursor {
+                row: top.table.selected(),
+                nodes: top.selected_row().map(|r| r.nodes.clone()),
+            });
+            match &top.parent {
+                Some(parent) => top = parent,
+                None => break,
+            }
+        }
+        cursors.reverse();
+        let Some(mut list) = self.build_list(top) else {
+            return;
+        };
+        cursors[0].apply(&mut list);
         self.results = Some(list);
+        for cursor in &cursors[1..] {
+            let on_group = self
+                .results
+                .as_ref()
+                .and_then(ResultList::selected_row)
+                .is_some_and(|r| r.group);
+            if !on_group {
+                break;
+            }
+            self.drill_down();
+            if let Some(r) = &mut self.results {
+                cursor.apply(r);
+            }
+        }
+    }
+
+    /// `old` built again from its source; `None` for a list of members,
+    /// which is rebuilt by opening its group again.
+    fn build_list(&self, old: &ResultList) -> Option<ResultList> {
+        let base = old.base;
+        Some(match &old.source {
+            Source::Members => return None,
+            Source::Report { kind, min_age_days } => self.report_list(*kind, base, *min_age_days),
+            Source::Search(pattern) => self.search_list(base, pattern)?,
+            Source::Changes(file) => self.changes_list(base, file).ok()?,
+            // The rows hold the groups that are left: no new search.
+            Source::Duplicates
+                if old.rows.is_empty() && duplicates::candidates(&self.tree, base).is_empty() =>
+            {
+                self.no_duplicates_list(base)
+            }
+            Source::Duplicates => {
+                let groups = old.rows.iter().map(|r| r.nodes.clone()).collect();
+                let mut list = self.duplicates_list(base, groups);
+                list.truncated = old.truncated;
+                list
+            }
+            Source::Basket => self.basket_list(),
+        })
     }
 
     /// Opens the members of the selected group row.
@@ -287,11 +390,17 @@ impl Browser {
             KeyCode::Char('S') => self.open_basket(),
             KeyCode::Char('f') => self.cycle_age_filter(),
             KeyCode::Char('u') => self.start_uninstall(),
-            KeyCode::Char('c') if r.basket_view => {
+            KeyCode::Char('c') if r.is_basket() => {
                 self.basket.clear();
                 self.refresh_basket_view();
             }
-            KeyCode::Char('/') => self.input = Some(r.pattern.clone().unwrap_or_default()),
+            KeyCode::Char('/') => {
+                let pattern = match &r.source {
+                    Source::Search(p) => p.clone(),
+                    _ => String::new(),
+                };
+                self.input = Some(pattern);
+            }
             KeyCode::Char('m') => self.report_menu = Some(0),
             KeyCode::Char('a') => self.toggle_size_mode(),
             KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => match r.selected_row() {

@@ -344,6 +344,19 @@ fn reports() {
     });
 }
 
+/// Opened in one language, then `L`: the list is built again in the other
+/// (`-tr` starts in Turkish and ends in English).
+#[test]
+fn report_after_switching_language() {
+    snap("report-after-language-switch", || {
+        let mut app = app();
+        menu(&mut app, 8);
+        press(&mut app, KeyCode::Down);
+        press(&mut app, KeyCode::Char('L'));
+        app
+    });
+}
+
 #[test]
 fn group_report_and_its_members() {
     snap("report-repeated-names", || {

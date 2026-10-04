@@ -105,7 +105,7 @@ fn uninstall_moves_the_app_and_its_data_to_the_trash() {
         browser(a)
             .results
             .as_ref()
-            .is_some_and(|r| r.report == Some(ReportKind::Apps))
+            .is_some_and(|r| r.report() == Some(ReportKind::Apps))
     });
     let at = rows(&app).iter().position(|l| l == "Sketchpad").unwrap();
     for _ in 0..at {

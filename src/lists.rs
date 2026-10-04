@@ -3,9 +3,11 @@
 //! drilled into.
 
 use std::collections::HashSet;
+use std::path::PathBuf;
 
 use ratatui::widgets::TableState;
 
+use crate::reports::ReportKind;
 use crate::tree::{NodeId, SizeMode, Tree};
 
 /// How a group row's size is derived from its members.
@@ -98,6 +100,26 @@ pub fn relative_label(tree: &Tree, base: NodeId, id: NodeId) -> String {
     label
 }
 
+/// What a result list was built from, so it can be built again: after the
+/// language changed, with another age filter, or after the tree changed.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Source {
+    /// The members of a group row of the parent list; rebuilt by opening
+    /// that group again.
+    Members,
+    /// A report, with its minimum age filter in days.
+    Report { kind: ReportKind, min_age_days: u32 },
+    /// Search results for a pattern.
+    Search(String),
+    /// Changes since the saved scan in this file.
+    Changes(PathBuf),
+    /// Groups of identical files. The groups are the list's own rows, so
+    /// rebuilding needs no new search.
+    Duplicates,
+    /// The basket.
+    Basket,
+}
+
 pub struct ResultList {
     pub title: String,
     /// Hint shown under the list.
@@ -108,18 +130,11 @@ pub struct ResultList {
     pub table: TableState,
     /// More results existed than are shown.
     pub truncated: bool,
-    /// The search pattern, for search results.
-    pub pattern: Option<String>,
+    pub source: Source,
     /// Groups of copies: selecting a group selects all but its oldest copy.
     pub keep_one: bool,
     /// In a list of copies, the one to keep when selecting all.
     pub keep: Option<NodeId>,
-    /// This list shows the basket itself.
-    pub basket_view: bool,
-    /// The report this list came from, to run it again with another filter.
-    pub report: Option<crate::reports::ReportKind>,
-    /// Minimum age filter applied to the report, in days.
-    pub min_age_days: u32,
     /// The group list this list was drilled down from.
     pub parent: Option<Box<ResultList>>,
 }
@@ -135,14 +150,32 @@ impl ResultList {
             rows,
             table,
             truncated: false,
-            pattern: None,
+            source: Source::Members,
             keep_one: false,
             keep: None,
-            basket_view: false,
-            report: None,
-            min_age_days: 0,
             parent: None,
         }
+    }
+
+    /// The report this list came from.
+    pub fn report(&self) -> Option<ReportKind> {
+        match self.source {
+            Source::Report { kind, .. } => Some(kind),
+            _ => None,
+        }
+    }
+
+    /// Minimum age filter of the report, in days (0: none).
+    pub fn min_age_days(&self) -> u32 {
+        match self.source {
+            Source::Report { min_age_days, .. } => min_age_days,
+            _ => 0,
+        }
+    }
+
+    /// This list shows the basket itself.
+    pub fn is_basket(&self) -> bool {
+        self.source == Source::Basket
     }
 
     pub fn selected_row(&self) -> Option<&Row> {

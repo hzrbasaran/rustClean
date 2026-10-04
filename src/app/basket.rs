@@ -1,7 +1,7 @@
 //! Adding entries to the basket and showing it.
 
 use crate::basket::Added;
-use crate::lists::{ResultList, Row};
+use crate::lists::{ResultList, Row, Source};
 use crate::tree::{NodeId, ROOT};
 
 use super::results::oldest;
@@ -79,8 +79,7 @@ impl Browser {
             return;
         };
         let ids = self.row_targets(r, row);
-        let basket_view = r.basket_view;
-        if basket_view {
+        if r.is_basket() {
             for id in ids {
                 self.basket.remove(id);
             }
@@ -124,7 +123,7 @@ impl Browser {
         self.results = Some(self.basket_list());
     }
 
-    fn basket_list(&self) -> ResultList {
+    pub(super) fn basket_list(&self) -> ResultList {
         let (tree, mode) = (&self.tree, self.size_mode);
         let mut ids = self.basket.items().to_vec();
         ids.sort_by_key(|&id| std::cmp::Reverse(tree.node(id).size.get(mode)));
@@ -133,7 +132,7 @@ impl Browser {
             .map(|id| Row::single(tree, ROOT, id, mode, String::new()))
             .collect();
         let mut list = ResultList::new(t!("Sepet", "Basket").into(), ROOT, rows);
-        list.basket_view = true;
+        list.source = Source::Basket;
         list.note = t!(
             "Space: sepetten çıkar · c: sepeti boşalt · x: hepsini çöpe taşı",
             "Space: remove from basket · c: empty the basket · x: move all to the trash",
@@ -144,19 +143,9 @@ impl Browser {
 
     /// Rebuilds the basket view after the basket changed, keeping the cursor.
     pub(super) fn refresh_basket_view(&mut self) {
-        if !self.results.as_ref().is_some_and(|r| r.basket_view) {
-            return;
+        if self.results.as_ref().is_some_and(ResultList::is_basket) {
+            self.rebuild_results();
         }
-        let row = self
-            .results
-            .as_ref()
-            .and_then(|r| r.table.selected())
-            .unwrap_or(0);
-        let mut list = self.basket_list();
-        if !list.rows.is_empty() {
-            list.table.select(Some(row.min(list.rows.len() - 1)));
-        }
-        self.results = Some(list);
     }
 }
 
@@ -176,7 +165,7 @@ mod tests {
         assert_eq!(br.basket.items(), &[a, b]);
         // The basket view lists the basket; Space there removes.
         br.open_basket();
-        assert!(br.results.as_ref().unwrap().basket_view);
+        assert!(br.results.as_ref().unwrap().is_basket());
         assert_eq!(br.results.as_ref().unwrap().rows.len(), 2);
         br.toggle_row();
         assert_eq!(br.basket.len(), 1);

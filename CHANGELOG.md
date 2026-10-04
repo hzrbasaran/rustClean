@@ -6,6 +6,13 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- `L` now rebuilds the open result list in the new language: a report (with
+  its age filter), search results, a comparison with an earlier scan, the
+  duplicates (without searching again) or the basket. The cursor stays on
+  the same entry, and an open group is opened again
+  ([#8](https://github.com/hzrbasaran/rustClean/issues/8)).
+
 ## [0.2.0] - 2026-10-03
 
 ### Added

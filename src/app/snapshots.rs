@@ -1,8 +1,11 @@
 //! Saved scans: recording this one and comparing with an earlier one.
 
+use std::io;
+use std::path::Path;
+
 use crate::history;
-use crate::lists::ResultList;
-use crate::tree::ROOT;
+use crate::lists::{ResultList, Source};
+use crate::tree::{NodeId, ROOT};
 
 use super::Browser;
 
@@ -27,29 +30,33 @@ impl Browser {
         }
     }
 
-    pub(super) fn compare_with(&mut self, file: &std::path::Path) {
-        let snap = match history::load(file) {
-            Ok(s) => s,
-            Err(e) => {
-                self.set_status(
-                    tf!("Kayıt okunamadı: {e}", "Could not read the saved scan: {e}"),
-                    true,
-                );
-                return;
+    pub(super) fn compare_with(&mut self, file: &Path) {
+        match self.changes_list(self.current, file) {
+            Ok(list) => {
+                self.dashboard = None;
+                self.results = Some(list);
             }
-        };
-        self.dashboard = None;
-        let (rows, truncated, note) =
-            history::changes(&self.tree, self.current, &snap, self.size_mode);
+            Err(e) => self.set_status(
+                tf!("Kayıt okunamadı: {e}", "Could not read the saved scan: {e}"),
+                true,
+            ),
+        }
+    }
+
+    /// What changed below `base` since the scan saved in `file`.
+    pub(super) fn changes_list(&self, base: NodeId, file: &Path) -> io::Result<ResultList> {
+        let snap = history::load(file)?;
+        let (rows, truncated, note) = history::changes(&self.tree, base, &snap, self.size_mode);
         let title = tf!(
             "Değişenler ({} taramasına göre)",
             "Changes (since the scan of {})",
             crate::ui::fmt_date(snap.header.time.min(u64::from(u32::MAX)) as u32)
         );
-        let mut list = ResultList::new(title, self.current, rows);
+        let mut list = ResultList::new(title, base, rows);
         list.truncated = truncated;
         list.note = note;
-        self.results = Some(list);
+        list.source = Source::Changes(file.to_path_buf());
+        Ok(list)
     }
 
     /// Saves this scan to the history (in the background) and tells how much

@@ -1,0 +1,43 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Installers and archives in Downloads — /Users/demo  │  3 rows, 3.6 GiB (on disk)
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+      Size        Count      Modified         Location                                    Details
+  [ ]     3.0 GiB            2025-08-27 12:00 Downloads/Xcode_16.xip                      archive
+▶ [ ]   450.0 MiB            2026-03-15 12:00 Downloads/setup.dmg                         disk image
+  [ ]   120.0 MiB            2026-09-19 12:00 Downloads/photos.zip                        archive
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Language: English (L: Türkçe)
+ ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 2+3 Gray/- | 29+16 Red/- | 90+7 Gray/-
+ 4: 0+2 -/DarkGray BOLD | 2+3 Gray/DarkGray BOLD | 5+24 -/DarkGray BOLD | 29+16 Yellow/DarkGray BOLD | 45+45 -/DarkGray BOLD | 90+10 Gray/DarkGray BOLD
+ 5: 2+3 Gray/- | 29+16 Cyan/- | 90+7 Gray/-
+28: 0+29 Green/-
+29: 0+4 Black/Gray | 11+7 Black/Gray | 30+3 Black/Gray | 39+3 Black/Gray | 55+3 Black/Gray | 74+3 Black/Gray | 86+7 Black/Gray
