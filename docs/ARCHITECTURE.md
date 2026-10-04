@@ -27,7 +27,11 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ tree.rs ──── compact arena tree of the scan
    ├─ clones.rs ── APFS clone ids and private sizes (getattrlistat)
    │
-   ├─ reports.rs ─ tree-based reports, age filter, menu items
+   ├─ reports/ ─── tree-based reports
+   │    ├─ mod.rs        report kinds, menu items, age filter, run(), shared
+   │    │                walk / top-N helpers
+   │    └─ one module per report group: size, downloads, dev_junk, caches,
+   │       names
    ├─ apps.rs ──── apps and their data, orphaned leftovers
    ├─ duplicates.rs  identical-content search (background thread)
    ├─ stats.rs ─── summary statistics, age groups, file categories
