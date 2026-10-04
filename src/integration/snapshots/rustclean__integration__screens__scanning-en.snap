@@ -31,7 +31,7 @@ expression: screen
 
 
 
- Esc  cancel   q  quit
+ ?  help   Esc  cancel   q  quit
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  2: 0+13 Cyan/- BOLD
@@ -41,4 +41,4 @@ expression: screen
  7: 0+15 Gray/-
  8: 0+15 Gray/-
 10: 0+15 Gray/-
-29: 0+5 Black/Gray | 14+3 Black/Gray
+29: 0+3 Black/Gray | 10+5 Black/Gray | 24+3 Black/Gray

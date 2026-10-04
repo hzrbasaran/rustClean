@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Disks — choose a disk to scan
+────────┌ Keys ────────────────────────────────────────────────────────────────────────────┐────────
+  Name  │▶ This screen: Disk list                                                          │
+▶ Macint│ ↑↓  j k       select a disk                                                      │
+  Backup│ Enter  →  l   scan                                                               │able
+        │ r             refresh the list                                                   │
+        │ Esc           quit                                                               │
+        │                                                                                  │
+        │On every screen                                                                   │
+        │ ?             this help                                                          │
+        │ L             English ↔ Türkçe                                                   │
+        │ T             theme: dark, light, color-blind                                    │
+        │ q  Ctrl-C     quit                                                               │
+        │                                                                                  │
+        │Folder list                                                                       │
+        │ ↑↓  j k       move                                                               │
+        │ PgUp PgDn     page up / down                                                     │
+        │ Home End  g G first / last row                                                   │
+        │ Enter  →  l   open the folder                                                    │
+        │ ⌫  ←  h  Esc  parent folder                                                      │
+        │ s             sort: size, name, file count, date                                 │
+        │ a             apparent / on-disk size                                            │
+        │ t             map view                                                           │
+        │ /             find by name (* and ? are wildcards)                               │
+        │ i             summary of this folder                                             │
+        │ m             reports menu                                                       │
+        │ Space         add to / remove from the basket                                    │
+────────│ S             show the basket                                                    │────────
+        └───────────────────── ↑↓ PgUp PgDn: scroll · Esc / ?: close ──────────────────────┘
+ ?  help   ↑↓  select   Enter  scan   r  refresh   L  Türkçe   T  theme   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 8+1 Cyan/- | 9+6 White/- BOLD | 15+77 Cyan/-
+ 2: 0+8 -/- BOLD | UNDERLINED | 8+1 Cyan/- | 9+24 Cyan/- BOLD | 91+1 Cyan/- | 92+8 -/- BOLD | UNDERLINED
+ 3: 0+8 White/Indexed(238) BOLD | 8+16 Cyan/- | 24+13 White/- | 91+1 Cyan/- | 92+8 White/Indexed(238) BOLD
+ 4: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+ 5: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+ 6: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+ 7: 8+1 Cyan/- | 91+1 Cyan/-
+ 8: 8+1 Cyan/- | 9+15 White/- BOLD | 91+1 Cyan/-
+ 9: 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
+10: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+11: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
+12: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+13: 8+1 Cyan/- | 91+1 Cyan/-
+14: 8+1 Cyan/- | 9+11 White/- BOLD | 91+1 Cyan/-
+15: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+16: 8+16 Cyan/- | 24+14 White/- | 91+1 Cyan/-
+17: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+18: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+19: 8+16 Cyan/- | 24+13 White/- | 91+1 Cyan/-
+20: 8+16 Cyan/- | 24+34 White/- | 91+1 Cyan/-
+21: 8+16 Cyan/- | 24+23 White/- | 91+1 Cyan/-
+22: 8+16 Cyan/- | 24+8 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
+24: 8+16 Cyan/- | 24+22 White/- | 91+1 Cyan/-
+25: 8+16 Cyan/- | 24+12 White/- | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+28: 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 37+3 Black/Gray | 50+3 Black/Gray | 62+3 Black/Gray | 73+3 Black/Gray

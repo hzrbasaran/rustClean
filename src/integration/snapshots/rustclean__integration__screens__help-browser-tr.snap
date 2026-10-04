@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (diskte)  │  17 dosya  │  sıralama: boyut
+────────┌ Tuşlar ──────────────────────────────────────────────────────────────────────────┐1 yıl
+    Boyu│▶ Bu ekran: Klasör listesi                                                        │
+▶       │ ↑↓  j k       gez                                                                │
+        │ PgUp PgDn     sayfa sayfa                                                        │
+        │ Home End  g G ilk / son satır                                                    │
+      66│ Enter  →  l   klasöre gir                                                        │
+      15│ ⌫  ←  h  Esc  üst klasör                                                         │
+        │ s             sırala: boyut, ad, dosya sayısı, tarih                             │
+        │ a             görünen / diskteki boyut                                           │
+        │ t             harita görünümü                                                    │
+        │ /             ada göre ara (* ve ? joker karakter)                               │
+        │ i             bu klasörün özeti                                                  │
+        │ m             raporlar menüsü                                                    │
+        │ Space         sepete ekle / çıkar                                                │
+        │ S             sepeti göster                                                      │
+        │ x  Delete     çöpe taşı (önce sorar; sepet doluysa sepeti)                       │
+        │ R             bu klasörü yeniden tara                                            │
+        │ r             hepsini yeniden tara                                               │
+        │ d             disk listesine dön                                                 │
+        │                                                                                  │
+        │Her ekranda                                                                       │
+        │ ?             bu yardım                                                          │
+        │ L             Türkçe ↔ English                                                   │
+        │ T             tema: koyu, açık, renk körü                                        │
+        │ q  Ctrl-C     çık                                                                │
+        │                                                                                  │
+────────│Harita (treemap)                                                                  │────────
+37 öğe t└───────────────────── ↑↓ PgUp PgDn: kaydır · Esc / ?: kapat ──────────────────────┘
+ ?  yardım   ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 8+1 Cyan/- | 9+8 White/- BOLD | 17+75 Cyan/- | 92+8 White/-
+ 2: 0+8 -/- BOLD | UNDERLINED | 8+1 Cyan/- | 9+26 Cyan/- BOLD | 91+1 Cyan/- | 92+8 -/- BOLD | UNDERLINED
+ 3: 0+8 White/Indexed(238) BOLD | 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/- | 92+8 White/Indexed(238) BOLD
+ 4: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
+ 5: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+ 6: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
+ 7: 8+16 Cyan/- | 24+10 White/- | 91+1 Cyan/-
+ 8: 8+16 Cyan/- | 24+38 White/- | 91+1 Cyan/-
+ 9: 8+16 Cyan/- | 24+24 White/- | 91+1 Cyan/-
+10: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+11: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
+12: 8+16 Cyan/- | 24+17 White/- | 91+1 Cyan/-
+13: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+14: 8+16 Cyan/- | 24+19 White/- | 91+1 Cyan/-
+15: 8+16 Cyan/- | 24+13 White/- | 91+1 Cyan/-
+16: 8+16 Cyan/- | 24+44 White/- | 91+1 Cyan/-
+17: 8+16 Cyan/- | 24+23 White/- | 91+1 Cyan/-
+18: 8+16 Cyan/- | 24+20 White/- | 91+1 Cyan/-
+19: 8+16 Cyan/- | 24+18 White/- | 91+1 Cyan/-
+20: 8+1 Cyan/- | 91+1 Cyan/-
+21: 8+1 Cyan/- | 9+11 White/- BOLD | 91+1 Cyan/-
+22: 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+24: 8+16 Cyan/- | 24+27 White/- | 91+1 Cyan/-
+25: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
+26: 8+1 Cyan/- | 91+1 Cyan/-
+27: 8+1 Cyan/- | 9+16 White/- BOLD | 91+1 Cyan/-
+28: 0+8 Gray/- | 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 57+3 Black/Gray | 66+3 Black/Gray | 80+3 Black/Gray | 90+3 Black/Gray

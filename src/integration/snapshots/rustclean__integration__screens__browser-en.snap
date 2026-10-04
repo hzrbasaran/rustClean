@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort   a  appare
+ ?  help   ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
@@ -43,4 +43,4 @@ expression: screen
  7: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Cyan/- | 64+13 LightBlue/- BOLD
  8: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+10 LightBlue/- BOLD
 28: 0+23 Gray/- | 23+25 Yellow/-
-29: 0+4 Black/Gray | 11+7 Black/Gray | 25+3 Black/Gray | 35+3 Black/Gray | 44+3 Black/Gray | 54+3 Black/Gray | 67+3 Black/Gray | 80+3 Black/Gray | 90+3 Black/Gray
+29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 54+3 Black/Gray | 64+3 Black/Gray | 77+3 Black/Gray | 90+3 Black/Gray

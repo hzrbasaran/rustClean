@@ -31,7 +31,7 @@ expression: screen
 │                                                ││                                                │
 └────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
 „En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.
- Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  görünen/diskt
+ ?  yardım   Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  g
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 1+7 -/- BOLD | 51+6 -/- BOLD
@@ -48,4 +48,4 @@ expression: screen
 22: 62+10 -/- BOLD
 23: 62+13 -/- BOLD
 24: 62+13 -/- BOLD
-29: 0+5 -/- REVERSED | 22+4 -/- REVERSED | 32+7 -/- REVERSED | 52+7 -/- REVERSED | 68+3 -/- REVERSED | 83+3 -/- REVERSED
+29: 0+3 -/- REVERSED | 12+5 -/- REVERSED | 34+4 -/- REVERSED | 44+7 -/- REVERSED | 64+7 -/- REVERSED | 80+3 -/- REVERSED | 95+3 -/- REVERSED

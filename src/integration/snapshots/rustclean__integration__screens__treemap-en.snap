@@ -31,7 +31,7 @@ expression: screen
 other (1 small items — Enter: show in list)
  t / Esc  back to list   Color: ████ folders (each its own)  ██ Video  ██ Audio  ██ Images  ██ Archi
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket   x  move to
+ ?  help   ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 0+41 White/Indexed(25) BOLD | 41+7 White/Indexed(130) BOLD | 48+30 White/Indexed(130) | 78+9 White/Indexed(29) BOLD | 87+13 White/Indexed(29)
@@ -62,4 +62,4 @@ other (1 small items — Enter: show in list)
 26: 0+43 White/DarkGray BOLD | 43+57 White/DarkGray
 27: 0+9 Black/Gray | 9+16 White/- | 25+7 White/- BOLD | 32+1 Indexed(25)/- | 33+1 Indexed(130)/- | 34+1 Indexed(29)/- | 35+1 Indexed(90)/- | 36+25 White/- | 61+2 Magenta/- | 63+8 White/- | 71+2 LightMagenta/- | 73+8 White/- | 81+2 LightBlue/- | 83+9 White/- | 92+2 LightYellow/- | 94+6 White/-
 28: 0+23 Gray/- | 23+25 Yellow/-
-29: 0+6 Black/Gray | 21+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 56+7 Black/Gray | 70+7 Black/Gray | 89+3 Black/Gray
+29: 0+3 Black/Gray | 10+6 Black/Gray | 31+7 Black/Gray | 45+3 Black/Gray | 55+3 Black/Gray | 66+7 Black/Gray | 80+7 Black/Gray | 99+1 Black/Gray

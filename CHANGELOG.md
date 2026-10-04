@@ -14,6 +14,10 @@ follows [Semantic Versioning](https://semver.org/).
   ([#25](https://github.com/hzrbasaran/rustClean/issues/25)).
 - `--no-color` and the `NO_COLOR` environment variable turn colors off; the
   selection is shown reversed and treemap blocks get borders.
+- `?` opens a help screen with every key: the current screen's first, then
+  the keys that work everywhere, then the other screens. The bottom line
+  starts with `?  help`
+  ([#26](https://github.com/hzrbasaran/rustClean/issues/26)).
 
 ### Changed
 - `L` now rebuilds the open result list in the new language: a report (with
@@ -23,6 +27,8 @@ follows [Semantic Versioning](https://semver.org/).
   ([#8](https://github.com/hzrbasaran/rustClean/issues/8)).
 
 ### Fixed
+- The basket's bottom line lists its own keys (`c` empties it, `x` moves
+  everything to the trash) instead of report keys that did nothing there.
 - The selected row of lists in the dark theme is white on dark gray: colored
   dates and folder names were hard to read on the old gray.
 - Summary: the file types column fits the longest label in the current

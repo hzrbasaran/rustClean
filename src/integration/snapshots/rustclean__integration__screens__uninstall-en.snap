@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ↑↓  move   Space  check   t  all   y  uninstall   n / Esc  cancel
+ ?  help   ↑↓  move   Space  check   t  all   y  uninstall   n / Esc  cancel
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
@@ -55,4 +55,4 @@ expression: screen
 19: 2+1 Red/- | 4+3 Black/Red BOLD | 22+7 Black/Gray | 40+3 Black/Gray | 97+1 Red/-
 20: 2+96 Red/-
 28: 0+23 Gray/- | 23+25 Yellow/-
-29: 0+4 Black/Gray | 11+7 Black/Gray | 26+3 Black/Gray | 35+3 Black/Gray | 50+9 Black/Gray
+29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 36+3 Black/Gray | 45+3 Black/Gray | 60+9 Black/Gray

@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort   a  appare
+ ?  help   ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Indexed(231)/Indexed(25) BOLD
  1: 36+7 -/- BOLD | 43+2 Indexed(28)/- | 57+2 Indexed(31)/- | 72+2 Indexed(130)/- | 86+2 Indexed(160)/-
@@ -43,4 +43,4 @@ expression: screen
  7: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(31)/- | 64+13 Indexed(26)/- BOLD
  8: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(28)/- | 64+10 Indexed(26)/- BOLD
 28: 0+23 Indexed(242)/- | 23+25 Indexed(130)/-
-29: 0+4 Indexed(231)/Indexed(242) | 11+7 Indexed(231)/Indexed(242) | 25+3 Indexed(231)/Indexed(242) | 35+3 Indexed(231)/Indexed(242) | 44+3 Indexed(231)/Indexed(242) | 54+3 Indexed(231)/Indexed(242) | 67+3 Indexed(231)/Indexed(242) | 80+3 Indexed(231)/Indexed(242) | 90+3 Indexed(231)/Indexed(242)
+29: 0+3 Indexed(231)/Indexed(242) | 10+4 Indexed(231)/Indexed(242) | 21+7 Indexed(231)/Indexed(242) | 35+3 Indexed(231)/Indexed(242) | 45+3 Indexed(231)/Indexed(242) | 54+3 Indexed(231)/Indexed(242) | 64+3 Indexed(231)/Indexed(242) | 77+3 Indexed(231)/Indexed(242) | 90+3 Indexed(231)/Indexed(242)

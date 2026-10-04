@@ -31,10 +31,10 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 Enter: dosyanın bulunduğu klasörü aç
- ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter  aç / konuma
+ ?  yardım   ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 39+8 -/- BOLD
  2: 0+100 -/- BOLD | UNDERLINED
  3: 0+100 -/- BOLD | REVERSED
-29: 0+4 -/- REVERSED | 10+7 -/- REVERSED | 26+3 -/- REVERSED | 36+3 -/- REVERSED | 54+3 -/- REVERSED | 69+3 -/- REVERSED | 80+7 -/- REVERSED
+29: 0+3 -/- REVERSED | 12+4 -/- REVERSED | 22+7 -/- REVERSED | 38+3 -/- REVERSED | 48+3 -/- REVERSED | 66+3 -/- REVERSED | 81+3 -/- REVERSED | 92+7 -/- REVERSED

@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+────────┌ Keys ────────────────────────────────────────────────────────────────────────────┐ year
+    Size│▶ This screen: Folder list                                                        │
+▶       │ ↑↓  j k       move                                                               │
+        │ PgUp PgDn     page up / down                                                     │
+        │ Home End  g G first / last row                                                   │
+      66│ Enter  →  l   open the folder                                                    │
+      15│ ⌫  ←  h  Esc  parent folder                                                      │
+        │ s             sort: size, name, file count, date                                 │
+        │ a             apparent / on-disk size                                            │
+        │ t             map view                                                           │
+        │ /             find by name (* and ? are wildcards)                               │
+        │ i             summary of this folder                                             │
+        │ m             reports menu                                                       │
+        │ Space         add to / remove from the basket                                    │
+        │ S             show the basket                                                    │
+        │ x  Delete     move to the trash (asks first; the basket if it has entries)       │
+        │ R             rescan this folder                                                 │
+        │ r             rescan everything                                                  │
+        │ d             back to the disk list                                              │
+        │                                                                                  │
+        │On every screen                                                                   │
+        │ ?             this help                                                          │
+        │ L             English ↔ Türkçe                                                   │
+        │ T             theme: dark, light, color-blind                                    │
+        │ q  Ctrl-C     quit                                                               │
+        │                                                                                  │
+────────│Map (treemap)                                                                     │────────
+37 items└───────────────────── ↑↓ PgUp PgDn: scroll · Esc / ?: close ──────────────────────┘
+ ?  help   ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 8+1 Cyan/- | 9+6 White/- BOLD | 15+77 Cyan/- | 92+8 White/-
+ 2: 0+8 -/- BOLD | UNDERLINED | 8+1 Cyan/- | 9+26 Cyan/- BOLD | 91+1 Cyan/- | 92+8 -/- BOLD | UNDERLINED
+ 3: 0+8 White/Indexed(238) BOLD | 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/- | 92+8 White/Indexed(238) BOLD
+ 4: 8+16 Cyan/- | 24+14 White/- | 91+1 Cyan/-
+ 5: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+ 6: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+ 7: 8+16 Cyan/- | 24+13 White/- | 91+1 Cyan/-
+ 8: 8+16 Cyan/- | 24+34 White/- | 91+1 Cyan/-
+ 9: 8+16 Cyan/- | 24+23 White/- | 91+1 Cyan/-
+10: 8+16 Cyan/- | 24+8 White/- | 91+1 Cyan/-
+11: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
+12: 8+16 Cyan/- | 24+22 White/- | 91+1 Cyan/-
+13: 8+16 Cyan/- | 24+12 White/- | 91+1 Cyan/-
+14: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
+15: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+16: 8+16 Cyan/- | 24+60 White/- | 91+1 Cyan/-
+17: 8+16 Cyan/- | 24+18 White/- | 91+1 Cyan/-
+18: 8+16 Cyan/- | 24+17 White/- | 91+1 Cyan/-
+19: 8+16 Cyan/- | 24+21 White/- | 91+1 Cyan/-
+20: 8+1 Cyan/- | 91+1 Cyan/-
+21: 8+1 Cyan/- | 9+15 White/- BOLD | 91+1 Cyan/-
+22: 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+24: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
+25: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+26: 8+1 Cyan/- | 91+1 Cyan/-
+27: 8+1 Cyan/- | 9+13 White/- BOLD | 91+1 Cyan/-
+28: 0+8 Gray/- | 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 54+3 Black/Gray | 64+3 Black/Gray | 77+3 Black/Gray | 90+3 Black/Gray

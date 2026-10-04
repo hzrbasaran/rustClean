@@ -31,7 +31,7 @@ expression: screen
 │    $ docker system prune                                                                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Measuring only reads. No command runs without your confirmation.
- ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+ ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Indexed(231)/Indexed(25) BOLD
  2: 0+100 -/- BOLD | UNDERLINED
@@ -45,4 +45,4 @@ Measuring only reads. No command runs without your confirmation.
 26: 0+1 Indexed(248)/- | 1+25 Indexed(242)/- | 99+1 Indexed(248)/-
 27: 0+100 Indexed(248)/-
 28: 0+100 Indexed(242)/-
-29: 0+4 Indexed(231)/Indexed(242) | 13+7 Indexed(231)/Indexed(242) | 28+3 Indexed(231)/Indexed(242) | 47+3 Indexed(231)/Indexed(242) | 57+5 Indexed(231)/Indexed(242) | 69+3 Indexed(231)/Indexed(242)
+29: 0+3 Indexed(231)/Indexed(242) | 10+4 Indexed(231)/Indexed(242) | 23+7 Indexed(231)/Indexed(242) | 38+3 Indexed(231)/Indexed(242) | 57+3 Indexed(231)/Indexed(242) | 67+5 Indexed(231)/Indexed(242) | 79+3 Indexed(231)/Indexed(242)

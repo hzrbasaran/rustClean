@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 Enter: open the file's folder
- ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+ ?  help   ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Ent
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Indexed(231)/Indexed(25) BOLD
  1: 36+7 -/- BOLD | 43+2 Indexed(28)/- | 57+2 Indexed(31)/- | 72+2 Indexed(130)/- | 86+2 Indexed(160)/-
@@ -54,4 +54,4 @@ Enter: open the file's folder
 18: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
 19: 2+3 Indexed(242)/- | 29+16 Indexed(28)/-
 28: 0+100 Indexed(242)/-
-29: 0+4 Indexed(231)/Indexed(242) | 11+7 Indexed(231)/Indexed(242) | 30+3 Indexed(231)/Indexed(242) | 39+3 Indexed(231)/Indexed(242) | 55+3 Indexed(231)/Indexed(242) | 74+3 Indexed(231)/Indexed(242) | 86+7 Indexed(231)/Indexed(242)
+29: 0+3 Indexed(231)/Indexed(242) | 10+4 Indexed(231)/Indexed(242) | 21+7 Indexed(231)/Indexed(242) | 40+3 Indexed(231)/Indexed(242) | 49+3 Indexed(231)/Indexed(242) | 65+3 Indexed(231)/Indexed(242) | 84+3 Indexed(231)/Indexed(242) | 96+4 Indexed(231)/Indexed(242)

@@ -31,7 +31,7 @@ expression: screen
 │                                                                                                  │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.
- r  yenile   m  menü   Esc  geri   q  çık
+ ?  yardım   r  yenile   m  menü   Esc  geri   q  çık
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+73 DarkGray/-
@@ -62,4 +62,4 @@ Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.
 26: 0+1 DarkGray/- | 99+1 DarkGray/-
 27: 0+100 DarkGray/-
 28: 0+100 Gray/-
-29: 0+3 Black/Gray | 12+3 Black/Gray | 22+5 Black/Gray | 34+3 Black/Gray
+29: 0+3 Black/Gray | 12+3 Black/Gray | 24+3 Black/Gray | 34+5 Black/Gray | 46+3 Black/Gray

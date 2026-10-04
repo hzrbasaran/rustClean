@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
- ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala   a  görüne
+ ?  yardım   ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 39+8 -/- BOLD
@@ -42,4 +42,4 @@ expression: screen
  6: 64+8 -/- BOLD
  7: 64+13 -/- BOLD
  8: 64+10 -/- BOLD
-29: 0+4 -/- REVERSED | 10+7 -/- REVERSED | 23+3 -/- REVERSED | 33+3 -/- REVERSED | 45+3 -/- REVERSED | 54+3 -/- REVERSED | 68+3 -/- REVERSED | 78+3 -/- REVERSED | 90+3 -/- REVERSED
+29: 0+3 -/- REVERSED | 12+4 -/- REVERSED | 22+7 -/- REVERSED | 35+3 -/- REVERSED | 45+3 -/- REVERSED | 57+3 -/- REVERSED | 66+3 -/- REVERSED | 80+3 -/- REVERSED | 90+3 -/- REVERSED

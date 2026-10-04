@@ -31,7 +31,7 @@ expression: screen
 other (1 small items — Enter: show in list)
  t / Esc  back to list   Color: ████ folders (each its own)  ██ Video  ██ Audio  ██ Images  ██ Archi
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket   x  move to
+ ?  help   ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Indexed(231)/Indexed(25) BOLD
  1: 0+41 White/Indexed(25) BOLD | 41+7 White/Indexed(130) BOLD | 48+30 White/Indexed(130) | 78+9 White/Indexed(29) BOLD | 87+13 White/Indexed(29)
@@ -62,4 +62,4 @@ other (1 small items — Enter: show in list)
 26: 0+43 White/Indexed(245) BOLD | 43+57 White/Indexed(245)
 27: 0+9 Indexed(231)/Indexed(242) | 25+7 -/- BOLD | 32+1 Indexed(25)/- | 33+1 Indexed(130)/- | 34+1 Indexed(29)/- | 35+1 Indexed(90)/- | 61+2 Indexed(127)/- | 71+2 Indexed(133)/- | 81+2 Indexed(32)/- | 92+2 Indexed(178)/-
 28: 0+23 Indexed(242)/- | 23+25 Indexed(130)/-
-29: 0+6 Indexed(231)/Indexed(242) | 21+7 Indexed(231)/Indexed(242) | 35+3 Indexed(231)/Indexed(242) | 45+3 Indexed(231)/Indexed(242) | 56+7 Indexed(231)/Indexed(242) | 70+7 Indexed(231)/Indexed(242) | 89+3 Indexed(231)/Indexed(242)
+29: 0+3 Indexed(231)/Indexed(242) | 10+6 Indexed(231)/Indexed(242) | 31+7 Indexed(231)/Indexed(242) | 45+3 Indexed(231)/Indexed(242) | 55+3 Indexed(231)/Indexed(242) | 66+7 Indexed(231)/Indexed(242) | 80+7 Indexed(231)/Indexed(242) | 99+1 Indexed(231)/Indexed(242)

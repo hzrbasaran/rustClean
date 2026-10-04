@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
- ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala   a  görüne
+ ?  yardım   ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Indexed(231)/Indexed(25) BOLD
  1: 39+8 -/- BOLD | 47+2 Indexed(28)/- | 60+2 Indexed(31)/- | 74+2 Indexed(130)/- | 87+2 Indexed(160)/-
@@ -43,4 +43,4 @@ expression: screen
  7: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(31)/- | 64+13 Indexed(26)/- BOLD
  8: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(28)/- | 64+10 Indexed(26)/- BOLD
 28: 0+22 Indexed(242)/- | 22+24 Indexed(130)/-
-29: 0+4 Indexed(231)/Indexed(242) | 10+7 Indexed(231)/Indexed(242) | 23+3 Indexed(231)/Indexed(242) | 33+3 Indexed(231)/Indexed(242) | 45+3 Indexed(231)/Indexed(242) | 54+3 Indexed(231)/Indexed(242) | 68+3 Indexed(231)/Indexed(242) | 78+3 Indexed(231)/Indexed(242) | 90+3 Indexed(231)/Indexed(242)
+29: 0+3 Indexed(231)/Indexed(242) | 12+4 Indexed(231)/Indexed(242) | 22+7 Indexed(231)/Indexed(242) | 35+3 Indexed(231)/Indexed(242) | 45+3 Indexed(231)/Indexed(242) | 57+3 Indexed(231)/Indexed(242) | 66+3 Indexed(231)/Indexed(242) | 80+3 Indexed(231)/Indexed(242) | 90+3 Indexed(231)/Indexed(242)

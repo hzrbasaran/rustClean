@@ -158,6 +158,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |
+| `?` | bütün tuşlar, önce bulunduğunuz ekranınkiler |
 | `q` | çık |
 
 Tüm ekranlar ve raporlar için [kullanım kılavuzu](docs/USAGE.md) (İngilizce).

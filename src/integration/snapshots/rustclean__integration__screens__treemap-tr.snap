@@ -31,7 +31,7 @@ expression: screen
 diğer (1 küçük öğe — Enter: listede gör)
  t / Esc  listeye dön   Renk: ████ klasörler (her biri ayrı)  ██ Video  ██ Ses  ██ Resim  ██ Arşiv /
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
- ←↑↓→  blok seç   Enter  gir   ⌫  geri   c  renk   t/Esc  liste   Space  sepete   x  çöpe taşı   S
+ ?  yardım   ←↑↓→  blok seç   Enter  gir   ⌫  geri   c  renk   t/Esc  liste   Space  sepete   x  çöp
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 0+41 White/Indexed(25) BOLD | 41+7 White/Indexed(130) BOLD | 48+30 White/Indexed(130) | 78+9 White/Indexed(29) BOLD | 87+13 White/Indexed(29)
@@ -62,4 +62,4 @@ diğer (1 küçük öğe — Enter: listede gör)
 26: 0+40 White/DarkGray BOLD | 40+60 White/DarkGray
 27: 0+9 Black/Gray | 9+15 White/- | 24+6 White/- BOLD | 30+1 Indexed(25)/- | 31+1 Indexed(130)/- | 32+1 Indexed(29)/- | 33+1 Indexed(90)/- | 34+28 White/- | 62+2 Magenta/- | 64+8 White/- | 72+2 LightMagenta/- | 74+6 White/- | 80+2 LightBlue/- | 82+8 White/- | 90+2 LightYellow/- | 92+8 White/-
 28: 0+22 Gray/- | 22+24 Yellow/-
-29: 0+6 Black/Gray | 17+7 Black/Gray | 30+3 Black/Gray | 40+3 Black/Gray | 50+7 Black/Gray | 65+7 Black/Gray | 81+3 Black/Gray | 96+3 Black/Gray
+29: 0+3 Black/Gray | 12+6 Black/Gray | 29+7 Black/Gray | 42+3 Black/Gray | 52+3 Black/Gray | 62+7 Black/Gray | 77+7 Black/Gray | 93+3 Black/Gray

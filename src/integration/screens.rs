@@ -795,3 +795,195 @@ fn css(c: Color) -> Option<String> {
         Color::Rgb(r, g, b) => Some(format!("#{r:02x}{g:02x}{b:02x}")),
     }
 }
+
+#[test]
+fn help_screen() {
+    snap("help-browser", || {
+        let mut app = app();
+        press(&mut app, KeyCode::Char('?'));
+        app
+    });
+    snap("help-report", || {
+        let mut app = app();
+        menu(&mut app, 0);
+        press(&mut app, KeyCode::Char('?'));
+        app
+    });
+    snap("help-disks", || {
+        let mut app = app();
+        app.screen = Screen::DiskSelect;
+        press(&mut app, KeyCode::Char('?'));
+        app
+    });
+    snap("help-scrolled", || {
+        let mut app = app();
+        press(&mut app, KeyCode::Char('?'));
+        press(&mut app, KeyCode::PageDown);
+        app
+    });
+}
+
+#[test]
+fn help_keys() {
+    let mut app = app();
+    press(&mut app, KeyCode::Char('?'));
+    assert_eq!(app.help, Some(0));
+    // Scrolling stays within the text once drawn.
+    for _ in 0..50 {
+        press(&mut app, KeyCode::PageDown);
+    }
+    render(&mut app);
+    let max = app.help.unwrap();
+    assert!(max > 0 && max < 500, "{max}");
+    press(&mut app, KeyCode::Home);
+    assert_eq!(app.help, Some(0));
+    // Any other key closes it and does nothing else.
+    press(&mut app, KeyCode::Char('m'));
+    assert_eq!(app.help, None);
+    assert!(browser(&mut app).report_menu.is_none());
+    // Over a dialog: the dialog stays open behind the help.
+    let id = find(&mut app, "Downloads/setup.dmg");
+    browser(&mut app).confirm = Some(vec![id]);
+    press(&mut app, KeyCode::Char('?'));
+    press(&mut app, KeyCode::Esc);
+    assert!(browser(&mut app).confirm.is_some());
+    // In the search box `?` is a wildcard, not help.
+    browser(&mut app).confirm = None;
+    press(&mut app, KeyCode::Char('/'));
+    press(&mut app, KeyCode::Char('?'));
+    assert_eq!(app.help, None);
+    assert_eq!(browser(&mut app).input.as_deref(), Some("?"));
+}
+
+/// Sets up a screen to draw; closures that capture nothing are fine too.
+type BoxedBuilder = Box<dyn Fn() -> App>;
+
+/// Every key the bottom line names is in the help of that screen.
+#[test]
+fn help_lists_every_key_of_the_bottom_line() {
+    use crate::ui::help::{global_keys, topic};
+    let tokens = |k: &str| -> Vec<String> {
+        k.split(|c: char| c.is_whitespace() || c == '/')
+            .filter(|t| !t.is_empty() && *t != "…")
+            .map(str::to_string)
+            .collect()
+    };
+    let screens: Vec<(&str, BoxedBuilder)> = vec![
+        ("list", Box::new(app)),
+        (
+            "map",
+            Box::new(|| {
+                let mut app = app();
+                press(&mut app, KeyCode::Char('t'));
+                app
+            }),
+        ),
+        (
+            "report",
+            Box::new(|| {
+                let mut app = app();
+                menu(&mut app, 0);
+                app
+            }),
+        ),
+        (
+            "apps",
+            Box::new(|| {
+                let mut app = app();
+                menu(&mut app, 3);
+                app
+            }),
+        ),
+        (
+            "basket",
+            Box::new(|| {
+                let mut app = app();
+                let id = find(&mut app, "Downloads/setup.dmg");
+                let b = browser(&mut app);
+                b.basket.add(&b.tree, id);
+                press(&mut app, KeyCode::Char('S'));
+                app
+            }),
+        ),
+        (
+            "dashboard",
+            Box::new(|| {
+                let mut app = app();
+                press(&mut app, KeyCode::Char('i'));
+                app
+            }),
+        ),
+        (
+            "menu",
+            Box::new(|| {
+                let mut app = app();
+                press(&mut app, KeyCode::Char('m'));
+                app
+            }),
+        ),
+        (
+            "confirm",
+            Box::new(|| {
+                let mut app = app();
+                let id = find(&mut app, "Downloads/setup.dmg");
+                browser(&mut app).confirm = Some(vec![id]);
+                app
+            }),
+        ),
+        (
+            "uninstall",
+            Box::new(|| {
+                let mut app = app();
+                let id = find(&mut app, "Applications/Sketchpad.app");
+                browser(&mut app).uninstall = Some(UninstallDialog {
+                    label: "Sketchpad".into(),
+                    items: vec![(id, true)],
+                    cursor: 0,
+                    running: false,
+                });
+                app
+            }),
+        ),
+        ("tools", Box::new(tools_app)),
+        (
+            "system",
+            Box::new(|| {
+                let mut app = app();
+                press(&mut app, KeyCode::Char('m'));
+                browser(&mut app).report_menu = None;
+                browser(&mut app).system = Some(SystemInfo {
+                    main: None,
+                    simulators: Vec::new(),
+                    snapshots: Vec::new(),
+                    swap: None,
+                    sleepimage: None,
+                    problems: Vec::new(),
+                });
+                app
+            }),
+        ),
+    ];
+    for lang in [Lang::Tr, Lang::En] {
+        with_lang(lang, || {
+            for (name, build) in &screens {
+                let mut app = build();
+                let t = topic(&app);
+                let known: Vec<String> = t
+                    .keys()
+                    .into_iter()
+                    .chain(global_keys())
+                    .flat_map(|(k, _)| tokens(k))
+                    .collect();
+                let footer = crate::ui::footer_keys(browser(&mut app));
+                for (k, desc) in footer {
+                    for tok in tokens(k) {
+                        assert!(
+                            known.contains(&tok),
+                            "{lang:?} {name} ({t:?}): `{tok}` ({desc}) is not in the help"
+                        );
+                    }
+                }
+            }
+        });
+    }
+}

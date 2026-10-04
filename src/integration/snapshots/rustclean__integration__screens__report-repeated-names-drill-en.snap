@@ -31,11 +31,11 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 
- ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+ ?  help   ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Ent
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
  2: 0+100 -/- BOLD | UNDERLINED
  3: 0+100 White/Indexed(238) BOLD
  4: 2+3 Gray/- | 29+16 Yellow/-
-29: 0+4 Black/Gray | 11+7 Black/Gray | 30+3 Black/Gray | 39+3 Black/Gray | 55+3 Black/Gray | 74+3 Black/Gray | 86+7 Black/Gray
+29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 40+3 Black/Gray | 49+3 Black/Gray | 65+3 Black/Gray | 84+3 Black/Gray | 96+4 Black/Gray

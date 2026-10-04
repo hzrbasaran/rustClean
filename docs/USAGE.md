@@ -24,6 +24,10 @@ Scanning shows live progress (files, folders, size, inaccessible entries).
 `Esc` cancels it. Scanning a whole disk with millions of files takes a minute
 or two on an SSD.
 
+`?` on any screen lists every key: the current screen's first, then the keys
+that work everywhere, then the other screens. The bottom line always starts
+with `?  help` and shows the most used keys.
+
 ## Browsing
 
 The list shows the current folder's entries with:

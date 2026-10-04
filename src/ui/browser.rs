@@ -8,6 +8,7 @@ use ratatui::widgets::{Cell, Row, Table};
 use ratatui::Frame;
 
 use crate::app::{App, Browser, View};
+use crate::lists::ResultList;
 use crate::tree::SizeMode;
 
 use super::dashboard::render_dashboard;
@@ -20,7 +21,7 @@ use super::style::{date_cell, highlight, Themed};
 use super::system::render_system;
 use super::theme::theme;
 use super::tools::render_tools;
-use super::{bar, keys, table_block, title, DATE_WIDTH, SPINNER, WIDE};
+use super::{bar, keys, keys_without_help, table_block, title, DATE_WIDTH, SPINNER, WIDE};
 
 pub(super) fn render_browser(
     f: &mut Frame<'_>,
@@ -244,135 +245,12 @@ pub(super) fn render_browser(
     };
     f.render_widget(status, status_area);
 
-    let footer_keys: &[(&str, &str)] = if b.rescan.is_some() {
-        &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
-    } else if b.failures.is_some() {
-        &[
-            ("↑↓", t!("kaydır", "scroll")),
-            ("Esc", t!("kapat", "close")),
-        ]
-    } else if b.dup_job.is_some() {
-        &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
-    } else if b.report_menu.is_some() || b.snapshot_picker.is_some() {
-        &[
-            ("↑↓", t!("seç", "select")),
-            ("Enter", t!("çalıştır", "run")),
-            ("Esc", t!("kapat", "close")),
-        ]
-    } else if b.uninstall.is_some() {
-        &[
-            ("↑↓", t!("gez", "move")),
-            ("Space", t!("işaretle", "check")),
-            ("t", t!("tümü", "all")),
-            (t!("e", "y"), t!("kaldır", "uninstall")),
-            (t!("h / Esc", "n / Esc"), t!("vazgeç", "cancel")),
-        ]
-    } else if b.confirm.is_some() {
-        &[
-            (t!("e", "y"), t!("evet, çöpe taşı", "yes, move to trash")),
-            (t!("h / Esc", "n / Esc"), t!("vazgeç", "cancel")),
-        ]
-    } else if b.deleting.is_some() {
-        &[("q", t!("çık", "quit"))]
-    } else if b.input.is_some() {
-        &[
-            ("Enter", t!("ara", "find")),
-            ("Esc", t!("vazgeç", "cancel")),
-        ]
-    } else if let Some(view) = &b.tools {
-        if view.running() {
-            &[("…", t!("komutlar çalışıyor", "commands running"))]
-        } else if view.confirm.is_some() || view.picker.is_some() {
-            &[("Esc", t!("vazgeç", "cancel"))]
-        } else {
-            &[
-                ("↑↓", t!("seç", "select")),
-                ("Enter", t!("temizle", "clean")),
-                ("r", t!("yeniden ölç", "measure again")),
-                ("m", t!("menü", "menu")),
-                ("Esc", t!("geri", "back")),
-                ("q", t!("çık", "quit")),
-            ]
-        }
-    } else if b.system.is_some() {
-        &[
-            ("r", t!("yenile", "refresh")),
-            ("m", t!("menü", "menu")),
-            ("Esc", t!("geri", "back")),
-            ("q", t!("çık", "quit")),
-        ]
-    } else if b.dashboard.is_some() {
-        &[
-            ("Tab", t!("liste değiştir", "switch list")),
-            ("↑↓", t!("gez", "move")),
-            ("Enter", t!("konuma git", "go to location")),
-            ("Space", t!("sepete", "to basket")),
-            ("x", t!("çöpe taşı", "move to trash")),
-            ("a", t!("görünen/diskte", "apparent/on disk")),
-            ("Esc", t!("geri", "back")),
-            ("q", t!("çık", "quit")),
-        ]
-    } else if b.apps_report().is_some() {
-        &[
-            ("↑↓", t!("gez", "move")),
-            ("u", t!("uygulamayı kaldır", "uninstall app")),
-            ("Space", t!("sepete", "to basket")),
-            ("x", t!("çöpe taşı", "move to trash")),
-            ("S", t!("sepet", "basket")),
-            ("Enter", t!("aç / konuma git", "open / go to")),
-            ("m", t!("raporlar", "reports")),
-            ("Esc", t!("geri", "back")),
-            ("q", t!("çık", "quit")),
-        ]
-    } else if b.results.is_some() {
-        &[
-            ("↑↓", t!("gez", "move")),
-            ("Space", t!("sepete", "to basket")),
-            ("t", t!("tümü", "all")),
-            ("f", t!("yaş filtresi", "age filter")),
-            ("x", t!("çöpe taşı", "move to trash")),
-            ("S", t!("sepet", "basket")),
-            ("Enter", t!("aç / konuma git", "open / go to")),
-            ("/", t!("ara", "find")),
-            ("m", t!("raporlar", "reports")),
-            ("Esc", t!("geri", "back")),
-            ("q", t!("çık", "quit")),
-        ]
-    } else if b.view == View::Map {
-        &[
-            ("←↑↓→", t!("blok seç", "select block")),
-            ("Enter", t!("gir", "open")),
-            ("⌫", t!("geri", "back")),
-            ("c", t!("renk", "color")),
-            ("t/Esc", t!("liste", "list")),
-            ("Space", t!("sepete", "to basket")),
-            ("x", t!("çöpe taşı", "move to trash")),
-            ("S", t!("sepet", "basket")),
-            ("R", t!("klasörü yenile", "refresh folder")),
-            ("m", t!("raporlar", "reports")),
-            ("q", t!("çık", "quit")),
-        ]
+    let hints = footer_keys(b);
+    if b.input.is_some() {
+        f.render_widget(keys_without_help(&hints), footer);
     } else {
-        &[
-            ("↑↓", t!("gez", "move")),
-            ("Enter", t!("gir", "open")),
-            ("⌫", t!("geri", "back")),
-            ("t", t!("harita", "map")),
-            ("/", t!("ara", "find")),
-            ("m", t!("raporlar", "reports")),
-            ("i", t!("özet", "summary")),
-            ("s", t!("sırala", "sort")),
-            ("a", t!("görünen/diskte", "apparent/on disk")),
-            ("Space", t!("sepete", "to basket")),
-            ("x", t!("çöpe taşı", "move to trash")),
-            ("S", t!("sepet", "basket")),
-            ("R", t!("klasörü yenile", "refresh folder")),
-            ("r", t!("tümünü tara", "rescan all")),
-            ("d", t!("diskler", "disks")),
-            ("q", t!("çık", "quit")),
-        ]
-    };
-    f.render_widget(keys(footer_keys), footer);
+        f.render_widget(keys(&hints), footer);
+    }
 
     if let Some(sel) = b.report_menu {
         render_report_menu(f, sel, f.area());
@@ -464,4 +342,147 @@ fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
         .highlight_symbol("▶ ")
         .block(table_block());
     f.render_stateful_widget(table, area, &mut b.table);
+}
+
+/// The key hints of the bottom line for what the browser shows.
+pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
+    let keys: &[(&str, &str)] = if b.rescan.is_some() {
+        &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
+    } else if b.failures.is_some() {
+        &[
+            ("↑↓", t!("kaydır", "scroll")),
+            ("Esc", t!("kapat", "close")),
+        ]
+    } else if b.dup_job.is_some() {
+        &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
+    } else if b.report_menu.is_some() || b.snapshot_picker.is_some() {
+        &[
+            ("↑↓", t!("seç", "select")),
+            ("Enter", t!("çalıştır", "run")),
+            ("Esc", t!("kapat", "close")),
+        ]
+    } else if b.uninstall.is_some() {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("Space", t!("işaretle", "check")),
+            ("t", t!("tümü", "all")),
+            (t!("e", "y"), t!("kaldır", "uninstall")),
+            (t!("h / Esc", "n / Esc"), t!("vazgeç", "cancel")),
+        ]
+    } else if b.confirm.is_some() {
+        &[
+            (t!("e", "y"), t!("evet, çöpe taşı", "yes, move to trash")),
+            (t!("h / Esc", "n / Esc"), t!("vazgeç", "cancel")),
+        ]
+    } else if b.deleting.is_some() {
+        &[("q", t!("çık", "quit"))]
+    } else if b.input.is_some() {
+        &[
+            ("Enter", t!("ara", "find")),
+            ("Esc", t!("vazgeç", "cancel")),
+        ]
+    } else if let Some(view) = &b.tools {
+        if view.running() {
+            &[("…", t!("komutlar çalışıyor", "commands running"))]
+        } else if view.confirm.is_some() || view.picker.is_some() {
+            &[("Esc", t!("vazgeç", "cancel"))]
+        } else {
+            &[
+                ("↑↓", t!("seç", "select")),
+                ("Enter", t!("temizle", "clean")),
+                ("r", t!("yeniden ölç", "measure again")),
+                ("m", t!("menü", "menu")),
+                ("Esc", t!("geri", "back")),
+                ("q", t!("çık", "quit")),
+            ]
+        }
+    } else if b.system.is_some() {
+        &[
+            ("r", t!("yenile", "refresh")),
+            ("m", t!("menü", "menu")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else if b.dashboard.is_some() {
+        &[
+            ("Tab", t!("liste değiştir", "switch list")),
+            ("↑↓", t!("gez", "move")),
+            ("Enter", t!("konuma git", "go to location")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("a", t!("görünen/diskte", "apparent/on disk")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else if b.results.as_ref().is_some_and(ResultList::is_basket) {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("Space", t!("sepetten çıkar", "remove")),
+            ("c", t!("sepeti boşalt", "empty the basket")),
+            ("x", t!("hepsini çöpe taşı", "move all to the trash")),
+            ("Enter", t!("konuma git", "go to")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else if b.apps_report().is_some() {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("u", t!("uygulamayı kaldır", "uninstall app")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("Enter", t!("aç / konuma git", "open / go to")),
+            ("m", t!("raporlar", "reports")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else if b.results.is_some() {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("Space", t!("sepete", "to basket")),
+            ("t", t!("tümü", "all")),
+            ("f", t!("yaş filtresi", "age filter")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("Enter", t!("aç / konuma git", "open / go to")),
+            ("/", t!("ara", "find")),
+            ("m", t!("raporlar", "reports")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else if b.view == View::Map {
+        &[
+            ("←↑↓→", t!("blok seç", "select block")),
+            ("Enter", t!("gir", "open")),
+            ("⌫", t!("geri", "back")),
+            ("c", t!("renk", "color")),
+            ("t/Esc", t!("liste", "list")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("R", t!("klasörü yenile", "refresh folder")),
+            ("m", t!("raporlar", "reports")),
+            ("q", t!("çık", "quit")),
+        ]
+    } else {
+        &[
+            ("↑↓", t!("gez", "move")),
+            ("Enter", t!("gir", "open")),
+            ("⌫", t!("geri", "back")),
+            ("t", t!("harita", "map")),
+            ("/", t!("ara", "find")),
+            ("m", t!("raporlar", "reports")),
+            ("i", t!("özet", "summary")),
+            ("s", t!("sırala", "sort")),
+            ("a", t!("görünen/diskte", "apparent/on disk")),
+            ("Space", t!("sepete", "to basket")),
+            ("x", t!("çöpe taşı", "move to trash")),
+            ("S", t!("sepet", "basket")),
+            ("R", t!("klasörü yenile", "refresh folder")),
+            ("r", t!("tümünü tara", "rescan all")),
+            ("d", t!("diskler", "disks")),
+            ("q", t!("çık", "quit")),
+        ]
+    };
+    keys.to_vec()
 }

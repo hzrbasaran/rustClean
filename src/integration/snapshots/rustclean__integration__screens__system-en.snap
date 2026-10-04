@@ -31,7 +31,7 @@ expression: screen
 │                                                                                                  │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 This screen only shows information; it changes nothing.
- r  refresh   m  menu   Esc  back   q  quit
+ ?  help   r  refresh   m  menu   Esc  back   q  quit
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 0+1 DarkGray/- | 1+24 White/- BOLD | 25+75 DarkGray/-
@@ -62,4 +62,4 @@ This screen only shows information; it changes nothing.
 26: 0+1 DarkGray/- | 99+1 DarkGray/-
 27: 0+100 DarkGray/-
 28: 0+100 Gray/-
-29: 0+3 Black/Gray | 13+3 Black/Gray | 23+5 Black/Gray | 35+3 Black/Gray
+29: 0+3 Black/Gray | 10+3 Black/Gray | 23+3 Black/Gray | 33+5 Black/Gray | 45+3 Black/Gray

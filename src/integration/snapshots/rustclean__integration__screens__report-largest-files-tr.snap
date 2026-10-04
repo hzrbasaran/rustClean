@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 Enter: dosyanın bulunduğu klasörü aç
- ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter  aç / konuma
+ ?  yardım   ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
@@ -54,4 +54,4 @@ Enter: dosyanın bulunduğu klasörü aç
 18: 2+3 Gray/- | 29+16 Green/-
 19: 2+3 Gray/- | 29+16 Green/-
 28: 0+100 Gray/-
-29: 0+4 Black/Gray | 10+7 Black/Gray | 26+3 Black/Gray | 36+3 Black/Gray | 54+3 Black/Gray | 69+3 Black/Gray | 80+7 Black/Gray
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 38+3 Black/Gray | 48+3 Black/Gray | 66+3 Black/Gray | 81+3 Black/Gray | 92+7 Black/Gray
