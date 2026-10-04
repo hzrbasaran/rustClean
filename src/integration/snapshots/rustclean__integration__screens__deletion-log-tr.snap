@@ -1,0 +1,48 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Silme kaydı  │  son 30 gün: 4.5 GiB  │  toplam 6 öğe, 5.7 GiB
+ 01.10.2026   3 öğe, 4.2 GiB
+   11:00     3.0 GiB  sepet                    /Users/demo/Downloads/Xcode_16.xip
+   10:00   409.6 MiB  rapor: İndirilen kurulu… /Users/demo/Downloads/setup.dmg
+   09:00   819.2 MiB  araç: npm önbelleği      /Users/demo/.npm/_cacache
+ 30.09.2026   2 öğe, 307.2 MiB
+   06:00   204.8 MiB  kaldırma: Sketchpad      /Users/demo/Applications/Sketchpad.app
+   06:00   102.4 MiB  kaldırma: Sketchpad      …mo/Library/Application Support/com.example.sketchpad
+ 29.08.2026   1 öğe, 1.2 GiB
+   04:00     1.2 GiB  liste                    /Users/demo/Movies/old.mov
+
+  Öğeler çöp kutusunda: boşaltılana kadar oradan geri alınabilir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
+ ?  yardım   ↑↓  kaydır   r  yenile   m  menü   Esc  geri   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 0+11 Cyan/- BOLD | 11+17 Gray/-
+ 2: 0+8 Gray/- | 8+12 White/- | 20+26 Gray/- | 46+35 White/-
+ 3: 0+8 Gray/- | 8+12 White/- | 20+26 Gray/- | 46+32 White/-
+ 4: 0+8 Gray/- | 8+12 White/- | 20+26 Gray/- | 46+26 White/-
+ 5: 0+11 Cyan/- BOLD | 11+19 Gray/-
+ 6: 0+8 Gray/- | 8+12 White/- | 20+26 Gray/- | 46+39 White/-
+ 7: 0+8 Gray/- | 8+12 White/- | 20+26 Gray/- | 46+54 White/-
+ 8: 0+11 Cyan/- BOLD | 11+17 Gray/-
+ 9: 0+8 Gray/- | 8+12 White/- | 20+26 Gray/- | 46+27 White/-
+11: 0+65 Gray/-
+28: 0+22 Gray/- | 22+24 Yellow/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 25+3 Black/Gray | 37+3 Black/Gray | 47+5 Black/Gray | 59+3 Black/Gray

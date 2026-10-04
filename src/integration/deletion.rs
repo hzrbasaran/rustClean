@@ -122,3 +122,77 @@ fn a_failed_move_is_reported_and_the_entry_kept() {
     // The row stays until a rescan shows it is gone.
     assert_eq!(rows(&app), ["Downloads/setup.dmg", "Downloads/photos.zip"]);
 }
+
+/// The log entries for paths below the fixture (tests share one log).
+fn logged(f: &Fixture) -> Vec<crate::trashlog::Entry> {
+    let root = std::path::absolute(f.root()).unwrap().display().to_string();
+    crate::trashlog::read()
+        .into_iter()
+        .filter(|e| e.path.starts_with(&root))
+        .collect()
+}
+
+#[test]
+fn moves_are_logged_with_how_they_were_made() {
+    use crate::trashlog::Via;
+    let f = Fixture::standard();
+    let mut app = downloads(&f);
+    // From the report: setup.dmg.
+    press(&mut app, KeyCode::Char('x'));
+    press(&mut app, KeyCode::Char('e'));
+    wait_for_deletion(&mut app);
+    // From the basket: photos.zip.
+    press(&mut app, KeyCode::Char(' '));
+    press(&mut app, KeyCode::Char('x'));
+    press(&mut app, KeyCode::Char('e'));
+    wait_for_deletion(&mut app);
+
+    let log = logged(&f);
+    assert_eq!(log.len(), 2, "{log:?}");
+    // Newest first.
+    assert!(log[0].path.ends_with("photos.zip"));
+    assert_eq!(log[0].via, Via::Basket);
+    assert!(log[1].path.ends_with("setup.dmg"));
+    assert_eq!(log[1].via, Via::Report(ReportKind::Downloads));
+    assert_eq!(log[1].size.apparent, 300 * super::KIB);
+
+    // Menu item 16: the log shows them.
+    menu(&mut app, 15);
+    let view = browser(&app).deletion_log.as_ref().expect("the log");
+    assert!(view.entries.iter().any(|e| e.path.ends_with("setup.dmg")));
+}
+
+#[test]
+fn failed_moves_are_not_logged() {
+    let f = Fixture::standard();
+    let mut app = downloads(&f);
+    press(&mut app, KeyCode::Char('x'));
+    std::fs::remove_file(f.path("Downloads/setup.dmg")).unwrap();
+    press(&mut app, KeyCode::Char('e'));
+    wait_for_deletion(&mut app);
+    assert!(browser(&app).failures.is_some());
+    assert!(logged(&f).is_empty());
+}
+
+#[test]
+fn tool_cleanups_are_logged_with_their_size() {
+    use crate::tools::{self, RunEvent, Step, ToolKind};
+    use crate::trashlog::Via;
+    let mut f = Fixture::new();
+    f.file("cache/a.bin", 10 * super::KIB, b'a', 0);
+    f.file("cache/sub/b.bin", 20 * super::KIB, b'b', 0);
+    let dir = std::path::absolute(f.path("cache")).unwrap();
+    let events = tools::run(ToolKind::Npm, vec![Step::TrashContents(dir.clone())]);
+    while events.recv().is_ok_and(|e| e != RunEvent::Finished) {}
+
+    assert_eq!(
+        std::fs::read_dir(&dir).unwrap().count(),
+        0,
+        "contents moved"
+    );
+    let log = logged(&f);
+    assert_eq!(log.len(), 1, "{log:?}");
+    assert_eq!(log[0].path, dir.display().to_string());
+    assert_eq!(log[0].via, Via::Tool(ToolKind::Npm));
+    assert_eq!(log[0].size.apparent, 30 * super::KIB);
+}

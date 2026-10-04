@@ -244,12 +244,13 @@ impl ToolsView {
             return;
         };
         let steps = c.actions.into_iter().flat_map(|a| a.steps).collect();
+        let kind = self.tools[c.tool].kind;
         self.run = Some(Run {
             tool: c.tool,
             log: Vec::new(),
             finished: false,
             failures: 0,
-            events: tools::run(steps),
+            events: tools::run(kind, steps),
         });
     }
 }

@@ -180,8 +180,9 @@ use simpler name-based matching).
 
 rustClean makes no network connections. It writes only:
 
-- scan summaries for the history feature (newest 10 per scanned folder), and
-- the chosen interface language and theme,
+- scan summaries for the history feature (newest 10 per scanned folder),
+- the chosen interface language and theme, and
+- a log of what was moved to the trash (newest 10 000 entries),
 
 in the platform data directory (`~/Library/Application Support/rustClean` on
 macOS, `~/.local/share/rustClean` on Linux, `%APPDATA%\rustClean` on Windows).

@@ -12,6 +12,7 @@ keys on the bottom line, so you rarely need to look anything up.
 - [Reports](#reports)
 - [Tools](#tools)
 - [Language](#language)
+- [Deletion log](#deletion-log)
 - [Themes and colors](#themes-and-colors)
 - [Command line](#command-line)
 
@@ -209,6 +210,18 @@ open report, search, comparison or basket is built again in the new language,
 with the cursor on the same entry and an open group still open. The choice is
 saved. `--lang tr|en` overrides it for one run. Without either, the system
 language is used.
+
+## Deletion log
+
+Every entry moved to the trash is written to `deletions.jsonl` in the data
+directory: when, the path, its size, and how (the folder list, the summary, a
+report, a search, the basket, uninstalling an app, or a developer tool's
+cleanup). Moves that failed are not written. The newest 10 000 entries are
+kept.
+
+**Deletion log** in the menu (`m`) shows it newest first, grouped by day with
+each day's total, and the total of the last 30 days. The entries themselves
+are in the trash and can be restored from there until it is emptied.
 
 ## Themes and colors
 

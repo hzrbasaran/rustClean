@@ -26,13 +26,14 @@ pub enum Topic {
     Dialogs,
     Tools,
     System,
+    Log,
     Disks,
     Scanning,
 }
 
 impl Topic {
     /// Every topic, in the order the help lists the other screens.
-    pub const ALL: [Topic; 12] = [
+    pub const ALL: [Topic; 13] = [
         Topic::List,
         Topic::Map,
         Topic::Results,
@@ -43,6 +44,7 @@ impl Topic {
         Topic::Dialogs,
         Topic::Tools,
         Topic::System,
+        Topic::Log,
         Topic::Disks,
         Topic::Scanning,
     ];
@@ -65,6 +67,7 @@ impl Topic {
             ),
             Topic::Tools => t!("Geliştirici araçları", "Developer tools"),
             Topic::System => t!("Sistem verileri", "System data"),
+            Topic::Log => t!("Silme kaydı", "Deletion log"),
             Topic::Disks => t!("Disk listesi", "Disk list"),
             Topic::Scanning => t!("Tarama", "Scanning"),
         }
@@ -287,6 +290,14 @@ impl Topic {
                 ("m", t!("raporlar menüsü", "reports menu")),
                 ("Esc  ⌫  ←", t!("geri", "back")),
             ]),
+            Topic::Log => keys.extend([
+                ("↑↓  j k", t!("kaydır", "scroll")),
+                ("PgUp PgDn", t!("sayfa sayfa", "page up / down")),
+                ("Home End  g G", t!("baş / son", "top / end")),
+                ("r", t!("yenile", "refresh")),
+                ("m", t!("raporlar menüsü", "reports menu")),
+                ("Esc  ⌫  ←", t!("geri", "back")),
+            ]),
             Topic::Disks => keys.extend([
                 ("↑↓  j k", t!("disk seç", "select a disk")),
                 ("Enter  →  l", t!("tara", "scan")),
@@ -331,6 +342,8 @@ fn browser_topic(b: &Browser) -> Topic {
         Topic::Menu
     } else if b.tools.is_some() {
         Topic::Tools
+    } else if b.deletion_log.is_some() {
+        Topic::Log
     } else if b.system.is_some() {
         Topic::System
     } else if b.dashboard.is_some() {

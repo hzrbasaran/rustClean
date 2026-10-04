@@ -1,0 +1,40 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Silme kaydı  │  son 30 gün: 0 B  │  toplam 0 öğe, 0 B
+
+  Henüz çöp kutusuna bir şey taşınmadı.
+
+  Öğeler çöp kutusunda: boşaltılana kadar oradan geri alınabilir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
+ ?  yardım   ↑↓  kaydır   r  yenile   m  menü   Esc  geri   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+39 Gray/-
+ 4: 0+65 Gray/-
+28: 0+22 Gray/- | 22+24 Yellow/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 25+3 Black/Gray | 37+3 Black/Gray | 47+5 Black/Gray | 59+3 Black/Gray
