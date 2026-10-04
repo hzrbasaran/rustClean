@@ -186,9 +186,11 @@ log. The tool is then measured again.
 
 ## Language
 
-`L` switches between Turkish and English anywhere (except while typing). The
-choice is saved. `--lang tr|en` overrides it for one run. Without either, the
-system language is used.
+`L` switches between Turkish and English anywhere (except while typing). An
+open report, search, comparison or basket is built again in the new language,
+with the cursor on the same entry and an open group still open. The choice is
+saved. `--lang tr|en` overrides it for one run. Without either, the system
+language is used.
 
 ## Command line
 

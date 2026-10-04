@@ -69,8 +69,15 @@ pub fn lang() -> Lang {
     }
 }
 
+#[cfg(not(test))]
 pub fn set_lang(lang: Lang) {
     LANG.store(u8::from(lang == Lang::En), Ordering::Relaxed);
+}
+
+/// In test builds `L` switches only the thread that pressed it.
+#[cfg(test)]
+pub fn set_lang(lang: Lang) {
+    TEST_LANG.set(Some(lang));
 }
 
 /// Picks the text for the current language.

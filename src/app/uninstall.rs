@@ -46,7 +46,7 @@ impl Browser {
     /// was opened from.
     pub fn apps_report(&self) -> Option<&ResultList> {
         let r = self.results.as_ref()?;
-        let is_apps = |l: &ResultList| l.report == Some(ReportKind::Apps);
+        let is_apps = |l: &ResultList| l.report() == Some(ReportKind::Apps);
         if is_apps(r) {
             Some(r)
         } else {
@@ -127,17 +127,12 @@ impl Browser {
     }
 
     /// After an uninstall, lists the apps again: removed apps drop out and
-    /// the data sizes of the others are current. Keeps the cursor row.
+    /// the data sizes of the others are current. Keeps the cursor on the
+    /// same app.
     pub(super) fn refresh_apps_report(&mut self) {
-        let Some(top) = self.apps_report() else {
-            return;
-        };
-        let row = top.table.selected().unwrap_or(0);
-        let mut list = apps::run(&self.tree, self.size_mode);
-        if !list.rows.is_empty() {
-            list.table.select(Some(row.min(list.rows.len() - 1)));
+        if self.apps_report().is_some() {
+            self.rebuild_results();
         }
-        self.results = Some(list);
     }
 }
 
@@ -197,7 +192,10 @@ mod tests {
             1,
         );
         let mut list = ResultList::new("apps".into(), ROOT, vec![row]);
-        list.report = Some(ReportKind::Apps);
+        list.source = crate::lists::Source::Report {
+            kind: ReportKind::Apps,
+            min_age_days: 0,
+        };
         br.results = Some(list);
         // From inside the group, too.
         br.drill_down();

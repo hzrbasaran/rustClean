@@ -230,7 +230,7 @@ impl Browser {
                 KeyCode::Enter => {
                     let pattern = std::mem::take(input);
                     self.input = None;
-                    self.run_search(pattern);
+                    self.run_search(&pattern);
                 }
                 KeyCode::Esc => self.input = None,
                 _ => {}

@@ -312,12 +312,15 @@ impl App {
         })
     }
 
-    /// `L`: Turkish ↔ English, remembered for the next start. Texts built
-    /// before (an open report) keep their language until rebuilt.
+    /// `L`: Turkish ↔ English, remembered for the next start. An open result
+    /// list is built again, so its title, notes and details follow.
     fn switch_language(&mut self) {
         let lang = crate::i18n::lang().other();
         crate::i18n::set_lang(lang);
         crate::i18n::save(lang);
+        if let Some(b) = &mut self.browser {
+            b.rebuild_results();
+        }
         let msg = t!("Dil: Türkçe (L: English)", "Language: English (L: Türkçe)");
         match &mut self.browser {
             Some(b) if matches!(self.screen, Screen::Browser) => b.set_status(msg, false),

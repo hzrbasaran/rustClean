@@ -11,7 +11,7 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use crate::lists::{ResultList, Row, RowSize};
+use crate::lists::{ResultList, Row, RowSize, Source};
 use crate::reports::{ReportKind, LIMIT};
 use crate::tree::{NodeId, SizeMode, Tree, ROOT};
 use crate::ui::fmt_size;
@@ -105,7 +105,10 @@ pub fn run(tree: &Tree, mode: SizeMode) -> ResultList {
 
     let mut list = ResultList::new(ReportKind::Apps.label().to_string(), base, rows);
     list.truncated = truncated;
-    list.report = Some(ReportKind::Apps);
+    list.source = Source::Report {
+        kind: ReportKind::Apps,
+        min_age_days: 0,
+    };
     list.note = if apps.is_empty() {
         t!(
             "Bu taramada uygulama yok. Uygulamalar için diski tarayın: d → Macintosh HD (Windows: C:\\, Linux: /).",

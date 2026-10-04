@@ -8,6 +8,7 @@
 mod apps;
 mod deletion;
 mod history;
+mod language;
 mod reports;
 mod scan;
 mod screens;

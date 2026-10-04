@@ -4,7 +4,7 @@
 
 use std::path::PathBuf;
 
-use crate::lists::{ResultList, Row};
+use crate::lists::{ResultList, Row, Source};
 use crate::reports::{AgeFilter, ReportKind, LIMIT};
 use crate::tree::{NodeId, SizeMode, Tree, ROOT};
 
@@ -151,8 +151,7 @@ pub fn orphans(tree: &Tree, mode: SizeMode, now: u64, min_age_days: u32) -> Resu
         let mut list = ResultList::new(title.clone(), ROOT, rows);
         list.truncated = truncated;
         list.note = note;
-        list.report = Some(kind);
-        list.min_age_days = min_age_days;
+        list.source = Source::Report { kind, min_age_days };
         list
     };
     if apps.is_empty() {
