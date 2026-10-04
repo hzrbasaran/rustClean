@@ -88,6 +88,31 @@ pub enum ToolKind {
 }
 
 impl ToolKind {
+    /// Every tool, on any platform.
+    pub const ALL: [ToolKind; 11] = [
+        ToolKind::Docker,
+        ToolKind::Simulators,
+        ToolKind::XcodeData,
+        ToolKind::Npm,
+        ToolKind::Pnpm,
+        ToolKind::Yarn,
+        ToolKind::Pip,
+        ToolKind::Gradle,
+        ToolKind::CocoaPods,
+        ToolKind::Homebrew,
+        ToolKind::Cargo,
+    ];
+
+    /// A name that does not depend on the language (the variant's), for
+    /// files.
+    pub fn code(self) -> String {
+        format!("{self:?}")
+    }
+
+    pub fn from_code(code: &str) -> Option<ToolKind> {
+        Self::ALL.into_iter().find(|k| k.code() == code)
+    }
+
     /// Tools that make sense on this platform.
     pub fn available() -> Vec<ToolKind> {
         use ToolKind::*;
@@ -220,13 +245,15 @@ pub enum RunEvent {
 
 /// Runs the steps one after another on a background thread. Programs are
 /// started directly (never through a shell), so arguments are passed as is.
-pub fn run(steps: Vec<Step>) -> Receiver<RunEvent> {
+/// Runs the cleanup steps of `kind` on a thread. Folder contents moved to
+/// the trash are written to the deletion log.
+pub fn run(kind: ToolKind, steps: Vec<Step>) -> Receiver<RunEvent> {
     let (tx, rx) = mpsc::channel();
     thread::spawn(move || {
         for step in steps {
             let desc = step.describe();
             let _ = tx.send(RunEvent::Started(desc.clone()));
-            let ok = run_step(&step, &tx);
+            let ok = run_step(kind, &step, &tx);
             let _ = tx.send(RunEvent::Done { step: desc, ok });
         }
         let _ = tx.send(RunEvent::Finished);
@@ -234,7 +261,7 @@ pub fn run(steps: Vec<Step>) -> Receiver<RunEvent> {
     rx
 }
 
-fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
+fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
     match step {
         Step::Command(args) => {
             let child = Command::new(&args[0])
@@ -303,8 +330,23 @@ fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
                 "moving {} items to the trash…",
                 entries.len()
             )));
-            match crate::delete::trash_context().delete_all(&entries) {
-                Ok(()) => true,
+            // Measured before the move, for the deletion log.
+            let size = entries
+                .iter()
+                .fold(crate::tree::Size::default(), |mut total, e| {
+                    total += size_on_disk(e);
+                    total
+                });
+            match crate::delete::trash_all(&entries) {
+                Ok(()) => {
+                    crate::trashlog::append(&[crate::trashlog::Entry {
+                        time: crate::ui::now_secs(),
+                        path: dir.display().to_string(),
+                        size,
+                        via: crate::trashlog::Via::Tool(kind),
+                    }]);
+                    true
+                }
                 Err(e) => {
                     let _ = tx.send(RunEvent::Output(tf!("hata: {e}", "error: {e}")));
                     false
@@ -315,6 +357,37 @@ fn run_step(step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
 }
 
 // ---------------------------------------------------------------- helpers
+
+/// Total size of `path` and everything below it, without following links.
+fn size_on_disk(path: &Path) -> crate::tree::Size {
+    let mut total = crate::tree::Size::default();
+    let mut stack = vec![path.to_path_buf()];
+    while let Some(p) = stack.pop() {
+        let Ok(md) = std::fs::symlink_metadata(&p) else {
+            continue;
+        };
+        // As in the scan: a directory's own length is bookkeeping, only its
+        // blocks count.
+        if !md.is_dir() {
+            total.apparent += md.len();
+        }
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt;
+            total.disk += md.blocks() * 512;
+        }
+        #[cfg(not(unix))]
+        if !md.is_dir() {
+            total.disk += md.len();
+        }
+        if md.is_dir() {
+            if let Ok(rd) = std::fs::read_dir(&p) {
+                stack.extend(rd.flatten().map(|e| e.path()));
+            }
+        }
+    }
+    total
+}
 
 fn home() -> Option<PathBuf> {
     dirs::home_dir()
@@ -835,11 +908,14 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn runs_steps_in_order_and_reports_failures() {
-        let events = collect(&run(vec![
-            Step::Command(vec!["/bin/echo".into(), "merhaba; rm -rf /".into()]),
-            Step::Command(vec!["/usr/bin/false".into()]),
-            Step::Command(vec!["/nonexistent/tool".into()]),
-        ]));
+        let events = collect(&run(
+            ToolKind::Npm,
+            vec![
+                Step::Command(vec!["/bin/echo".into(), "merhaba; rm -rf /".into()]),
+                Step::Command(vec!["/usr/bin/false".into()]),
+                Step::Command(vec!["/nonexistent/tool".into()]),
+            ],
+        ));
         // Arguments are not interpreted by a shell.
         assert!(events.contains(&RunEvent::Output("merhaba; rm -rf /".into())));
         let done: Vec<bool> = events

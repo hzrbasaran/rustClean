@@ -115,10 +115,11 @@ impl Browser {
                     self.set_status(t!("Seçili öğe yok.", "Nothing selected."), true);
                     return;
                 }
+                let label = d.label.clone();
                 self.uninstall = None;
                 let ok = self.deletable(ids);
                 if !ok.is_empty() {
-                    self.start_deletion(&ok);
+                    self.start_deletion(&ok, crate::trashlog::Via::Uninstall(label));
                 }
             }
             KeyCode::Esc | KeyCode::Char('h' | 'H' | 'n' | 'N' | 'q') => self.uninstall = None,

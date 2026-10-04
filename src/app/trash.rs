@@ -5,6 +5,9 @@ use std::collections::HashSet;
 
 use crate::delete::{self, Deletion};
 use crate::disks;
+use crate::lists::Source;
+use crate::reports::ReportKind;
+use crate::trashlog::{self, Via};
 use crate::tree::{NodeId, Size};
 
 use super::Browser;
@@ -92,11 +95,40 @@ impl Browser {
 
     pub(super) fn confirm_delete(&mut self) {
         if let Some(ids) = self.confirm.take() {
-            self.start_deletion(&ids);
+            let via = self.deletion_via();
+            self.start_deletion(&ids, via);
         }
     }
 
-    pub(super) fn start_deletion(&mut self, ids: &[NodeId]) {
+    /// How `x` deletes, for the log: like `delete_targets`, the basket when
+    /// it has anything, else the open list, the summary or the folder list.
+    fn deletion_via(&self) -> Via {
+        if !self.basket.is_empty() {
+            return Via::Basket;
+        }
+        if let Some(r) = &self.results {
+            let mut top = r;
+            while let Some(p) = &top.parent {
+                top = p;
+            }
+            return match &top.source {
+                Source::Report { kind, .. } => Via::Report(*kind),
+                Source::Search(_) => Via::Search,
+                Source::Changes(_) => Via::Changes,
+                Source::Duplicates => Via::Report(ReportKind::Duplicates),
+                Source::Basket => Via::Basket,
+                Source::Members => Via::List,
+            };
+        }
+        if self.dashboard.is_some() {
+            Via::Summary
+        } else {
+            Via::List
+        }
+    }
+
+    pub(super) fn start_deletion(&mut self, ids: &[NodeId], via: Via) {
+        self.batch_via = via;
         let items: Vec<_> = ids.iter().map(|&id| (id, self.tree.path_of(id))).collect();
         self.batch_trashed = Size::default();
         self.batch_failures.clear();
@@ -118,10 +150,18 @@ impl Browser {
         };
         let outcomes = deletion.poll();
         let (done, total, finished) = (deletion.done, deletion.total, deletion.finished());
+        let mut logged = Vec::new();
+        let now = crate::ui::now_secs();
         for (id, res) in outcomes {
             match res {
                 Ok(()) => {
                     let size = self.tree.node(id).size;
+                    logged.push(trashlog::Entry {
+                        time: now,
+                        path: self.tree.path_of(id).display().to_string(),
+                        size,
+                        via: self.batch_via.clone(),
+                    });
                     self.tree.remove(id);
                     self.basket.remove(id);
                     self.trashed += size;
@@ -136,6 +176,8 @@ impl Browser {
                 )),
             }
         }
+        // Only what was moved: failures are not deletions.
+        trashlog::append(&logged);
         if !finished {
             self.set_status(
                 tf!(

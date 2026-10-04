@@ -81,6 +81,23 @@ pub struct Status {
     pub error: bool,
 }
 
+/// The deletion log screen.
+pub struct LogView {
+    /// Newest first.
+    pub entries: Vec<crate::trashlog::Entry>,
+    /// First line shown.
+    pub scroll: u16,
+}
+
+impl LogView {
+    pub fn open() -> Self {
+        Self {
+            entries: crate::trashlog::read(),
+            scroll: 0,
+        }
+    }
+}
+
 /// How the current directory is shown.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum View {
@@ -123,6 +140,8 @@ pub struct Browser {
     pub snapshot_picker: Option<(Vec<history::Saved>, usize)>,
     /// Open "system data" panel.
     pub system: Option<SystemInfo>,
+    /// Open deletion log.
+    pub deletion_log: Option<LogView>,
     /// Open developer tools cleanup screen.
     pub tools: Option<ToolsView>,
     /// Report to run once the "preparing" message has been drawn.
@@ -150,6 +169,8 @@ pub struct Browser {
     /// Outcome of the running deletion batch.
     batch_trashed: Size,
     batch_failures: Vec<delete::Failure>,
+    /// How the running deletion batch was started, for the deletion log.
+    batch_via: crate::trashlog::Via,
     /// Entries that could not be trashed, shown in a dialog until dismissed.
     pub failures: Option<FailureDialog>,
     /// Directories we came from, with the row that was selected there.
@@ -173,6 +194,7 @@ impl Browser {
             report_menu: None,
             snapshot_picker: None,
             system: None,
+            deletion_log: None,
             tools: None,
             pending_report: None,
             dup_job: None,
@@ -189,6 +211,7 @@ impl Browser {
             trashed: Size::default(),
             batch_trashed: Size::default(),
             batch_failures: Vec::new(),
+            batch_via: crate::trashlog::Via::List,
             failures: None,
             history: Vec::new(),
         };

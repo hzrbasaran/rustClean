@@ -43,6 +43,30 @@ pub enum ReportKind {
 }
 
 impl ReportKind {
+    pub const ALL: [ReportKind; 11] = [
+        ReportKind::LargestFiles,
+        ReportKind::LargestDirs,
+        ReportKind::RepeatedNames,
+        ReportKind::Apps,
+        ReportKind::Orphans,
+        ReportKind::DevJunk,
+        ReportKind::Caches,
+        ReportKind::OldBig,
+        ReportKind::Downloads,
+        ReportKind::Duplicates,
+        ReportKind::Clutter,
+    ];
+
+    /// A name that does not depend on the language (the variant's), for
+    /// files.
+    pub fn code(self) -> String {
+        format!("{self:?}")
+    }
+
+    pub fn from_code(code: &str) -> Option<ReportKind> {
+        Self::ALL.into_iter().find(|k| k.code() == code)
+    }
+
     pub fn label(self) -> &'static str {
         match self {
             ReportKind::LargestFiles => t!("En büyük dosyalar", "Largest files"),
@@ -145,10 +169,12 @@ pub enum MenuItem {
     Leftovers,
     Tools,
     System,
+    /// What was moved to the trash.
+    DeletionLog,
 }
 
 impl MenuItem {
-    pub const ALL: [MenuItem; 15] = [
+    pub const ALL: [MenuItem; 16] = [
         MenuItem::Report(ReportKind::LargestFiles),
         MenuItem::Report(ReportKind::LargestDirs),
         MenuItem::Report(ReportKind::RepeatedNames),
@@ -164,6 +190,7 @@ impl MenuItem {
         MenuItem::Leftovers,
         MenuItem::Tools,
         MenuItem::System,
+        MenuItem::DeletionLog,
     ];
 
     pub fn label(self) -> &'static str {
@@ -176,6 +203,7 @@ impl MenuItem {
             MenuItem::Leftovers => t!("Silinmiş uygulama artıkları", "Removed app leftovers"),
             MenuItem::Tools => t!("Geliştirici araçları temizliği", "Developer tools cleanup"),
             MenuItem::System => t!("Sistem verileri", "System data"),
+            MenuItem::DeletionLog => t!("Silme kaydı", "Deletion log"),
         }
     }
 
@@ -203,6 +231,10 @@ impl MenuItem {
             MenuItem::System => t!(
                 "APFS bölümleri, Time Machine anlık görüntüleri, takas dosyası",
                 "APFS volumes, Time Machine snapshots, swap file"
+            ),
+            MenuItem::DeletionLog => t!(
+                "Çöp kutusuna taşınanlar, günlere göre, en yeniler önce",
+                "What was moved to the trash, by day, newest first"
             ),
         }
     }

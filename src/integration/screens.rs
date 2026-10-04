@@ -27,6 +27,7 @@ use crate::delete::Failure;
 use crate::disks::DiskInfo;
 use crate::history::{Header, Saved};
 use crate::i18n::{with_lang, Lang};
+use crate::reports::ReportKind;
 use crate::scanner::{ScanProgress, ScanResult};
 use crate::system::{Container, SystemInfo, Volume};
 use crate::tools::{CleanAction, Risk, Status, Step, Tool, ToolKind};
@@ -946,6 +947,17 @@ fn help_lists_every_key_of_the_bottom_line() {
         ),
         ("tools", Box::new(tools_app)),
         (
+            "log",
+            Box::new(|| {
+                let mut app = app();
+                browser(&mut app).deletion_log = Some(crate::app::LogView {
+                    entries: Vec::new(),
+                    scroll: 0,
+                });
+                app
+            }),
+        ),
+        (
             "system",
             Box::new(|| {
                 let mut app = app();
@@ -986,4 +998,57 @@ fn help_lists_every_key_of_the_bottom_line() {
             }
         });
     }
+}
+
+#[test]
+fn deletion_log() {
+    use crate::app::LogView;
+    use crate::trashlog::{Entry, Via};
+    let entry = |hours_ago: u64, path: &str, gib_tenths: u64, via: Via| Entry {
+        time: NOW - hours_ago * 3600,
+        path: path.into(),
+        size: Size {
+            apparent: gib_tenths * GIB / 10,
+            disk: gib_tenths * GIB / 10,
+        },
+        via,
+    };
+    snap("deletion-log", || {
+        let mut app = app();
+        browser(&mut app).deletion_log = Some(LogView {
+            entries: vec![
+                entry(1, "/Users/demo/Downloads/Xcode_16.xip", 30, Via::Basket),
+                entry(
+                    2,
+                    "/Users/demo/Downloads/setup.dmg",
+                    4,
+                    Via::Report(ReportKind::Downloads),
+                ),
+                entry(3, "/Users/demo/.npm/_cacache", 8, Via::Tool(ToolKind::Npm)),
+                entry(
+                    30,
+                    "/Users/demo/Applications/Sketchpad.app",
+                    2,
+                    Via::Uninstall("Sketchpad".into()),
+                ),
+                entry(
+                    30,
+                    "/Users/demo/Library/Application Support/com.example.sketchpad",
+                    1,
+                    Via::Uninstall("Sketchpad".into()),
+                ),
+                entry(800, "/Users/demo/Movies/old.mov", 12, Via::List),
+            ],
+            scroll: 0,
+        });
+        app
+    });
+    snap("deletion-log-empty", || {
+        let mut app = app();
+        browser(&mut app).deletion_log = Some(LogView {
+            entries: Vec::new(),
+            scroll: 0,
+        });
+        app
+    });
 }

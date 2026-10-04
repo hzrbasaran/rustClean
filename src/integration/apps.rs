@@ -138,4 +138,15 @@ fn uninstall_moves_the_app_and_its_data_to_the_trash() {
         "exactly one data folder kept"
     );
     assert!(!rows(&app).contains(&"Sketchpad".to_string()));
+
+    // The log says the app was uninstalled.
+    let root = std::path::absolute(f.root()).unwrap().display().to_string();
+    let log: Vec<_> = crate::trashlog::read()
+        .into_iter()
+        .filter(|e| e.path.starts_with(&root))
+        .collect();
+    assert_eq!(log.len(), 2, "{log:?}");
+    assert!(log
+        .iter()
+        .all(|e| e.via == crate::trashlog::Via::Uninstall("Sketchpad".into())));
 }

@@ -48,6 +48,8 @@ pub(super) fn render_browser(
                 ""
             }
         )
+    } else if let Some(log) = &b.deletion_log {
+        super::log::heading(log, mode, now_secs())
     } else if b.system.is_some() {
         t!("Sistem verileri", "System data").to_string()
     } else if let Some(d) = &b.dashboard {
@@ -99,6 +101,8 @@ pub(super) fn render_browser(
 
     if let Some(view) = &mut b.tools {
         render_tools(f, view, app.tick, table_area);
+    } else if let Some(log) = &mut b.deletion_log {
+        super::log::render_log(f, log, mode, table_area);
     } else if let Some(sys) = &b.system {
         render_system(f, b, sys, table_area);
     } else if let Some(d) = &mut b.dashboard {
@@ -396,6 +400,14 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
                 ("q", t!("çık", "quit")),
             ]
         }
+    } else if b.deletion_log.is_some() {
+        &[
+            ("↑↓", t!("kaydır", "scroll")),
+            ("r", t!("yenile", "refresh")),
+            ("m", t!("menü", "menu")),
+            ("Esc", t!("geri", "back")),
+            ("q", t!("çık", "quit")),
+        ]
     } else if b.system.is_some() {
         &[
             ("r", t!("yenile", "refresh")),

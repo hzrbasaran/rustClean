@@ -9,7 +9,7 @@ use crate::toolsview::ToolsKey;
 use crate::tree::{NodeId, SizeMode, ROOT};
 use crate::treemap::{self, Slot};
 
-use super::{Action, Browser, MapColor, SortMode, Status, View};
+use super::{Action, Browser, LogView, MapColor, SortMode, Status, View};
 
 impl Browser {
     pub(super) fn load(&mut self, dir: NodeId, selected: usize) {
@@ -276,6 +276,22 @@ impl Browser {
                 ToolsKey::Quit => return Action::Quit,
                 ToolsKey::Close => self.tools = None,
                 ToolsKey::Menu => self.report_menu = Some(0),
+            }
+            return Action::None;
+        }
+        if let Some(log) = &mut self.deletion_log {
+            match code {
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Up | KeyCode::Char('k') => log.scroll = log.scroll.saturating_sub(1),
+                KeyCode::Down | KeyCode::Char('j') => log.scroll = log.scroll.saturating_add(1),
+                KeyCode::PageUp => log.scroll = log.scroll.saturating_sub(20),
+                KeyCode::PageDown => log.scroll = log.scroll.saturating_add(20),
+                KeyCode::Home | KeyCode::Char('g') => log.scroll = 0,
+                KeyCode::End | KeyCode::Char('G') => log.scroll = u16::MAX,
+                KeyCode::Char('r') => *log = LogView::open(),
+                KeyCode::Char('m') => self.report_menu = Some(0),
+                KeyCode::Esc | KeyCode::Backspace | KeyCode::Left => self.deletion_log = None,
+                _ => {}
             }
             return Action::None;
         }

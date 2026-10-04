@@ -18,6 +18,7 @@ mod dialogs;
 mod disks;
 mod format;
 pub mod help;
+mod log;
 mod map;
 mod menus;
 mod results;

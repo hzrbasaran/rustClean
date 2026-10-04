@@ -1,0 +1,40 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Deletion log  │  last 30 days: 0 B  │  0 items in all, 0 B
+
+  Nothing has been moved to the trash yet.
+
+  The entries are in the trash: they can be restored from there until it is emptied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ?  help   ↑↓  scroll   r  refresh   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+42 Gray/-
+ 4: 0+84 Gray/-
+28: 0+23 Gray/- | 23+25 Yellow/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 23+3 Black/Gray | 36+3 Black/Gray | 46+5 Black/Gray | 58+3 Black/Gray

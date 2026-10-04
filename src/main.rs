@@ -19,6 +19,7 @@ mod stats;
 mod system;
 mod tools;
 mod toolsview;
+mod trashlog;
 mod tree;
 mod treemap;
 mod ui;

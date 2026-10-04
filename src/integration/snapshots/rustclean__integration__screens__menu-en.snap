@@ -4,13 +4,12 @@ expression: screen
 ---
  rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
 ──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
-    Size        Share               Files      Modified         Name
-▶       ┌ Menu ────────────────────────────────────────────────────────────────────────────┐
-        │                                                                                  │
+    Size┌ Menu ────────────────────────────────────────────────────────────────────────────┐
+▶       │                                                                                  │
         │ Reports                                                                          │
-      66│▶  1. Largest files                                                               │
-      15│   2. Largest folders                                                             │
-        │   3. Most repeated file names                                                    │
+        │▶  1. Largest files                                                               │
+      66│   2. Largest folders                                                             │
+      15│   3. Most repeated file names                                                    │
         │   4. Applications and their data                                                 │
         │   5. Orphaned app leftovers                                                      │
         │   6. Developer junk                                                              │
@@ -25,6 +24,7 @@ expression: screen
         │  13. Removed app leftovers                                                       │
         │  14. Developer tools cleanup                                                     │
         │  15. System data                                                                 │
+        │  16. Deletion log                                                                │
         │                                                                                  │
         │ The 200 largest files below this folder                                          │
         │ Reports cover the folder you are in (apps: the whole scan). L: Türkçe            │
@@ -35,27 +35,27 @@ expression: screen
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
- 2: 0+100 -/- BOLD | UNDERLINED
- 3: 0+8 White/Indexed(238) BOLD | 8+1 Cyan/- | 9+6 White/- BOLD | 15+77 Cyan/- | 92+8 White/Indexed(238) BOLD
- 4: 8+1 Cyan/- | 91+1 Cyan/-
- 5: 8+1 Cyan/- | 9+8 Cyan/- BOLD | 91+1 Cyan/-
- 6: 8+1 Cyan/- | 9+2 White/Indexed(238) BOLD | 11+4 Gray/Indexed(238) BOLD | 15+13 White/Indexed(238) BOLD | 91+1 Cyan/-
- 7: 8+1 Cyan/- | 11+4 Gray/- | 15+15 White/- BOLD | 91+1 Cyan/-
- 8: 8+1 Cyan/- | 11+4 Gray/- | 15+24 White/- BOLD | 91+1 Cyan/-
- 9: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
-10: 8+1 Cyan/- | 11+4 Gray/- | 15+22 White/- BOLD | 91+1 Cyan/-
-11: 8+1 Cyan/- | 11+4 Gray/- | 15+14 White/- BOLD | 91+1 Cyan/-
-12: 8+1 Cyan/- | 11+4 Gray/- | 15+13 White/- BOLD | 91+1 Cyan/-
-13: 8+1 Cyan/- | 11+4 Gray/- | 15+19 White/- BOLD | 91+1 Cyan/-
-14: 8+1 Cyan/- | 11+4 Gray/- | 15+36 White/- BOLD | 91+1 Cyan/-
-15: 8+1 Cyan/- | 11+4 Gray/- | 15+30 White/- BOLD | 91+1 Cyan/-
-16: 8+1 Cyan/- | 11+4 Gray/- | 15+44 White/- BOLD | 91+1 Cyan/-
-17: 8+1 Cyan/- | 91+1 Cyan/-
-18: 8+1 Cyan/- | 9+6 Cyan/- BOLD | 91+1 Cyan/-
-19: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
-20: 8+1 Cyan/- | 11+4 Gray/- | 15+21 White/- BOLD | 91+1 Cyan/-
-21: 8+1 Cyan/- | 11+4 Gray/- | 15+23 White/- BOLD | 91+1 Cyan/-
-22: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
+ 2: 0+8 -/- BOLD | UNDERLINED | 8+1 Cyan/- | 9+6 White/- BOLD | 15+77 Cyan/- | 92+8 -/- BOLD | UNDERLINED
+ 3: 0+8 White/Indexed(238) BOLD | 8+1 Cyan/- | 91+1 Cyan/- | 92+8 White/Indexed(238) BOLD
+ 4: 8+1 Cyan/- | 9+8 Cyan/- BOLD | 91+1 Cyan/-
+ 5: 8+1 Cyan/- | 9+2 White/Indexed(238) BOLD | 11+4 Gray/Indexed(238) BOLD | 15+13 White/Indexed(238) BOLD | 91+1 Cyan/-
+ 6: 8+1 Cyan/- | 11+4 Gray/- | 15+15 White/- BOLD | 91+1 Cyan/-
+ 7: 8+1 Cyan/- | 11+4 Gray/- | 15+24 White/- BOLD | 91+1 Cyan/-
+ 8: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
+ 9: 8+1 Cyan/- | 11+4 Gray/- | 15+22 White/- BOLD | 91+1 Cyan/-
+10: 8+1 Cyan/- | 11+4 Gray/- | 15+14 White/- BOLD | 91+1 Cyan/-
+11: 8+1 Cyan/- | 11+4 Gray/- | 15+13 White/- BOLD | 91+1 Cyan/-
+12: 8+1 Cyan/- | 11+4 Gray/- | 15+19 White/- BOLD | 91+1 Cyan/-
+13: 8+1 Cyan/- | 11+4 Gray/- | 15+36 White/- BOLD | 91+1 Cyan/-
+14: 8+1 Cyan/- | 11+4 Gray/- | 15+30 White/- BOLD | 91+1 Cyan/-
+15: 8+1 Cyan/- | 11+4 Gray/- | 15+44 White/- BOLD | 91+1 Cyan/-
+16: 8+1 Cyan/- | 91+1 Cyan/-
+17: 8+1 Cyan/- | 9+6 Cyan/- BOLD | 91+1 Cyan/-
+18: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
+19: 8+1 Cyan/- | 11+4 Gray/- | 15+21 White/- BOLD | 91+1 Cyan/-
+20: 8+1 Cyan/- | 11+4 Gray/- | 15+23 White/- BOLD | 91+1 Cyan/-
+21: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
+22: 8+1 Cyan/- | 11+4 Gray/- | 15+12 White/- BOLD | 91+1 Cyan/-
 23: 8+1 Cyan/- | 91+1 Cyan/-
 24: 8+1 Cyan/- | 9+40 Yellow/- | 91+1 Cyan/-
 25: 8+1 Cyan/- | 9+70 Gray/- | 91+1 Cyan/-

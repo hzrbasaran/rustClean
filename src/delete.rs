@@ -179,6 +179,15 @@ impl Deletion {
     }
 }
 
+/// Moves several entries to the trash in one go (the developer tools use
+/// it). Test builds use the test trash, like `Deletion`.
+pub(crate) fn trash_all(paths: &[PathBuf]) -> Result<(), String> {
+    #[cfg(not(test))]
+    return trash_context().delete_all(paths).map_err(|e| e.to_string());
+    #[cfg(test)]
+    paths.iter().try_for_each(|p| test_trash::delete(p))
+}
+
 /// The trash of test builds: a folder under the temp directory. Entries are
 /// renamed into it, so tests can check what was moved.
 #[cfg(test)]
@@ -200,7 +209,8 @@ pub(crate) mod test_trash {
     }
 }
 
-pub(crate) fn trash_context() -> trash::TrashContext {
+#[cfg(not(test))]
+fn trash_context() -> trash::TrashContext {
     #[allow(unused_mut)]
     let mut ctx = trash::TrashContext::default();
     // The default Finder method needs an Automation permission prompt per

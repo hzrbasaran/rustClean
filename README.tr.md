@@ -185,8 +185,9 @@ kullanımda daha az denenmiştir. Bazı özellikler yalnızca macOS'ta vardır:
 
 rustClean hiçbir ağ bağlantısı kurmaz. Yalnızca şunları yazar:
 
-- geçmiş özelliği için tarama özetleri (taranan her klasör için en yeni 10), ve
-- seçilen arayüz dili ve tema.
+- geçmiş özelliği için tarama özetleri (taranan her klasör için en yeni 10),
+- seçilen arayüz dili ve tema, ve
+- çöp kutusuna taşınanların kaydı (en yeni 10 000 öğe).
 
 Bunlar platformun veri klasöründe tutulur: macOS'ta
 `~/Library/Application Support/rustClean`, Linux'ta `~/.local/share/rustClean`,

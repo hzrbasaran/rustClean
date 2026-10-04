@@ -12,7 +12,7 @@ use crate::toolsview::ToolsView;
 use crate::tree::{NodeId, SizeMode, Tree};
 use crate::{apps, search};
 
-use super::{Action, Browser};
+use super::{Action, Browser, LogView};
 
 /// Index of the entry that has existed longest (by creation date, else
 /// modification date): the copy kept when removing duplicates.
@@ -115,6 +115,7 @@ impl Browser {
     }
 
     pub(super) fn open_menu_item(&mut self, item: MenuItem) {
+        self.deletion_log = None;
         match item {
             MenuItem::Report(kind) => self.request_report(kind),
             MenuItem::Leftovers => self.request_report(ReportKind::Orphans),
@@ -123,6 +124,12 @@ impl Browser {
                 self.dashboard = None;
                 self.tools = None;
                 self.system = Some(system::collect());
+            }
+            MenuItem::DeletionLog => {
+                self.dashboard = None;
+                self.tools = None;
+                self.system = None;
+                self.deletion_log = Some(LogView::open());
             }
             MenuItem::Tools => {
                 self.dashboard = None;

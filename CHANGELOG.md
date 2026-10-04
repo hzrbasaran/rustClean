@@ -25,6 +25,12 @@ follows [Semantic Versioning](https://semver.org/).
   folders, bundles, `Library`, `AppData`, build output and dependencies,
   system folders and the standard home folders are left alone
   ([#12](https://github.com/hzrbasaran/rustClean/issues/12)).
+- Deletion log: every entry moved to the trash is written to
+  `deletions.jsonl` in the data directory (time, path, size and how: list,
+  summary, report, search, basket, uninstall or a developer tool). Failed
+  moves are not written; the newest 10 000 entries are kept. "Deletion log"
+  in the menu shows it by day, newest first
+  ([#9](https://github.com/hzrbasaran/rustClean/issues/9)).
 
 ### Changed
 - `L` now rebuilds the open result list in the new language: a report (with
@@ -34,6 +40,9 @@ follows [Semantic Versioning](https://semver.org/).
   ([#8](https://github.com/hzrbasaran/rustClean/issues/8)).
 
 ### Fixed
+- Developer tool cleanups that move folder contents to the trash now go
+  through the same code as other deletions; test builds can no longer reach
+  the real trash through them.
 - The basket's bottom line lists its own keys (`c` empties it, `x` moves
   everything to the trash) instead of report keys that did nothing there.
 - The selected row of lists in the dark theme is white on dark gray: colored
