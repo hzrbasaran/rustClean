@@ -326,9 +326,9 @@ fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
                 return true;
             }
             let _ = tx.send(RunEvent::Output(tf!(
-                "{} öğe çöp kutusuna taşınıyor…",
-                "moving {} items to the trash…",
-                entries.len()
+                "{} çöp kutusuna taşınıyor…",
+                "moving {} to the trash…",
+                crate::i18n::count(entries.len() as u64, "öğe", "item", "items")
             )));
             // Measured before the move, for the deletion log.
             let size = entries

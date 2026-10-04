@@ -9,7 +9,7 @@ use ratatui::Frame;
 use crate::app::LogView;
 use crate::tree::SizeMode;
 
-use super::format::{fmt_count, fmt_date, fmt_size, tilde, truncate_path};
+use super::format::{fmt_date, fmt_size, tilde, truncate_path};
 use super::style::Themed;
 
 /// `(date, time)` of a log entry, in the current language and time zone.
@@ -31,10 +31,10 @@ pub(super) fn heading(log: &LogView, mode: SizeMode, now: u64) -> String {
         .sum();
     let all: u64 = log.entries.iter().map(|e| e.size.get(mode)).sum();
     tf!(
-        "Silme kaydı  │  son 30 gün: {}  │  toplam {} öğe, {}",
-        "Deletion log  │  last 30 days: {}  │  {} items in all, {}",
+        "Silme kaydı  │  son 30 gün: {}  │  toplam {}, {}",
+        "Deletion log  │  last 30 days: {}  │  {} in all, {}",
         fmt_size(month),
-        fmt_count(log.entries.len() as u64),
+        crate::i18n::count(log.entries.len() as u64, "öğe", "item", "items"),
         fmt_size(all)
     )
 }
@@ -62,16 +62,11 @@ pub(super) fn render_log(f: &mut Frame<'_>, log: &mut LogView, mode: SizeMode, a
         let total: u64 = log.entries[i..end].iter().map(|e| e.size.get(mode)).sum();
         lines.push(Line::from(vec![
             Span::raw(format!(" {day}")).accent().bold(),
-            Span::raw(if end - i == 1 {
-                tf!("   1 öğe, {}", "   1 item, {}", fmt_size(total))
-            } else {
-                tf!(
-                    "   {} öğe, {}",
-                    "   {} items, {}",
-                    fmt_count((end - i) as u64),
-                    fmt_size(total)
-                )
-            })
+            Span::raw(format!(
+                "   {}, {}",
+                crate::i18n::count((end - i) as u64, "öğe", "item", "items"),
+                fmt_size(total)
+            ))
             .muted(),
         ]));
         for e in &log.entries[i..end] {

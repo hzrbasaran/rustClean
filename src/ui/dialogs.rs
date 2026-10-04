@@ -27,16 +27,16 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
         Line::from(""),
         Line::from(vec![
             Span::raw(tf!(
-                " ✗ {} öğe taşınamadı",
-                " ✗ {} items could not be moved",
-                d.items.len()
+                " ✗ {} taşınamadı",
+                " ✗ {} could not be moved",
+                crate::i18n::count(d.items.len() as u64, "öğe", "item", "items")
             ))
             .danger()
             .bold(),
             Span::raw(tf!(
-                "   ·   ✓ {} öğe taşındı ({})",
-                "   ·   ✓ {} items moved ({})",
-                d.moved,
+                "   ·   ✓ {} taşındı ({})",
+                "   ·   ✓ {} moved ({})",
+                crate::i18n::count(d.moved as u64, "öğe", "item", "items"),
                 d.size
             ))
             .success(),
@@ -135,7 +135,7 @@ pub(super) fn render_confirm(
     if let [id] = ids {
         lines.push(Line::from(truncate_path(&tree.path_of(*id), inner_width)).bold());
     } else {
-        lines.push(Line::from(tf!("{} öğe", "{} items", fmt_count(ids.len() as u64))).bold());
+        lines.push(Line::from(crate::i18n::count(ids.len() as u64, "öğe", "item", "items")).bold());
         lines.push(Line::from(""));
         for &id in ids.iter().take(LISTED) {
             lines.push(Line::from(truncate_path(&tree.path_of(id), inner_width)).muted());
@@ -214,10 +214,10 @@ pub(super) fn render_uninstall(
     let mut tail = vec![
         Line::from(""),
         Line::from(tf!(
-            "Seçili: {} / {} öğe · {}",
-            "Selected: {} of {} items · {}",
+            "Seçili: {} / {} · {}",
+            "Selected: {} of {} · {}",
             chosen.len(),
-            d.items.len(),
+            crate::i18n::count(d.items.len() as u64, "öğe", "item", "items"),
             fmt_size(total)
         ))
         .bold(),

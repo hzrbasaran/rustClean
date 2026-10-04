@@ -200,17 +200,19 @@ impl Browser {
         if self.batch_failures.is_empty() {
             self.set_status(
                 tf!(
-                    "✓ {moved} öğe çöp kutusuna taşındı ({size}). Yer, çöp kutusu boşaltılınca açılır.",
-                    "✓ {moved} items moved to the trash ({size}). The space is freed when the trash is emptied.",
+                    "✓ {} çöp kutusuna taşındı ({size}). Yer, çöp kutusu boşaltılınca açılır.",
+                    "✓ {} moved to the trash ({size}). The space is freed when the trash is emptied.",
+                    crate::i18n::count(moved as u64, "öğe", "item", "items")
                 ),
                 false,
             );
         } else {
             self.set_status(
                 tf!(
-                    "✗ {} öğe taşınamadı, {moved} öğe taşındı ({size}).",
-                    "✗ {} items could not be moved, {moved} moved ({size}).",
-                    self.batch_failures.len()
+                    "✗ {} taşınamadı, {} taşındı ({size}).",
+                    "✗ {} could not be moved, {} moved ({size}).",
+                    crate::i18n::count(self.batch_failures.len() as u64, "öğe", "item", "items"),
+                    crate::i18n::count(moved as u64, "öğe", "item", "items")
                 ),
                 true,
             );

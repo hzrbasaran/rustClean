@@ -59,10 +59,10 @@ pub(super) fn render_dashboard(
         Line::from(vec![
             Span::raw(format!("{:<15}", t!("İçerik", "Contents"))).normal(),
             Span::raw(tf!(
-                "{} dosya · {} klasör",
-                "{} files · {} folders",
-                fmt_count(s.files),
-                fmt_count(s.dirs)
+                "{} · {}",
+                "{} · {}",
+                crate::i18n::count(s.files, "dosya", "file", "files"),
+                crate::i18n::count(s.dirs, "klasör", "folder", "folders")
             )),
         ]),
         Line::from(vec![
@@ -72,11 +72,19 @@ pub(super) fn render_dashboard(
     ];
     if scan_errors > 0 {
         lines.push(
-            Line::from(tf!(
-                "⚠ Taramada {} öğeye erişilemedi",
-                "⚠ {} items were inaccessible during the scan",
-                fmt_count(scan_errors)
-            ))
+            Line::from(if scan_errors == 1 {
+                t!(
+                    "⚠ Taramada 1 öğeye erişilemedi",
+                    "⚠ 1 item was inaccessible during the scan"
+                )
+                .to_string()
+            } else {
+                tf!(
+                    "⚠ Taramada {} öğeye erişilemedi",
+                    "⚠ {} items were inaccessible during the scan",
+                    fmt_count(scan_errors)
+                )
+            })
             .warn(),
         );
     }

@@ -6,6 +6,11 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- English counts use the singular for one: "1 item", "1 row", "1 file"
+  instead of "1 items" (and "1 item was inaccessible", "the parent folder of
+  1 item").
+
 ## [0.3.0] - 2026-10-04
 
 ### Added
