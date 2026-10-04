@@ -6,6 +6,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-04
+
 ### Added
 - Themes: `T` switches between dark (the default), light (for white
   terminal backgrounds) and a color-blind friendly palette (Okabe–Ito: blue
@@ -38,11 +40,19 @@ follows [Semantic Versioning](https://semver.org/).
   duplicates (without searching again) or the basket. The cursor stays on
   the same entry, and an open group is opened again
   ([#8](https://github.com/hzrbasaran/rustClean/issues/8)).
+- Releases are published to crates.io by the release workflow, together
+  with the binaries and the Homebrew formula
+  ([#29](https://github.com/hzrbasaran/rustClean/issues/29)).
+- For contributors: the code is split into one module per screen, job and
+  report ([#37](https://github.com/hzrbasaran/rustClean/issues/37)–[#40](https://github.com/hzrbasaran/rustClean/issues/40)),
+  lints live in `Cargo.toml` and `cargo-deny` checks dependencies weekly
+  ([#41](https://github.com/hzrbasaran/rustClean/issues/41)), integration
+  tests run on real folders and every screen has a snapshot in both
+  languages ([#42](https://github.com/hzrbasaran/rustClean/issues/42),
+  [#43](https://github.com/hzrbasaran/rustClean/issues/43)). Test builds
+  never touch your history, settings or trash. See CONTRIBUTING.md.
 
 ### Fixed
-- Developer tool cleanups that move folder contents to the trash now go
-  through the same code as other deletions; test builds can no longer reach
-  the real trash through them.
 - The basket's bottom line lists its own keys (`c` empties it, `x` moves
   everything to the trash) instead of report keys that did nothing there.
 - The selected row of lists in the dark theme is white on dark gray: colored
@@ -129,6 +139,7 @@ First public release.
 - Turkish and English interface (`L`, `--lang`).
 - `--list-disks` and `--summary` command line modes.
 
-[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/hzrbasaran/rustClean/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/hzrbasaran/rustClean/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/hzrbasaran/rustClean/releases/tag/v0.1.0
