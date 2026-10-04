@@ -294,6 +294,10 @@ impl App {
             self.switch_language();
             return;
         }
+        if key.code == KeyCode::Char('T') && !self.typing() {
+            self.switch_theme();
+            return;
+        }
         match self.screen {
             Screen::DiskSelect => self.on_key_disks(key.code),
             Screen::Scanning => self.on_key_scanning(key.code),
@@ -325,6 +329,33 @@ impl App {
         match &mut self.browser {
             Some(b) if matches!(self.screen, Screen::Browser) => b.set_status(msg, false),
             _ => self.message = Some(msg.to_string()),
+        }
+    }
+
+    /// `T`: dark → light → color-blind, remembered for the next start. With
+    /// `--no-color` or `NO_COLOR` the colors stay off.
+    fn switch_theme(&mut self) {
+        use crate::ui::theme::{self, ThemeKind};
+        let current = theme::current();
+        let msg = if current == ThemeKind::Mono {
+            t!(
+                "Renkler kapalı (--no-color / NO_COLOR).",
+                "Colors are off (--no-color / NO_COLOR)."
+            )
+            .to_string()
+        } else {
+            let next = current.next();
+            theme::set(next);
+            theme::save(next);
+            tf!(
+                "Tema: {} (T: değiştir)",
+                "Theme: {} (T: change)",
+                next.label()
+            )
+        };
+        match &mut self.browser {
+            Some(b) if matches!(self.screen, Screen::Browser) => b.set_status(msg, false),
+            _ => self.message = Some(msg),
         }
     }
 

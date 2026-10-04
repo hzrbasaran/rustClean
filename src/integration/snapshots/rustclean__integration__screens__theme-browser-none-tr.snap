@@ -1,0 +1,45 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (diskte)  │  17 dosya  │  sıralama: boyut
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+    Boyut       Oran                Dosya      Son değişiklik   Ad
+▶       3.6 GiB █████         %41.2          4 29.09.2026 12:00 Downloads/
+        3.2 GiB ████▍         %36.7          2 21.09.2026 12:00 Movies/
+        1.1 GiB █▌            %12.8          5 28.09.2026 12:00 Projects/
+      665.0 MiB ▉              %7.5          2 30.09.2026 12:00 Library/
+      150.0 MiB ▎              %1.7          1 21.09.2026 12:00 Applications/
+        4.0 MiB                %0.0          3 30.09.2026 12:00 Documents/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
+ ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala   a  görüne
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 -/- BOLD | REVERSED
+ 1: 39+8 -/- BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 -/- BOLD | REVERSED
+ 4: 64+7 -/- BOLD
+ 5: 64+9 -/- BOLD
+ 6: 64+8 -/- BOLD
+ 7: 64+13 -/- BOLD
+ 8: 64+10 -/- BOLD
+29: 0+4 -/- REVERSED | 10+7 -/- REVERSED | 23+3 -/- REVERSED | 33+3 -/- REVERSED | 45+3 -/- REVERSED | 54+3 -/- REVERSED | 68+3 -/- REVERSED | 78+3 -/- REVERSED | 90+3 -/- REVERSED

@@ -1,0 +1,48 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer tools cleanup  │  reclaimable: 6.8 GiB (measuring…)
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Tool                               Reclaimable  Details
+▶ Docker                                  6.0 GiB 3 images, 2 volumes
+  npm cache                             800.0 MiB ~/.npm
+  Cargo download cache               ⠋            measuring…
+  pip cache                          —            not installed
+  Gradle cache                       —            daemon not running
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
+│ re-downloaded  docker system prune                                                               │
+│    $ docker system prune                                                                         │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Measuring only reads. No command runs without your confirmation.
+ ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Indexed(74) BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 White/Indexed(238) BOLD
+ 4: 2+9 White/- BOLD | 37+12 -/- BOLD
+ 5: 2+20 White/- BOLD | 37+12 Indexed(74)/- | 50+10 Indexed(74)/-
+ 6: 2+9 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 7: 2+12 White/- BOLD | 37+12 Indexed(214)/- | 50+18 Indexed(214)/-
+24: 0+1 DarkGray/- | 1+9 White/- BOLD | 10+90 DarkGray/-
+25: 0+1 DarkGray/- | 1+15 Black/Indexed(214) | 16+20 White/- BOLD | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+4 Black/Gray | 13+7 Black/Gray | 28+3 Black/Gray | 47+3 Black/Gray | 57+5 Black/Gray | 69+3 Black/Gray

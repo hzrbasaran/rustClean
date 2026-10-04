@@ -48,7 +48,7 @@ expression: screen
 12: 0+1 DarkGray/- | 1+23 White/- | 24+6 LightGreen/- | 41+6 Gray/- | 49+2 DarkGray/- | 99+1 DarkGray/-
 13: 0+100 DarkGray/-
 14: 0+1 Cyan/- | 1+15 White/- BOLD | 16+34 Cyan/- | 50+1 DarkGray/- | 51+35 White/- BOLD | 86+14 DarkGray/-
-15: 0+1 Cyan/- | 1+13 -/DarkGray BOLD | 14+16 Red/DarkGray BOLD | 30+19 -/DarkGray BOLD | 49+1 Cyan/- | 50+1 DarkGray/- | 62+10 LightBlue/- BOLD | 99+1 DarkGray/-
+15: 0+1 Cyan/- | 1+48 White/Indexed(238) BOLD | 49+1 Cyan/- | 50+1 DarkGray/- | 62+10 LightBlue/- BOLD | 99+1 DarkGray/-
 16: 0+1 Cyan/- | 14+16 Red/- | 49+1 Cyan/- | 50+1 DarkGray/- | 62+7 LightBlue/- BOLD | 99+1 DarkGray/-
 17: 0+1 Cyan/- | 14+16 Yellow/- | 49+1 Cyan/- | 50+1 DarkGray/- | 62+26 LightBlue/- BOLD | 99+1 DarkGray/-
 18: 0+1 Cyan/- | 14+16 Yellow/- | 49+1 Cyan/- | 50+1 DarkGray/- | 62+35 LightBlue/- BOLD | 99+1 DarkGray/-

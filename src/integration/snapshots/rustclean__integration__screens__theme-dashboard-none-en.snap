@@ -1,0 +1,51 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Summary — /Users/demo  │  on disk
+┌ General ───────────────────────────────────────┐┌ Disk ──────────────────────────────────────────┐
+│Total size     8.6 GiB                          ││No disk information.                            │
+│Contents       17 files · 19 folders            ││                                                │
+│Latest change  2026-09-30 12:00                 ││                                                │
+│⚠ 2 items were inaccessible during the scan     ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ File types ────────────────────────────────────┐┌ Age (last modified) ───────────────────────────┐
+│Archives / disk images ██▌       3.6 GiB   41%  ││≤ 7 days   █▉                  923.0 MiB   10%  │
+│Video                  ██▎       3.2 GiB   37%  ││≤ 30 days  ▍                   175.0 MiB    2%  │
+│Other                  █▏        1.6 GiB   18%  ││≤ 1 year   ████▊                 2.3 GiB   26%  │
+│Code                   ▎       310.0 MiB    4%  ││> 1 year   ███████████           5.3 GiB   61%  │
+│Documents                        7.0 MiB    0%  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ Largest files ─────────────────────────────────┐┌ Fullest folders (direct contents) ─────────────┐
+│▶    3.0 GiB 2025-08-27 12:00 Downloads/Xcode_16││   3.6 GiB Downloads/                           │
+│     2.3 GiB 2025-02-28 12:00 Movies/holiday-202││   3.2 GiB Movies/                              │
+│   900.0 MiB 2026-08-22 12:00 Movies/screen-reco││ 820.0 MiB Projects/api/target/debug/           │
+│   820.0 MiB 2026-06-03 12:00 Projects/api/targe││ 610.0 MiB Library/Caches/com.example.browser/  │
+│   610.0 MiB 2026-09-30 12:00 Library/Caches/com││ 310.0 MiB Projects/web/node_modules/react/     │
+│   450.0 MiB 2026-03-15 12:00 Downloads/setup.dm││ 150.0 MiB Applications/Sketchpad.app/Contents/M│
+│   310.0 MiB 2026-09-28 12:00 Projects/web/node_││  55.0 MiB Library/Application Support/com.examp│
+│   150.0 MiB 2026-08-02 12:00 Applications/Sketc││   4.0 MiB Documents/                           │
+│   120.0 MiB 2026-09-19 12:00 Downloads/photos.z││   8.0 KiB Projects/web/                        │
+│    55.0 MiB 2026-09-11 12:00 Library/Applicatio││   4.0 KiB Projects/api/                        │
+│                                                ││                                                │
+│                                                ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+“Fullest folders” ignores subfolders: it shows where the space actually sits.
+ Tab  switch list   ↑↓  move   Enter  go to location   Space  to basket   x  move to trash   a  appa
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 -/- BOLD | REVERSED
+ 1: 1+9 -/- BOLD | 51+6 -/- BOLD
+ 2: 16+7 -/- BOLD
+ 7: 1+12 -/- BOLD | 51+21 -/- BOLD
+14: 1+15 -/- BOLD | 51+35 -/- BOLD
+15: 1+48 -/- BOLD | REVERSED | 62+10 -/- BOLD
+16: 62+7 -/- BOLD
+17: 62+26 -/- BOLD
+18: 62+35 -/- BOLD
+19: 62+32 -/- BOLD
+20: 62+37 -/- BOLD
+21: 62+37 -/- BOLD
+22: 62+10 -/- BOLD
+23: 62+13 -/- BOLD
+24: 62+13 -/- BOLD
+29: 0+5 -/- REVERSED | 19+4 -/- REVERSED | 30+7 -/- REVERSED | 54+7 -/- REVERSED | 73+3 -/- REVERSED | 92+3 -/- REVERSED

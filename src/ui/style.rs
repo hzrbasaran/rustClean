@@ -1,6 +1,6 @@
 //! Colors and styles shared by the screens.
 
-use ratatui::style::{Color, Modifier, Style, Stylize};
+use ratatui::style::{Color, Style, Stylize};
 use ratatui::text::Span;
 use ratatui::widgets::Cell;
 
@@ -8,24 +8,22 @@ use crate::stats;
 use crate::tools::Risk;
 
 use super::format::fmt_date;
+use super::theme::theme;
 
-pub(super) const HIGHLIGHT: Style = Style::new()
-    .bg(Color::DarkGray)
-    .add_modifier(Modifier::BOLD);
+/// The style of the selected row.
+pub(super) fn highlight() -> Style {
+    theme().selected
+}
 
-/// Colors of the age groups of `stats::age_label`: fresh is green,
-/// untouched for over a year is red.
-pub(super) const AGE_COLORS: [Color; 5] = [
-    Color::Green,
-    Color::Cyan,
-    Color::Yellow,
-    Color::Red,
-    Color::Gray,
-];
+/// Color of an age group of `stats::age_label`: fresh is green, untouched
+/// for over a year is red (in the dark theme).
+pub(super) fn age_colors() -> [Color; 5] {
+    theme().ages
+}
 
 /// Color for a timestamp of the given age in seconds.
 pub(super) fn age_color(age: u64) -> Color {
-    AGE_COLORS[stats::age_group(age)]
+    theme().ages[stats::age_group(age)]
 }
 
 pub(super) fn date_cell(secs: u32, now: u64) -> Cell<'static> {
@@ -35,6 +33,8 @@ pub(super) fn date_cell(secs: u32, now: u64) -> Cell<'static> {
 /// Text color that stays readable on `bg`.
 pub(super) fn text_on(bg: Color) -> Color {
     match bg {
+        // No background color: the terminal's own text color.
+        Color::Reset => Color::Reset,
         Color::Blue | Color::Magenta | Color::Red | Color::DarkGray | Color::Black => Color::White,
         Color::Indexed(n) if indexed_luma(n) < 140.0 => Color::White,
         _ => Color::Black,
@@ -58,67 +58,103 @@ fn indexed_luma(n: u8) -> f64 {
     0.299 * r + 0.587 * g + 0.114 * b
 }
 
-/// Folder colors in the treemap: distinct mid-dark hues (xterm 256-color
-/// palette, which Terminal.app supports, unlike 24-bit color). Files keep
-/// the lighter type colors, so folders and files stay apart.
-pub(super) const DIR_COLORS: [Color; 12] = [
-    Color::Indexed(25),  // blue
-    Color::Indexed(130), // orange
-    Color::Indexed(29),  // green
-    Color::Indexed(90),  // magenta
-    Color::Indexed(31),  // teal
-    Color::Indexed(124), // red
-    Color::Indexed(60),  // slate
-    Color::Indexed(64),  // olive
-    Color::Indexed(54),  // purple
-    Color::Indexed(94),  // brown
-    Color::Indexed(23),  // dark teal
-    Color::Indexed(89),  // wine
-];
+/// Treemap color of folder number `i`.
+pub(super) fn dir_color(i: usize) -> Color {
+    let dirs = theme().dirs;
+    dirs[i % dirs.len()]
+}
 
-pub(super) const CATEGORY_COLORS: [Color; 8] = [
-    Color::Magenta,
-    Color::LightMagenta,
-    Color::LightBlue,
-    Color::LightYellow,
-    Color::LightGreen,
-    Color::LightCyan,
-    Color::LightRed,
-    Color::Gray,
-];
+/// Color of a file category (`stats::Category as usize`).
+pub(super) fn category_color(i: usize) -> Color {
+    theme().categories[i]
+}
 
 pub(super) fn risk_style(risk: Risk) -> (Style, &'static str) {
+    let risks = theme().risks;
     match risk {
-        Risk::Safe => (
-            Style::new().fg(Color::Black).bg(Color::Green),
-            t!(" güvenli ", " safe "),
-        ),
-        Risk::Redownload => (
-            Style::new().fg(Color::Black).bg(Color::Yellow),
-            t!(" yeniden indirilir ", " re-downloaded "),
-        ),
-        Risk::DataLoss => (
-            Style::new().fg(Color::White).bg(Color::Red).bold(),
-            t!(" VERİ KAYBI ", " DATA LOSS "),
-        ),
+        Risk::Safe => (risks[0], t!(" güvenli ", " safe ")),
+        Risk::Redownload => (risks[1], t!(" yeniden indirilir ", " re-downloaded ")),
+        Risk::DataLoss => (risks[2], t!(" VERİ KAYBI ", " DATA LOSS ")),
     }
 }
 
 pub(super) fn usage_color(ratio: f64) -> Color {
+    let usage = theme().usage;
     match ratio {
-        r if r >= 0.9 => Color::Red,
-        r if r >= 0.75 => Color::Yellow,
-        _ => Color::Green,
+        r if r >= 0.9 => usage[2],
+        r if r >= 0.75 => usage[1],
+        _ => usage[0],
     }
 }
 
 pub(super) fn date_span(secs: u32, now: u64) -> Span<'static> {
     if secs == 0 {
-        return Span::raw("—").gray();
+        return Span::raw("—").muted();
     }
     let age = now.saturating_sub(u64::from(secs));
     Span::styled(fmt_date(secs), Style::new().fg(age_color(age)))
 }
+
+/// Colors by role, for anything ratatui can style (spans, lines, cells).
+pub(super) trait Themed<'a, T>: Stylize<'a, T> + Sized {
+    /// Labels and values.
+    fn normal(self) -> T {
+        self.fg(theme().text)
+    }
+    /// Secondary text.
+    fn muted(self) -> T {
+        self.fg(theme().muted)
+    }
+    fn accent(self) -> T {
+        self.fg(theme().accent)
+    }
+    fn success(self) -> T {
+        self.fg(theme().ok)
+    }
+    fn warn(self) -> T {
+        self.fg(theme().warn)
+    }
+    fn danger(self) -> T {
+        self.fg(theme().danger)
+    }
+    /// A key in the key hints (`m`, `Enter`, …).
+    fn key(self) -> T
+    where
+        T: Stylize<'a, T>,
+    {
+        apply(self, theme().key)
+    }
+    /// The "yes" key of a dangerous question.
+    fn key_danger(self) -> T
+    where
+        T: Stylize<'a, T>,
+    {
+        apply(self, theme().key_danger)
+    }
+    /// A key on a warning line.
+    fn key_warn(self) -> T
+    where
+        T: Stylize<'a, T>,
+    {
+        apply(self, theme().key_warn)
+    }
+    /// The `rustClean` badge of the title line.
+    fn badge(self) -> T
+    where
+        T: Stylize<'a, T>,
+    {
+        apply(self, theme().badge)
+    }
+}
+
+/// Gives `x` the colors and modifiers of `style`.
+fn apply<'a, T: Stylize<'a, T>, U: Stylize<'a, T>>(x: U, style: Style) -> T {
+    x.fg(style.fg.unwrap_or(Color::Reset))
+        .bg(style.bg.unwrap_or(Color::Reset))
+        .add_modifier(style.add_modifier)
+}
+
+impl<'a, T, U: Stylize<'a, T>> Themed<'a, T> for U {}
 
 #[cfg(test)]
 mod tests {
@@ -137,7 +173,7 @@ mod tests {
     #[test]
     fn folder_colors_get_readable_text() {
         // Dark palette entries get white text, light ones black.
-        for c in DIR_COLORS {
+        for c in super::super::theme::DARK.dirs {
             assert_eq!(text_on(c), Color::White, "{c:?}");
         }
         assert_eq!(text_on(Color::Indexed(231)), Color::Black); // white

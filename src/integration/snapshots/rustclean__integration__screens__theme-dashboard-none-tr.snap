@@ -1,0 +1,51 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Özet — /Users/demo  │  diskte
+┌ Genel ─────────────────────────────────────────┐┌ Disk ──────────────────────────────────────────┐
+│Toplam boyut   8.6 GiB                          ││Disk bilgisi bulunamadı.                        │
+│İçerik         17 dosya · 19 klasör             ││                                                │
+│En yeni değişiklik  30.09.2026 12:00            ││                                                │
+│⚠ Taramada 2 öğeye erişilemedi                  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ Dosya türleri ─────────────────────────────────┐┌ Yaş (son değişiklik) ──────────────────────────┐
+│Arşiv / disk imajı ████▏         3.6 GiB   %41  ││≤ 7 gün    █▉                  923.0 MiB   %10  │
+│Video              ███▋          3.2 GiB   %37  ││≤ 30 gün   ▍                   175.0 MiB    %2  │
+│Diğer              █▉            1.6 GiB   %18  ││≤ 1 yıl    ████▊                 2.3 GiB   %26  │
+│Kod                ▍           310.0 MiB    %4  ││> 1 yıl    ███████████           5.3 GiB   %61  │
+│Belge                            7.0 MiB    %0  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ En büyük dosyalar ─────────────────────────────┐┌ En dolu klasörler (doğrudan içerik) ───────────┐
+│▶    3.0 GiB 27.08.2025 12:00 Downloads/Xcode_16││   3.6 GiB Downloads/                           │
+│     2.3 GiB 28.02.2025 12:00 Movies/holiday-202││   3.2 GiB Movies/                              │
+│   900.0 MiB 22.08.2026 12:00 Movies/screen-reco││ 820.0 MiB Projects/api/target/debug/           │
+│   820.0 MiB 03.06.2026 12:00 Projects/api/targe││ 610.0 MiB Library/Caches/com.example.browser/  │
+│   610.0 MiB 30.09.2026 12:00 Library/Caches/com││ 310.0 MiB Projects/web/node_modules/react/     │
+│   450.0 MiB 15.03.2026 12:00 Downloads/setup.dm││ 150.0 MiB Applications/Sketchpad.app/Contents/M│
+│   310.0 MiB 28.09.2026 12:00 Projects/web/node_││  55.0 MiB Library/Application Support/com.examp│
+│   150.0 MiB 02.08.2026 12:00 Applications/Sketc││   4.0 MiB Documents/                           │
+│   120.0 MiB 19.09.2026 12:00 Downloads/photos.z││   8.0 KiB Projects/web/                        │
+│    55.0 MiB 11.09.2026 12:00 Library/Applicatio││   4.0 KiB Projects/api/                        │
+│                                                ││                                                │
+│                                                ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+„En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.
+ Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  görünen/diskt
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 -/- BOLD | REVERSED
+ 1: 1+7 -/- BOLD | 51+6 -/- BOLD
+ 2: 16+7 -/- BOLD
+ 7: 1+15 -/- BOLD | 51+22 -/- BOLD
+14: 1+19 -/- BOLD | 51+37 -/- BOLD
+15: 1+48 -/- BOLD | REVERSED | 62+10 -/- BOLD
+16: 62+7 -/- BOLD
+17: 62+26 -/- BOLD
+18: 62+35 -/- BOLD
+19: 62+32 -/- BOLD
+20: 62+37 -/- BOLD
+21: 62+37 -/- BOLD
+22: 62+10 -/- BOLD
+23: 62+13 -/- BOLD
+24: 62+13 -/- BOLD
+29: 0+5 -/- REVERSED | 22+4 -/- REVERSED | 32+7 -/- REVERSED | 52+7 -/- REVERSED | 68+3 -/- REVERSED | 83+3 -/- REVERSED

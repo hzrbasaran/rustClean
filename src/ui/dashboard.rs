@@ -1,7 +1,7 @@
 //! The summary dashboard of a folder.
 
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Paragraph, Row, Table};
 use ratatui::Frame;
@@ -11,7 +11,10 @@ use crate::stats;
 use crate::tree::{NodeId, SizeMode, Tree};
 
 use super::format::{clip, fmt_count, fmt_pct, fmt_size, now_secs};
-use super::style::{date_cell, date_span, usage_color, AGE_COLORS, CATEGORY_COLORS, HIGHLIGHT};
+use super::style::{
+    age_colors, category_color, date_cell, date_span, highlight, usage_color, Themed,
+};
+use super::theme::theme;
 use super::{bar, halves, panel, DATE_WIDTH};
 
 /// Width of the size and percentage columns of the file types panel, with
@@ -50,11 +53,11 @@ pub(super) fn render_dashboard(
     let base = tree.node(d.base);
     let mut lines = vec![
         Line::from(vec![
-            Span::raw(format!("{:<15}", t!("Toplam boyut", "Total size"))).white(),
+            Span::raw(format!("{:<15}", t!("Toplam boyut", "Total size"))).normal(),
             Span::raw(fmt_size(s.size)).bold(),
         ]),
         Line::from(vec![
-            Span::raw(format!("{:<15}", t!("İçerik", "Contents"))).white(),
+            Span::raw(format!("{:<15}", t!("İçerik", "Contents"))).normal(),
             Span::raw(tf!(
                 "{} dosya · {} klasör",
                 "{} files · {} folders",
@@ -63,7 +66,7 @@ pub(super) fn render_dashboard(
             )),
         ]),
         Line::from(vec![
-            Span::raw(format!("{}  ", t!("En yeni değişiklik", "Latest change"))).white(),
+            Span::raw(format!("{}  ", t!("En yeni değişiklik", "Latest change"))).normal(),
             date_span(base.modified, now),
         ]),
     ];
@@ -74,7 +77,7 @@ pub(super) fn render_dashboard(
                 "⚠ {} items were inaccessible during the scan",
                 fmt_count(scan_errors)
             ))
-            .yellow(),
+            .warn(),
         );
     }
     f.render_widget(
@@ -104,7 +107,7 @@ pub(super) fn render_dashboard(
                 fmt_size(disk.available)
             )),
             Line::from(vec![
-                Span::raw(t!("Disk payı  ", "Disk share  ")).white(),
+                Span::raw(t!("Disk payı  ", "Disk share  ")).normal(),
                 Span::raw(if share > 0.0 && share < 0.1 {
                     format!("< {}", fmt_pct(0.1, 1))
                 } else {
@@ -114,7 +117,7 @@ pub(super) fn render_dashboard(
             ]),
         ]
     } else {
-        vec![Line::from(t!("Disk bilgisi bulunamadı.", "No disk information.")).gray()]
+        vec![Line::from(t!("Disk bilgisi bulunamadı.", "No disk information.")).muted()]
     };
     let disk_title = d
         .disk
@@ -146,13 +149,13 @@ pub(super) fn render_dashboard(
         .map(|&(cat, b)| {
             let ratio = b.size as f64 / total;
             Line::from(vec![
-                Span::raw(format!("{:<label_w$}", clip(cat.label(), label_w - 1))).white(),
+                Span::raw(format!("{:<label_w$}", clip(cat.label(), label_w - 1))).normal(),
                 Span::styled(
                     bar(ratio, bar_w),
-                    Style::new().fg(CATEGORY_COLORS[cat as usize]),
+                    Style::new().fg(category_color(cat as usize)),
                 ),
                 Span::raw(format!(" {:>10}", fmt_size(b.size))),
-                Span::raw(format!(" {:>5}", fmt_pct(ratio * 100.0, 0))).gray(),
+                Span::raw(format!(" {:>5}", fmt_pct(ratio * 100.0, 0))).muted(),
             ])
         })
         .collect();
@@ -169,10 +172,10 @@ pub(super) fn render_dashboard(
             let b = s.ages[i];
             let ratio = b.size as f64 / total;
             Line::from(vec![
-                Span::raw(format!("{:<11}", stats::age_label(i))).white(),
-                Span::styled(bar(ratio, bar_w), Style::new().fg(AGE_COLORS[i])),
+                Span::raw(format!("{:<11}", stats::age_label(i))).normal(),
+                Span::styled(bar(ratio, bar_w), Style::new().fg(age_colors()[i])),
                 Span::raw(format!(" {:>10}", fmt_size(b.size))),
-                Span::raw(format!(" {:>5}", fmt_pct(ratio * 100.0, 0))).gray(),
+                Span::raw(format!(" {:>5}", fmt_pct(ratio * 100.0, 0))).muted(),
             ])
         })
         .collect();
@@ -219,7 +222,9 @@ pub(super) fn render_dashboard(
         focus_files,
     ));
     let table = if focus_files {
-        table.row_highlight_style(HIGHLIGHT).highlight_symbol("▶ ")
+        table
+            .row_highlight_style(highlight())
+            .highlight_symbol("▶ ")
     } else {
         table
     };
@@ -235,7 +240,7 @@ pub(super) fn render_dashboard(
                 } else {
                     format!("{}/", rel(id))
                 },
-                Style::new().fg(Color::LightBlue).bold(),
+                Style::new().fg(theme().folder).bold(),
             )),
         ])
     });
@@ -247,7 +252,9 @@ pub(super) fn render_dashboard(
         focus_dirs,
     ));
     let table = if focus_dirs {
-        table.row_highlight_style(HIGHLIGHT).highlight_symbol("▶ ")
+        table
+            .row_highlight_style(highlight())
+            .highlight_symbol("▶ ")
     } else {
         table
     };

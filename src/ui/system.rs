@@ -1,7 +1,7 @@
 //! The system data screen.
 
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
+use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Paragraph, Wrap};
 use ratatui::Frame;
@@ -11,7 +11,8 @@ use crate::system;
 use crate::system::SystemInfo;
 
 use super::format::{fmt_count, fmt_pct, fmt_size};
-use super::style::usage_color;
+use super::style::{usage_color, Themed};
+use super::theme::theme;
 use super::{bar, halves, panel};
 
 pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, area: Rect) {
@@ -25,7 +26,7 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
     let [gap_area, other_area] = halves(mid);
     let line = |label: &str, value: String| {
         Line::from(vec![
-            Span::raw(format!("{label:<30}")).white(),
+            Span::raw(format!("{label:<30}")).normal(),
             Span::raw(value).bold(),
         ])
     };
@@ -60,10 +61,10 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
             for v in vols {
                 let ratio = v.used as f64 / c.total.max(1) as f64;
                 lines.push(Line::from(vec![
-                    Span::raw(format!("{:<26}", v.name)).white().bold(),
-                    Span::raw(format!("{:<38}", system::role_label(&v.role))).gray(),
+                    Span::raw(format!("{:<26}", v.name)).normal().bold(),
+                    Span::raw(format!("{:<38}", system::role_label(&v.role))).muted(),
                     Span::raw(format!("{:>11}  ", fmt_size(v.used))),
-                    Span::styled(bar(ratio, 20), Style::new().fg(Color::Cyan)),
+                    Span::styled(bar(ratio, 20), Style::new().fg(theme().accent)),
                 ]));
             }
             tf!(
@@ -78,7 +79,7 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
                     "APFS bilgisi alınamadı.",
                     "Could not read APFS information."
                 ))
-                .yellow(),
+                .warn(),
             );
             t!(" APFS kapsayıcısı ", " APFS container ").to_string()
         }
@@ -104,9 +105,9 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
                         t!("Taramanın göremediği", "Not seen by the scan"),
                         fmt_size(expected - scanned),
                     )
-                    .yellow(),
+                    .warn(),
                 );
-                lines.push(Line::from(t!("Olası nedenler:", "Possible reasons:")).gray());
+                lines.push(Line::from(t!("Olası nedenler:", "Possible reasons:")).muted());
                 if b.errors > 0 {
                     lines.push(Line::from(tf!(
                         " • erişilemeyen {} öğe — terminale Tam Disk Erişimi verin",
@@ -137,7 +138,7 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
                         "Pure clones are counted once; partly modified clones and clones of \
                          small files share blocks but are still counted separately.",
                     ))
-                    .gray(),
+                    .muted(),
                 );
             }
         }
@@ -146,7 +147,7 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
                 "Bu karşılaştırma için diskin kökünü (/) tarayın:",
                 "For this comparison, scan the disk root (/):",
             )));
-            lines.push(Line::from("d → Macintosh HD").cyan());
+            lines.push(Line::from("d → Macintosh HD").accent());
         }
     }
     f.render_widget(
@@ -165,7 +166,7 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
         tf!("{} adet", "{}", sys.snapshots.len()),
     )];
     for name in sys.snapshots.iter().take(2) {
-        lines.push(Line::from(format!("  {name}")).gray());
+        lines.push(Line::from(format!("  {name}")).muted());
     }
     if let Some(first) = sys.snapshots.first() {
         let date = first
@@ -176,7 +177,7 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
                 "  silmek için: sudo tmutil deletelocalsnapshots {date}",
                 "  to delete: sudo tmutil deletelocalsnapshots {date}"
             ))
-            .cyan(),
+            .accent(),
         );
     }
     if let Some((total, used)) = sys.swap {
@@ -217,11 +218,11 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
                 "  Ayrı disk imajlarında durur, taramada görünmez. Temizlik: m → Geliştirici araçları temizliği",
                 "  Kept in separate disk images, not in the scan. Clean up: m → Developer tools cleanup",
             ))
-                .gray(),
+                .muted(),
         );
     }
     for p in &sys.problems {
-        lines.push(Line::from(format!("⚠ {p}")).yellow());
+        lines.push(Line::from(format!("⚠ {p}")).warn());
     }
     f.render_widget(
         Paragraph::new(lines).block(panel(t!(" Diğer ", " Other "), false)),

@@ -14,6 +14,7 @@ mod paths;
 mod reports;
 mod scanner;
 mod search;
+mod settings;
 mod stats;
 mod system;
 mod tools;
@@ -51,6 +52,16 @@ struct Args {
     #[arg(long, value_name = "tr|en")]
     lang: Option<String>,
 
+    /// Renk teması / color theme: dark, light, colorblind (programda T ile değişir / switch with T)
+    #[arg(long, value_name = "dark|light|colorblind", value_parser = ["dark", "light", "colorblind"])]
+    theme: Option<String>,
+
+    #[arg(
+        long,
+        help = "Renk kullanma (NO_COLOR ortam değişkeni de olur) / no colors (NO_COLOR works too)"
+    )]
+    no_color: bool,
+
     /// Arayüz açmadan YOL'u tarayıp özetini yazdır / scan PATH and print a summary, no interface
     #[arg(long, requires = "path")]
     summary: bool,
@@ -59,6 +70,7 @@ struct Args {
 fn main() -> Result<()> {
     let args = Args::parse();
     i18n::init(args.lang.as_deref());
+    ui::theme::init(args.theme.as_deref(), args.no_color);
 
     if args.list_disks {
         for d in disks::list_disks() {

@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Summary — /Users/demo  │  on disk
+┌ General ───────────────────────────────────────┐┌ Disk ──────────────────────────────────────────┐
+│Total size     8.6 GiB                          ││No disk information.                            │
+│Contents       17 files · 19 folders            ││                                                │
+│Latest change  2026-09-30 12:00                 ││                                                │
+│⚠ 2 items were inaccessible during the scan     ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ File types ────────────────────────────────────┐┌ Age (last modified) ───────────────────────────┐
+│Archives / disk images ██▌       3.6 GiB   41%  ││≤ 7 days   █▉                  923.0 MiB   10%  │
+│Video                  ██▎       3.2 GiB   37%  ││≤ 30 days  ▍                   175.0 MiB    2%  │
+│Other                  █▏        1.6 GiB   18%  ││≤ 1 year   ████▊                 2.3 GiB   26%  │
+│Code                   ▎       310.0 MiB    4%  ││> 1 year   ███████████           5.3 GiB   61%  │
+│Documents                        7.0 MiB    0%  ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ Largest files ─────────────────────────────────┐┌ Fullest folders (direct contents) ─────────────┐
+│▶    3.0 GiB 2025-08-27 12:00 Downloads/Xcode_16││   3.6 GiB Downloads/                           │
+│     2.3 GiB 2025-02-28 12:00 Movies/holiday-202││   3.2 GiB Movies/                              │
+│   900.0 MiB 2026-08-22 12:00 Movies/screen-reco││ 820.0 MiB Projects/api/target/debug/           │
+│   820.0 MiB 2026-06-03 12:00 Projects/api/targe││ 610.0 MiB Library/Caches/com.example.browser/  │
+│   610.0 MiB 2026-09-30 12:00 Library/Caches/com││ 310.0 MiB Projects/web/node_modules/react/     │
+│   450.0 MiB 2026-03-15 12:00 Downloads/setup.dm││ 150.0 MiB Applications/Sketchpad.app/Contents/M│
+│   310.0 MiB 2026-09-28 12:00 Projects/web/node_││  55.0 MiB Library/Application Support/com.examp│
+│   150.0 MiB 2026-08-02 12:00 Applications/Sketc││   4.0 MiB Documents/                           │
+│   120.0 MiB 2026-09-19 12:00 Downloads/photos.z││   8.0 KiB Projects/web/                        │
+│    55.0 MiB 2026-09-11 12:00 Library/Applicatio││   4.0 KiB Projects/api/                        │
+│                                                ││                                                │
+│                                                ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+“Fullest folders” ignores subfolders: it shows where the space actually sits.
+ Tab  switch list   ↑↓  move   Enter  go to location   Space  to basket   x  move to trash   a  appa
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Indexed(231)/Indexed(25) BOLD
+ 1: 0+1 Indexed(248)/- | 1+9 -/- BOLD | 10+41 Indexed(248)/- | 51+6 -/- BOLD | 57+43 Indexed(248)/-
+ 2: 0+1 Indexed(248)/- | 16+7 -/- BOLD | 49+2 Indexed(248)/- | 51+20 Indexed(242)/- | 99+1 Indexed(248)/-
+ 3: 0+1 Indexed(248)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+ 4: 0+1 Indexed(248)/- | 16+16 Indexed(28)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+ 5: 0+1 Indexed(248)/- | 1+43 Indexed(130)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+ 6: 0+100 Indexed(248)/-
+ 7: 0+1 Indexed(248)/- | 1+12 -/- BOLD | 13+38 Indexed(248)/- | 51+21 -/- BOLD | 72+28 Indexed(248)/-
+ 8: 0+1 Indexed(248)/- | 24+6 Indexed(178)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(28)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+ 9: 0+1 Indexed(248)/- | 24+6 Indexed(127)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(31)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+10: 0+1 Indexed(248)/- | 24+6 Indexed(245)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(130)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+11: 0+1 Indexed(248)/- | 24+6 Indexed(37)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 62+18 Indexed(160)/- | 91+6 Indexed(242)/- | 99+1 Indexed(248)/-
+12: 0+1 Indexed(248)/- | 24+6 Indexed(70)/- | 41+6 Indexed(242)/- | 49+2 Indexed(248)/- | 99+1 Indexed(248)/-
+13: 0+100 Indexed(248)/-
+14: 0+1 Indexed(25)/- | 1+15 -/- BOLD | 16+34 Indexed(25)/- | 50+1 Indexed(248)/- | 51+35 -/- BOLD | 86+14 Indexed(248)/-
+15: 0+1 Indexed(25)/- | 1+13 -/Indexed(253) BOLD | 14+16 Indexed(160)/Indexed(253) BOLD | 30+19 -/Indexed(253) BOLD | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+10 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+16: 0+1 Indexed(25)/- | 14+16 Indexed(160)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+7 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+17: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+26 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+18: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+35 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+19: 0+1 Indexed(25)/- | 14+16 Indexed(28)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+32 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+20: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+37 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+21: 0+1 Indexed(25)/- | 14+16 Indexed(28)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+37 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+22: 0+1 Indexed(25)/- | 14+16 Indexed(130)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+10 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+23: 0+1 Indexed(25)/- | 14+16 Indexed(31)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+13 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+24: 0+1 Indexed(25)/- | 14+16 Indexed(31)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 62+13 Indexed(26)/- BOLD | 99+1 Indexed(248)/-
+25: 0+1 Indexed(25)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 99+1 Indexed(248)/-
+26: 0+1 Indexed(25)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 99+1 Indexed(248)/-
+27: 0+50 Indexed(25)/- | 50+50 Indexed(248)/-
+28: 0+100 Indexed(242)/-
+29: 0+5 Indexed(231)/Indexed(242) | 19+4 Indexed(231)/Indexed(242) | 30+7 Indexed(231)/Indexed(242) | 54+7 Indexed(231)/Indexed(242) | 73+3 Indexed(231)/Indexed(242) | 92+3 Indexed(231)/Indexed(242)

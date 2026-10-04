@@ -1,0 +1,46 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+    Size        Share               Files      Modified         Name
+▶       3.6 GiB █████         41.2%          4 2026-09-29 12:00 Downloads/
+        3.2 GiB ████▍         36.7%          2 2026-09-21 12:00 Movies/
+        1.1 GiB █▌            12.8%          5 2026-09-28 12:00 Projects/
+      665.0 MiB ▉              7.5%          2 2026-09-30 12:00 Library/
+      150.0 MiB ▎              1.7%          1 2026-09-21 12:00 Applications/
+        4.0 MiB                0.0%          3 2026-09-30 12:00 Documents/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort   a  appare
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Indexed(231)/Indexed(25) BOLD
+ 1: 36+7 -/- BOLD | 43+2 Indexed(28)/- | 57+2 Indexed(31)/- | 72+2 Indexed(130)/- | 86+2 Indexed(160)/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+16 -/Indexed(253) BOLD | 16+12 Indexed(25)/Indexed(253) BOLD | 28+8 -/Indexed(253) BOLD | 36+10 Indexed(242)/Indexed(253) BOLD | 46+1 -/Indexed(253) BOLD | 47+16 Indexed(28)/Indexed(253) BOLD | 63+1 -/Indexed(253) BOLD | 64+10 Indexed(26)/Indexed(253) BOLD | 74+26 -/Indexed(253) BOLD
+ 4: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(31)/- | 64+7 Indexed(26)/- BOLD
+ 5: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(28)/- | 64+9 Indexed(26)/- BOLD
+ 6: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(28)/- | 64+8 Indexed(26)/- BOLD
+ 7: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(31)/- | 64+13 Indexed(26)/- BOLD
+ 8: 16+12 Indexed(25)/- | 36+10 Indexed(242)/- | 47+16 Indexed(28)/- | 64+10 Indexed(26)/- BOLD
+28: 0+23 Indexed(242)/- | 23+25 Indexed(130)/-
+29: 0+4 Indexed(231)/Indexed(242) | 11+7 Indexed(231)/Indexed(242) | 25+3 Indexed(231)/Indexed(242) | 35+3 Indexed(231)/Indexed(242) | 44+3 Indexed(231)/Indexed(242) | 54+3 Indexed(231)/Indexed(242) | 67+3 Indexed(231)/Indexed(242) | 80+3 Indexed(231)/Indexed(242) | 90+3 Indexed(231)/Indexed(242)

@@ -36,7 +36,7 @@ expression: screen
  0: 0+11 Black/Cyan BOLD
  1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
  2: 0+100 -/- BOLD | UNDERLINED
- 3: 0+16 -/DarkGray BOLD | 16+12 Cyan/DarkGray BOLD | 28+8 -/DarkGray BOLD | 36+10 Gray/DarkGray BOLD | 46+1 -/DarkGray BOLD | 47+16 Green/DarkGray BOLD | 63+1 -/DarkGray BOLD | 64+10 LightBlue/DarkGray BOLD | 74+26 -/DarkGray BOLD
+ 3: 0+100 White/Indexed(238) BOLD
  4: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Cyan/- | 64+7 LightBlue/- BOLD
  5: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+9 LightBlue/- BOLD
  6: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+8 LightBlue/- BOLD

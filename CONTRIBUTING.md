@@ -88,7 +88,15 @@ cargo insta review          # or: INSTA_UPDATE=always cargo test
 ```
 
 and commit the `.snap` changes with the code, so the review shows what the
-screen looks like now. Snapshot tests run on macOS and Linux (paths use `/`).
+screen looks like now.
+
+Colors come from `ui/theme.rs` by role (`.normal()`, `.muted()`, `.warn()`,
+…); do not use color names in the screens. To compare the themes in a
+browser:
+
+```bash
+RUSTCLEAN_PREVIEW=preview.html cargo test theme_preview -- --ignored
+``` Snapshot tests run on macOS and Linux (paths use `/`).
 CI never writes snapshots; a missing or different one fails the build.
 
 `cargo test` never touches your history, settings or trash: test builds use

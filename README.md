@@ -55,6 +55,8 @@ from anywhere and move them to the trash in one go.
 - **System data panel** (macOS) — APFS volumes, Time Machine local snapshots,
   swap, and why the scan total differs from what the disk reports.
 - **Turkish and English** interface (`L` to switch).
+- **Themes** for dark and light terminals and a color-blind friendly palette
+  (`T` to switch), or no colors at all (`--no-color`, `NO_COLOR`).
 
 ## Screenshots
 
@@ -132,6 +134,8 @@ cargo build --release   # binary: target/release/rustclean
 rustclean                 # pick a disk to scan
 rustclean ~/Projects      # scan a folder directly
 rustclean --lang en       # interface language: en or tr (also: L in the app)
+rustclean --theme light   # dark, light or colorblind (also: T in the app)
+rustclean --no-color      # no colors; NO_COLOR=1 works too
 rustclean --list-disks    # list disks and exit
 rustclean --summary ~     # scan without the interface and print totals
 ```
@@ -150,6 +154,7 @@ Every screen lists its keys at the bottom. The most important ones:
 | `s` · `a` | sort · apparent / on-disk size |
 | `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
+| `T` | theme: dark → light → color-blind |
 | `q` | quit |
 
 See the [usage guide](docs/USAGE.md) for every screen and report.
@@ -174,7 +179,7 @@ use simpler name-based matching).
 rustClean makes no network connections. It writes only:
 
 - scan summaries for the history feature (newest 10 per scanned folder), and
-- the chosen interface language,
+- the chosen interface language and theme,
 
 in the platform data directory (`~/Library/Application Support/rustClean` on
 macOS, `~/.local/share/rustClean` on Linux, `%APPDATA%\rustClean` on Windows).
