@@ -99,6 +99,24 @@ RUSTCLEAN_PREVIEW=preview.html cargo test theme_preview -- --ignored
 ``` Snapshot tests run on macOS and Linux (paths use `/`).
 CI never writes snapshots; a missing or different one fails the build.
 
+#### Screenshots in the docs
+
+The README (English and Turkish) and the usage guide show every main screen
+from `docs/screenshots/`. When a change alters a screen that is shown there,
+regenerate them in the same pull request:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install pyte   # once
+cargo build --release
+scripts/screenshots/make-shots.sh
+```
+
+The script rebuilds the demo folder from `scripts/screenshots/demo.json`
+(sparse files, so it takes no space), takes each screen in English and
+Turkish at 120×30, and writes the SVGs. Look at the changed images before
+committing them. A new screen gets a line in `make-shots.sh` and a place in
+both READMEs.
+
 `cargo test` never touches your history, settings or trash: test builds use
 folders under the system temp directory instead (see `docs/ARCHITECTURE.md`).
 

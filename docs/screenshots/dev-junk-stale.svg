@@ -3,7 +3,7 @@
 <g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
 <rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#00cdcd"/>
 <text x="0.0" y="14.0" fill="#000000" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
-<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> Developer junk · untouched for ≥ 90 days — ~/demo                                                           </text>
+<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> Developer junk · untouched for ≥ 90 days — ~/demo  │  2 rows, 1.5 GiB (apparent)                            </text>
 <text x="0.0" y="33.0" fill="#cdd6f4" xml:space="preserve" textLength="504.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────</text>
 <text x="504.0" y="33.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Date: </text>
 <text x="567.0" y="33.0" fill="#00cd00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
@@ -15,59 +15,41 @@
 <text x="954.0" y="33.0" fill="#cd0000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
 <text x="972.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 year   </text>
 <text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">      Size        Count      Modified         Created          Location                       Details                   </text>
-<rect x="0.0" y="57.0" width="18.0" height="19.0" fill="#7f7f7f"/>
-<text x="0.0" y="71.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">▶ </text>
-<rect x="18.0" y="57.0" width="27.0" height="19.0" fill="#7f7f7f"/>
-<text x="18.0" y="71.0" fill="#e5e5e5" font-weight="bold" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">[ ]</text>
-<rect x="45.0" y="57.0" width="117.0" height="19.0" fill="#7f7f7f"/>
-<text x="45.0" y="71.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">     1.3 GiB </text>
-<rect x="162.0" y="57.0" width="90.0" height="19.0" fill="#7f7f7f"/>
-<text x="162.0" y="71.0" fill="#e5e5e5" font-weight="bold" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         2</text>
-<rect x="252.0" y="57.0" width="9.0" height="19.0" fill="#7f7f7f"/>
-<rect x="261.0" y="57.0" width="144.0" height="19.0" fill="#7f7f7f"/>
-<text x="261.0" y="71.0" fill="#cdcd00" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-03-17 16:53</text>
-<rect x="405.0" y="57.0" width="9.0" height="19.0" fill="#7f7f7f"/>
-<rect x="414.0" y="57.0" width="144.0" height="19.0" fill="#7f7f7f"/>
-<text x="414.0" y="71.0" fill="#cdcd00" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-03-17 16:53</text>
-<rect x="558.0" y="57.0" width="9.0" height="19.0" fill="#7f7f7f"/>
-<rect x="567.0" y="57.0" width="243.0" height="19.0" fill="#7f7f7f"/>
-<text x="567.0" y="71.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="243.0" lengthAdjust="spacingAndGlyphs">Projects/ml-notebook/.venv/</text>
-<rect x="810.0" y="57.0" width="36.0" height="19.0" fill="#7f7f7f"/>
-<rect x="846.0" y="57.0" width="234.0" height="19.0" fill="#7f7f7f"/>
-<text x="846.0" y="71.0" fill="#e5e5e5" font-weight="bold" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">Python virtual environment</text>
+<rect x="0.0" y="57.0" width="1080.0" height="19.0" fill="#444444"/>
+<text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">▶ [ ]     1.3 GiB          2 2026-03-17 17:01 2026-03-17 17:01 Projects/ml-notebook/.venv/    Python virtual environment</text>
 <text x="18.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">[ ]</text>
 <text x="45.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">   275.0 MiB </text>
 <text x="162.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         5</text>
-<text x="261.0" y="90.0" fill="#00cd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-10-01 16:53</text>
-<text x="414.0" y="90.0" fill="#00cd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-10-01 16:53</text>
+<text x="261.0" y="90.0" fill="#00cd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-10-01 17:01</text>
+<text x="414.0" y="90.0" fill="#00cd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-10-01 17:01</text>
 <text x="567.0" y="90.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="270.0" lengthAdjust="spacingAndGlyphs">Projects/old-site/node_modules</text>
 <text x="846.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">Node.js dependencies · pro</text>
 <text x="0.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
 <text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">These folders come back when the project is built / installed again.                                                    </text>
-<rect x="0.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
-<text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
-<text x="36.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> move  </text>
-<rect x="99.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="99.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Space </text>
-<text x="162.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> to basket  </text>
-<rect x="270.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="270.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> t </text>
-<text x="297.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> all  </text>
-<rect x="351.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="351.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> f </text>
-<text x="378.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs"> age filter  </text>
-<rect x="495.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="495.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> x </text>
-<text x="522.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs"> move to trash  </text>
-<rect x="666.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="666.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> S </text>
-<text x="693.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> basket  </text>
-<rect x="774.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="774.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
-<text x="837.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs"> open / go to  </text>
-<rect x="972.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="972.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> / </text>
-<text x="999.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> find  </text>
+<rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
+<text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> help  </text>
+<rect x="90.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
+<text x="90.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
+<text x="126.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> move  </text>
+<rect x="189.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="189.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Space </text>
+<text x="252.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> to basket  </text>
+<rect x="360.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="360.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> t </text>
+<text x="387.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> all  </text>
+<rect x="441.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="441.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> f </text>
+<text x="468.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs"> age filter  </text>
+<rect x="585.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="585.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> x </text>
+<text x="612.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs"> move to trash  </text>
+<rect x="756.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="756.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> S </text>
+<text x="783.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> basket  </text>
+<rect x="864.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="864.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
+<text x="927.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs"> open / go to  </text>
 <rect x="1062.0" y="551.0" width="18.0" height="19.0" fill="#e5e5e5"/>
-<text x="1062.0" y="565.0" fill="#000000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs"> m</text>
+<text x="1062.0" y="565.0" fill="#000000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs"> /</text>
 </g></svg>

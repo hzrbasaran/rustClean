@@ -18,10 +18,12 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │
    ├─ ui/ ──────── all drawing (ratatui); no state of its own
    │    ├─ mod.rs        picks the screen; shared title, key, popup, panel helpers
-   │    ├─ format.rs     sizes, counts, dates, ages, paths
-   │    ├─ style.rs      shared colors and styles
+   │    ├─ format.rs     sizes, counts, dates, ages, paths, wrapping
+   │    ├─ theme.rs      the four themes (dark, light, color-blind, no color)
+   │    ├─ style.rs      colors by role (`.muted()`, `.warn()`…) from the theme
+   │    ├─ help.rs       the `?` screen: every key, by screen
    │    └─ one module per screen: disks, scanning, browser, map, results,
-   │       dashboard, tools, system, menus, dialogs
+   │       dashboard, tools, system, menus, dialogs, log (deletion log)
    │
    ├─ scanner.rs ─ parallel scan → tree.rs
    ├─ tree.rs ──── compact arena tree of the scan
@@ -31,7 +33,7 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ mod.rs        report kinds, menu items, age filter, run(), shared
    │    │                walk / top-N helpers
    │    └─ one module per report group: size, downloads, dev_junk, caches,
-   │       names
+   │       names, clutter (empty folders, broken links, temporary files)
    ├─ apps/ ────── apps and their data, orphaned leftovers
    │    ├─ mod.rs        App, DataDir, the Apps report, uninstall checks
    │    ├─ find.rs       installed apps (in the scan and on disk)
@@ -47,9 +49,11 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ tools.rs ─── developer tool measurement and cleanup commands
    ├─ system.rs ── macOS system data (diskutil, tmutil, sysctl)
    ├─ delete.rs ── safety checks and moving to the trash
+   ├─ trashlog.rs  the deletion log (deletions.jsonl)
    ├─ disks.rs ─── disk discovery (sysinfo)
-   ├─ paths.rs ─── data directory (history, settings)
-   └─ i18n.rs ──── Turkish / English texts
+   ├─ paths.rs ─── data directory (history, settings, deletion log)
+   ├─ settings.rs  saved choices (language, theme) as key=value lines
+   └─ i18n.rs ──── Turkish / English texts, counts with their nouns
 ```
 
 ## Scanning
@@ -101,6 +105,14 @@ Whether a row shows `[✓]` is not stored in the row. The UI derives it from the
 basket (`Browser::row_in_basket`), which is the single source of truth for what
 is selected.
 
+A list records its `Source`: a report and its age filter, a search pattern, a
+saved scan, the duplicates (rebuilt from their own rows, without hashing
+again), the basket, or the members of a group. `Browser::rebuild_results`
+builds the open list again from it and puts the cursor back on the same entry,
+re-opening groups level by level. It runs after `L` (so titles and details
+follow the language), after the age filter changes, and after the basket or
+the apps change.
+
 ## Background work
 
 Long operations run on their own threads and report through channels. The UI
@@ -114,6 +126,11 @@ polls them on every tick:
 | tool measurement and commands | `tools::measure_all`, `tools::run` |
 | saving history | a detached thread in `Browser::record_history` |
 
+Every successful move to the trash is appended to the deletion log
+(`trashlog::append`): by `Browser::poll_delete` for deletions from the
+interface, and by `tools::run` for a tool's "move the contents to the trash"
+step. A failed move is never written.
+
 Reports that only read the tree run synchronously. They take under a second
 even on a full disk. A "preparing" message is drawn first so the UI never looks
 frozen.
@@ -125,7 +142,26 @@ Every text shown to the user is written in both languages where it is used:
 - `tf!("{n} öğe", "{n} items")` formats.
 
 The language is a global set by `i18n::init` and `L`. Formatting helpers in
-`ui/format.rs` (`fmt_count`, `fmt_date`, `fmt_pct`, `fmt_ago`) follow it.
+`ui/format.rs` (`fmt_count`, `fmt_date`, `fmt_pct`, `fmt_ago`) follow it. For
+a number with a noun use `i18n::count(n, "öğe", "item", "items")`: English
+takes the singular for one, Turkish nouns do not change after a number. Files
+store language-independent codes (`ReportKind::code`, `ToolKind::code`), not
+labels.
+
+## Colors
+
+Screens never name colors. They ask for a role from `ui/style.rs`:
+`.normal()`, `.muted()`, `.accent()`, `.success()`, `.warn()`, `.danger()`,
+`.key()`, `.badge()`, and the age, usage, risk, category and treemap palettes.
+`ui/theme.rs` answers from the current theme:
+- **dark**: the 16 named colors, which follow the terminal's palette;
+- **light** and **color-blind**: 256-color entries, which look the same
+  everywhere;
+- **no color** (`--no-color`, `NO_COLOR`): reversed and bold text instead,
+  and borders around treemap blocks.
+
+`T` cycles the themes and `--theme` picks one at start; `settings.rs`
+remembers the choice. `--no-color` or `NO_COLOR` wins over both.
 
 ## Tests
 

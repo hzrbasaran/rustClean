@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1104" height="594" viewBox="0 0 1104 594">
+<rect width="100%" height="100%" rx="8" fill="#11111b"/>
+<g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
+<rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#00cdcd"/>
+<text x="0.0" y="14.0" fill="#000000" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
+<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo  │  21.9 GiB (apparent)  │  105 files  │  sort: size                                                 </text>
+<text x="0.0" y="33.0" fill="#cdd6f4" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">──────────────────</text>
+<text x="162.0" y="33.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">┌</text>
+<text x="171.0" y="33.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> Keys </text>
+<text x="225.0" y="33.0" fill="#00cdcd" xml:space="preserve" textLength="693.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────┐</text>
+<text x="918.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">r   </text>
+<text x="954.0" y="33.0" fill="#cd0000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
+<text x="972.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 year   </text>
+<text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">    Size        Sh</text>
+<text x="162.0" y="52.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="171.0" y="52.0" fill="#00cdcd" font-weight="bold" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">▶ This screen: Folder list</text>
+<text x="909.0" y="52.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<rect x="0.0" y="57.0" width="162.0" height="19.0" fill="#444444"/>
+<text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">▶       9.7 GiB ██</text>
+<text x="162.0" y="71.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ ↑↓  j k       </text>
+<text x="306.0" y="71.0" fill="#ffffff" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">move</text>
+<text x="909.0" y="71.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<rect x="918.0" y="57.0" width="162.0" height="19.0" fill="#444444"/>
+<text x="0.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.6 GiB </text>
+<text x="144.0" y="90.0" fill="#00cdcd" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">██│ PgUp PgDn     </text>
+<text x="306.0" y="90.0" fill="#ffffff" xml:space="preserve" textLength="126.0" lengthAdjust="spacingAndGlyphs">page up / down</text>
+<text x="909.0" y="90.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="0.0" y="109.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.2 GiB </text>
+<text x="144.0" y="109.0" fill="#00cdcd" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">█▊│ Home End  g G </text>
+<text x="306.0" y="109.0" fill="#ffffff" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">first / last row</text>
+<text x="909.0" y="109.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="0.0" y="128.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.0 GiB </text>
+<text x="144.0" y="128.0" fill="#00cdcd" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">█▋│ Enter  →  l   </text>
+<text x="306.0" y="128.0" fill="#ffffff" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs">open the folder</text>
+<text x="909.0" y="128.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="0.0" y="147.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        1.5 GiB </text>
+<text x="144.0" y="147.0" fill="#00cdcd" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">▊ │ ⌫  ←  h  Esc  </text>
+<text x="306.0" y="147.0" fill="#ffffff" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">parent folder</text>
+<text x="909.0" y="147.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="0.0" y="166.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      950.0 MiB </text>
+<text x="144.0" y="166.0" fill="#00cdcd" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">▌ │ s             </text>
+<text x="306.0" y="166.0" fill="#ffffff" xml:space="preserve" textLength="306.0" lengthAdjust="spacingAndGlyphs">sort: size, name, file count, date</text>
+<text x="909.0" y="166.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="0.0" y="185.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      117.3 MiB </text>
+<text x="144.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">▏ │ a             </text>
+<text x="306.0" y="185.0" fill="#ffffff" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">apparent / on-disk size</text>
+<text x="909.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="204.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ t             </text>
+<text x="306.0" y="204.0" fill="#ffffff" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">map view</text>
+<text x="909.0" y="204.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="223.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ /             </text>
+<text x="306.0" y="223.0" fill="#ffffff" xml:space="preserve" textLength="324.0" lengthAdjust="spacingAndGlyphs">find by name (* and ? are wildcards)</text>
+<text x="909.0" y="223.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="242.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ i             </text>
+<text x="306.0" y="242.0" fill="#ffffff" xml:space="preserve" textLength="198.0" lengthAdjust="spacingAndGlyphs">summary of this folder</text>
+<text x="909.0" y="242.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="261.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ m             </text>
+<text x="306.0" y="261.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">reports menu</text>
+<text x="909.0" y="261.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="280.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ Space         </text>
+<text x="306.0" y="280.0" fill="#ffffff" xml:space="preserve" textLength="279.0" lengthAdjust="spacingAndGlyphs">add to / remove from the basket</text>
+<text x="909.0" y="280.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="299.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ S             </text>
+<text x="306.0" y="299.0" fill="#ffffff" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs">show the basket</text>
+<text x="909.0" y="299.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="318.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ x  Delete     </text>
+<text x="306.0" y="318.0" fill="#ffffff" xml:space="preserve" textLength="540.0" lengthAdjust="spacingAndGlyphs">move to the trash (asks first; the basket if it has entries)</text>
+<text x="909.0" y="318.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="337.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ R             </text>
+<text x="306.0" y="337.0" fill="#ffffff" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">rescan this folder</text>
+<text x="909.0" y="337.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="356.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ r             </text>
+<text x="306.0" y="356.0" fill="#ffffff" xml:space="preserve" textLength="153.0" lengthAdjust="spacingAndGlyphs">rescan everything</text>
+<text x="909.0" y="356.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="375.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ d             </text>
+<text x="306.0" y="375.0" fill="#ffffff" xml:space="preserve" textLength="189.0" lengthAdjust="spacingAndGlyphs">back to the disk list</text>
+<text x="909.0" y="375.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="394.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="909.0" y="394.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="413.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="171.0" y="413.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs">On every screen</text>
+<text x="909.0" y="413.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="432.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ ?             </text>
+<text x="306.0" y="432.0" fill="#ffffff" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">this help</text>
+<text x="909.0" y="432.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="451.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ L             </text>
+<text x="306.0" y="451.0" fill="#ffffff" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">English ↔ Türkçe</text>
+<text x="909.0" y="451.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="470.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ T             </text>
+<text x="306.0" y="470.0" fill="#ffffff" xml:space="preserve" textLength="279.0" lengthAdjust="spacingAndGlyphs">theme: dark, light, color-blind</text>
+<text x="909.0" y="470.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="489.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">│ q  Ctrl-C     </text>
+<text x="306.0" y="489.0" fill="#ffffff" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">quit</text>
+<text x="909.0" y="489.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="508.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="909.0" y="508.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="0.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">──────────────────</text>
+<text x="162.0" y="527.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="171.0" y="527.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">Map (treemap)</text>
+<text x="909.0" y="527.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="918.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">──────────────────</text>
+<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="162.0" lengthAdjust="spacingAndGlyphs">156 items scanned,</text>
+<text x="162.0" y="546.0" fill="#00cdcd" xml:space="preserve" textLength="198.0" lengthAdjust="spacingAndGlyphs">└─────────────────────</text>
+<text x="360.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="351.0" lengthAdjust="spacingAndGlyphs"> ↑↓ PgUp PgDn: scroll · Esc / ?: close </text>
+<text x="711.0" y="546.0" fill="#00cdcd" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">──────────────────────┘</text>
+<rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
+<text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> help  </text>
+<rect x="90.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
+<text x="90.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
+<text x="126.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> move  </text>
+<rect x="189.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
+<text x="189.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
+<text x="252.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> open  </text>
+<rect x="315.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="315.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ⌫ </text>
+<text x="342.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> back  </text>
+<rect x="405.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="405.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> t </text>
+<text x="432.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> map  </text>
+<rect x="486.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="486.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> / </text>
+<text x="513.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> find  </text>
+<rect x="576.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="576.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> m </text>
+<text x="603.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs"> reports  </text>
+<rect x="693.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="693.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> i </text>
+<text x="720.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs"> summary  </text>
+<rect x="810.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="810.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> s </text>
+<text x="837.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> sort  </text>
+<rect x="900.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="900.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> a </text>
+<text x="927.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="153.0" lengthAdjust="spacingAndGlyphs"> apparent/on disk</text>
+</g></svg>
