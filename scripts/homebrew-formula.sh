@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Prints the Homebrew formula for a release.
 #
-#   scripts/homebrew-formula.sh 0.2.0 SHA256SUMS.txt > Formula/rustclean.rb
+#   scripts/homebrew-formula.sh 0.3.0 SHA256SUMS.txt > Formula/rustclean.rb
 #
 # SHA256SUMS.txt is the checksum file attached to every GitHub release.
 set -euo pipefail
