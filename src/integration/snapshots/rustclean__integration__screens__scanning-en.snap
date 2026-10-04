@@ -1,0 +1,44 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Scanning: /Users/demo
+
+  ⠋ Scanning…
+
+  Files        123,456
+  Folders      7,890
+  Size         42.0 GiB
+  Inaccessible 3
+  Time         0.0 s
+
+  Now          /Users/demo/Library/Caches/com.example.browser
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Esc  cancel   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+13 Cyan/- BOLD
+ 4: 0+15 Gray/-
+ 5: 0+15 Gray/-
+ 6: 0+15 Gray/-
+ 7: 0+15 Gray/-
+ 8: 0+15 Gray/-
+10: 0+15 Gray/-
+29: 0+5 Black/Gray | 14+3 Black/Gray

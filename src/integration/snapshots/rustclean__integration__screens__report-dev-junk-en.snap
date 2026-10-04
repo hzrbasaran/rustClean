@@ -1,0 +1,42 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer junk — /Users/demo  │  2 rows, 1.1 GiB (on disk)
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+      Size        Count      Modified         Location                       Details
+▶ [ ]   820.0 MiB          1 2026-09-21 12:00 Projects/api/target/           Rust build output · pro
+  [ ]   310.0 MiB          1 2026-09-28 12:00 Projects/web/node_modules/     Node.js dependencies ·
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+These folders come back when the project is built / installed again.
+ ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+2 -/DarkGray BOLD | 2+3 Gray/DarkGray BOLD | 5+13 -/DarkGray BOLD | 18+10 Gray/DarkGray BOLD | 28+1 -/DarkGray BOLD | 29+16 Cyan/DarkGray BOLD | 45+1 -/DarkGray BOLD | 46+20 LightBlue/DarkGray BOLD | 66+11 -/DarkGray BOLD | 77+23 Gray/DarkGray BOLD
+ 4: 2+3 Gray/- | 18+10 Gray/- | 29+16 Green/- | 46+26 LightBlue/- BOLD | 77+23 Gray/-
+28: 0+100 Gray/-
+29: 0+4 Black/Gray | 11+7 Black/Gray | 30+3 Black/Gray | 39+3 Black/Gray | 55+3 Black/Gray | 74+3 Black/Gray | 86+7 Black/Gray

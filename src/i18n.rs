@@ -40,7 +40,28 @@ impl Lang {
 
 static LANG: AtomicU8 = AtomicU8::new(0);
 
+// Test builds can pick the language per thread, so tests that render in
+// English do not change what tests running beside them see.
+#[cfg(test)]
+thread_local! {
+    static TEST_LANG: std::cell::Cell<Option<Lang>> = const { std::cell::Cell::new(None) };
+}
+
+/// Runs `f` with this thread's texts in `lang` (test builds only; the
+/// screen snapshots, which run on Unix, use it).
+#[cfg(all(test, unix))]
+pub fn with_lang<R>(lang: Lang, f: impl FnOnce() -> R) -> R {
+    let before = TEST_LANG.replace(Some(lang));
+    let out = f();
+    TEST_LANG.set(before);
+    out
+}
+
 pub fn lang() -> Lang {
+    #[cfg(test)]
+    if let Some(lang) = TEST_LANG.get() {
+        return lang;
+    }
     if LANG.load(Ordering::Relaxed) == 1 {
         Lang::En
     } else {

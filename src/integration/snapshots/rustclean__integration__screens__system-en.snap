@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  System data
+┌ APFS container (disk3) ──────────────────────────────────────────────────────────────────────────┐
+│Total 994.0 GiB  ·  used 724.0 GiB  ·  free 270.0 GiB   █████████████████████████████▏           %│
+│                                                                                                  │
+│Macintosh HD - Data       Data (apps and your files)              640.0 GiB  ████████████▉        │
+│Macintosh HD              System (read-only macOS)                 11.0 GiB  ▎                    │
+│Preboot                   Preboot                                   7.0 GiB  ▏                    │
+│VM                        Virtual memory (swap)                     4.0 GiB  ▏                    │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌ Not seen by the scan ──────────────────────────┐┌ Snapshots and memory ──────────────────────────┐
+│For this comparison, scan the disk root (/):    ││Time Machine snapshots        1                 │
+│d → Macintosh HD                                ││  com.apple.TimeMachine.2026-10-01-110000.local │
+│                                                ││  to delete: sudo tmutil deletelocalsnapshots 20│
+│                                                ││Swap                          1.0 GiB / 4.0 GiB │
+│                                                ││Sleep image (sleepimage)      1.0 GiB           │
+│                                                ││                                                │
+│                                                ││                                                │
+└────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
+┌ Other ───────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+This screen only shows information; it changes nothing.
+ r  refresh   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 0+1 DarkGray/- | 1+24 White/- BOLD | 25+75 DarkGray/-
+ 2: 0+1 DarkGray/- | 57+40 Green/- | 97+2 -/- BOLD | 99+1 DarkGray/-
+ 3: 0+1 DarkGray/- | 99+1 DarkGray/-
+ 4: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+38 Gray/- | 78+20 Cyan/- | 99+1 DarkGray/-
+ 5: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+38 Gray/- | 78+20 Cyan/- | 99+1 DarkGray/-
+ 6: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+38 Gray/- | 78+20 Cyan/- | 99+1 DarkGray/-
+ 7: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+38 Gray/- | 78+20 Cyan/- | 99+1 DarkGray/-
+ 8: 0+100 DarkGray/-
+ 9: 0+1 DarkGray/- | 1+22 White/- BOLD | 23+28 DarkGray/- | 51+22 White/- BOLD | 73+27 DarkGray/-
+10: 0+1 DarkGray/- | 49+2 DarkGray/- | 51+30 White/- | 81+1 -/- BOLD | 99+1 DarkGray/-
+11: 0+1 DarkGray/- | 1+16 Cyan/- | 49+2 DarkGray/- | 51+47 Gray/- | 99+1 DarkGray/-
+12: 0+1 DarkGray/- | 49+2 DarkGray/- | 51+48 Cyan/- | 99+1 DarkGray/-
+13: 0+1 DarkGray/- | 49+2 DarkGray/- | 51+30 White/- | 81+17 -/- BOLD | 99+1 DarkGray/-
+14: 0+1 DarkGray/- | 49+2 DarkGray/- | 51+30 White/- | 81+7 -/- BOLD | 99+1 DarkGray/-
+15: 0+1 DarkGray/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+16: 0+1 DarkGray/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+17: 0+100 DarkGray/-
+18: 0+1 DarkGray/- | 1+7 White/- BOLD | 8+92 DarkGray/-
+19: 0+1 DarkGray/- | 99+1 DarkGray/-
+20: 0+1 DarkGray/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 13+3 Black/Gray | 23+5 Black/Gray | 35+3 Black/Gray

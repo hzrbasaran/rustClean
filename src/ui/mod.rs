@@ -24,6 +24,8 @@ mod system;
 mod tools;
 
 // Formatting helpers used outside `ui`.
+#[cfg(all(test, unix))]
+pub use format::with_fixed_now;
 pub use format::{fmt_ago, fmt_date, fmt_delta, fmt_size, now_secs};
 
 use browser::render_browser;

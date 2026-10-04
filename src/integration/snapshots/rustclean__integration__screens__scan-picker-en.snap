@@ -1,0 +1,53 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+    Size        Share               Files      Modified         Name
+▶       3.6 GiB █████         41.2%          4 2026-09-29 12:00 Downloads/
+        3.2 GiB ████▍         36.7%          2 2026-09-21 12:00 Movies/
+        1.1 GiB █▌            12.8%          5 2026-09-28 12:00 Projects/
+      665.0 MiB ▉              7.5%          2 2026-09-30 12:00 Library/
+      150.0 MiB ▎              1.7%          1 2026-09-21 12:00 Applications/
+        4.0 MiB                0.0%          3 2026-09-30 12:00 Documents/
+
+
+        ┌ Compare with which scan? ────────────────────────────────────────────────────────┐
+        │                                                                                  │
+        │▶ 2026-09-30 12:00  1 day ago       total    9.0 GiB   vs. now −374.0 MiB         │
+        │  2026-09-01 12:00  30 days ago     total   12.0 GiB   vs. now −3.4 GiB           │
+        │                                                                                  │
+        │ The comparison covers the folder you are in.                                     │
+        └──────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ↑↓  select   Enter  run   Esc  close
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+16 -/DarkGray BOLD | 16+12 Cyan/DarkGray BOLD | 28+8 -/DarkGray BOLD | 36+10 Gray/DarkGray BOLD | 46+1 -/DarkGray BOLD | 47+16 Green/DarkGray BOLD | 63+1 -/DarkGray BOLD | 64+10 LightBlue/DarkGray BOLD | 74+26 -/DarkGray BOLD
+ 4: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Cyan/- | 64+7 LightBlue/- BOLD
+ 5: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+9 LightBlue/- BOLD
+ 6: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+8 LightBlue/- BOLD
+ 7: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Cyan/- | 64+13 LightBlue/- BOLD
+ 8: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+10 LightBlue/- BOLD
+11: 8+1 Cyan/- | 9+26 White/- BOLD | 35+57 Cyan/-
+12: 8+1 Cyan/- | 91+1 Cyan/-
+13: 8+1 Cyan/- | 9+2 -/DarkGray BOLD | 11+16 White/DarkGray BOLD | 27+18 Gray/DarkGray BOLD | 45+16 -/DarkGray BOLD | 61+21 Yellow/DarkGray BOLD | 91+1 Cyan/-
+14: 8+1 Cyan/- | 11+16 White/- BOLD | 27+18 Gray/- | 61+19 Yellow/- | 91+1 Cyan/-
+15: 8+1 Cyan/- | 91+1 Cyan/-
+16: 8+1 Cyan/- | 9+45 Gray/- | 91+1 Cyan/-
+17: 8+84 Cyan/-
+28: 0+23 Gray/- | 23+25 Yellow/-
+29: 0+4 Black/Gray | 13+7 Black/Gray | 26+5 Black/Gray

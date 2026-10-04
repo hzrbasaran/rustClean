@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓Movies/                              Projects/
+┃Downloads/                             ┃3.2 GiB · 36.7%                      1.1 GiB · 12.8%
+┃3.6 GiB · 41.2%                        ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃                                     Library/          App…
+┃                                       ┃                                     665.0 MiB · 7.5%  150…
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┃                                       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+other (1 small items — Enter: show in list)
+ t / Esc  back to list   Color: ██ ≤ 7 days  ██ ≤ 30 days  ██ ≤ 1 year  ██ > 1 year    (c: by type)
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket   x  move to
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 0+41 White/Green BOLD | 41+7 Black/Cyan BOLD | 48+30 Black/Cyan | 78+9 Black/Green BOLD | 87+13 Black/Green
+ 2: 0+1 White/Green BOLD | 1+10 Black/Green BOLD | 11+29 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 3: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 4: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 5: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 6: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 7: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 8: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+ 9: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+10: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+11: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+12: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+13: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+14: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+15: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+22 Black/Green
+16: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+8 Black/Green BOLD | 86+10 Black/Green | 96+4 Black/Cyan BOLD
+17: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+18: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+19: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+20: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+21: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+22: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+23: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+24: 0+1 White/Green BOLD | 1+39 Black/Green | 40+1 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+25: 0+41 White/Green BOLD | 41+37 Black/Cyan | 78+18 Black/Green | 96+4 Black/Cyan
+26: 0+43 White/DarkGray BOLD | 43+57 White/DarkGray
+27: 0+9 Black/Gray | 9+16 White/- | 25+7 White/- BOLD | 32+2 Green/- | 34+11 White/- | 45+2 Cyan/- | 47+12 White/- | 59+2 Yellow/- | 61+11 White/- | 72+2 Red/- | 74+11 White/- | 85+14 Gray/-
+28: 0+23 Gray/- | 23+25 Yellow/-
+29: 0+6 Black/Gray | 21+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 56+7 Black/Gray | 70+7 Black/Gray | 89+3 Black/Gray

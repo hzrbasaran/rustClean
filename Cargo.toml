@@ -10,7 +10,7 @@ homepage = "https://github.com/hzrbasaran/rustClean"
 readme = "README.md"
 keywords = ["disk-usage", "cleaner", "tui", "duplicates", "treemap"]
 categories = ["command-line-utilities", "filesystem"]
-exclude = ["docs/screenshots/*", ".github/*"]
+exclude = ["docs/screenshots/*", ".github/*", "src/integration/snapshots/*"]
 
 [dependencies]
 anyhow = "1.0.104"
@@ -31,6 +31,7 @@ xxhash-rust = { version = "0.8.19", features = ["xxh3"] }
 libc = "0.2"
 
 [dev-dependencies]
+insta = "1.49.0"
 tempfile = "3.27.0"
 
 [profile.release]

@@ -10,6 +10,7 @@ mod deletion;
 mod history;
 mod reports;
 mod scan;
+mod screens;
 
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};

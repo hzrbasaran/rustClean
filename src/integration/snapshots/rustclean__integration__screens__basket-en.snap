@@ -1,0 +1,42 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  🧺  2 items, 3.8 GiB (S)  │  Basket — /Users/demo  │  2 rows, 3.8 GiB (on disk)
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+      Size        Count      Modified         Location
+▶ [✓]     3.0 GiB            2025-08-27 12:00 Downloads/Xcode_16.xip
+  [✓]   820.0 MiB          1 2026-09-21 12:00 Projects/api/target/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Space: remove from basket · c: empty the basket · x: move all to the trash
+ ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+2 -/DarkGray BOLD | 2+3 Green/DarkGray BOLD | 5+24 -/DarkGray BOLD | 29+16 Red/DarkGray BOLD | 45+55 -/DarkGray BOLD
+ 4: 2+3 Green/- BOLD | 18+10 Gray/- | 29+16 Cyan/- | 46+20 LightBlue/- BOLD
+28: 0+100 Gray/-
+29: 0+4 Black/Gray | 11+7 Black/Gray | 30+3 Black/Gray | 39+3 Black/Gray | 55+3 Black/Gray | 74+3 Black/Gray | 86+7 Black/Gray
