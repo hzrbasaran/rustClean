@@ -48,6 +48,7 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ system.rs ── macOS system data (diskutil, tmutil, sysctl)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ disks.rs ─── disk discovery (sysinfo)
+   ├─ paths.rs ─── data directory (history, settings)
    └─ i18n.rs ──── Turkish / English texts
 ```
 
@@ -132,6 +133,18 @@ Unit tests sit next to the code (`#[cfg(test)]`):
 - Most build a synthetic `Tree` by hand.
 - Scanner, duplicate and history tests use temporary directories.
 - Parsers are tested against real command output in `tests/fixtures/`.
+
+Integration tests live in `src/integration/` (test builds only, so they can
+reach the internals without a library target). `Fixture` builds a real folder
+tree in a temp directory with distinct file sizes and set ages. The tests scan
+it with the real scanner and drive `App` by key presses, as the interface
+does: reports, duplicates, the basket, moving to the trash, uninstalling, and
+comparing with a saved scan. `tests/cli.rs` runs the binary itself
+(`--summary`, `--help`, errors).
+
+Test builds never touch the user's data. `paths::data_dir` points to a
+folder under the temp directory, and `Deletion` renames entries into
+`delete::test_trash` instead of calling the real trash.
 
 Tests run in the default language (Turkish) and must pass on macOS, Linux and
 Windows. Compare paths with `/` normalized, and gate Unix-only tests with

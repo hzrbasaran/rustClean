@@ -62,6 +62,22 @@ advisories, licenses compatible with MIT OR Apache-2.0, banned crates and
 sources. A new dependency with a license not in `deny.toml` needs a note in
 the pull request.
 
+### Tests
+
+Unit tests sit next to the code. For behavior that spans modules, add an
+integration test in `src/integration/`:
+
+```rust
+let f = Fixture::standard(); // or Fixture::new() and f.file(...)
+let mut app = open(f.root()); // scans and opens the browser
+menu(&mut app, 8);            // m, ↓ × 8, Enter: the Downloads report
+tick_until(&mut app, "the report", |a| browser(a).results.is_some());
+assert_eq!(rows(&app), ["Downloads/setup.dmg", "Downloads/photos.zip"]);
+```
+
+`cargo test` never touches your history, settings or trash: test builds use
+folders under the system temp directory instead (see `docs/ARCHITECTURE.md`).
+
 ## Guidelines
 
 **Safety comes first.** rustClean deletes files, so changes that touch
