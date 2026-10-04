@@ -9,7 +9,7 @@ use ratatui::Frame;
 use crate::app::FailureDialog;
 use crate::tree::{NodeId, SizeMode, Tree};
 
-use super::format::{fmt_count, fmt_size, tilde, truncate_path};
+use super::format::{fmt_count, fmt_size, tilde, truncate_path, wrap_indented};
 
 /// The entries a deletion could not move, with full, wrapped errors.
 pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Rect) {
@@ -41,26 +41,43 @@ pub(super) fn render_failures(f: &mut Frame<'_>, d: &mut FailureDialog, area: Re
         ]),
         Line::from(""),
     ];
+    // Every line is wrapped here, with continuation lines indented under
+    // their text, so each fits the box.
+    let inner_width = usize::from(width.saturating_sub(2)).max(1);
+    let wrap = |text: &str, first: &str, rest: &str| wrap_indented(text, inner_width, first, rest);
     // Errors sharing a hint get it once, after the last of them.
     for (i, item) in d.items.iter().enumerate() {
         let name = std::path::Path::new(&item.path)
             .file_name()
             .map_or(item.path.clone(), |n| n.to_string_lossy().into_owned());
-        lines.push(Line::from(format!(" {}. {name}", i + 1)).white().bold());
-        lines.push(Line::from(format!("    {}", item.path)).gray());
-        lines.push(Line::from(format!("    {}", item.error)).white());
+        let number = format!(" {}. ", i + 1);
+        let indent = " ".repeat(number.chars().count());
+        for l in wrap(&name, &number, &indent) {
+            lines.push(Line::from(l).white().bold());
+        }
+        for l in wrap(&item.path, "    ", "    ") {
+            lines.push(Line::from(l).gray());
+        }
+        for l in wrap(&item.error, "    ", "    ") {
+            lines.push(Line::from(l).white());
+        }
         let next_hint = d.items.get(i + 1).and_then(|n| n.hint);
         if let Some(hint) = item.hint.filter(|h| Some(*h) != next_hint) {
-            lines.push(Line::from(vec![
-                Span::raw("    → ").yellow().bold(),
-                Span::raw(hint).yellow(),
-            ]));
+            const ARROW: &str = "    → ";
+            for (n, l) in wrap(hint, ARROW, "      ").into_iter().enumerate() {
+                lines.push(match l.strip_prefix(ARROW) {
+                    Some(text) if n == 0 => Line::from(vec![
+                        Span::raw(ARROW).yellow().bold(),
+                        Span::raw(text.to_string()).yellow(),
+                    ]),
+                    _ => Line::from(l).yellow(),
+                });
+            }
         }
         lines.push(Line::from(""));
     }
 
-    // Keep scrolling within the text (wrapped lines counted roughly).
-    let inner_width = usize::from(width.saturating_sub(2)).max(1);
+    // Keep scrolling within the text.
     let total: usize = lines
         .iter()
         .map(|l| l.width().div_ceil(inner_width).max(1))

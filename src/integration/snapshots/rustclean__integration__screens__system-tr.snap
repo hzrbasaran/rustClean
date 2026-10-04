@@ -4,7 +4,7 @@ expression: screen
 ---
  rustClean  Sistem verileri
 ┌ APFS kapsayıcısı (disk3) ────────────────────────────────────────────────────────────────────────┐
-│Toplam 994.0 GiB  ·  kullanılan 724.0 GiB  ·  boş 270.0 GiB   █████████████████████████████▏      │
+│Toplam 994.0 GiB  ·  kullanılan 724.0 GiB  ·  boş 270.0 GiB   ███████████████████████▎         %73│
 │                                                                                                  │
 │Macintosh HD - Data       Veri (uygulamalar ve dosyalarınız)      640.0 GiB  ████████████▉        │
 │Macintosh HD              Sistem (salt okunur macOS)               11.0 GiB  ▎                    │
@@ -35,7 +35,7 @@ Bu ekran yalnızca bilgi verir; hiçbir şeyi değiştirmez.
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+73 DarkGray/-
- 2: 0+1 DarkGray/- | 63+36 Green/- | 99+1 DarkGray/-
+ 2: 0+1 DarkGray/- | 63+32 Green/- | 95+4 -/- BOLD | 99+1 DarkGray/-
  3: 0+1 DarkGray/- | 99+1 DarkGray/-
  4: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+38 Gray/- | 78+20 Cyan/- | 99+1 DarkGray/-
  5: 0+1 DarkGray/- | 1+26 White/- BOLD | 27+38 Gray/- | 78+20 Cyan/- | 99+1 DarkGray/-
