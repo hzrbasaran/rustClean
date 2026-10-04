@@ -11,7 +11,12 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ toolsview.rs   developer tools screen state and keys
    │    └─ basket.rs      entries collected for deletion
    │
-   ├─ ui.rs ────── all drawing (ratatui); no state of its own
+   ├─ ui/ ──────── all drawing (ratatui); no state of its own
+   │    ├─ mod.rs        picks the screen; shared title, key, popup, panel helpers
+   │    ├─ format.rs     sizes, counts, dates, ages, paths
+   │    ├─ style.rs      shared colors and styles
+   │    └─ one module per screen: disks, scanning, browser, map, results,
+   │       dashboard, tools, system, menus, dialogs
    │
    ├─ scanner.rs ─ parallel scan → tree.rs
    ├─ tree.rs ──── compact arena tree of the scan
@@ -106,7 +111,7 @@ Every text shown to the user is written in both languages where it is used:
 - `tf!("{n} öğe", "{n} items")` formats.
 
 The language is a global set by `i18n::init` and `L`. Formatting helpers in
-`ui.rs` (`fmt_count`, `fmt_date`, `fmt_pct`, `fmt_ago`) follow it.
+`ui/format.rs` (`fmt_count`, `fmt_date`, `fmt_pct`, `fmt_ago`) follow it.
 
 ## Tests
 
