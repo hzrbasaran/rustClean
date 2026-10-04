@@ -61,13 +61,9 @@ pub struct Saved {
     pub header: Header,
 }
 
-/// Where snapshots of `root` are kept. `RUSTCLEAN_DATA_DIR` overrides the
-/// platform data directory (used by tests).
+/// Where snapshots of `root` are kept, below the data directory.
 pub fn dir_for(root: &Path) -> Option<PathBuf> {
-    let base = match std::env::var_os("RUSTCLEAN_DATA_DIR") {
-        Some(d) => PathBuf::from(d),
-        None => dirs::data_dir()?.join("rustClean"),
-    };
+    let base = crate::paths::data_dir()?;
     let key = xxh3_64(root.to_string_lossy().as_bytes());
     Some(base.join("history").join(format!("{key:016x}")))
 }

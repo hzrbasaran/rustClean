@@ -10,6 +10,7 @@ mod disks;
 mod duplicates;
 mod history;
 mod lists;
+mod paths;
 mod reports;
 mod scanner;
 mod search;
@@ -20,6 +21,9 @@ mod toolsview;
 mod tree;
 mod treemap;
 mod ui;
+
+#[cfg(test)]
+mod integration;
 
 use std::path::PathBuf;
 use std::time::Duration;

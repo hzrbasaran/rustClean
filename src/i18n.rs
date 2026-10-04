@@ -80,11 +80,7 @@ macro_rules! tf {
 }
 
 fn settings_file() -> Option<PathBuf> {
-    let base = match std::env::var_os("RUSTCLEAN_DATA_DIR") {
-        Some(d) => PathBuf::from(d),
-        None => dirs::data_dir()?.join("rustClean"),
-    };
-    Some(base.join("settings"))
+    Some(crate::paths::data_dir()?.join("settings"))
 }
 
 /// The saved choice, if any.

@@ -139,9 +139,14 @@ impl Deletion {
         let total = items.len();
         let (tx, rx) = mpsc::channel();
         thread::spawn(move || {
+            #[cfg(not(test))]
             let ctx = trash_context();
             for (id, path) in items {
+                #[cfg(not(test))]
                 let res = ctx.delete(&path).map_err(|e| e.to_string());
+                // Test builds never touch the real trash.
+                #[cfg(test)]
+                let res = test_trash::delete(&path);
                 if tx.send((id, res)).is_err() {
                     break;
                 }
@@ -171,6 +176,27 @@ impl Deletion {
 
     pub fn finished(&self) -> bool {
         self.done >= self.total
+    }
+}
+
+/// The trash of test builds: a folder under the temp directory. Entries are
+/// renamed into it, so tests can check what was moved.
+#[cfg(test)]
+pub(crate) mod test_trash {
+    use std::path::{Path, PathBuf};
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    pub fn dir() -> PathBuf {
+        std::env::temp_dir().join(format!("rustclean-test-trash-{}", std::process::id()))
+    }
+
+    pub fn delete(path: &Path) -> Result<(), String> {
+        static NEXT: AtomicU64 = AtomicU64::new(0);
+        let dir = dir();
+        std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let name = path.file_name().ok_or("no file name")?.to_string_lossy();
+        let n = NEXT.fetch_add(1, Ordering::Relaxed);
+        std::fs::rename(path, dir.join(format!("{n}-{name}"))).map_err(|e| e.to_string())
     }
 }
 
