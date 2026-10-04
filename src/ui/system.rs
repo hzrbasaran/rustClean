@@ -10,7 +10,7 @@ use crate::app::Browser;
 use crate::system;
 use crate::system::SystemInfo;
 
-use super::format::{fmt_count, fmt_size};
+use super::format::{fmt_count, fmt_pct, fmt_size};
 use super::style::usage_color;
 use super::{bar, halves, panel};
 
@@ -36,17 +36,23 @@ pub(super) fn render_system(f: &mut Frame<'_>, b: &Browser, sys: &SystemInfo, ar
         Some(c) => {
             let used = c.total.saturating_sub(c.free);
             let ratio = used as f64 / c.total.max(1) as f64;
-            let bar_w = (top.width as usize).saturating_sub(60).max(10);
+            let sizes = tf!(
+                "Toplam {}  ·  kullanılan {}  ·  boş {}   ",
+                "Total {}  ·  used {}  ·  free {}   ",
+                fmt_size(c.total),
+                fmt_size(used),
+                fmt_size(c.free)
+            );
+            let pct = format!(" {}", fmt_pct(ratio * 100.0, 0));
+            // The bar takes what the text leaves inside the border.
+            let inner = usize::from(top.width.saturating_sub(2));
+            let bar_w = inner
+                .saturating_sub(sizes.chars().count() + pct.chars().count())
+                .max(10);
             lines.push(Line::from(vec![
-                Span::raw(tf!(
-                    "Toplam {}  ·  kullanılan {}  ·  boş {}   ",
-                    "Total {}  ·  used {}  ·  free {}   ",
-                    fmt_size(c.total),
-                    fmt_size(used),
-                    fmt_size(c.free)
-                )),
+                Span::raw(sizes),
                 Span::styled(bar(ratio, bar_w), Style::new().fg(usage_color(ratio))),
-                Span::raw(format!(" %{:.0}", ratio * 100.0)).bold(),
+                Span::raw(pct).bold(),
             ]));
             lines.push(Line::from(""));
             let mut vols = c.volumes.clone();

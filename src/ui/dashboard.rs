@@ -10,9 +10,15 @@ use crate::app::{Dashboard, Pane};
 use crate::stats;
 use crate::tree::{NodeId, SizeMode, Tree};
 
-use super::format::{fmt_count, fmt_pct, fmt_size, now_secs};
+use super::format::{clip, fmt_count, fmt_pct, fmt_size, now_secs};
 use super::style::{date_cell, date_span, usage_color, AGE_COLORS, CATEGORY_COLORS, HIGHLIGHT};
 use super::{bar, halves, panel, DATE_WIDTH};
+
+/// Width of the size and percentage columns of the file types panel, with
+/// their gaps.
+const NUMBERS: usize = 11 + 6 + 2;
+/// The narrowest bar shown before labels are cut.
+const MIN_BAR: usize = 4;
 
 pub(super) fn render_dashboard(
     f: &mut Frame<'_>,
@@ -119,9 +125,20 @@ pub(super) fn render_dashboard(
         disk_area,
     );
 
-    // File types
+    // File types. The label column fits the longest label shown, in the
+    // current language, but leaves room for a short bar and the numbers;
+    // longer labels are cut. The bar takes what is left.
     let inner = types.width.saturating_sub(2) as usize;
-    let bar_w = inner.saturating_sub(20 + 11 + 6 + 2).max(4);
+    let longest = s
+        .categories
+        .iter()
+        .map(|(cat, _)| cat.label().chars().count())
+        .max()
+        .unwrap_or(0);
+    let label_w = (longest + 1)
+        .min(inner.saturating_sub(MIN_BAR + NUMBERS))
+        .max(2);
+    let bar_w = inner.saturating_sub(label_w + NUMBERS).max(MIN_BAR);
     let total = s.size.max(1) as f64;
     let lines: Vec<Line<'_>> = s
         .categories
@@ -129,7 +146,7 @@ pub(super) fn render_dashboard(
         .map(|&(cat, b)| {
             let ratio = b.size as f64 / total;
             Line::from(vec![
-                Span::raw(format!("{:<19}", cat.label())).white(),
+                Span::raw(format!("{:<label_w$}", clip(cat.label(), label_w - 1))).white(),
                 Span::styled(
                     bar(ratio, bar_w),
                     Style::new().fg(CATEGORY_COLORS[cat as usize]),

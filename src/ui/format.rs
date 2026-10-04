@@ -61,6 +61,44 @@ pub fn fmt_pct(value: f64, decimals: usize) -> String {
     }
 }
 
+/// Wraps `text` at spaces to lines of at most `width` characters: the first
+/// line starts with `first`, the others with `rest` (a hanging indent).
+/// Words longer than a line, such as paths, are split.
+pub(super) fn wrap_indented(text: &str, width: usize, first: &str, rest: &str) -> Vec<String> {
+    let mut lines = Vec::new();
+    let mut line = first.to_string();
+    // Nothing but the prefix on `line` yet.
+    let mut fresh = true;
+    for word in text.split(' ').filter(|w| !w.is_empty()) {
+        let mut word: Vec<char> = word.chars().collect();
+        loop {
+            let room = width.saturating_sub(line.chars().count() + usize::from(!fresh));
+            if word.len() <= room {
+                if !fresh {
+                    line.push(' ');
+                }
+                line.extend(&word);
+                fresh = false;
+                break;
+            }
+            if fresh {
+                // Longer than a whole line: fill this one with its start.
+                let take = room.max(1);
+                line.extend(word.drain(..take));
+            }
+            lines.push(std::mem::replace(&mut line, rest.to_string()));
+            fresh = true;
+            if word.is_empty() {
+                break;
+            }
+        }
+    }
+    if !fresh || lines.is_empty() {
+        lines.push(line);
+    }
+    lines
+}
+
 /// Cuts `s` to at most `width` characters.
 pub(super) fn clip(s: &str, width: usize) -> String {
     if s.chars().count() <= width {
@@ -203,6 +241,24 @@ mod tests {
         assert_eq!(fmt_count(999), "999");
         assert_eq!(fmt_count(1000), "1.000");
         assert_eq!(fmt_count(1234567), "1.234.567");
+    }
+
+    #[test]
+    fn wraps_with_a_hanging_indent() {
+        let lines = wrap_indented("one two three four", 12, "  → ", "    ");
+        assert_eq!(lines, ["  → one two", "    three", "    four"]);
+        assert!(lines.iter().all(|l| l.chars().count() <= 12));
+        // A path without spaces is split; nothing is lost.
+        let path = "/Users/demo/Library/Containers/com.example.locked";
+        let lines = wrap_indented(path, 20, "    ", "    ");
+        assert!(lines.iter().all(|l| l.chars().count() <= 20), "{lines:?}");
+        let joined: String = lines.iter().map(|l| &l[4..]).collect();
+        assert_eq!(joined, path);
+        // Short text stays on one line; empty text keeps the prefix.
+        assert_eq!(wrap_indented("ok", 20, "> ", "  "), ["> ok"]);
+        assert_eq!(wrap_indented("", 20, "> ", "  "), ["> "]);
+        // A width below the prefix still ends.
+        assert!(!wrap_indented("abc def", 2, "    ", "    ").is_empty());
     }
 
     #[test]

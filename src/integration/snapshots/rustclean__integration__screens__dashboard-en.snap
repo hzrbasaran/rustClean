@@ -10,11 +10,11 @@ expression: screen
 │⚠ 2 items were inaccessible during the scan     ││                                                │
 └────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
 ┌ File types ────────────────────────────────────┐┌ Age (last modified) ───────────────────────────┐
-│Archives / disk images███▊         3.6 GiB   41%││≤ 7 days   █▉                  923.0 MiB   10%  │
-│Video              ███▎         3.2 GiB   37%   ││≤ 30 days  ▍                   175.0 MiB    2%  │
-│Other              █▋           1.6 GiB   18%   ││≤ 1 year   ████▊                 2.3 GiB   26%  │
-│Code               ▍          310.0 MiB    4%   ││> 1 year   ███████████           5.3 GiB   61%  │
-│Documents                       7.0 MiB    0%   ││                                                │
+│Archives / disk images ██▌       3.6 GiB   41%  ││≤ 7 days   █▉                  923.0 MiB   10%  │
+│Video                  ██▎       3.2 GiB   37%  ││≤ 30 days  ▍                   175.0 MiB    2%  │
+│Other                  █▏        1.6 GiB   18%  ││≤ 1 year   ████▊                 2.3 GiB   26%  │
+│Code                   ▎       310.0 MiB    4%  ││> 1 year   ███████████           5.3 GiB   61%  │
+│Documents                        7.0 MiB    0%  ││                                                │
 └────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
 ┌ Largest files ─────────────────────────────────┐┌ Fullest folders (direct contents) ─────────────┐
 │▶    3.0 GiB 2025-08-27 12:00 Downloads/Xcode_16││   3.6 GiB Downloads/                           │
@@ -41,11 +41,11 @@ expression: screen
  5: 0+1 DarkGray/- | 1+43 Yellow/- | 49+2 DarkGray/- | 99+1 DarkGray/-
  6: 0+100 DarkGray/-
  7: 0+1 DarkGray/- | 1+12 White/- BOLD | 13+38 DarkGray/- | 51+21 White/- BOLD | 72+28 DarkGray/-
- 8: 0+1 DarkGray/- | 1+22 White/- | 23+9 LightYellow/- | 43+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Green/- | 91+6 Gray/- | 99+1 DarkGray/-
- 9: 0+1 DarkGray/- | 1+19 White/- | 20+9 Magenta/- | 40+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Cyan/- | 91+6 Gray/- | 99+1 DarkGray/-
-10: 0+1 DarkGray/- | 1+19 White/- | 20+9 Gray/- | 40+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Yellow/- | 91+6 Gray/- | 99+1 DarkGray/-
-11: 0+1 DarkGray/- | 1+19 White/- | 20+9 LightCyan/- | 40+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Red/- | 91+6 Gray/- | 99+1 DarkGray/-
-12: 0+1 DarkGray/- | 1+19 White/- | 20+9 LightGreen/- | 40+6 Gray/- | 49+2 DarkGray/- | 99+1 DarkGray/-
+ 8: 0+1 DarkGray/- | 1+23 White/- | 24+6 LightYellow/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Green/- | 91+6 Gray/- | 99+1 DarkGray/-
+ 9: 0+1 DarkGray/- | 1+23 White/- | 24+6 Magenta/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Cyan/- | 91+6 Gray/- | 99+1 DarkGray/-
+10: 0+1 DarkGray/- | 1+23 White/- | 24+6 Gray/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Yellow/- | 91+6 Gray/- | 99+1 DarkGray/-
+11: 0+1 DarkGray/- | 1+23 White/- | 24+6 LightCyan/- | 41+6 Gray/- | 49+2 DarkGray/- | 51+11 White/- | 62+18 Red/- | 91+6 Gray/- | 99+1 DarkGray/-
+12: 0+1 DarkGray/- | 1+23 White/- | 24+6 LightGreen/- | 41+6 Gray/- | 49+2 DarkGray/- | 99+1 DarkGray/-
 13: 0+100 DarkGray/-
 14: 0+1 Cyan/- | 1+15 White/- BOLD | 16+34 Cyan/- | 50+1 DarkGray/- | 51+35 White/- BOLD | 86+14 DarkGray/-
 15: 0+1 Cyan/- | 1+13 -/DarkGray BOLD | 14+16 Red/DarkGray BOLD | 30+19 -/DarkGray BOLD | 49+1 Cyan/- | 50+1 DarkGray/- | 62+10 LightBlue/- BOLD | 99+1 DarkGray/-

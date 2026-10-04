@@ -13,6 +13,16 @@ follows [Semantic Versioning](https://semver.org/).
   the same entry, and an open group is opened again
   ([#8](https://github.com/hzrbasaran/rustClean/issues/8)).
 
+### Fixed
+- Summary: the file types column fits the longest label in the current
+  language ("Archives / disk images" ran into its bar), and on narrow
+  terminals labels are cut instead of the numbers.
+- System data: the usage percentage after the bar is no longer cut off, and
+  it is written the English way (`73%`) in English.
+- Items that could not be moved to the trash: wrapped explanations, paths
+  and errors continue indented under their own text
+  ([#51](https://github.com/hzrbasaran/rustClean/issues/51)).
+
 ## [0.2.0] - 2026-10-03
 
 ### Added

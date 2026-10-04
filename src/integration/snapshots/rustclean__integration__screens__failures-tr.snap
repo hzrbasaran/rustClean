@@ -12,14 +12,14 @@ expression: screen
    │    /Users/demo/Library/Containers/com.example.locked                                       │
    │    Operation not permitted (os error 1)                                                    │
    │    → macOS izin vermedi. Öğe kilitli olabilir (Finder → Bilgi Al → Kilitli) ya da korumalı │
-   │bir konumdadır (ör. Library/Containers). Korumalı konumlar için Sistem Ayarları → Gizlilik  │
-   │ve Güvenlik → Tam Disk Erişimi'nden terminal uygulamanızı ekleyip terminali yeniden açın.   │
+   │      bir konumdadır (ör. Library/Containers). Korumalı konumlar için Sistem Ayarları →     │
+   │      Gizlilik ve Güvenlik → Tam Disk Erişimi'nden terminal uygulamanızı ekleyip terminali  │
+   │      yeniden açın.                                                                         │
    │                                                                                            │
    │ 2. gone.zip                                                                                │
    │    /Users/demo/Downloads/gone.zip                                                          │
    │    No such file or directory (os error 2)                                                  │
    │    → Öğe artık yerinde değil; başka bir program silmiş ya da taşımış olabilir.             │
-   │                                                                                            │
    │                                                                                            │
    │                                                                                            │
    │                                                                                            │
@@ -43,14 +43,14 @@ expression: screen
  7: 3+1 Red/- | 4+53 Gray/- | 96+1 Red/-
  8: 3+1 Red/- | 4+40 White/- | 96+1 Red/-
  9: 3+1 Red/- | 4+6 Yellow/- BOLD | 10+85 Yellow/- | 96+1 Red/-
-10: 3+1 Red/- | 4+90 Yellow/- | 96+1 Red/-
-11: 3+1 Red/- | 4+89 Yellow/- | 96+1 Red/-
-12: 3+1 Red/- | 96+1 Red/-
-13: 3+1 Red/- | 4+12 White/- BOLD | 96+1 Red/-
-14: 3+1 Red/- | 4+34 Gray/- | 96+1 Red/-
-15: 3+1 Red/- | 4+42 White/- | 96+1 Red/-
-16: 3+1 Red/- | 4+6 Yellow/- BOLD | 10+73 Yellow/- | 96+1 Red/-
-17: 3+1 Red/- | 96+1 Red/-
+10: 3+1 Red/- | 4+87 Yellow/- | 96+1 Red/-
+11: 3+1 Red/- | 4+90 Yellow/- | 96+1 Red/-
+12: 3+1 Red/- | 4+19 Yellow/- | 96+1 Red/-
+13: 3+1 Red/- | 96+1 Red/-
+14: 3+1 Red/- | 4+12 White/- BOLD | 96+1 Red/-
+15: 3+1 Red/- | 4+34 Gray/- | 96+1 Red/-
+16: 3+1 Red/- | 4+42 White/- | 96+1 Red/-
+17: 3+1 Red/- | 4+6 Yellow/- BOLD | 10+73 Yellow/- | 96+1 Red/-
 18: 3+1 Red/- | 96+1 Red/-
 19: 3+1 Red/- | 96+1 Red/-
 20: 3+1 Red/- | 96+1 Red/-
