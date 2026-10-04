@@ -6,8 +6,13 @@ has a doc comment at the top explaining its job.
 ```text
 main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │
-   ├─ app.rs ───── state machine: disk list → scanning → browser
+   ├─ app/ ─────── state machine: disk list → scanning → browser
    │    │           Browser: current folder, result lists, dialogs, keys
+   │    ├─ mod.rs        App, shared enums, and the Browser struct (kept here
+   │    │                so the submodules can use its private fields)
+   │    ├─ browser.rs    navigation, treemap moves, the key dispatcher
+   │    ├─ one module per job, each adding an `impl Browser` block:
+   │    │  results, dashboard, basket, trash, uninstall, snapshots, rescan
    │    ├─ toolsview.rs   developer tools screen state and keys
    │    └─ basket.rs      entries collected for deletion
    │
