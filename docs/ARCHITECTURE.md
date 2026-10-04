@@ -142,6 +142,12 @@ does: reports, duplicates, the basket, moving to the trash, uninstalling, and
 comparing with a saved scan. `tests/cli.rs` runs the binary itself
 (`--summary`, `--help`, errors).
 
+`src/integration/screens.rs` stores a snapshot of every screen (text plus the
+styles of each line) in Turkish and English. It uses a hand-built tree, fake
+disks, tools and system data, and two test-only, per-thread switches:
+`i18n::with_lang` and `ui::with_fixed_now`. The latter also shows dates in
+UTC, so snapshots match on every machine.
+
 Test builds never touch the user's data. `paths::data_dir` points to a
 folder under the temp directory, and `Deletion` renames entries into
 `delete::test_trash` instead of calling the real trash.

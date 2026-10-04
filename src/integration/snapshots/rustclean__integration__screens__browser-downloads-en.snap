@@ -1,0 +1,44 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo/Downloads  │  3.6 GiB (on disk)  │  4 files  │  sort: size
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+    Size        Share               Files      Modified         Name
+▶       3.0 GiB ██████████▏   84.3%            2025-08-27 12:00 Xcode_16.xip
+      450.0 MiB █▌            12.3%            2026-03-15 12:00 setup.dmg
+      120.0 MiB ▍              3.3%            2026-09-19 12:00 photos.zip
+        3.0 MiB                0.1%            2026-09-29 12:00 report.pdf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+37 items scanned, 1.2 s   ⚠ 2 items inaccessible
+ ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort   a  appare
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+16 -/DarkGray BOLD | 16+12 Cyan/DarkGray BOLD | 28+19 -/DarkGray BOLD | 47+16 Red/DarkGray BOLD | 63+37 -/DarkGray BOLD
+ 4: 16+12 Cyan/- | 47+16 Yellow/-
+ 5: 16+12 Cyan/- | 47+16 Cyan/-
+ 6: 16+12 Cyan/- | 47+16 Green/-
+28: 0+23 Gray/- | 23+25 Yellow/-
+29: 0+4 Black/Gray | 11+7 Black/Gray | 25+3 Black/Gray | 35+3 Black/Gray | 44+3 Black/Gray | 54+3 Black/Gray | 67+3 Black/Gray | 80+3 Black/Gray | 90+3 Black/Gray

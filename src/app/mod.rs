@@ -157,7 +157,7 @@ pub struct Browser {
 }
 
 impl Browser {
-    fn new(res: ScanResult) -> Self {
+    pub(crate) fn new(res: ScanResult) -> Self {
         let mut b = Self {
             tree: res.tree,
             errors: res.errors,

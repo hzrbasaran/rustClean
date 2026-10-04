@@ -75,6 +75,22 @@ tick_until(&mut app, "the report", |a| browser(a).results.is_some());
 assert_eq!(rows(&app), ["Downloads/setup.dmg", "Downloads/photos.zip"]);
 ```
 
+#### Screen snapshots
+
+`src/integration/screens.rs` draws every screen at 100×30 in Turkish and
+English and compares it with `src/integration/snapshots/*.snap`. A snapshot
+holds the text and the colors of each line. When you change a screen on
+purpose, the test fails with a diff; accept the new version with
+
+```bash
+cargo install cargo-insta   # once
+cargo insta review          # or: INSTA_UPDATE=always cargo test
+```
+
+and commit the `.snap` changes with the code, so the review shows what the
+screen looks like now. Snapshot tests run on macOS and Linux (paths use `/`).
+CI never writes snapshots; a missing or different one fails the build.
+
 `cargo test` never touches your history, settings or trash: test builds use
 folders under the system temp directory instead (see `docs/ARCHITECTURE.md`).
 

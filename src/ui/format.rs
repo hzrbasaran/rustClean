@@ -4,7 +4,27 @@ use std::path::Path;
 
 use crate::i18n::{lang, Lang};
 
+// Test builds can stop the clock per thread, for screens that show ages.
+#[cfg(test)]
+thread_local! {
+    static FIXED_NOW: std::cell::Cell<Option<u64>> = const { std::cell::Cell::new(None) };
+}
+
+/// Runs `f` with this thread's clock fixed at `now`, and dates shown in UTC
+/// instead of the local time zone (test builds only).
+#[cfg(test)]
+pub fn with_fixed_now<R>(now: u64, f: impl FnOnce() -> R) -> R {
+    let before = FIXED_NOW.replace(Some(now));
+    let out = f();
+    FIXED_NOW.set(before);
+    out
+}
+
 pub fn now_secs() -> u64 {
+    #[cfg(test)]
+    if let Some(now) = FIXED_NOW.get() {
+        return now;
+    }
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_secs())
@@ -21,6 +41,11 @@ fn fmt_date_in(lang: Lang, secs: u32) -> String {
         Lang::Tr => "%d.%m.%Y %H:%M",
         Lang::En => "%Y-%m-%d %H:%M",
     };
+    #[cfg(test)]
+    if FIXED_NOW.get().is_some() {
+        return chrono::DateTime::from_timestamp(i64::from(secs), 0)
+            .map_or_else(|| "—".into(), |t| t.format(pattern).to_string());
+    }
     chrono::DateTime::from_timestamp(i64::from(secs), 0).map_or_else(
         || "—".into(),
         |t| t.with_timezone(&chrono::Local).format(pattern).to_string(),

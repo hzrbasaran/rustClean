@@ -1,0 +1,40 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Diskler — taramak için bir disk seçin
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Ad           Bağlama nok FS       Kullanılan  Toplam      Doluluk
+▶ Macintosh HD /           apfs       724.0 GiB   994.0 GiB ██████████████▋       %73
+  Backup       /Volumes/Ba exfat        1.8 TiB     2.0 TiB ██████████████████▌   %92  çıkarılabilir
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ ↑↓  seç   Enter  tara   r  yenile   L  English   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+60 -/DarkGray BOLD | 60+20 Green/DarkGray BOLD | 80+20 -/DarkGray BOLD
+ 4: 60+20 Red/-
+29: 0+4 Black/Gray | 10+7 Black/Gray | 24+3 Black/Gray | 36+3 Black/Gray | 49+3 Black/Gray

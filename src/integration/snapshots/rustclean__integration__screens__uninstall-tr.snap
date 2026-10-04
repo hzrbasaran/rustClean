@@ -1,0 +1,58 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (diskte)  │  17 dosya  │  sıralama: boyut
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+    Boyut       Oran                Dosya      Son değişiklik   Ad
+▶       3.6 GiB █████         %41.2          4 29.09.2026 12:00 Downloads/
+        3.2 GiB ████▍         %36.7          2 21.09.2026 12:00 Movies/
+        1.1 GiB █▌            %12.8          5 28.09.2026 12:00 Projects/
+      665.0 MiB ▉              %7.5          2 30.09.2026 12:00 Library/
+      150.0 MiB ▎              %1.7          1 21.09.2026 12:00 Applications/
+  ┌ Kaldır: Sketchpad ───────────────────────────────────────────────────────────────────────────┐
+  │                                                                                              │
+  │ [✓] /Users/demo/Applications/Sketchpad.app                                         150.0 MiB │
+  │ [✓] /Users/demo/Library/Application Support/com.example.sketchpad                   55.0 MiB │
+  │ [ ] /Users/demo/Library/Caches/com.example.browser                                 610.0 MiB │
+  │                                                                                              │
+  │ Seçili: 2 / 3 öğe · 205.0 MiB                                                                │
+  │ Veriler ad ve paket kimliğiyle eşleştirildi (tahmin): listeyi kontrol edin.                  │
+  │ ⚠ Uygulama şu an açık: önce kapatın.                                                         │
+  │ Çöp kutusuna taşınacak.                                                                      │
+  │                                                                                              │
+  │  e  kaldır      Space  işaretle      h  vazgeç                                               │
+  └──────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
+ ↑↓  gez   Space  işaretle   t  tümü   e  kaldır   h / Esc  vazgeç
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+16 -/DarkGray BOLD | 16+12 Cyan/DarkGray BOLD | 28+8 -/DarkGray BOLD | 36+10 Gray/DarkGray BOLD | 46+1 -/DarkGray BOLD | 47+16 Green/DarkGray BOLD | 63+1 -/DarkGray BOLD | 64+10 LightBlue/DarkGray BOLD | 74+26 -/DarkGray BOLD
+ 4: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Cyan/- | 64+7 LightBlue/- BOLD
+ 5: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+9 LightBlue/- BOLD
+ 6: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Green/- | 64+8 LightBlue/- BOLD
+ 7: 16+12 Cyan/- | 36+10 Gray/- | 47+16 Cyan/- | 64+13 LightBlue/- BOLD
+ 8: 2+96 Red/-
+ 9: 2+1 Red/- | 97+1 Red/-
+10: 2+1 Red/- | 97+1 Red/-
+11: 2+1 Red/- | 4+92 -/- REVERSED | 97+1 Red/-
+12: 2+1 Red/- | 4+92 Gray/- | 97+1 Red/-
+13: 2+1 Red/- | 97+1 Red/-
+14: 2+1 Red/- | 4+29 -/- BOLD | 97+1 Red/-
+15: 2+1 Red/- | 4+75 Gray/- | 97+1 Red/-
+16: 2+1 Red/- | 4+36 Red/- BOLD | 97+1 Red/-
+17: 2+1 Red/- | 4+23 Gray/- | 97+1 Red/-
+18: 2+1 Red/- | 97+1 Red/-
+19: 2+1 Red/- | 4+3 Black/Red BOLD | 19+7 Black/Gray | 40+3 Black/Gray | 97+1 Red/-
+20: 2+96 Red/-
+28: 0+22 Gray/- | 22+24 Yellow/-
+29: 0+4 Black/Gray | 10+7 Black/Gray | 28+3 Black/Gray | 38+3 Black/Gray | 50+9 Black/Gray

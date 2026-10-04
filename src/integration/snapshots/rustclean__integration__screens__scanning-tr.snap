@@ -1,0 +1,44 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Taranıyor: /Users/demo
+
+  ⠋ Taranıyor…
+
+  Dosya        123.456
+  Klasör       7.890
+  Boyut        42.0 GiB
+  Erişilemeyen 3
+  Süre         0.0 sn
+
+  Şu an        /Users/demo/Library/Caches/com.example.browser
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Esc  iptal   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+14 Cyan/- BOLD
+ 4: 0+15 Gray/-
+ 5: 0+15 Gray/-
+ 6: 0+15 Gray/-
+ 7: 0+15 Gray/-
+ 8: 0+15 Gray/-
+10: 0+15 Gray/-
+29: 0+5 Black/Gray | 13+3 Black/Gray

@@ -1,0 +1,42 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  🧺  2 öğe, 3.8 GiB (S)  │  Sepet — /Users/demo  │  2 satır, 3.8 GiB (diskte)
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+      Boyut       Adet       Son değişiklik   Konum
+▶ [✓]     3.0 GiB            27.08.2025 12:00 Downloads/Xcode_16.xip
+  [✓]   820.0 MiB          1 21.09.2026 12:00 Projects/api/target/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Space: sepetten çıkar · c: sepeti boşalt · x: hepsini çöpe taşı
+ ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter  aç / konuma
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+2 -/DarkGray BOLD | 2+3 Green/DarkGray BOLD | 5+24 -/DarkGray BOLD | 29+16 Red/DarkGray BOLD | 45+55 -/DarkGray BOLD
+ 4: 2+3 Green/- BOLD | 18+10 Gray/- | 29+16 Cyan/- | 46+20 LightBlue/- BOLD
+28: 0+100 Gray/-
+29: 0+4 Black/Gray | 10+7 Black/Gray | 26+3 Black/Gray | 36+3 Black/Gray | 54+3 Black/Gray | 69+3 Black/Gray | 80+7 Black/Gray

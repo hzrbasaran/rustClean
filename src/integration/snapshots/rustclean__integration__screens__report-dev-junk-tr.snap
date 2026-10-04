@@ -1,0 +1,42 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Geliştirici çöpleri — /Users/demo  │  2 satır, 1.1 GiB (diskte)
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+      Boyut       Adet       Son değişiklik   Konum                          Ayrıntı
+▶ [ ]   820.0 MiB          1 21.09.2026 12:00 Projects/api/target/           Rust derleme çıktısı ·
+  [ ]   310.0 MiB          1 28.09.2026 12:00 Projects/web/node_modules/     Node.js bağımlılıkları
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Bu klasörler projeyi yeniden derleyince / kurunca geri gelir.
+ ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter  aç / konuma
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+2 -/DarkGray BOLD | 2+3 Gray/DarkGray BOLD | 5+13 -/DarkGray BOLD | 18+10 Gray/DarkGray BOLD | 28+1 -/DarkGray BOLD | 29+16 Cyan/DarkGray BOLD | 45+1 -/DarkGray BOLD | 46+20 LightBlue/DarkGray BOLD | 66+11 -/DarkGray BOLD | 77+23 Gray/DarkGray BOLD
+ 4: 2+3 Gray/- | 18+10 Gray/- | 29+16 Green/- | 46+26 LightBlue/- BOLD | 77+23 Gray/-
+28: 0+100 Gray/-
+29: 0+4 Black/Gray | 10+7 Black/Gray | 26+3 Black/Gray | 36+3 Black/Gray | 54+3 Black/Gray | 69+3 Black/Gray | 80+7 Black/Gray
