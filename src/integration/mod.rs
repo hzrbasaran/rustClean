@@ -6,6 +6,7 @@
 //! (`delete::test_trash`), so nothing here touches the user's data.
 
 mod apps;
+mod clutter;
 mod deletion;
 mod history;
 mod language;

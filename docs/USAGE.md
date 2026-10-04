@@ -127,6 +127,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Old and large files | ≥ 100 MiB and unchanged for over a year |
 | Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
 | Duplicate files | files with identical content (≥ 1 MiB); `Space` on a group adds all but the oldest copy |
+| Empty folders, broken links, temporary files | three groups: folders with nothing below them (only the topmost is listed), symbolic links whose target is gone, and temporary files (`.DS_Store`, `Thumbs.db`, `*.tmp`, Office `~$…` locks, unfinished downloads) untouched for a day; `Enter` opens a group, `Space` adds it whole |
 
 **Age filter.** In most reports `f` cycles a minimum age: none → 30 → 90 → 180
 → 365 days since the last change. For developer junk the age is the
@@ -146,6 +147,18 @@ bundle id only.
 bundle identifiers. The report excludes shared and system folders and
 anything that looks like it belongs to an installed app. Still, look inside
 (`Enter`) before deleting.
+
+**What the clutter report leaves alone.** Nothing is lost by removing an
+empty folder or a broken link, unless something expects it. So the report
+does not look inside hidden folders (a fresh repository's `.git/refs` is
+empty and needed), app and package bundles (`.app`, `.framework`,
+`.photoslibrary`…), `Library`, `AppData`, build output and dependencies
+(`target`, `Pods`, `node_modules`, `vendor`…) and system folders,
+and it never lists the standard folders of your home folder (`Desktop`,
+`Documents`, `Downloads`…). A folder that holds only such a folder is not
+empty. Temporary files changed in the last day may be in use (an open
+document's lock file, a running download) and are left out; `.DS_Store` and
+`Thumbs.db` are listed at any age, as the system writes them again.
 
 **Duplicates and APFS.** Copies that are APFS clones (made by `cp -c`, Finder's
 Duplicate and many apps) share their blocks. The group's detail says how many

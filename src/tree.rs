@@ -70,6 +70,8 @@ pub struct Node {
     next_sibling: NodeId,
     name_len: u16,
     pub is_dir: bool,
+    /// A symbolic link (never followed; counted as a file).
+    pub is_link: bool,
 }
 
 #[derive(Debug)]
@@ -125,6 +127,7 @@ impl Tree {
             next_sibling: NONE,
             name_len: name.len() as u16,
             is_dir,
+            is_link: false,
         });
         id
     }
@@ -203,6 +206,7 @@ impl Tree {
             new.file_count = n.file_count;
             new.modified = n.modified;
             new.created = n.created;
+            new.is_link = n.is_link;
             map[sid] = id;
             if let Some(&c) = sub.clones.get(&(sid as NodeId)) {
                 self.clones.insert(id, c);
@@ -232,6 +236,10 @@ impl Tree {
                 cur = self.parent(a);
             }
         }
+    }
+
+    pub fn set_link(&mut self, id: NodeId) {
+        self.nodes[id as usize].is_link = true;
     }
 
     pub fn set_times(&mut self, id: NodeId, modified: u32, created: u32) {

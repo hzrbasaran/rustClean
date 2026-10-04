@@ -10,12 +10,14 @@ use crate::stats::DAY;
 use crate::tree::{NodeId, SizeMode, Tree};
 
 mod caches;
+mod clutter;
 mod dev_junk;
 mod downloads;
 mod names;
 mod size;
 
 use caches::caches;
+use clutter::clutter;
 use dev_junk::dev_junk;
 use downloads::downloads;
 use names::repeated_names;
@@ -36,6 +38,8 @@ pub enum ReportKind {
     OldBig,
     Downloads,
     Duplicates,
+    /// Empty folders, broken links and temporary files.
+    Clutter,
 }
 
 impl ReportKind {
@@ -60,6 +64,10 @@ impl ReportKind {
                 "Kopya dosyalar (içeriği aynı)",
                 "Duplicate files (same content)"
             ),
+            ReportKind::Clutter => t!(
+                "Boş klasörler, kırık bağlantılar, geçici dosyalar",
+                "Empty folders, broken links, temporary files"
+            ),
         }
     }
 
@@ -74,6 +82,7 @@ impl ReportKind {
                 | ReportKind::Caches
                 | ReportKind::Orphans
                 | ReportKind::Downloads
+                | ReportKind::Clutter
         )
     }
 
@@ -119,6 +128,10 @@ impl ReportKind {
                     "Files with identical content (≥ 1 MiB); files are read, may take a while"
                 )
             }
+            ReportKind::Clutter => t!(
+                "Gizli klasörler, paketler, Library ve sistem dışında; geçici dosyalar 1 günden eski",
+                "Outside hidden folders, bundles, Library and system; temporary files over a day old"
+            ),
         }
     }
 }
@@ -135,7 +148,7 @@ pub enum MenuItem {
 }
 
 impl MenuItem {
-    pub const ALL: [MenuItem; 14] = [
+    pub const ALL: [MenuItem; 15] = [
         MenuItem::Report(ReportKind::LargestFiles),
         MenuItem::Report(ReportKind::LargestDirs),
         MenuItem::Report(ReportKind::RepeatedNames),
@@ -146,6 +159,7 @@ impl MenuItem {
         MenuItem::Report(ReportKind::OldBig),
         MenuItem::Report(ReportKind::Downloads),
         MenuItem::Report(ReportKind::Duplicates),
+        MenuItem::Report(ReportKind::Clutter),
         MenuItem::Changes,
         MenuItem::Leftovers,
         MenuItem::Tools,
@@ -241,6 +255,7 @@ pub fn run(
         ReportKind::Caches => caches(tree, base, mode, age),
         ReportKind::OldBig => old_big(tree, base, mode, now),
         ReportKind::Downloads => downloads(tree, base, mode, age),
+        ReportKind::Clutter => clutter(tree, base, mode, age, now),
         ReportKind::Apps | ReportKind::Orphans | ReportKind::Duplicates => {
             unreachable!("{kind:?} is computed elsewhere")
         }

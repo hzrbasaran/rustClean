@@ -24,7 +24,7 @@ fn changes_since_an_earlier_scan() {
     });
 
     // Menu item 10: Changes, which lists the earlier scans.
-    menu(&mut app, 10);
+    menu(&mut app, 11);
     let picker = browser(&app)
         .snapshot_picker
         .as_ref()
@@ -47,7 +47,7 @@ fn without_an_earlier_scan_changes_explains_itself() {
         history::list(&dir).len() == 1
     });
 
-    menu(&mut app, 10);
+    menu(&mut app, 11);
     let b = browser(&app);
     assert!(b.snapshot_picker.is_none());
     assert!(b.status.as_ref().unwrap().error);
