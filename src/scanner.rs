@@ -105,6 +105,7 @@ struct Listing {
 struct Entry {
     name: Box<str>,
     is_dir: bool,
+    is_link: bool,
     size: Size,
     modified: u32,
     created: u32,
@@ -208,6 +209,9 @@ pub fn scan(
                 tree.set_clone(id, c.id, c.private);
             }
             tree.set_times(id, entry.modified, entry.created);
+            if entry.is_link {
+                tree.set_link(id);
+            }
             if entry.is_dir {
                 progress.dirs += 1;
             } else {
@@ -302,6 +306,7 @@ fn read_dir(job: Job, ctx: &Ctx) -> Listing {
         listing.entries.push(Entry {
             name: dir_entry.file_name().to_string_lossy().into(),
             is_dir,
+            is_link: md.file_type().is_symlink(),
             size,
             clone,
             modified: epoch_secs(md.modified()),
@@ -392,6 +397,8 @@ mod tests {
         let t = &res.tree;
         let link = child(t, ROOT, "link");
         assert!(!t.node(link).is_dir);
+        assert!(t.node(link).is_link);
+        assert!(!t.node(child(t, ROOT, "real")).is_link);
         assert!(t.node(link).size.apparent < 4000);
         assert_eq!(t.node(child(t, ROOT, "real")).size.apparent, 4000);
     }

@@ -17,9 +17,10 @@ English · [Türkçe](README.tr.md)
 
 rustClean scans a disk or folder in parallel and lets you explore where the
 space went — as a sortable list or a treemap — and then act on it: built-in
-reports find developer junk, duplicates, old large files, caches and the
-leftovers of apps you removed long ago, and a basket lets you collect entries
-from anywhere and move them to the trash in one go.
+reports find developer junk, duplicates, empty folders and temporary files,
+old large files, caches and the leftovers of apps you removed long ago, and a
+basket lets you collect entries from anywhere and move them to the trash in
+one go.
 
 ## Highlights
 

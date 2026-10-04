@@ -18,8 +18,9 @@
 rustClean bir diski ya da klasörü paralel olarak tarar ve yerin nereye gittiğini
 sıralanabilir bir liste veya ağaç haritası (treemap) olarak gösterir. Ardından
 harekete geçmenizi sağlar:
-- Hazır raporlar geliştirici çöplerini, kopya dosyaları, eski büyük dosyaları,
-  önbellekleri ve çoktan kaldırdığınız uygulamaların artıklarını bulur.
+- Hazır raporlar geliştirici çöplerini, kopya dosyaları, boş klasörleri ve
+  geçici dosyaları, eski büyük dosyaları, önbellekleri ve çoktan kaldırdığınız
+  uygulamaların artıklarını bulur.
 - Sepet, her yerden öğe toplayıp tek seferde çöp kutusuna taşımanızı sağlar.
 
 ## Öne çıkanlar

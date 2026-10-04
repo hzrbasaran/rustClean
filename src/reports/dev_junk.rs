@@ -5,7 +5,7 @@ use crate::tree::{NodeId, SizeMode, Tree};
 use super::{by_size, singles, walk, AgeFilter, Report};
 
 /// What kind of regenerable directory `id` is, if any.
-fn dev_junk_kind(tree: &Tree, id: NodeId) -> Option<&'static str> {
+pub(super) fn dev_junk_kind(tree: &Tree, id: NodeId) -> Option<&'static str> {
     let name = tree.name(id);
     let parent = tree.parent(id)?;
     let sibling = |pred: &dyn Fn(&str) -> bool| tree.children(parent).any(|c| pred(tree.name(c)));

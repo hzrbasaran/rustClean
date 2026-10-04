@@ -18,6 +18,13 @@ follows [Semantic Versioning](https://semver.org/).
   the keys that work everywhere, then the other screens. The bottom line
   starts with `?  help`
   ([#26](https://github.com/hzrbasaran/rustClean/issues/26)).
+- "Empty folders, broken links, temporary files" report, in three groups:
+  folders with nothing below them, symbolic links whose target is gone
+  (checked when the report runs), and `.DS_Store`, `Thumbs.db`, `*.tmp`,
+  Office `~$…` locks and unfinished downloads untouched for a day. Hidden
+  folders, bundles, `Library`, `AppData`, build output and dependencies,
+  system folders and the standard home folders are left alone
+  ([#12](https://github.com/hzrbasaran/rustClean/issues/12)).
 
 ### Changed
 - `L` now rebuilds the open result list in the new language: a report (with
