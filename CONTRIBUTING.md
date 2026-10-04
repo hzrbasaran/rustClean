@@ -167,11 +167,17 @@ For anything involving data being deleted unexpectedly, see
    and turn *Unreleased* in `CHANGELOG.md` into the new version with its date.
 2. After the release PR is merged, tag `main` and push the tag:
    `git tag vX.Y.Z && git push origin vX.Y.Z`.
-3. The release workflow builds the binaries, publishes the GitHub release with
-   the CHANGELOG section as notes, and updates the Homebrew formula in
-   [hzrbasaran/homebrew-tap](https://github.com/hzrbasaran/homebrew-tap)
-   (needs the `HOMEBREW_TAP_TOKEN` secret).
-4. Publish the crate: `cargo publish`.
+3. The release workflow builds the binaries and then, in parallel:
+   - publishes the GitHub release with the CHANGELOG section as notes, and
+     updates the Homebrew formula in
+     [hzrbasaran/homebrew-tap](https://github.com/hzrbasaran/homebrew-tap)
+     (needs the `HOMEBREW_TAP_TOKEN` secret);
+   - publishes the crate to crates.io (needs the `CARGO_REGISTRY_TOKEN`
+     secret: a crates.io token with only the `publish-update` scope for
+     `rustclean`). It stops if the tag and `Cargo.toml` disagree, and skips a
+     version that is already published.
+4. Check the release page, `cargo install rustclean` and
+   `brew upgrade rustclean`.
 
 ## License
 

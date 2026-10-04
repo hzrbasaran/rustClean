@@ -31,3 +31,7 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
       - name: Test
         run: cargo test
+      # What `cargo publish` would upload builds on its own (once is enough).
+      - name: Package
+        if: matrix.os == 'ubuntu-latest'
+        run: cargo package --locked
