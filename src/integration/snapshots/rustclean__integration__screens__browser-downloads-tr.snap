@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
- ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala   a  görüne
+ ?  yardım   ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
@@ -41,4 +41,4 @@ expression: screen
  5: 16+12 Cyan/- | 47+16 Cyan/-
  6: 16+12 Cyan/- | 47+16 Green/-
 28: 0+22 Gray/- | 22+24 Yellow/-
-29: 0+4 Black/Gray | 10+7 Black/Gray | 23+3 Black/Gray | 33+3 Black/Gray | 45+3 Black/Gray | 54+3 Black/Gray | 68+3 Black/Gray | 78+3 Black/Gray | 90+3 Black/Gray
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 57+3 Black/Gray | 66+3 Black/Gray | 80+3 Black/Gray | 90+3 Black/Gray

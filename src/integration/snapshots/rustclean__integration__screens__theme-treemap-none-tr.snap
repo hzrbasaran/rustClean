@@ -31,7 +31,7 @@ expression: screen
 diğer (1 küçük öğe — Enter: listede gör)
  t / Esc  listeye dön   Renk: ████ klasörler (her biri ayrı)  ██ Video  ██ Ses  ██ Resim  ██ Arşiv /
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
- ←↑↓→  blok seç   Enter  gir   ⌫  geri   c  renk   t/Esc  liste   Space  sepete   x  çöpe taşı   S
+ ?  yardım   ←↑↓→  blok seç   Enter  gir   ⌫  geri   c  renk   t/Esc  liste   Space  sepete   x  çöp
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 0+41 -/- BOLD
@@ -61,4 +61,4 @@ diğer (1 küçük öğe — Enter: listede gör)
 25: 0+41 -/- BOLD
 26: 0+40 -/- BOLD
 27: 0+9 -/- REVERSED | 24+6 -/- BOLD
-29: 0+6 -/- REVERSED | 17+7 -/- REVERSED | 30+3 -/- REVERSED | 40+3 -/- REVERSED | 50+7 -/- REVERSED | 65+7 -/- REVERSED | 81+3 -/- REVERSED | 96+3 -/- REVERSED
+29: 0+3 -/- REVERSED | 12+6 -/- REVERSED | 29+7 -/- REVERSED | 42+3 -/- REVERSED | 52+3 -/- REVERSED | 62+7 -/- REVERSED | 77+7 -/- REVERSED | 93+3 -/- REVERSED

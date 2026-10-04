@@ -31,7 +31,7 @@ expression: screen
 │    $ docker system prune                                                                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Measuring only reads. No command runs without your confirmation.
- ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+ ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  2: 0+100 -/- BOLD | UNDERLINED
@@ -45,4 +45,4 @@ Measuring only reads. No command runs without your confirmation.
 26: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
 27: 0+100 DarkGray/-
 28: 0+100 Gray/-
-29: 0+4 Black/Gray | 13+7 Black/Gray | 28+3 Black/Gray | 47+3 Black/Gray | 57+5 Black/Gray | 69+3 Black/Gray
+29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 38+3 Black/Gray | 57+3 Black/Gray | 67+5 Black/Gray | 79+3 Black/Gray

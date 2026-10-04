@@ -11,10 +11,13 @@ use crate::app::{App, Screen};
 use crate::stats;
 
 mod browser;
+#[cfg(all(test, unix))]
+pub use browser::footer_keys;
 mod dashboard;
 mod dialogs;
 mod disks;
 mod format;
+pub mod help;
 mod map;
 mod menus;
 mod results;
@@ -50,6 +53,10 @@ pub fn render(f: &mut Frame<'_>, app: &mut App) {
         Screen::Scanning => render_scanning(f, app, header, body, footer),
         Screen::Browser => render_browser(f, app, header, body, footer),
     }
+    if let Some(mut scroll) = app.help {
+        help::render_help(f, app, &mut scroll);
+        app.help = Some(scroll);
+    }
 }
 
 fn title(text: String) -> Line<'static> {
@@ -60,7 +67,15 @@ fn title(text: String) -> Line<'static> {
     ])
 }
 
+/// The key hints of the bottom line, after `?  help`.
 fn keys(pairs: &[(&str, &str)]) -> Line<'static> {
+    let mut all = vec![("?", t!("yardım", "help"))];
+    all.extend_from_slice(pairs);
+    keys_without_help(&all)
+}
+
+/// Key hints without `?`, for when `?` is typed as text (the search box).
+fn keys_without_help(pairs: &[(&str, &str)]) -> Line<'static> {
     let mut spans = Vec::new();
     for (k, desc) in pairs {
         spans.push(Span::raw(format!(" {k} ")).key());

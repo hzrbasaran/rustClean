@@ -155,6 +155,7 @@ Every screen lists its keys at the bottom. The most important ones:
 | `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
 | `T` | theme: dark → light → color-blind |
+| `?` | every key, for the current screen first |
 | `q` | quit |
 
 See the [usage guide](docs/USAGE.md) for every screen and report.

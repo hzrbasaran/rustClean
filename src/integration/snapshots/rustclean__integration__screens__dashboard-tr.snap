@@ -31,7 +31,7 @@ expression: screen
 │                                                ││                                                │
 └────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
 „En dolu klasörler” alt klasörleri saymaz: yerin asıl durduğu klasörleri gösterir.
- Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  görünen/diskt
+ ?  yardım   Tab  liste değiştir   ↑↓  gez   Enter  konuma git   Space  sepete   x  çöpe taşı   a  g
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 0+1 DarkGray/- | 1+7 White/- BOLD | 8+43 DarkGray/- | 51+6 White/- BOLD | 57+43 DarkGray/-
@@ -62,4 +62,4 @@ expression: screen
 26: 0+1 Cyan/- | 49+1 Cyan/- | 50+1 DarkGray/- | 99+1 DarkGray/-
 27: 0+50 Cyan/- | 50+50 DarkGray/-
 28: 0+100 Gray/-
-29: 0+5 Black/Gray | 22+4 Black/Gray | 32+7 Black/Gray | 52+7 Black/Gray | 68+3 Black/Gray | 83+3 Black/Gray
+29: 0+3 Black/Gray | 12+5 Black/Gray | 34+4 Black/Gray | 44+7 Black/Gray | 64+7 Black/Gray | 80+3 Black/Gray | 95+3 Black/Gray

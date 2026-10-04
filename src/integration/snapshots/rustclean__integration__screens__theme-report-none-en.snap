@@ -31,10 +31,10 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 Enter: open the file's folder
- ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+ ?  help   ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Ent
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 36+7 -/- BOLD
  2: 0+100 -/- BOLD | UNDERLINED
  3: 0+100 -/- BOLD | REVERSED
-29: 0+4 -/- REVERSED | 11+7 -/- REVERSED | 30+3 -/- REVERSED | 39+3 -/- REVERSED | 55+3 -/- REVERSED | 74+3 -/- REVERSED | 86+7 -/- REVERSED
+29: 0+3 -/- REVERSED | 10+4 -/- REVERSED | 21+7 -/- REVERSED | 40+3 -/- REVERSED | 49+3 -/- REVERSED | 65+3 -/- REVERSED | 84+3 -/- REVERSED | 96+4 -/- REVERSED

@@ -31,7 +31,7 @@ expression: screen
 │    $ docker system prune                                                                         │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
- ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
+ ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  2: 0+100 -/- BOLD | UNDERLINED
@@ -45,4 +45,4 @@ expression: screen
 26: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
 27: 0+100 DarkGray/-
 28: 0+100 Gray/-
-29: 0+4 Black/Gray | 10+7 Black/Gray | 27+3 Black/Gray | 44+3 Black/Gray | 54+5 Black/Gray | 66+3 Black/Gray
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 39+3 Black/Gray | 56+3 Black/Gray | 66+5 Black/Gray | 78+3 Black/Gray

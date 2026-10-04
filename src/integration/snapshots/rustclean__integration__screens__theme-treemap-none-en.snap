@@ -31,7 +31,7 @@ expression: screen
 other (1 small items — Enter: show in list)
  t / Esc  back to list   Color: ████ folders (each its own)  ██ Video  ██ Audio  ██ Images  ██ Archi
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket   x  move to
+ ?  help   ←↑↓→  select block   Enter  open   ⌫  back   c  color   t/Esc  list   Space  to basket
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 0+41 -/- BOLD
@@ -61,4 +61,4 @@ other (1 small items — Enter: show in list)
 25: 0+41 -/- BOLD
 26: 0+43 -/- BOLD
 27: 0+9 -/- REVERSED | 25+7 -/- BOLD
-29: 0+6 -/- REVERSED | 21+7 -/- REVERSED | 35+3 -/- REVERSED | 45+3 -/- REVERSED | 56+7 -/- REVERSED | 70+7 -/- REVERSED | 89+3 -/- REVERSED
+29: 0+3 -/- REVERSED | 10+6 -/- REVERSED | 31+7 -/- REVERSED | 45+3 -/- REVERSED | 55+3 -/- REVERSED | 66+7 -/- REVERSED | 80+7 -/- REVERSED | 99+1 -/- REVERSED

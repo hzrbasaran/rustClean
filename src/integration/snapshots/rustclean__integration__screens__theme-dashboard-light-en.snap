@@ -31,7 +31,7 @@ expression: screen
 │                                                ││                                                │
 └────────────────────────────────────────────────┘└────────────────────────────────────────────────┘
 “Fullest folders” ignores subfolders: it shows where the space actually sits.
- Tab  switch list   ↑↓  move   Enter  go to location   Space  to basket   x  move to trash   a  appa
+ ?  help   Tab  switch list   ↑↓  move   Enter  go to location   Space  to basket   x  move to trash
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Indexed(231)/Indexed(25) BOLD
  1: 0+1 Indexed(248)/- | 1+9 -/- BOLD | 10+41 Indexed(248)/- | 51+6 -/- BOLD | 57+43 Indexed(248)/-
@@ -62,4 +62,4 @@ expression: screen
 26: 0+1 Indexed(25)/- | 49+1 Indexed(25)/- | 50+1 Indexed(248)/- | 99+1 Indexed(248)/-
 27: 0+50 Indexed(25)/- | 50+50 Indexed(248)/-
 28: 0+100 Indexed(242)/-
-29: 0+5 Indexed(231)/Indexed(242) | 19+4 Indexed(231)/Indexed(242) | 30+7 Indexed(231)/Indexed(242) | 54+7 Indexed(231)/Indexed(242) | 73+3 Indexed(231)/Indexed(242) | 92+3 Indexed(231)/Indexed(242)
+29: 0+3 Indexed(231)/Indexed(242) | 10+5 Indexed(231)/Indexed(242) | 29+4 Indexed(231)/Indexed(242) | 40+7 Indexed(231)/Indexed(242) | 64+7 Indexed(231)/Indexed(242) | 83+3 Indexed(231)/Indexed(242)

@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
- ↑↓  seç   Enter  çalıştır   Esc  kapat
+ ?  yardım   ↑↓  seç   Enter  çalıştır   Esc  kapat
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
@@ -60,4 +60,4 @@ expression: screen
 24: 8+1 Cyan/- | 9+82 Gray/- | 91+1 Cyan/-
 25: 8+84 Cyan/-
 28: 0+22 Gray/- | 22+24 Yellow/-
-29: 0+4 Black/Gray | 10+7 Black/Gray | 28+5 Black/Gray
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 40+5 Black/Gray

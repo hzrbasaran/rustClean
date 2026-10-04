@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 Space: remove from basket · c: empty the basket · x: move all to the trash
- ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Enter  open /
+ ?  help   ↑↓  move   Space  remove   c  empty the basket   x  move all to the trash   Enter  go to
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
@@ -39,4 +39,4 @@ Space: remove from basket · c: empty the basket · x: move all to the trash
  3: 0+100 White/Indexed(238) BOLD
  4: 2+3 Green/- BOLD | 18+10 Gray/- | 29+16 Cyan/- | 46+20 LightBlue/- BOLD
 28: 0+100 Gray/-
-29: 0+4 Black/Gray | 11+7 Black/Gray | 30+3 Black/Gray | 39+3 Black/Gray | 55+3 Black/Gray | 74+3 Black/Gray | 86+7 Black/Gray
+29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 37+3 Black/Gray | 59+3 Black/Gray | 86+7 Black/Gray

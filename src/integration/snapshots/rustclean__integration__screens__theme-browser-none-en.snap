@@ -31,7 +31,7 @@ expression: screen
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 37 items scanned, 1.2 s   ⚠ 2 items inaccessible
- ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort   a  appare
+ ?  help   ↑↓  move   Enter  open   ⌫  back   t  map   /  find   m  reports   i  summary   s  sort
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 -/- BOLD | REVERSED
  1: 36+7 -/- BOLD
@@ -42,4 +42,4 @@ expression: screen
  6: 64+8 -/- BOLD
  7: 64+13 -/- BOLD
  8: 64+10 -/- BOLD
-29: 0+4 -/- REVERSED | 11+7 -/- REVERSED | 25+3 -/- REVERSED | 35+3 -/- REVERSED | 44+3 -/- REVERSED | 54+3 -/- REVERSED | 67+3 -/- REVERSED | 80+3 -/- REVERSED | 90+3 -/- REVERSED
+29: 0+3 -/- REVERSED | 10+4 -/- REVERSED | 21+7 -/- REVERSED | 35+3 -/- REVERSED | 45+3 -/- REVERSED | 54+3 -/- REVERSED | 64+3 -/- REVERSED | 77+3 -/- REVERSED | 90+3 -/- REVERSED

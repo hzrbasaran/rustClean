@@ -208,6 +208,8 @@ pub struct App {
     pub message: Option<String>,
     pub tick: usize,
     pub should_quit: bool,
+    /// The help screen (`?`) is open, scrolled this far.
+    pub help: Option<u16>,
 }
 
 impl App {
@@ -223,6 +225,7 @@ impl App {
             message: None,
             tick: 0,
             should_quit: false,
+            help: None,
         };
         app.refresh_disks();
         if let Some(path) = start_path {
@@ -288,6 +291,24 @@ impl App {
     pub fn on_key(&mut self, key: KeyEvent) {
         if key.code == KeyCode::Char('c') && key.modifiers.contains(KeyModifiers::CONTROL) {
             self.should_quit = true;
+            return;
+        }
+        if let Some(scroll) = &mut self.help {
+            match key.code {
+                KeyCode::Up | KeyCode::Char('k') => *scroll = scroll.saturating_sub(1),
+                KeyCode::Down | KeyCode::Char('j') => *scroll = scroll.saturating_add(1),
+                KeyCode::PageUp => *scroll = scroll.saturating_sub(10),
+                KeyCode::PageDown => *scroll = scroll.saturating_add(10),
+                KeyCode::Home => *scroll = 0,
+                KeyCode::Char('L') => self.switch_language(),
+                KeyCode::Char('T') => self.switch_theme(),
+                KeyCode::Char('q') => self.should_quit = true,
+                _ => self.help = None,
+            }
+            return;
+        }
+        if key.code == KeyCode::Char('?') && !self.typing() {
+            self.help = Some(0);
             return;
         }
         if key.code == KeyCode::Char('L') && !self.typing() {
