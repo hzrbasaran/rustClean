@@ -73,6 +73,9 @@ harekete geçmenizi sağlar:
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 - **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
+- **İsteğe bağlı fare** (`M`): tıklayınca satır ya da harita bloğu seçilir,
+  çift tıklayınca açılır, tekerlekle kaydırılır. Terminalde metin seçmek
+  mümkün kalsın diye başlangıçta kapalıdır; onaylar yalnızca klavyeyle verilir.
 
 ## Ekran görüntüleri
 
@@ -178,6 +181,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |
+| `M` | fareyi aç / kapat (başlangıçta kapalı) |
 | `?` | bütün tuşlar, önce bulunduğunuz ekranınkiler |
 | `q` | çık |
 

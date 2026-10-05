@@ -322,6 +322,13 @@ pub fn global_keys() -> Vec<(&'static str, &'static str)> {
                 "theme: dark, light, color-blind"
             ),
         ),
+        (
+            "M",
+            t!(
+                "fare aç / kapat (kapalıyken terminalde metin seçilebilir)",
+                "mouse on / off (with it off, the terminal can select text)"
+            ),
+        ),
         ("q  Ctrl-C", t!("çık", "quit")),
     ]
 }

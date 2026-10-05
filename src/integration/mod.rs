@@ -11,6 +11,7 @@ mod clutter;
 mod deletion;
 mod history;
 mod language;
+mod mouse;
 mod reports;
 mod scan;
 mod screens;

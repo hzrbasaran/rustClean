@@ -68,6 +68,9 @@ one go.
 - **Themes** for dark and light terminals and a color-blind friendly palette
   (`T` to switch), or no colors at all (`--no-color`, `NO_COLOR`).
 - **Help** (`?`) — every key on one screen, the current screen's first.
+- **Optional mouse** (`M`) — click to select a row or a treemap block,
+  double-click to open, scroll with the wheel. Off by default, so the
+  terminal can still select text; confirmations stay keyboard-only.
 
 ## Screenshots
 
@@ -172,6 +175,7 @@ Every screen lists its keys at the bottom. The most important ones:
 | `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
 | `T` | theme: dark → light → color-blind |
+| `M` | mouse on / off (off by default) |
 | `?` | every key, for the current screen first |
 | `q` | quit |
 

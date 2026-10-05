@@ -7,6 +7,13 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Optional mouse support: `M` turns it on or off (off by default and not
+  saved, as mouse capture stops the terminal from selecting text). A click
+  selects a row in the lists, the menu and the summary, or a treemap block; a
+  double click opens it like `Enter`; the wheel moves through lists and
+  scrolls the help, the deletion log and the failure list. Questions before
+  deleting, uninstalling or running a cleanup take no mouse input
+  ([#24](https://github.com/hzrbasaran/rustClean/issues/24)).
 - "iPhone / iPad backups" report, the last of the reports in the menu (the
   tools move down by one): one row per backup folder in `MobileSync/Backup`
   (macOS, and iTunes / Apple Devices on Windows) with the device name and
@@ -24,6 +31,11 @@ follows [Semantic Versioning](https://semver.org/).
 - English counts use the singular for one: "1 item", "1 row", "1 file"
   instead of "1 items" (and "1 item was inaccessible", "the parent folder of
   1 item").
+- The clutter report no longer lists a folder it could not look into as
+  empty. A folder without read permission, on another disk or skipped by
+  the scan showed nothing below it and was offered as an empty folder,
+  although it may hold files. Such folders, and the folders around them,
+  are now never counted as empty.
 
 ## [0.3.0] - 2026-10-04
 
