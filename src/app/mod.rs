@@ -156,6 +156,11 @@ pub struct Browser {
     pending_report: Option<(ReportKind, u8)>,
     /// Running duplicate search.
     pub dup_job: Option<DupJob>,
+    /// Running similar-image search.
+    pub similar_job: Option<crate::similar::SimilarJob>,
+    /// Width and height of the images found by the similar-image search,
+    /// for the details of its groups and for picking the one to keep.
+    pub image_sizes: std::collections::HashMap<NodeId, (u32, u32)>,
     /// Folder being rescanned (`R`), with its progress.
     pub rescan: Option<Rescan>,
     /// History time stamp of this scan, so it is not compared with itself.
@@ -216,6 +221,8 @@ impl Browser {
             tools: None,
             pending_report: None,
             dup_job: None,
+            similar_job: None,
+            image_sizes: std::collections::HashMap::new(),
             rescan: None,
             snapshot_time: None,
             confirm: None,
@@ -315,6 +322,7 @@ impl App {
             b.poll_delete();
             b.poll_report();
             b.poll_dups();
+            b.poll_similar();
             b.poll_rescan();
             if let Some(view) = &mut b.tools {
                 view.poll();

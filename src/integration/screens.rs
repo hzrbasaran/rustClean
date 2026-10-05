@@ -516,6 +516,47 @@ fn device_backups() {
     });
 }
 
+#[test]
+fn similar_images() {
+    let extra: [(&str, &str, u64, u64); 5] = [
+        ("Pictures/Trip", "beach.jpg", 6 * MIB, 30),
+        ("Pictures/Trip", "beach-edited.jpg", 3 * MIB, 20),
+        ("Pictures/Export", "beach-small.png", 2 * MIB, 10),
+        ("Pictures", "IMG_0042.jpg", 4 * MIB, 300),
+        ("Pictures/Old", "IMG_0042 copy.jpg", MIB, 300),
+    ];
+    // The images are not on disk: the groups and sizes the search would
+    // have found are filled in.
+    let build = |open_group: bool| {
+        let mut app = app_over(demo_tree_with(&extra));
+        let b = app.browser.as_mut().unwrap();
+        let id = |b: &Browser, rel: &str| super::find(&b.tree, rel);
+        let sizes = [
+            ("Pictures/Trip/beach.jpg", (4032, 3024)),
+            ("Pictures/Trip/beach-edited.jpg", (4032, 3024)),
+            ("Pictures/Export/beach-small.png", (1600, 1200)),
+            ("Pictures/IMG_0042.jpg", (3024, 4032)),
+            ("Pictures/Old/IMG_0042 copy.jpg", (1080, 1440)),
+        ];
+        for (rel, size) in sizes {
+            let n = id(b, rel);
+            b.image_sizes.insert(n, size);
+        }
+        let groups = vec![
+            sizes[..3].iter().map(|(rel, _)| id(b, rel)).collect(),
+            sizes[3..].iter().map(|(rel, _)| id(b, rel)).collect(),
+        ];
+        let list = b.similar_list(ROOT, groups);
+        b.results = Some(list);
+        if open_group {
+            press(&mut app, KeyCode::Enter);
+        }
+        app
+    };
+    snap("report-similar-images", || build(false));
+    snap("report-similar-images-group", || build(true));
+}
+
 /// Opened in one language, then `L`: the list is built again in the other
 /// (`-tr` starts in Turkish and ends in English).
 #[test]

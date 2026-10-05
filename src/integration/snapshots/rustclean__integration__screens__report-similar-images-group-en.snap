@@ -1,0 +1,43 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Similar images (resized copies) › beach.jpg — /Users/demo  │  3 rows, 11.0 MiB (on disk)
+──────────────────────────────────── Date: ██ ≤ 7 days   ██ ≤ 30 days   ██ ≤ 1 year   ██ > 1 year
+      Size        Count      Modified         Location                           Details
+▶ [ ]     6.0 MiB            2026-09-01 12:00 Pictures/Trip/beach.jpg            4032×3024 · largest
+  [ ]     3.0 MiB            2026-09-11 12:00 Pictures/Trip/beach-edited.jpg     4032×3024
+  [ ]     2.0 MiB            2026-09-21 12:00 Pictures/Export/beach-small.png    1600×1200
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Largest image: Pictures/Trip/beach.jpg · t: add the others to the basket
+ ?  help   ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Ent
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 36+7 White/- BOLD | 43+2 Green/- | 45+12 White/- | 57+2 Cyan/- | 59+13 White/- | 72+2 Yellow/- | 74+12 White/- | 86+2 Red/- | 88+12 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 White/Indexed(238) BOLD
+ 4: 2+3 Gray/- | 29+16 Cyan/- | 81+9 Gray/-
+ 5: 2+3 Gray/- | 29+16 Cyan/- | 81+9 Gray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 40+3 Black/Gray | 49+3 Black/Gray | 65+3 Black/Gray | 84+3 Black/Gray | 96+4 Black/Gray

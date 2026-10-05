@@ -96,8 +96,9 @@ const HOME_FOLDERS: [&str; 12] = [
     "Library",
 ];
 
-/// Whether the search goes into folder `id`.
-fn searched(tree: &Tree, id: NodeId, path: &Path) -> bool {
+/// Whether the search goes into folder `id` (also used by the similar
+/// images search).
+pub(crate) fn searched(tree: &Tree, id: NodeId, path: &Path) -> bool {
     let name = tree.name(id);
     if name.starts_with('.') || KEEP_OUT.contains(&name) {
         return false;

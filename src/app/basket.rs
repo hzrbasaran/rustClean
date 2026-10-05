@@ -4,15 +4,15 @@ use crate::basket::Added;
 use crate::lists::{ResultList, Row, Source};
 use crate::tree::{NodeId, ROOT};
 
-use super::results::oldest;
+use super::results::keeper;
 use super::Browser;
 
 impl Browser {
-    /// The entries a result row stands for: its members, except the oldest
-    /// copy in a group of duplicates.
+    /// The entries a result row stands for: its members, except the copy to
+    /// keep in a group of duplicates or similar images.
     pub(super) fn row_targets(&self, list: &ResultList, row: &Row) -> Vec<NodeId> {
         let keep = if list.keep_one && row.group {
-            oldest(&self.tree, &row.nodes).map(|i| row.nodes[i])
+            keeper(self, &list.source, &row.nodes).map(|i| row.nodes[i])
         } else {
             None
         };

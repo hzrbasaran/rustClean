@@ -47,8 +47,9 @@ both dev-junk-stale   dark "m,$(down 5)ENTER,SLEEP1,f,f,"
 both duplicates       dark "m,$(down 9)ENTER,SLEEP3,"
 both basket           dark "m,ENTER,SLEEP1,SPACE,SPACE,S,"
 both help             dark "QM,"
-both clutter          dark "m,$(down 10)ENTER,SLEEP1,"
-both device-backups   dark "m,$(down 11)ENTER,SLEEP1,"
+both similar-images   dark "m,$(down 10)ENTER,SLEEP3,"
+both clutter          dark "m,$(down 11)ENTER,SLEEP1,"
+both device-backups   dark "m,$(down 12)ENTER,SLEEP1,"
 both export           dark "o,"
 both theme-light      light "" LIGHT=1
 both theme-colorblind colorblind ""
@@ -67,5 +68,5 @@ cat > "$LOGFILE" <<JSON
 {"time":$((now-600)),"path":"$HOME/demo/Projects/web-app/node_modules","apparent":524288000,"disk":524288000,"via":"report","detail":"DevJunk"}
 JSON
 export LOGFILE
-both deletion-log dark "m,$(down 16)ENTER,"
+both deletion-log dark "m,$(down 17)ENTER,"
 echo "wrote $(ls "$OUT"/*.svg | wc -l | tr -d ' ') screenshots to $OUT"

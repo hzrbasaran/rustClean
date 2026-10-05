@@ -116,6 +116,8 @@ pub enum Source {
     /// Groups of identical files. The groups are the list's own rows, so
     /// rebuilding needs no new search.
     Duplicates,
+    /// Groups of similar images, like `Duplicates`.
+    Similar,
     /// The basket.
     Basket,
 }

@@ -31,6 +31,10 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
       - name: Test
         run: cargo test
+      # The build without the image decoders (`similar-images` off).
+      - name: Without default features
+        if: matrix.os == 'ubuntu-latest'
+        run: cargo clippy --no-default-features --all-targets -- -D warnings
       # What `cargo publish` would upload builds on its own (once is enough).
       - name: Package
         if: matrix.os == 'ubuntu-latest'

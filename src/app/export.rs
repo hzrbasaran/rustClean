@@ -25,6 +25,7 @@ fn list_name(list: &ResultList) -> String {
     match &top.source {
         Source::Report { kind, .. } => kind.slug().to_string(),
         Source::Duplicates => crate::reports::ReportKind::Duplicates.slug().to_string(),
+        Source::Similar => crate::reports::ReportKind::SimilarImages.slug().to_string(),
         Source::Search(_) => "search".into(),
         Source::Changes(_) => "changes".into(),
         Source::Basket => "basket".into(),

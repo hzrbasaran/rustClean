@@ -295,6 +295,7 @@ impl Browser {
             || self.pending_report.is_some()
             || self.rescan.is_some()
             || self.dup_job.is_some()
+            || self.similar_job.is_some()
             || self.input.is_some()
             || self
                 .tools

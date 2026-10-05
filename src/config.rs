@@ -8,6 +8,7 @@
 //! old_big_min_mib = 100
 //! old_big_min_days = 365
 //! duplicates_min_mib = 1
+//! similar_distance = 4   # 0–16: how different similar images may be
 //! [view]
 //! size = "disk"      # or "apparent"
 //! sort = "size"      # size | name | count | modified
@@ -44,6 +45,8 @@ pub struct Config {
     pub old_big_min_days: u64,
     /// The smallest file the duplicate search reads, in MiB.
     pub duplicates_min_mib: u64,
+    /// How many of the 64 hash bits similar images may differ in.
+    pub similar_distance: u32,
     /// The size shown when a scan opens.
     pub size: SizeMode,
     /// The order of the folder list when a scan opens.
@@ -62,6 +65,7 @@ impl Default for Config {
             old_big_min_mib: crate::reports::OLD_BIG_SIZE / MIB,
             old_big_min_days: crate::reports::OLD_BIG_AGE / crate::stats::DAY,
             duplicates_min_mib: crate::duplicates::MIN_SIZE / MIB,
+            similar_distance: crate::similar::MAX_DISTANCE,
             size: SizeMode::Disk,
             sort: SortMode::Size,
             watch_threshold: 90,
@@ -94,7 +98,8 @@ pub enum Expected {
     PathList,
     Path,
     PositiveInt,
-    Percent,
+    /// A whole number from the first to the second.
+    Range(u32, u32),
     OneOf(&'static [&'static str]),
 }
 
@@ -117,11 +122,10 @@ impl Expected {
                 "must be a whole number of 1 or more"
             )
             .into(),
-            Expected::Percent => t!(
-                "1 ile 99 arasında bir tam sayı olmalı",
-                "must be a whole number from 1 to 99"
-            )
-            .into(),
+            Expected::Range(lo, hi) => tf!(
+                "{lo} ile {hi} arasında bir tam sayı olmalı",
+                "must be a whole number from {lo} to {hi}"
+            ),
             Expected::OneOf(values) => tf!(
                 "şunlardan biri olmalı: {}",
                 "must be one of: {}",
@@ -280,7 +284,12 @@ pub fn parse(text: &str, home: Option<&Path>) -> (Config, Vec<Problem>) {
     for (section, value) in &table {
         let keys: &[&str] = match section.as_str() {
             "scan" => &["exclude"],
-            "reports" => &["old_big_min_mib", "old_big_min_days", "duplicates_min_mib"],
+            "reports" => &[
+                "old_big_min_mib",
+                "old_big_min_days",
+                "duplicates_min_mib",
+                "similar_distance",
+            ],
             "view" => &["size", "sort"],
             "watch" => &["threshold", "disks"],
             _ => {
@@ -322,13 +331,13 @@ pub fn parse(text: &str, home: Option<&Path>) -> (Config, Vec<Problem>) {
                     }
                     None => problems.push(bad(Expected::PathList)),
                 },
-                "threshold" => match value
-                    .as_integer()
-                    .and_then(|n| u8::try_from(n).ok())
-                    .filter(|n| (1..=99).contains(n))
-                {
-                    Some(n) => config.watch_threshold = n,
-                    None => problems.push(bad(Expected::Percent)),
+                "threshold" => match in_range(value, 1, 99) {
+                    Some(n) => config.watch_threshold = n as u8,
+                    None => problems.push(bad(Expected::Range(1, 99))),
+                },
+                "similar_distance" => match in_range(value, 0, 16) {
+                    Some(n) => config.similar_distance = n,
+                    None => problems.push(bad(Expected::Range(0, 16))),
                 },
                 "old_big_min_mib" | "old_big_min_days" | "duplicates_min_mib" => {
                     let unit = if key == "old_big_min_days" {
@@ -359,6 +368,14 @@ pub fn parse(text: &str, home: Option<&Path>) -> (Config, Vec<Problem>) {
         }
     }
     (config, problems)
+}
+
+/// A whole number from `lo` to `hi`.
+fn in_range(value: &toml::Value, lo: u32, hi: u32) -> Option<u32> {
+    value
+        .as_integer()
+        .and_then(|n| u32::try_from(n).ok())
+        .filter(|n| (lo..=hi).contains(n))
 }
 
 const SIZES: &[&str] = &["disk", "apparent"];
@@ -449,6 +466,7 @@ pub fn to_toml(config: &Config) -> String {
          old_big_min_mib = {}\n\
          old_big_min_days = {}\n\
          duplicates_min_mib = {}\n\
+         similar_distance = {}\n\
          \n\
          [view]\n\
          size = \"{}\"\n\
@@ -461,6 +479,7 @@ pub fn to_toml(config: &Config) -> String {
         config.old_big_min_mib,
         config.old_big_min_days,
         config.duplicates_min_mib,
+        config.similar_distance,
         size_code(config.size),
         sort_code(config.sort),
         config.watch_threshold,
@@ -701,6 +720,7 @@ mod tests {
             old_big_min_mib: 2048,
             old_big_min_days: 10,
             duplicates_min_mib: 5,
+            similar_distance: 8,
             size: SizeMode::Apparent,
             sort: SortMode::Count,
             watch_threshold: 85,

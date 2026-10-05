@@ -37,6 +37,11 @@ cargo clippy --all-targets -- -D warnings
 cargo test
 ```
 
+CI also runs clippy without the default `similar-images` feature, which
+holds the image decoders: `cargo clippy --no-default-features --all-targets
+-- -D warnings`. Run it too when you touch `src/similar.rs` or code that
+uses it.
+
 ### Lint policy
 
 The lints live in `Cargo.toml` (`[lints]`), so your editor shows the same

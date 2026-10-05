@@ -134,6 +134,20 @@ pub(super) fn render_browser(
             .accent(),
             Span::raw(t!("   Esc: iptal", "   Esc: cancel")).muted(),
         ])
+    } else if let Some(job) = &b.similar_job {
+        use std::sync::atomic::Ordering::Relaxed;
+        let p = &job.progress;
+        let spin = SPINNER[app.tick % SPINNER.len()];
+        Line::from(vec![
+            Span::raw(tf!(
+                "{spin} Benzer görseller aranıyor — görseller okunuyor: {} / {}",
+                "{spin} Looking for similar images — reading images: {} / {}",
+                fmt_count(p.done.load(Relaxed)),
+                fmt_count(p.total.load(Relaxed))
+            ))
+            .accent(),
+            Span::raw(t!("   Esc: iptal", "   Esc: cancel")).muted(),
+        ])
     } else if let Some(job) = &b.dup_job {
         use std::sync::atomic::Ordering::Relaxed;
         let p = &job.progress;
@@ -373,7 +387,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("↑↓", t!("kaydır", "scroll")),
             ("Esc", t!("kapat", "close")),
         ]
-    } else if b.dup_job.is_some() {
+    } else if b.dup_job.is_some() || b.similar_job.is_some() {
         &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
     } else if b.export_prompt.is_some() {
         &[("c", "CSV"), ("j", "JSON"), ("Esc", t!("vazgeç", "cancel"))]

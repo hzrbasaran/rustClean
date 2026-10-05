@@ -7,6 +7,24 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- "Similar images" report, after the duplicates in the menu (the reports
+  and tools below it move down by one).
+  - It finds resized, re-compressed or re-saved copies of the same picture,
+    whose bytes differ.
+  - It reads JPEG, PNG, WebP, GIF, TIFF and BMP images of 100 KiB or more.
+    HEIC and RAW files are not read.
+  - Each image gets a 64-bit gradient hash. Images within 4 bits of each
+    other are grouped (`[reports] similar_distance`, 0–16).
+  - The search runs in the background with progress, and `Esc` cancels it.
+  - A group shows how many images it holds and the largest in pixels.
+    `Space` adds all but the largest image to the basket, and `Enter`
+    lists each image with its size in pixels.
+  - It skips the same folders as the clutter report: hidden folders,
+    bundles such as a Photos library, `Library` and system folders.
+  - It works with `rustclean report similar-images` and with `o`.
+  - The image decoders sit behind the default `similar-images` cargo
+    feature (about 1.2 MB). `--no-default-features` builds without them.
+  ([#13](https://github.com/hzrbasaran/rustClean/issues/13))
 - `rustclean check` warns when a disk is fuller than a threshold: 90 % by
   default, or `--threshold`, or `[watch] threshold` in `config.toml`.
   - It watches the disk with your home folder, plus the ones listed under

@@ -50,6 +50,9 @@ harekete geçmenizi sağlar:
   - eski ve büyük dosyalar
   - **İndirilenlerdeki kurulum dosyaları ve arşivler** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - içeriği aynı **kopya dosyalar** (en eski kopya korunur)
+  - **benzer görseller:** aynı resmin yeniden boyutlandırılmış, yeniden
+    sıkıştırılmış ya da başka biçimde kaydedilmiş kopyaları (JPEG, PNG, WebP,
+    GIF, TIFF, BMP; HEIC hariç); en büyüğü korunur
   - **boş klasörler, kırık bağlantılar ve geçici dosyalar** (`.DS_Store`,
     `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
     paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
@@ -110,16 +113,18 @@ harekete geçmenizi sağlar:
 | ![Ağaç haritası](docs/screenshots/treemap-tr.svg) | ![Özet](docs/screenshots/summary-tr.svg) |
 | **Rapor menüsü** | **90+ gündür dokunulmamış geliştirici çöpleri** |
 | ![Rapor menüsü](docs/screenshots/menu-tr.svg) | ![Geliştirici çöpleri](docs/screenshots/dev-junk-stale-tr.svg) |
-| **Kopya dosyalar** | **Sepet** |
-| ![Kopya dosyalar](docs/screenshots/duplicates-tr.svg) | ![Sepet](docs/screenshots/basket-tr.svg) |
-| **Boş klasörler, kırık bağlantılar, geçici dosyalar** | **Silme kaydı** |
-| ![Boş klasörler raporu](docs/screenshots/clutter-tr.svg) | ![Silme kaydı](docs/screenshots/deletion-log-tr.svg) |
-| **iPhone / iPad yedekleri** | **Listeyi kaydetme (`o`)** |
-| ![iPhone / iPad yedekleri](docs/screenshots/device-backups-tr.svg) | ![Dışa aktarma](docs/screenshots/export-tr.svg) |
-| **Açık tema** | **Renk körü dostu tema** |
-| ![Açık tema](docs/screenshots/theme-light-tr.svg) | ![Renk körü dostu tema](docs/screenshots/theme-colorblind-tr.svg) |
-| **Yardım (`?`)** | **Web sayfası olarak harita (`w`)** |
-| ![Yardım](docs/screenshots/help-tr.svg) | ![Tarayıcıda harita sayfası](docs/screenshots/html-treemap.png) |
+| **Kopya dosyalar** | **Benzer görseller** |
+| ![Kopya dosyalar](docs/screenshots/duplicates-tr.svg) | ![Benzer görseller](docs/screenshots/similar-images-tr.svg) |
+| **Sepet** | **Boş klasörler, kırık bağlantılar, geçici dosyalar** |
+| ![Sepet](docs/screenshots/basket-tr.svg) | ![Boş klasörler raporu](docs/screenshots/clutter-tr.svg) |
+| **Silme kaydı** | **iPhone / iPad yedekleri** |
+| ![Silme kaydı](docs/screenshots/deletion-log-tr.svg) | ![iPhone / iPad yedekleri](docs/screenshots/device-backups-tr.svg) |
+| **Listeyi kaydetme (`o`)** | **Açık tema** |
+| ![Dışa aktarma](docs/screenshots/export-tr.svg) | ![Açık tema](docs/screenshots/theme-light-tr.svg) |
+| **Renk körü dostu tema** | **Yardım (`?`)** |
+| ![Renk körü dostu tema](docs/screenshots/theme-colorblind-tr.svg) | ![Yardım](docs/screenshots/help-tr.svg) |
+| **Web sayfası olarak harita (`w`)** | |
+| ![Tarayıcıda harita sayfası](docs/screenshots/html-treemap.png) | |
 
 ## Önce güvenlik
 
@@ -160,6 +165,10 @@ cargo install rustclean
 Güncel bir kararlı [Rust](https://rustup.rs) sürümü gerekir (Rust 1.99 ile
 geliştirildi ve test edildi; 1.79 gibi eski sürümler bağımlılıkları
 derleyemez). Derleme başarısız olursa `rustup update` çalıştırın.
+
+Benzer görseller raporunun kullandığı görsel çözücüler yaklaşık 1,2 MB
+ekler. `cargo install rustclean --no-default-features` onlarsız (ve o rapor
+olmadan) derler.
 
 ### Hazır derlemeler
 
@@ -207,7 +216,7 @@ rustclean check --install
 
 Rapor türleri: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
 `orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
-`clutter`, `device-backups`. Seçenekler ve sütunlar için
+`similar-images`, `clutter`, `device-backups`. Seçenekler ve sütunlar için
 [kullanım kılavuzu](docs/USAGE.md#reports-from-the-command-line).
 
 Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:

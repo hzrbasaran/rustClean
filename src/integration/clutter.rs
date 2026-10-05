@@ -69,7 +69,10 @@ fn broken_links_are_found_and_moved_to_the_trash() {
 
     let mut app = open(f.root());
     // Menu item 10: clutter.
-    menu(&mut app, 10);
+    menu(
+        &mut app,
+        super::index_of(reports::MenuItem::Report(ReportKind::Clutter)),
+    );
     tick_until(&mut app, "the report", |a| {
         browser(a)
             .results

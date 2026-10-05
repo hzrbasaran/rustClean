@@ -7,6 +7,7 @@ use crossterm::event::KeyCode;
 use crate::duplicates::{self, DupJob};
 use crate::lists::{ResultList, Row, RowSize, Source};
 use crate::reports::{self, MenuItem, ReportKind};
+use crate::similar::{self, SimilarJob};
 use crate::system;
 use crate::toolsview::ToolsView;
 use crate::tree::{NodeId, SizeMode, Tree};
@@ -26,6 +27,29 @@ pub(super) fn oldest(tree: &Tree, ids: &[NodeId]) -> Option<usize> {
         }
     };
     (0..ids.len()).min_by_key(|&i| (age(ids[i]), i))
+}
+
+/// Index of the member to keep when the others of a group are removed: the
+/// image with the most pixels among similar images (the sharpest copy), the
+/// oldest file among identical copies.
+pub(super) fn keeper(b: &Browser, source: &Source, ids: &[NodeId]) -> Option<usize> {
+    if *source == Source::Similar {
+        let pixels = |id: NodeId| {
+            b.image_sizes
+                .get(&id)
+                .map_or(0, |&(w, h)| u64::from(w) * u64::from(h))
+        };
+        // Equal sizes: the larger file, then the older one.
+        let order = oldest(&b.tree, ids);
+        return (0..ids.len()).max_by_key(|&i| {
+            (
+                pixels(ids[i]),
+                b.tree.node(ids[i]).size.apparent,
+                Some(i) == order,
+            )
+        });
+    }
+    oldest(&b.tree, ids)
 }
 
 /// Sizes of a duplicate group's members, and how many are APFS clones of
@@ -172,6 +196,14 @@ impl Browser {
             } else {
                 self.dup_job = Some(DupJob::start(self.current, cands));
             }
+        } else if kind == ReportKind::SimilarImages {
+            let cands = similar::candidates(&self.tree, self.current, similar::MIN_SIZE);
+            if cands.len() < 2 || !similar::AVAILABLE {
+                self.results = Some(self.no_similar_list(self.current));
+            } else {
+                let distance = crate::config::get().similar_distance;
+                self.similar_job = Some(SimilarJob::start(self.current, cands, distance));
+            }
         } else {
             self.results = Some(self.report_list(kind, self.current, 0));
         }
@@ -201,6 +233,97 @@ impl Browser {
             "No two files of {min} or more have the same size.",
         );
         list.source = Source::Duplicates;
+        list
+    }
+
+    /// The similar images report when there is nothing to compare.
+    pub(crate) fn no_similar_list(&self, base: NodeId) -> ResultList {
+        let mut list = ResultList::new(ReportKind::SimilarImages.label().into(), base, Vec::new());
+        list.note = if similar::AVAILABLE {
+            t!(
+                "Bu klasörün altında karşılaştırılacak, 100 KiB'tan büyük en az iki JPEG, PNG, WebP, GIF, TIFF ya da BMP görsel yok. HEIC ve RAW dosyaları aranmaz.",
+                "No two JPEG, PNG, WebP, GIF, TIFF or BMP images of 100 KiB or more below this folder to compare. HEIC and RAW files are not searched.",
+            )
+        } else {
+            t!(
+                "Bu rustClean görsel desteği olmadan derlendi (similar-images özelliği kapalı).",
+                "This rustClean was built without image support (the similar-images feature is off).",
+            )
+        }
+        .into();
+        list.source = Source::Similar;
+        list
+    }
+
+    pub(super) fn poll_similar(&mut self) {
+        let Some(job) = &self.similar_job else {
+            return;
+        };
+        let Some(groups) = job.poll() else {
+            return;
+        };
+        let base = job.base;
+        self.similar_job = None;
+        for m in groups.iter().flatten() {
+            self.image_sizes.insert(m.id, (m.width, m.height));
+        }
+        let groups = groups
+            .into_iter()
+            .map(|g| g.into_iter().map(|m| m.id).collect())
+            .collect();
+        self.results = Some(self.similar_list(base, groups));
+    }
+
+    /// The similar images report for groups of images (their sizes in
+    /// `image_sizes`).
+    pub(crate) fn similar_list(&self, base: NodeId, groups: Vec<Vec<NodeId>>) -> ResultList {
+        let (tree, mode) = (&self.tree, self.size_mode);
+        let mut rows: Vec<Row> = groups
+            .into_iter()
+            .map(|ids| {
+                let keep = keeper(self, &Source::Similar, &ids).unwrap_or(0);
+                let members = ids
+                    .iter()
+                    .map(|&id| (id, tree.node(id).size.get(mode)))
+                    .collect();
+                let mut detail = crate::i18n::count(
+                    ids.len() as u64,
+                    "benzer görsel",
+                    "similar image",
+                    "similar images",
+                );
+                if let Some(&(w, h)) = self.image_sizes.get(&ids[keep]) {
+                    detail += &tf!(" · en büyüğü {w}×{h}", " · largest {w}×{h}");
+                }
+                Row::group(
+                    tree.name(ids[keep]).to_string(),
+                    detail,
+                    members,
+                    RowSize::Wasted,
+                    2,
+                )
+            })
+            .collect();
+        rows.sort_by_key(|r| std::cmp::Reverse(r.size()));
+        let truncated = rows.len() > reports::LIMIT;
+        rows.truncate(reports::LIMIT);
+        let empty = rows.is_empty();
+        let mut list = ResultList::new(ReportKind::SimilarImages.label().to_string(), base, rows);
+        list.truncated = truncated;
+        list.keep_one = true;
+        list.note = if empty {
+            t!(
+                "Birbirine benzeyen görsel bulunmadı. HEIC ve RAW dosyaları aranmaz.",
+                "No images look alike. HEIC and RAW files are not searched.",
+            )
+        } else {
+            t!(
+                "Boyut: en büyük görsel dışındakiler silinince açılacak yer. Space: en büyüğü hariç sepete ekle · Enter: görselleri gör. Benzer, aynı değil: silmeden önce bakın. HEIC ve RAW aranmaz.",
+                "Size: space freed by deleting all but the largest image. Space: add all but the largest to the basket · Enter: see the images. Similar is not identical: look before deleting. HEIC and RAW are not searched.",
+            )
+        }
+        .into();
+        list.source = Source::Similar;
         list
     }
 
@@ -349,6 +472,13 @@ impl Browser {
                 list.truncated = old.truncated;
                 list
             }
+            Source::Similar if old.rows.is_empty() => self.no_similar_list(base),
+            Source::Similar => {
+                let groups = old.rows.iter().map(|r| r.nodes.clone()).collect();
+                let mut list = self.similar_list(base, groups);
+                list.truncated = old.truncated;
+                list
+            }
             Source::Basket => self.basket_list(),
         })
     }
@@ -364,20 +494,39 @@ impl Browser {
         let (tree, mode) = (&self.tree, self.size_mode);
         let mut ids = row.nodes.clone();
         ids.sort_by_key(|&id| std::cmp::Reverse(tree.node(id).size.get(mode)));
+        let similar = r.source == Source::Similar;
+        let keep = r.keep_one.then(|| keeper(self, &r.source, &ids)).flatten();
         let rows: Vec<Row> = ids
             .iter()
-            .map(|&id| Row::single(tree, r.base, id, mode, String::new()))
+            .enumerate()
+            .map(|(i, &id)| {
+                // Images show their size in pixels; the one to keep is marked.
+                let detail = match self.image_sizes.get(&id).filter(|_| similar) {
+                    Some(&(w, h)) if Some(i) == keep => {
+                        tf!("{w}×{h} · en büyük", "{w}×{h} · largest")
+                    }
+                    Some(&(w, h)) => format!("{w}×{h}"),
+                    None => String::new(),
+                };
+                Row::single(tree, r.base, id, mode, detail)
+            })
             .collect();
         let mut list = ResultList::new(format!("{} › {}", r.title, row.label), r.base, rows);
-        if r.keep_one {
-            if let Some(keep) = oldest(tree, &ids) {
-                list.keep = Some(ids[keep]);
-                list.note = tf!(
+        if let Some(keep) = keep {
+            list.keep = Some(ids[keep]);
+            list.note = if similar {
+                tf!(
+                    "En büyük görsel: {} · t: diğerlerini sepete ekle",
+                    "Largest image: {} · t: add the others to the basket",
+                    list.rows[keep].label
+                )
+            } else {
+                tf!(
                     "En eski kopya: {} · t: diğerlerini sepete ekle",
                     "Oldest copy: {} · t: add the others to the basket",
                     list.rows[keep].label
-                );
-            }
+                )
+            };
         }
         if let Some(r) = &mut self.results {
             r.drill_into(list);

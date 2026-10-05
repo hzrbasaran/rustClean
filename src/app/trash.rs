@@ -116,6 +116,7 @@ impl Browser {
                 Source::Search(_) => Via::Search,
                 Source::Changes(_) => Via::Changes,
                 Source::Duplicates => Via::Report(ReportKind::Duplicates),
+                Source::Similar => Via::Report(ReportKind::SimilarImages),
                 Source::Basket => Via::Basket,
                 Source::Members => Via::List,
             };

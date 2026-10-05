@@ -18,6 +18,8 @@ mod mouse;
 mod reports;
 mod scan;
 mod screens;
+#[cfg(feature = "similar-images")]
+mod similar;
 
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};

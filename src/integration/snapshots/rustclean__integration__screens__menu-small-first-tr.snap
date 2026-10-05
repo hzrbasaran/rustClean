@@ -16,9 +16,9 @@ expression: screen
   │   8. Eski ve büyük dosyalar                                              │
   │   9. İndirilen kurulum dosyaları ve arşivler                             │
   │  10. Kopya dosyalar (içeriği aynı)                                       │
-  │  11. Boş klasörler, kırık bağlantılar, geçici dosyalar                   │
-  │  12. iPhone / iPad yedekleri                                             │
-  │                                                                          │
+  │  11. Benzer görseller (yeniden boyutlanmış kopyalar)                     │
+  │  12. Boş klasörler, kırık bağlantılar, geçici dosyalar                   │
+  │  13. iPhone / iPad yedekleri                                             │
   │ ▼ 5 öğe daha                                                             │
   │                                                                          │
   │ Bu klasörün altındaki en büyük 200 dosya                                 │
@@ -41,9 +41,9 @@ expression: screen
 11: 2+1 Cyan/- | 5+4 Gray/- | 9+22 White/- BOLD | 77+1 Cyan/-
 12: 2+1 Cyan/- | 5+4 Gray/- | 9+39 White/- BOLD | 77+1 Cyan/-
 13: 2+1 Cyan/- | 5+4 Gray/- | 9+29 White/- BOLD | 77+1 Cyan/-
-14: 2+1 Cyan/- | 5+4 Gray/- | 9+49 White/- BOLD | 77+1 Cyan/-
-15: 2+1 Cyan/- | 5+4 Gray/- | 9+23 White/- BOLD | 77+1 Cyan/-
-16: 2+1 Cyan/- | 77+1 Cyan/-
+14: 2+1 Cyan/- | 5+4 Gray/- | 9+47 White/- BOLD | 77+1 Cyan/-
+15: 2+1 Cyan/- | 5+4 Gray/- | 9+49 White/- BOLD | 77+1 Cyan/-
+16: 2+1 Cyan/- | 5+4 Gray/- | 9+23 White/- BOLD | 77+1 Cyan/-
 17: 2+1 Cyan/- | 3+74 Gray/- | 77+1 Cyan/-
 18: 2+1 Cyan/- | 77+1 Cyan/-
 19: 2+1 Cyan/- | 4+40 Yellow/- | 77+1 Cyan/-

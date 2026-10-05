@@ -4,21 +4,21 @@ expression: screen
 ---
  rustClean  /Users/demo  │  8.6 GiB (diskte)  │  17 dosya  │  sıralama: boyut
 ──┌ Menü ────────────────────────────────────────────────────────────────────┐
-  │ ▲ 5 öğe daha                                                             │
-▶ │   6. Geliştirici çöpleri                                                 │
-  │   7. Önbellek klasörleri                                                 │
+  │ ▲ 6 öğe daha                                                             │
+▶ │   7. Önbellek klasörleri                                                 │
   │   8. Eski ve büyük dosyalar                                              │
   │   9. İndirilen kurulum dosyaları ve arşivler                             │
   │  10. Kopya dosyalar (içeriği aynı)                                       │
-  │  11. Boş klasörler, kırık bağlantılar, geçici dosyalar                   │
-  │  12. iPhone / iPad yedekleri                                             │
+  │  11. Benzer görseller (yeniden boyutlanmış kopyalar)                     │
+  │  12. Boş klasörler, kırık bağlantılar, geçici dosyalar                   │
+  │  13. iPhone / iPad yedekleri                                             │
   │                                                                          │
   │ Araçlar                                                                  │
-  │  13. Son taramadan bu yana değişenler                                    │
-  │  14. Silinmiş uygulama artıkları                                         │
-  │  15. Geliştirici araçları temizliği                                      │
-  │  16. Sistem verileri                                                     │
-  │▶ 17. Silme kaydı                                                         │
+  │  14. Son taramadan bu yana değişenler                                    │
+  │  15. Silinmiş uygulama artıkları                                         │
+  │  16. Geliştirici araçları temizliği                                      │
+  │  17. Sistem verileri                                                     │
+  │▶ 18. Silme kaydı                                                         │
   │                                                                          │
   │                                                                          │
   │ Çöp kutusuna taşınanlar, günlere göre, en yeniler önce                   │
@@ -31,10 +31,10 @@ expression: screen
  1: 2+1 Cyan/- | 3+6 White/- BOLD | 9+69 Cyan/- | 78+2 White/-
  2: 0+2 -/- BOLD | UNDERLINED | 2+1 Cyan/- | 3+74 Gray/- | 77+1 Cyan/- | 78+2 -/- BOLD | UNDERLINED
  3: 0+2 White/Indexed(238) BOLD | 2+1 Cyan/- | 5+4 Gray/- | 9+19 White/- BOLD | 77+1 Cyan/- | 78+2 White/Indexed(238) BOLD
- 4: 2+1 Cyan/- | 5+4 Gray/- | 9+19 White/- BOLD | 77+1 Cyan/-
- 5: 2+1 Cyan/- | 5+4 Gray/- | 9+22 White/- BOLD | 77+1 Cyan/-
- 6: 2+1 Cyan/- | 5+4 Gray/- | 9+39 White/- BOLD | 77+1 Cyan/-
- 7: 2+1 Cyan/- | 5+4 Gray/- | 9+29 White/- BOLD | 77+1 Cyan/-
+ 4: 2+1 Cyan/- | 5+4 Gray/- | 9+22 White/- BOLD | 77+1 Cyan/-
+ 5: 2+1 Cyan/- | 5+4 Gray/- | 9+39 White/- BOLD | 77+1 Cyan/-
+ 6: 2+1 Cyan/- | 5+4 Gray/- | 9+29 White/- BOLD | 77+1 Cyan/-
+ 7: 2+1 Cyan/- | 5+4 Gray/- | 9+47 White/- BOLD | 77+1 Cyan/-
  8: 2+1 Cyan/- | 5+4 Gray/- | 9+49 White/- BOLD | 77+1 Cyan/-
  9: 2+1 Cyan/- | 5+4 Gray/- | 9+23 White/- BOLD | 77+1 Cyan/-
 10: 2+1 Cyan/- | 77+1 Cyan/-

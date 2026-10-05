@@ -13,7 +13,7 @@ use crate::export::{self, Format, Meta};
 use crate::lists::ResultList;
 use crate::reports::ReportKind;
 use crate::tree::{SizeMode, Tree, ROOT};
-use crate::{config, duplicates, scanner, ui};
+use crate::{config, duplicates, scanner, similar, ui};
 
 impl clap::ValueEnum for ReportKind {
     fn value_variants<'a>() -> &'a [Self] {
@@ -77,8 +77,8 @@ pub fn report(args: &ReportArgs) -> Result<()> {
     // rank by them too, whatever size the configuration opens scans with.
     let mut browser = Browser::new(res);
     browser.size_mode = SizeMode::Disk;
+    let mut list = build(&mut browser, kind, min_age);
     let tree = &browser.tree;
-    let mut list = build(&browser, kind, min_age);
     if let Some(n) = args.limit {
         if list.rows.len() > n {
             list.rows.truncate(n);
@@ -112,9 +112,29 @@ pub fn report(args: &ReportArgs) -> Result<()> {
     }
 }
 
-/// The report over the whole scan. Duplicates are searched right here, not
-/// on a background thread as in the interface.
-fn build(b: &Browser, kind: ReportKind, min_age: u32) -> ResultList {
+/// The report over the whole scan. Duplicates and similar images are
+/// searched right here, not on a background thread as in the interface.
+fn build(b: &mut Browser, kind: ReportKind, min_age: u32) -> ResultList {
+    if kind == ReportKind::SimilarImages {
+        let cands = similar::candidates(&b.tree, ROOT, similar::MIN_SIZE);
+        if cands.len() < 2 || !similar::AVAILABLE {
+            return b.no_similar_list(ROOT);
+        }
+        let groups = similar::find_groups(
+            &cands,
+            config::get().similar_distance,
+            &AtomicBool::new(false),
+            &similar::Progress::default(),
+        );
+        for m in groups.iter().flatten() {
+            b.image_sizes.insert(m.id, (m.width, m.height));
+        }
+        let groups = groups
+            .into_iter()
+            .map(|g| g.into_iter().map(|m| m.id).collect())
+            .collect();
+        return b.similar_list(ROOT, groups);
+    }
     if kind != ReportKind::Duplicates {
         return b.report_list(kind, ROOT, min_age);
     }
