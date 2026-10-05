@@ -260,7 +260,7 @@ pub(super) fn render_browser(
     }
 
     if let Some(sel) = b.report_menu {
-        render_report_menu(f, sel, f.area(), mouse);
+        render_report_menu(f, sel, &mut b.menu_scroll, f.area(), mouse);
     }
     if let Some((saved, sel)) = &b.snapshot_picker {
         let total = b.tree.node(crate::tree::ROOT).size.disk;

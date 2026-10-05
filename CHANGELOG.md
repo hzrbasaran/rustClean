@@ -7,6 +7,12 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- The menu fits small terminals. At 80×24 its lower items and the
+  description of the selected one were cut off. Now the list scrolls with
+  the selection and shows how many items are above or below. The
+  description and the note always stay visible, and long ones wrap instead
+  of being cut. A mouse click picks the item drawn where you click
+  ([#73](https://github.com/hzrbasaran/rustClean/issues/73)).
 - Saving the language or theme can no longer drop the other one when two
   saves happen at once, and the settings file is replaced in one step, so it
   is never read half written

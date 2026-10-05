@@ -1,0 +1,53 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (diskte)  │  17 dosya  │  sıralama: boyut
+──┌ Menü ────────────────────────────────────────────────────────────────────┐
+  │ ▲ 5 öğe daha                                                             │
+▶ │   6. Geliştirici çöpleri                                                 │
+  │   7. Önbellek klasörleri                                                 │
+  │   8. Eski ve büyük dosyalar                                              │
+  │   9. İndirilen kurulum dosyaları ve arşivler                             │
+  │  10. Kopya dosyalar (içeriği aynı)                                       │
+  │  11. Boş klasörler, kırık bağlantılar, geçici dosyalar                   │
+  │  12. iPhone / iPad yedekleri                                             │
+  │                                                                          │
+  │ Araçlar                                                                  │
+  │  13. Son taramadan bu yana değişenler                                    │
+  │  14. Silinmiş uygulama artıkları                                         │
+  │  15. Geliştirici araçları temizliği                                      │
+  │  16. Sistem verileri                                                     │
+  │▶ 17. Silme kaydı                                                         │
+  │                                                                          │
+  │                                                                          │
+  │ Çöp kutusuna taşınanlar, günlere göre, en yeniler önce                   │
+  │ Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm         │
+──│ tarama). L: English                                                      │──
+37└──────────────────────────────────────────────────────────────────────────┘
+ ?  yardım   ↑↓  seç   Enter  çalıştır   Esc  kapat
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 2+1 Cyan/- | 3+6 White/- BOLD | 9+69 Cyan/- | 78+2 White/-
+ 2: 0+2 -/- BOLD | UNDERLINED | 2+1 Cyan/- | 3+74 Gray/- | 77+1 Cyan/- | 78+2 -/- BOLD | UNDERLINED
+ 3: 0+2 White/Indexed(238) BOLD | 2+1 Cyan/- | 5+4 Gray/- | 9+19 White/- BOLD | 77+1 Cyan/- | 78+2 White/Indexed(238) BOLD
+ 4: 2+1 Cyan/- | 5+4 Gray/- | 9+19 White/- BOLD | 77+1 Cyan/-
+ 5: 2+1 Cyan/- | 5+4 Gray/- | 9+22 White/- BOLD | 77+1 Cyan/-
+ 6: 2+1 Cyan/- | 5+4 Gray/- | 9+39 White/- BOLD | 77+1 Cyan/-
+ 7: 2+1 Cyan/- | 5+4 Gray/- | 9+29 White/- BOLD | 77+1 Cyan/-
+ 8: 2+1 Cyan/- | 5+4 Gray/- | 9+49 White/- BOLD | 77+1 Cyan/-
+ 9: 2+1 Cyan/- | 5+4 Gray/- | 9+23 White/- BOLD | 77+1 Cyan/-
+10: 2+1 Cyan/- | 77+1 Cyan/-
+11: 2+1 Cyan/- | 3+8 Cyan/- BOLD | 77+1 Cyan/-
+12: 2+1 Cyan/- | 5+4 Gray/- | 9+32 White/- BOLD | 77+1 Cyan/-
+13: 2+1 Cyan/- | 5+4 Gray/- | 9+27 White/- BOLD | 77+1 Cyan/-
+14: 2+1 Cyan/- | 5+4 Gray/- | 9+30 White/- BOLD | 77+1 Cyan/-
+15: 2+1 Cyan/- | 5+4 Gray/- | 9+15 White/- BOLD | 77+1 Cyan/-
+16: 2+1 Cyan/- | 3+2 White/Indexed(238) BOLD | 5+4 Gray/Indexed(238) BOLD | 9+11 White/Indexed(238) BOLD | 77+1 Cyan/-
+17: 2+1 Cyan/- | 77+1 Cyan/-
+18: 2+1 Cyan/- | 77+1 Cyan/-
+19: 2+1 Cyan/- | 4+54 Yellow/- | 77+1 Cyan/-
+20: 2+1 Cyan/- | 4+64 Gray/- | 77+1 Cyan/-
+21: 2+1 Cyan/- | 4+19 Gray/- | 77+1 Cyan/-
+22: 0+2 Gray/- | 2+76 Cyan/-
+23: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 40+5 Black/Gray
