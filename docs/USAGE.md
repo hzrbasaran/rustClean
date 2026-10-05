@@ -18,6 +18,7 @@ need to look anything up.
 - [Saving a list (CSV / JSON)](#saving-a-list-csv--json)
 - [Reports from the command line](#reports-from-the-command-line)
 - [Mouse](#mouse)
+- [Disk space check](#disk-space-check)
 - [Command line](#command-line)
 - [Configuration file](#configuration-file)
 
@@ -579,6 +580,61 @@ selecting text. To copy a path from the screen, turn the mouse off with `M`
 terminal's mouse mode is always switched off again when rustClean quits,
 also when it stops because of an error.
 
+## Disk space check
+
+`rustclean check` looks at how full your disks are and warns above a
+threshold, 90 % by default. It only reads: nothing is scanned or deleted.
+
+```bash
+rustclean check                  # one line per disk; exit code 3 if one is over
+rustclean check --threshold 85   # another threshold for this run
+rustclean check --install        # run it every hour in the background
+rustclean check --uninstall      # remove that again
+```
+
+```text
+Macintosh HD  /  93 % full, 34.1 GiB free  over the threshold (90 %)
+```
+
+**Which disks.** The disk that holds your home folder, plus the disks of
+the folders listed under `[watch] disks` in the
+[configuration file](#configuration-file). Backup and other external disks
+are often full on purpose, so they are watched only when you list them. A
+folder stands for its disk: `"/Volumes/Data"` or `"/Volumes/Data/Projects"`
+both watch the Data disk.
+
+**Exit code.** 0 when every watched disk is below the threshold, 3 when
+one is at it or above, 2 for a wrong command line, 1 for an error. Scripts
+can test it.
+
+**In the background.** `--install` shows what it will write and run, and
+does it after you type `yes` (`evet` in Turkish). `--yes` skips the question, for scripts.
+- **macOS:** a launchd agent,
+  `~/Library/LaunchAgents/io.github.hzrbasaran.rustclean.check.plist`, runs
+  `rustclean check` at login and every hour (`launchctl bootstrap`).
+- **Linux:** a systemd user timer, `rustclean-check.service` and `.timer` in
+  `~/.config/systemd/user`, runs it hourly (`systemctl --user enable --now`).
+  Without `systemctl`, rustClean says so; a crontab line such as
+  `0 * * * * rustclean check` does the same.
+- **Windows:** rustClean does not register scheduled tasks. It shows the
+  `schtasks` command to run yourself, and the one that removes it.
+
+Nothing needs root. When the `rustclean` on your `PATH` is the program you
+ran (for example Homebrew's `/opt/homebrew/bin/rustclean` link), the agent
+uses that path, so it keeps working after upgrades. The threshold and the disks come from the configuration
+file at each run, so change them there; no need to install again.
+`--uninstall` stops the agent and removes its files.
+
+**Notifications.** When the check runs in the background (its output is not
+a terminal), a disk over the threshold also gets a system notification:
+`osascript` on macOS, `notify-send` on Linux when it is installed. Windows
+only has the output and the exit code. A disk is notified at most once a
+day while it stays over, and again at once if it goes below and back over.
+When it last was is kept in `check-state` in the data directory.
+`--no-notify` never shows one. A check in the terminal shows the lines and
+leaves that memory alone, so it never silences the next background
+notification.
+
 ## Command line
 
 ```text
@@ -586,6 +642,8 @@ rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
           [--list-disks] [--summary] [--config]
 rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
           [--lang tr|en]
+rustclean check [--threshold PERCENT] [--no-notify] [--install | --uninstall]
+          [--yes] [--lang tr|en]
 ```
 
 - `PATH`: scan this folder directly instead of choosing a disk.
@@ -598,6 +656,8 @@ rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
 - `report`: print one report without the interface; see
   [Reports from the command line](#reports-from-the-command-line). Excluded
   folders are skipped here too.
+- `check`: warn when a disk is fuller than a threshold, and set that up to
+  run every hour; see [Disk space check](#disk-space-check).
 - `RUSTCLEAN_DATA_DIR`: where history, settings and `config.toml` are stored.
 
 ## Configuration file
@@ -642,9 +702,16 @@ size = "disk"
 # The order a scan opens with: "size", "name", "count" (file count) or
 # "modified" (oldest change first). The s key still cycles.
 sort = "size"
+
+[watch]
+# rustclean check warns from this percentage full on (1 to 99).
+threshold = 90
+# Disks watched besides the one with your home folder, as a folder on each.
+disks = []
+# disks = ["/Volumes/Data"]
 ```
 
-The numbers are whole numbers of 1 or more. The menu line and the note of
+The numbers are whole numbers of 1 or more (the threshold: 1 to 99). The menu line and the note of
 "Old and large files" and of the duplicate search show the values in effect.
 
 Theme and language are not in this file: `T` and `L` save them in the

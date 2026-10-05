@@ -65,6 +65,11 @@ one go.
 - **Reports from the command line** — `rustclean report dev-junk ~/Projects
   --older 90 --json` prints any report as a table, CSV or JSON, for scripts
   and cron jobs. It only reads; nothing is deleted.
+- **Low disk space warning** — `rustclean check` says when the disk with
+  your home folder (and any you add) is fuller than 90 %. `rustclean check
+  --install` runs it every hour in the background (launchd on macOS, a
+  systemd timer on Linux) and shows a notification, at most once a day per
+  disk ([details](docs/USAGE.md#disk-space-check)).
 - **Deletion log** — everything moved to the trash, by day, with how it was
   deleted (menu → Deletion log).
 - **Developer tools cleanup** — measures what Docker, Xcode (simulators,
@@ -189,6 +194,10 @@ rustclean --config        # where config.toml goes, and the values in effect
 # a report without the interface: a table, or --csv / --json (read-only)
 rustclean report dev-junk ~/Projects --older 90 --json
 rustclean report largest-files ~ --limit 20 --csv > big.csv
+
+# warn when a disk is fuller than 90 % (exit code 3); --install: every hour
+rustclean check
+rustclean check --install
 ```
 
 Report kinds: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
@@ -244,13 +253,18 @@ The tools screen has platform-specific rows:
   shown), and the Recycle Bin size. Windows support is the least tested;
   reports from real machines are welcome.
 
+`rustclean check --install` sets up a launchd agent on macOS and a systemd
+user timer on Linux. On Windows it shows the `schtasks` command to run
+instead of registering the task itself.
+
 ## Data stored on your computer
 
 rustClean makes no network connections. It writes only:
 
 - scan summaries for the history feature (newest 10 per scanned folder),
-- the chosen interface language and theme, and
-- a log of what was moved to the trash (newest 10 000 entries),
+- the chosen interface language and theme,
+- a log of what was moved to the trash (newest 10 000 entries), and
+- when `rustclean check` last notified about each full disk,
 
 in the platform data directory (`~/Library/Application Support/rustClean` on
 macOS, `~/.local/share/rustClean` on Linux, `%APPDATA%\rustClean` on Windows).
@@ -259,6 +273,11 @@ Set `RUSTCLEAN_DATA_DIR` to use another directory.
 The same directory holds `config.toml`, the
 [configuration file](docs/USAGE.md#configuration-file). rustClean only reads
 it; it exists only if you create it.
+
+`rustclean check --install` also writes one file outside it, removed again
+by `--uninstall`: `~/Library/LaunchAgents/io.github.hzrbasaran.rustclean.check.plist`
+on macOS, or `rustclean-check.service` and `.timer` in
+`~/.config/systemd/user` on Linux.
 
 ## Contributing
 

@@ -4,6 +4,7 @@ mod i18n;
 mod app;
 mod apps;
 mod basket;
+mod check;
 mod cli;
 mod clones;
 mod config;
@@ -49,7 +50,7 @@ use app::App;
 #[derive(Parser)]
 #[command(
     version,
-    override_usage = "rustclean [OPTIONS] [PATH]\n       rustclean report <KIND> [PATH] [OPTIONS]"
+    override_usage = "rustclean [OPTIONS] [PATH]\n       rustclean report <KIND> [PATH] [OPTIONS]\n       rustclean check [OPTIONS]"
 )]
 struct Args {
     #[command(subcommand)]
@@ -94,6 +95,10 @@ enum Command {
     /// interface (read-only, never deletes)
     #[command(after_help = "rustclean report dev-junk ~/Projects --older 90 --json")]
     Report(cli::ReportArgs),
+    /// Disklerin doluluğunu kontrol et, eşiği geçince uyar (yalnızca okur) / check how full the
+    /// disks are and warn above a threshold (read-only)
+    #[command(after_help = "rustclean check --threshold 85\nrustclean check --install")]
+    Check(check::CheckArgs),
 }
 
 fn main() -> Result<()> {
@@ -126,6 +131,26 @@ fn main() -> Result<()> {
             eprintln!("{message}");
         }
         return cli::report(report);
+    }
+
+    if let Some(Command::Check(check)) = &args.command {
+        if args.path.is_some() || args.summary || args.list_disks {
+            use clap::CommandFactory;
+            Args::command()
+                .error(
+                    clap::error::ErrorKind::ArgumentConflict,
+                    t!(
+                        "check; YOL, --summary ve --list-disks ile birlikte kullanılamaz",
+                        "check cannot be combined with PATH, --summary or --list-disks"
+                    ),
+                )
+                .exit();
+        }
+        for message in loaded.messages() {
+            eprintln!("{message}");
+        }
+        let code = check::run(check)?;
+        std::process::exit(code);
     }
 
     if args.list_disks {
