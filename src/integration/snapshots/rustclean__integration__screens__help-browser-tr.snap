@@ -28,8 +28,8 @@ expression: screen
         │ ?             bu yardım                                                          │
         │ L             Türkçe ↔ English                                                   │
         │ T             tema: koyu, açık, renk körü                                        │
-        │ q  Ctrl-C     çık                                                                │
-────────│                                                                                  │────────
+        │ M             fare aç / kapat (kapalıyken terminalde metin seçilebilir)          │
+────────│ q  Ctrl-C     çık                                                                │────────
 37 öğe t└───────────────────── ↑↓ PgUp PgDn: kaydır · Esc / ?: kapat ──────────────────────┘
  ?  yardım   ↑↓  gez   Enter  gir   ⌫  geri   t  harita   /  ara   m  raporlar   i  özet   s  sırala
 --- styles (column+width foreground/background modifiers) ---
@@ -59,7 +59,7 @@ expression: screen
 23: 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
 24: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
 25: 8+16 Cyan/- | 24+27 White/- | 91+1 Cyan/-
-26: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
-27: 8+1 Cyan/- | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+57 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
 28: 0+8 Gray/- | 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
 29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 35+3 Black/Gray | 45+3 Black/Gray | 57+3 Black/Gray | 66+3 Black/Gray | 80+3 Black/Gray | 90+3 Black/Gray

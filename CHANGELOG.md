@@ -7,6 +7,25 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Optional mouse support: `M` turns it on or off (off by default and not
+  saved, as mouse capture stops the terminal from selecting text). A click
+  selects a row in the lists, the menu and the summary, or a treemap block; a
+  double click opens it like `Enter`; the wheel moves through lists and
+  scrolls the help, the deletion log and the failure list. Questions before
+  deleting, uninstalling or running a cleanup take no mouse input
+  ([#24](https://github.com/hzrbasaran/rustClean/issues/24)).
+- "iPhone / iPad backups" report, the last of the reports in the menu (the
+  tools move down by one): one row per backup folder in `MobileSync/Backup`
+  (macOS, and iTunes / Apple Devices on Windows) with the device name and
+  model, the date of the backup, the iOS version and whether it is
+  encrypted, read from the backup's `Info.plist` and `Manifest.plist`. The
+  newest backup of each device is marked, and the note warns that a deleted
+  backup cannot restore the device. The age filter goes by the backup date.
+  When the folder cannot be read (Full Disk Access) or was not scanned, the
+  report says so and how to fix it
+  ([#11](https://github.com/hzrbasaran/rustClean/issues/11)).
+- An empty report shows its note (why nothing was found) in place of the
+  list; before, only "No results." was shown.
 - `w` in the folder list and the treemap saves the current folder as a
   self-contained HTML page with a zoomable treemap (click a folder to zoom
   in, the path or `Esc` to go back), colored by type or by age, in the
@@ -21,6 +40,11 @@ follows [Semantic Versioning](https://semver.org/).
 - English counts use the singular for one: "1 item", "1 row", "1 file"
   instead of "1 items" (and "1 item was inaccessible", "the parent folder of
   1 item").
+- The clutter report no longer lists a folder it could not look into as
+  empty. A folder without read permission, on another disk or skipped by
+  the scan showed nothing below it and was offered as an empty folder,
+  although it may hold files. Such folders, and the folders around them,
+  are now never counted as empty.
 
 ## [0.3.0] - 2026-10-04
 

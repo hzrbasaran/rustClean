@@ -15,6 +15,7 @@ need to look anything up.
 - [Language](#language)
 - [Deletion log](#deletion-log)
 - [Themes and colors](#themes-and-colors)
+- [Mouse](#mouse)
 - [Command line](#command-line)
 
 ## Starting
@@ -47,6 +48,7 @@ with `?  help` and shows the most used keys.
 | `m` | the menu of reports and tools |
 | `?` | every key |
 | `L` · `T` | Türkçe ↔ English · theme |
+| `M` | mouse on / off; see [Mouse](#mouse) |
 | `q` or `Ctrl-C` | quit |
 
 ## Browsing
@@ -184,6 +186,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
 | Duplicate files | files with identical content (≥ 1 MiB); `Space` on a group adds all but the oldest copy |
 | Empty folders, broken links, temporary files | three groups: folders with nothing below them (only the topmost is listed), symbolic links whose target is gone, and temporary files (`.DS_Store`, `Thumbs.db`, `*.tmp`, Office `~$…` locks, unfinished downloads) untouched for a day; `Enter` opens a group, `Space` adds it whole |
+| iPhone / iPad backups | one row per backup folder in `MobileSync/Backup`: the device name and model, then the date of the backup, `newest` on the newest backup of each device, `encrypted`, and the iOS version, read from the backup's `Info.plist` and `Manifest.plist`; see below |
 
 **Age filter.** In most reports `f` cycles a minimum age: none → 30 → 90 → 180
 → 365 days since the last change. For developer junk the age is the
@@ -212,11 +215,34 @@ empty and needed), app and package bundles (`.app`, `.framework`,
 (`target`, `Pods`, `node_modules`, `vendor`…) and system folders,
 and it never lists the standard folders of your home folder (`Desktop`,
 `Documents`, `Downloads`…). A folder that holds only such a folder is not
-empty. Temporary files changed in the last day may be in use (an open
+empty. Neither is a folder rustClean could not look into (no permission,
+another disk, or a skipped path), nor one around it: it may hold anything.
+Temporary files changed in the last day may be in use (an open
 document's lock file, a running download) and are left out; `.DS_Store` and
 `Thumbs.db` are listed at any age, as the system writes them again.
 
 ![The clutter report: temporary files, empty folders and broken links](screenshots/clutter.svg)
+
+**iPhone / iPad backups.** Finder (and iTunes before it) keeps device backups
+in `~/Library/Application Support/MobileSync/Backup`; on Windows, iTunes and
+Apple Devices use `%APPDATA%\Apple Computer\MobileSync\Backup` or
+`%USERPROFILE%\Apple\MobileSync\Backup`. Each backup is one folder, often
+tens of GB. Scan your home folder to see them. The age filter (`f`) goes by
+the date of the backup, not by the folder's last change.
+
+A deleted backup cannot restore the device. Keep the newest backup of each
+device (marked `newest`) unless the device is gone or backs up to iCloud;
+older ones, and those of devices you no longer have, are the usual
+candidates. `x` and the basket move a backup to the trash as usual, so it
+can still be put back until the trash is emptied.
+
+On macOS the backup folder is protected: without Full Disk Access the scan
+sees it empty, and the report says so instead of listing nothing. To grant
+it, open System Settings → Privacy & Security → Full Disk Access, turn on
+your terminal app (Terminal, iTerm, …; add it with `+` if it is not listed),
+restart the terminal and scan again. When the scan does not include the
+backup folder at all (you scanned another folder), the report says to scan
+your home folder.
 
 **Duplicates and APFS.** Copies that are APFS clones (made by `cp -c`, Finder's
 Duplicate and many apps) share their blocks. The group's detail says how many
@@ -302,6 +328,37 @@ borders. `T` then leaves the colors off.
 | Light | Color-blind friendly |
 |---|---|
 | ![Light theme](screenshots/theme-light.svg) | ![Color-blind friendly theme](screenshots/theme-colorblind.svg) |
+
+## Mouse
+
+rustClean is made for the keyboard; the mouse is optional and **off by
+default**. `M` turns it on anywhere (except while typing), and `M` again
+turns it off. A message says which it is. The choice is not saved:
+every start begins with the mouse off.
+
+With the mouse on:
+
+- **Click** a row to select it: the folder list, a report or search result,
+  the basket, the two lists of the summary, the report menu, the list of
+  saved scans, the disk list and the developer tools list. In the treemap,
+  a click selects a block.
+- **Double-click** opens what you clicked, like `Enter`: a folder, a group,
+  a report from the menu, a disk to scan, a summary entry's location.
+- **The wheel** moves the selection of a list one row at a time, and scrolls
+  the help screen, the deletion log and the list of failed moves three lines
+  at a time. On the treemap it does nothing; use the arrow keys there.
+
+Clicks outside these rows do nothing. **Questions stay keyboard-only**: while
+rustClean asks whether to move something to the trash, uninstall an app or
+run a cleanup command (and while you choose what a tool should clean), every
+click and wheel turn is ignored, so a stray click can never delete anything.
+Answer with `e`/`y` or `h`/`n`/`Esc` as usual.
+
+While the mouse is on, the terminal sends clicks to rustClean instead of
+selecting text. To copy a path from the screen, turn the mouse off with `M`
+(many terminals also select text while you hold `Shift` or `Option`). The
+terminal's mouse mode is always switched off again when rustClean quits,
+also when it stops because of an error.
 
 ## Command line
 

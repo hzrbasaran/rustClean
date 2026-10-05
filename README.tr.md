@@ -54,6 +54,10 @@ harekete geçmenizi sağlar:
     `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
     paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
     dokunmaz
+  - Finder ya da iTunes ile alınmış **iPhone / iPad yedekleri**
+    (`MobileSync/Backup`): her yedeğin cihazı, modeli, iOS sürümü ve tarihi;
+    şifreli yedekler ve her cihazın en yeni yedeği işaretlenir; klasör için
+    Tam Disk Erişimi gerekiyorsa söyler
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık
   klasörünün değil *projenin* yaşıdır.
@@ -73,6 +77,9 @@ harekete geçmenizi sağlar:
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 - **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
+- **İsteğe bağlı fare** (`M`): tıklayınca satır ya da harita bloğu seçilir,
+  çift tıklayınca açılır, tekerlekle kaydırılır. Terminalde metin seçmek
+  mümkün kalsın diye başlangıçta kapalıdır; onaylar yalnızca klavyeyle verilir.
 
 ## Ekran görüntüleri
 
@@ -179,6 +186,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |
+| `M` | fareyi aç / kapat (başlangıçta kapalı) |
 | `?` | bütün tuşlar, önce bulunduğunuz ekranınkiler |
 | `q` | çık |
 

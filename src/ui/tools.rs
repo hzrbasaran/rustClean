@@ -6,15 +6,22 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Paragraph, Row, Table};
 use ratatui::Frame;
 
+use crate::app::{Hit, Mouse};
 use crate::tools::Status as ToolStatus;
 use crate::toolsview::{confirm_word, ToolsView};
 
 use super::format::fmt_size;
 use super::style::{highlight, risk_style, Themed};
 use super::theme::theme;
-use super::{panel, popup, table_block_plain, SPINNER};
+use super::{panel, popup, table_block_plain, table_rows, SPINNER};
 
-pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize, area: Rect) {
+pub(super) fn render_tools(
+    f: &mut Frame<'_>,
+    view: &mut ToolsView,
+    tick: usize,
+    area: Rect,
+    mouse: &mut Mouse,
+) {
     let action_rows: u16 = if view.run.is_some() {
         area.height / 2
     } else {
@@ -80,6 +87,12 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
     .highlight_symbol("▶ ")
     .block(table_block_plain());
     f.render_stateful_widget(table, list_area, &mut view.table);
+    mouse.add_rows(
+        table_rows(list_area),
+        view.table.offset(),
+        view.tools.len(),
+        Hit::Tool,
+    );
 
     let mut lines = Vec::new();
     match view.selected() {
@@ -150,6 +163,10 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
         );
     }
 
+    if view.picker.is_some() || view.confirm.is_some() {
+        // Choosing and confirming what to clean is keyboard-only.
+        mouse.clear();
+    }
     if let Some(p) = &view.picker {
         let tool = &view.tools[p.tool];
         let mut lines = vec![Line::from("")];
