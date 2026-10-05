@@ -9,6 +9,7 @@ mod apps;
 mod clutter;
 mod deletion;
 mod history;
+mod htmlmap;
 mod language;
 mod reports;
 mod scan;

@@ -387,6 +387,7 @@ impl Browser {
             KeyCode::Char('r') => return Action::Rescan,
             KeyCode::Char('R') => self.start_rescan(),
             KeyCode::Char('d') => return Action::Disks,
+            KeyCode::Char('w') => self.export_html(),
             _ => {}
         }
         Action::None

@@ -31,6 +31,9 @@ one go.
 - **Explore** — a navigable list with size bars, file counts and color-coded
   modification dates, a **treemap** view (`t`), and a per-folder
   **summary** with file types, age distribution and the largest items (`i`).
+- **Treemap as a web page** (`w`) — saves the current folder as a single,
+  self-contained HTML file with a zoomable treemap four levels deep, to open
+  in any browser (also offline, also on a phone) or to share.
 - **Reports** (`m`)
   - largest files and folders
   - most repeated file names
@@ -159,6 +162,7 @@ Every screen lists its keys at the bottom. The most important ones:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | move · open · go back |
 | `t` | list ↔ treemap |
+| `w` | save the treemap as an HTML page |
 | `i` | summary of the current folder |
 | `m` | reports and tools |
 | `/` | find by name (`*` and `?` wildcards) |

@@ -28,6 +28,7 @@ use rescan::Rescan;
 mod basket;
 mod browser;
 mod dashboard;
+mod htmlmap;
 mod rescan;
 mod results;
 mod snapshots;
@@ -175,6 +176,9 @@ pub struct Browser {
     pub failures: Option<FailureDialog>,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
+    /// Where `w` writes the treemap page. `None`: the working directory,
+    /// else the home folder (tests set a temp directory).
+    pub html_dir: Option<PathBuf>,
 }
 
 impl Browser {
@@ -214,6 +218,7 @@ impl Browser {
             batch_via: crate::trashlog::Via::List,
             failures: None,
             history: Vec::new(),
+            html_dir: None,
         };
         b.load(ROOT, 0);
         b

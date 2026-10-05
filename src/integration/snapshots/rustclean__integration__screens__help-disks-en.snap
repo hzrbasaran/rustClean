@@ -25,11 +25,11 @@ expression: screen
         │ s             sort: size, name, file count, date                                 │
         │ a             apparent / on-disk size                                            │
         │ t             map view                                                           │
+        │ w             save the treemap as an HTML page                                   │
         │ /             find by name (* and ? are wildcards)                               │
         │ i             summary of this folder                                             │
         │ m             reports menu                                                       │
-        │ Space         add to / remove from the basket                                    │
-────────│ S             show the basket                                                    │────────
+────────│ Space         add to / remove from the basket                                    │────────
         └───────────────────── ↑↓ PgUp PgDn: scroll · Esc / ?: close ──────────────────────┘
  ?  help   ↑↓  select   Enter  scan   r  refresh   L  Türkçe   T  theme   q  quit
 --- styles (column+width foreground/background modifiers) ---
@@ -56,10 +56,10 @@ expression: screen
 20: 8+16 Cyan/- | 24+34 White/- | 91+1 Cyan/-
 21: 8+16 Cyan/- | 24+23 White/- | 91+1 Cyan/-
 22: 8+16 Cyan/- | 24+8 White/- | 91+1 Cyan/-
-23: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
-24: 8+16 Cyan/- | 24+22 White/- | 91+1 Cyan/-
-25: 8+16 Cyan/- | 24+12 White/- | 91+1 Cyan/-
-26: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
-27: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+32 White/- | 91+1 Cyan/-
+24: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
+25: 8+16 Cyan/- | 24+22 White/- | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+12 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
 28: 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
 29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 37+3 Black/Gray | 50+3 Black/Gray | 62+3 Black/Gray | 73+3 Black/Gray

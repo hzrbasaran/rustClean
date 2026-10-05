@@ -9,6 +9,7 @@ mod delete;
 mod disks;
 mod duplicates;
 mod history;
+mod htmlmap;
 mod lists;
 mod paths;
 mod reports;

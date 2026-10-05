@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<meta name="generator" content="rustClean">
+<title>{{TITLE}}</title>
+<style>
+:root {
+  --bg: #16181d; --panel: #20232a; --text: #e8e8ea; --muted: #a0a4ad;
+  --line: #343842; --accent: #4cc3d9; --btn: #2a2e37;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --text: #1d1f24; --muted: #5c6370;
+    --line: #d7dae0; --accent: #0b7a8f; --btn: #eceef2;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body {
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  padding: 12px 16px 16px;
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+h1 { font-size: 18px; margin: 0; }
+h1 .brand { color: var(--accent); }
+#path { color: var(--muted); overflow-wrap: anywhere; }
+#total { font-weight: 600; }
+.bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+  margin: 10px 0 6px;
+}
+#crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; flex: 1 1 320px; min-width: 0; }
+#crumbs button, #crumbs span { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#crumbs .sep { color: var(--muted); padding: 0 2px; }
+#crumbs .now { font-weight: 600; padding: 3px 4px; }
+button {
+  font: inherit; color: var(--text); background: var(--btn); border: 1px solid var(--line);
+  border-radius: 6px; padding: 3px 9px; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; border-color: var(--line); }
+button[aria-pressed="true"] { background: var(--accent); color: #000; border-color: var(--accent); }
+#crumbs button { background: none; border-color: transparent; color: var(--accent); padding: 3px 4px; }
+#crumbs button:hover { text-decoration: underline; }
+.group { display: flex; align-items: center; gap: 4px; }
+#legend { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+#legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; }
+#map {
+  position: relative; width: 100%; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; overflow: hidden; user-select: none; -webkit-user-select: none;
+}
+.b {
+  position: absolute; overflow: hidden; border: 1px solid rgba(0,0,0,.35);
+  cursor: default;
+}
+.b.zoom { cursor: zoom-in; }
+.b.zoom:hover, .b.pick { outline: 2px solid #fff; outline-offset: -2px; z-index: 1; }
+.b.cut {
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.14) 0 6px, transparent 6px 12px);
+}
+.b .l {
+  padding: 1px 5px; font-size: 12px; line-height: 15px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; pointer-events: none;
+}
+.b .l b { font-weight: 600; }
+.b .in { position: absolute; left: 3px; right: 3px; bottom: 3px; background: rgba(0,0,0,.25); }
+.b .in .b .l { font-size: 11px; line-height: 13px; padding: 1px 3px; }
+#info {
+  min-height: 2.8em; margin: 8px 0 4px; padding: 6px 10px; border-radius: 6px;
+  background: var(--panel); border: 1px solid var(--line); overflow-wrap: anywhere;
+}
+#info .muted, footer { color: var(--muted); }
+footer { font-size: 12px; margin-top: 8px; }
+footer p { margin: 3px 0; }
+#empty { padding: 24px; color: var(--muted); }
+</style>
+</head>
+<body>
+<noscript><p>{{NOSCRIPT}}</p></noscript>
+<header>
+  <h1><span class="brand">rustClean</span> <span id="title"></span></h1>
+  <span id="path"></span>
+  <span id="total"></span>
+</header>
+<div class="bar">
+  <button id="up" type="button"></button>
+  <nav id="crumbs"></nav>
+  <div class="group"><span id="colorLabel"></span>
+    <button id="byType" type="button"></button><button id="byAge" type="button"></button>
+  </div>
+</div>
+<div id="legend"></div>
+<div id="map"></div>
+<div id="info"></div>
+<footer><p id="hint"></p><p id="limits"></p><p id="offline"></p><p id="made"></p></footer>
+<script id="data" type="application/json">{{DATA}}</script>
+<script>
+(function () {
+  "use strict";
+  var P = JSON.parse(document.getElementById("data").textContent);
+  var T = P.texts;
+  // The treemap colors of rustClean's dark theme.
+  var DIRS = ["#005faf", "#af5f00", "#00875f", "#870087", "#0087af", "#af0000",
+              "#5f5f87", "#5f8700", "#5f0087", "#875f00", "#005f5f", "#87005f"];
+  var CATS = ["#b35fd1", "#e88ae8", "#6fa8ff", "#ecd35f", "#7fd77f", "#62d9d9", "#ff8080", "#b4b4b4"];
+  var AGES = ["#3fb950", "#39c5cf", "#e3b341", "#f0605a", "#8b949e"];
+  var OTHER = "#505050";
+  var stack = [P.root];
+  var mode = "kind";
+  var picked = null;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function fmtSize(b) {
+    var units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"], v = b, i = 0;
+    while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+    return i === 0 ? b + " B" : v.toFixed(1) + " " + units[i];
+  }
+  function fmtPct(part, whole) {
+    var s = (whole > 0 ? part / whole * 100 : 0).toFixed(1);
+    return P.lang === "tr" ? "%" + s : s + "%";
+  }
+  function label(n) { return n.t === "d" ? n.n + "/" : n.n; }
+  function color(n, i) {
+    if (n.t === "o") return OTHER;
+    if (mode === "age") return AGES[n.a] || AGES[4];
+    return n.t === "d" ? DIRS[i % DIRS.length] : CATS[n.c] || CATS[7];
+  }
+  // Black or white, whichever reads better on `bg`.
+  function ink(bg) {
+    var r = parseInt(bg.substr(1, 2), 16), g = parseInt(bg.substr(3, 2), 16), b = parseInt(bg.substr(5, 2), 16);
+    return 0.299 * r + 0.587 * g + 0.114 * b < 150 ? "#fff" : "#111";
+  }
+
+  // Squarified layout (Bruls, Huizing, van Wijk), as in rustClean's treemap.rs.
+  function worst(row, side) {
+    var sum = 0, min = Infinity, max = 0;
+    for (var i = 0; i < row.length; i++) { sum += row[i]; min = Math.min(min, row[i]); max = Math.max(max, row[i]); }
+    var s2 = sum * sum, w2 = side * side;
+    return Math.max(w2 * max / s2, s2 / (w2 * min));
+  }
+  function squarify(sizes, w, h) {
+    var total = 0, i;
+    for (i = 0; i < sizes.length; i++) total += sizes[i];
+    var out = [];
+    if (total <= 0 || w <= 0 || h <= 0) return out;
+    var areas = sizes.map(function (s) { return s / total * w * h; });
+    var r = { x: 0, y: 0, w: w, h: h }, start = 0;
+    while (start < areas.length) {
+      var side = Math.min(r.w, r.h), end = start + 1;
+      while (end < areas.length && worst(areas.slice(start, end + 1), side) <= worst(areas.slice(start, end), side)) end++;
+      var row = areas.slice(start, end), sum = 0, last = end === areas.length, pos, k;
+      for (k = 0; k < row.length; k++) sum += row[k];
+      if (r.w >= r.h) {
+        var cw = last ? r.w : sum / r.h;
+        pos = r.y;
+        for (k = 0; k < row.length; k++) {
+          var hh = k === row.length - 1 ? r.y + r.h - pos : row[k] / cw;
+          out.push({ x: r.x, y: pos, w: cw, h: hh });
+          pos += hh;
+        }
+        r = { x: r.x + cw, y: r.y, w: r.w - cw, h: r.h };
+      } else {
+        var rh = last ? r.h : sum / r.w;
+        pos = r.x;
+        for (k = 0; k < row.length; k++) {
+          var ww = k === row.length - 1 ? r.x + r.w - pos : row[k] / rh;
+          out.push({ x: pos, y: r.y, w: ww, h: rh });
+          pos += ww;
+        }
+        r = { x: r.x, y: r.y + rh, w: r.w, h: r.h - rh };
+      }
+      start = end;
+    }
+    // Whole pixels; neighbors share their edges.
+    return out.map(function (q) {
+      var x0 = Math.round(q.x), y0 = Math.round(q.y);
+      return { x: x0, y: y0, w: Math.round(q.x + q.w) - x0, h: Math.round(q.y + q.h) - y0 };
+    });
+  }
+
+  // Lays out the children of `node` inside `box` (w × h); `nested` blocks
+  // are one level down and get no further level.
+  function draw(node, box, w, h, nested) {
+    var kids = (node.k || []).map(function (c, i) { return { n: c, i: i }; });
+    kids.sort(function (a, b) { return b.n.s - a.n.s; });
+    var rects = squarify(kids.map(function (c) { return c.n.s; }), w, h);
+    var whole = node.s;
+    rects.forEach(function (r, j) {
+      if (r.w < 1 || r.h < 1) return;
+      var c = kids[j].n, bg = color(c, kids[j].i);
+      var b = el("div", "b");
+      b.style.left = r.x + "px"; b.style.top = r.y + "px";
+      b.style.width = r.w + "px"; b.style.height = r.h + "px";
+      b.style.background = bg; b.style.color = ink(bg);
+      b._node = c; b._parent = node;
+      if (c.t === "d" && c.k) b.classList.add("zoom");
+      if (c.x) b.classList.add("cut");
+      b.title = label(c) + "\n" + fmtSize(c.s) + " · " + fmtPct(c.s, whole);
+      var small = nested ? 12 : 15;
+      if (r.w >= 28 && r.h >= small) {
+        var l = el("div", "l");
+        l.appendChild(el("b", null, label(c)));
+        b.appendChild(l);
+        if (r.h >= small * 2 + 4) b.appendChild(el("div", "l", fmtSize(c.s) + " · " + fmtPct(c.s, whole)));
+      }
+      var head = 36; // two label lines
+      if (!nested && c.k && r.w >= 60 && r.h >= 70) {
+        var inner = el("div", "in");
+        inner.style.top = head + "px";
+        b.appendChild(inner);
+        draw(c, inner, r.w - 8, r.h - head - 5, true);
+      }
+      box.appendChild(b);
+    });
+  }
+
+  function current() { return stack[stack.length - 1]; }
+
+  function render() {
+    var node = current(), map = $("map");
+    var top = map.getBoundingClientRect().top + window.scrollY;
+    var h = Math.max(320, Math.min(window.innerHeight - 24, window.innerHeight - top - 110));
+    map.style.height = h + "px";
+    map.textContent = "";
+    if (!node.k || !node.k.length) {
+      map.appendChild(el("div", null, T.empty)).id = "empty";
+    } else {
+      draw(node, map, map.clientWidth, map.clientHeight, false);
+    }
+    $("up").disabled = stack.length < 2;
+    var crumbs = $("crumbs");
+    crumbs.textContent = "";
+    stack.forEach(function (n, i) {
+      if (i > 0) crumbs.appendChild(el("span", "sep", "›"));
+      if (i === stack.length - 1) {
+        crumbs.appendChild(el("span", "now", n.n));
+      } else {
+        var b = el("button", null, n.n);
+        b.type = "button";
+        b.onclick = function () { stack.length = i + 1; picked = null; render(); };
+        crumbs.appendChild(b);
+      }
+    });
+    $("total").textContent = fmtSize(node.s) + " · " + T.size;
+    $("byType").setAttribute("aria-pressed", mode === "kind");
+    $("byAge").setAttribute("aria-pressed", mode === "age");
+    legend();
+    show(picked);
+  }
+
+  function legend() {
+    var box = $("legend");
+    box.textContent = "";
+    function item(c, text) {
+      var s = el("span"), i = el("i");
+      i.style.background = c;
+      s.appendChild(i);
+      s.appendChild(document.createTextNode(text));
+      box.appendChild(s);
+    }
+    if (mode === "kind") {
+      var f = el("span"), k;
+      for (k = 0; k < 4; k++) { var i = el("i"); i.style.background = DIRS[k]; i.style.marginRight = "1px"; f.appendChild(i); }
+      f.appendChild(document.createTextNode(" " + T.folders));
+      box.appendChild(f);
+      P.cats.forEach(function (name, j) { item(CATS[j], name); });
+    } else {
+      P.ages.forEach(function (name, j) { item(AGES[j], name); });
+    }
+    item(OTHER, T.other);
+  }
+
+  // The info line for a block (or the current folder).
+  function show(pick) {
+    var info = $("info"), node = pick ? pick.node : current();
+    info.textContent = "";
+    info.appendChild(el("b", null, label(node)));
+    var parts = [fmtSize(node.s)];
+    if (pick) parts.push(T.here.replace("{p}", fmtPct(node.s, pick.parent.s)));
+    parts.push(T.whole.replace("{p}", fmtPct(node.s, P.root.s)));
+    var kind = node.t === "d" ? T.folder : node.t === "o" ? T.other : P.cats[node.c];
+    if (node.t !== "o") kind += " · " + P.ages[node.a];
+    parts.push(kind);
+    info.appendChild(document.createTextNode("  " + parts.join(" · ")));
+    var note = node.x ? T.cut : pick && node.t === "d" && node.k ? T.zoom : "";
+    if (note) info.appendChild(el("div", "muted", note));
+  }
+
+  function zoom(path) {
+    path.forEach(function (n) { stack.push(n); });
+    picked = null;
+    render();
+  }
+
+  var map = $("map");
+  map.addEventListener("click", function (e) {
+    var b = e.target.closest(".b");
+    if (!b) return;
+    var outer = b.parentNode.closest ? b.parentNode.closest(".b") : null;
+    var n = b._node;
+    if (n.t === "d" && n.k) {
+      zoom(outer ? [outer._node, n] : [n]);
+    } else if (outer) {
+      // A file inside a folder block: open that folder.
+      zoom([outer._node]);
+    } else {
+      picked = { node: n, parent: b._parent };
+      show(picked);
+    }
+  });
+  map.addEventListener("mouseover", function (e) {
+    var b = e.target.closest(".b");
+    if (b) show({ node: b._node, parent: b._parent });
+  });
+  map.addEventListener("mouseleave", function () { show(picked); });
+  function up() {
+    if (stack.length > 1) { stack.pop(); picked = null; render(); }
+  }
+  $("up").onclick = up;
+  $("byType").onclick = function () { mode = "kind"; render(); };
+  $("byAge").onclick = function () { mode = "age"; render(); };
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" || e.key === "Backspace") { e.preventDefault(); up(); }
+  });
+  var pending = false;
+  window.addEventListener("resize", function () {
+    if (pending) return;
+    pending = true;
+    window.requestAnimationFrame(function () { pending = false; render(); });
+  });
+
+  $("title").textContent = T.title;
+  $("path").textContent = P.path;
+  $("up").textContent = T.up;
+  $("colorLabel").textContent = T.color;
+  $("byType").textContent = T.byType;
+  $("byAge").textContent = T.byAge;
+  $("hint").textContent = T.hint;
+  $("limits").textContent = T.limits;
+  $("offline").textContent = T.offline;
+  $("made").textContent = T.made;
+  render();
+})();
+</script>
+</body>
+</html>

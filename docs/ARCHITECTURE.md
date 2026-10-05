@@ -44,6 +44,10 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ search.rs ── name patterns
    ├─ lists.rs ─── generic result list (rows, groups, drill-down)
    ├─ treemap.rs ─ squarified layout and block navigation
+   ├─ htmlmap/ ─── the treemap as a self-contained HTML page (`w`)
+   │    ├─ mod.rs        picks the blocks (depth, block and "other" limits),
+   │    │                fills the page, writes the file without overwriting
+   │    └─ page.html     the page: styles, JSON data, layout and zoom script
    │
    ├─ history.rs ─ scan snapshots and "what changed"
    ├─ tools.rs ─── developer tool measurement and cleanup commands
@@ -134,6 +138,23 @@ step. A failed move is never written.
 Reports that only read the tree run synchronously. They take under a second
 even on a full disk. A "preparing" message is drawn first so the UI never looks
 frozen.
+
+## The treemap page
+
+`w` writes the current folder as an HTML page (`htmlmap`, called from
+`app/htmlmap.rs`). Rust only picks the data: breadth first and largest first
+within `htmlmap::LIMITS` (4 levels, 3,000 blocks, 60 per folder, small
+entries merged into "other"), so a full disk still gives a small file. The
+layout runs in the page: it is redone on every zoom and window size, and
+only the browser knows the pixel size, so the script ports the squarified
+layout of `treemap.rs` instead of shipping precomputed rectangles.
+
+The data is inlined as JSON in a `<script type="application/json">`
+element, with `<`, `>` and `&` escaped, so a file name cannot end the
+element; the script inserts names with `textContent` only. A Content
+Security Policy (`default-src 'none'`) keeps the page from loading anything.
+Test builds write into the temp directory unless a test sets
+`Browser::html_dir`.
 
 ## Interface texts
 

@@ -474,6 +474,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("S", t!("sepet", "basket")),
             ("R", t!("klasörü yenile", "refresh folder")),
             ("m", t!("raporlar", "reports")),
+            ("w", t!("HTML", "HTML")),
             ("q", t!("çık", "quit")),
         ]
     } else {
@@ -493,6 +494,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("R", t!("klasörü yenile", "refresh folder")),
             ("r", t!("tümünü tara", "rescan all")),
             ("d", t!("diskler", "disks")),
+            ("w", t!("HTML", "HTML")),
             ("q", t!("çık", "quit")),
         ]
     };
