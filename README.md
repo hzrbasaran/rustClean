@@ -47,6 +47,7 @@ one go.
   - old and large files
   - **installers and archives in Downloads** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - **duplicate files** with identical content, keeping the oldest copy
+    (never inside an app, a Photos library or a `.git` folder)
   - **similar images**: resized, re-compressed or re-saved copies of the
     same picture (JPEG, PNG, WebP, GIF, TIFF, BMP; not HEIC), keeping the
     largest

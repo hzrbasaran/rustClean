@@ -31,9 +31,35 @@ pub struct Candidate {
     pub size: u64,
 }
 
+/// Version control folders: their files belong to the repository.
+const VCS: [&str; 3] = [".git", ".hg", ".svn"];
+
+/// Whether files in folder `name` must not be offered one by one: a
+/// package (an app, a Photos library…) or a version control folder.
+fn kept_whole(name: &str) -> bool {
+    VCS.contains(&name) || crate::reports::is_bundle(name)
+}
+
+/// Whether `id` is such a folder or inside one.
+pub fn inside_kept_whole(tree: &Tree, id: NodeId) -> bool {
+    let mut at = Some(id);
+    while let Some(n) = at {
+        if tree.node(n).is_dir && kept_whole(tree.name(n)) {
+            return true;
+        }
+        at = tree.parent(n);
+    }
+    false
+}
+
 /// Files below `base` of at least the configured size that share their
-/// size with at least one other file.
+/// size with at least one other file. Packages and version control folders
+/// are not searched: removing one of their files breaks them, even when
+/// the same bytes exist elsewhere.
 pub fn candidates(tree: &Tree, base: NodeId) -> Vec<Candidate> {
+    if inside_kept_whole(tree, base) {
+        return Vec::new();
+    }
     // Never 0: extra hard links have size 0 and must not become "copies".
     let min_size = crate::config::get().duplicates_min_size().max(1);
     let mut by_size: HashMap<u64, Vec<NodeId>> = HashMap::new();
@@ -42,7 +68,9 @@ pub fn candidates(tree: &Tree, base: NodeId) -> Vec<Candidate> {
         for id in tree.children(dir) {
             let n = tree.node(id);
             if n.is_dir {
-                stack.push(id);
+                if !kept_whole(tree.name(id)) {
+                    stack.push(id);
+                }
             } else if n.size.apparent >= min_size {
                 // Extra hard links were recorded with size 0, so each file
                 // is only considered once.
@@ -268,6 +296,39 @@ mod tests {
             ..Default::default()
         };
         assert!(crate::config::with(config, || candidates(&t, ROOT)).is_empty());
+    }
+
+    #[test]
+    fn bundles_and_repositories_are_not_searched() {
+        let mut t = Tree::new(Path::new("/r"));
+        let size = crate::tree::Size {
+            apparent: 2 * MIN_SIZE,
+            disk: 2 * MIN_SIZE,
+        };
+        let dir = |t: &mut Tree, name| t.push(ROOT, name, true, crate::tree::Size::default());
+        let photos = dir(&mut t, "Photos Library.photoslibrary");
+        let originals = t.push(photos, "originals", true, crate::tree::Size::default());
+        t.push(originals, "IMG_1.jpg", false, size);
+        let app = dir(&mut t, "Editor.app");
+        t.push(app, "IMG_1.jpg", false, size);
+        let git = dir(&mut t, ".git");
+        t.push(git, "pack.bin", false, size);
+        let pics = dir(&mut t, "Pictures");
+        t.push(pics, "IMG_1.jpg", false, size);
+        t.push(pics, "pack.bin", false, size);
+        t.finalize();
+        // The files inside the library, the app and the repository are never
+        // offered; the two in Pictures stay (they share a size).
+        let mut names: Vec<String> = candidates(&t, ROOT)
+            .iter()
+            .map(|c| t.path_of(c.id).display().to_string())
+            .collect();
+        names.sort();
+        assert_eq!(names, ["/r/Pictures/IMG_1.jpg", "/r/Pictures/pack.bin"]);
+        // Run from inside a package, nothing is offered.
+        assert!(candidates(&t, originals).is_empty());
+        assert!(inside_kept_whole(&t, originals));
+        assert!(!inside_kept_whole(&t, pics));
     }
 
     #[test]

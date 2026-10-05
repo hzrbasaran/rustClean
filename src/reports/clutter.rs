@@ -96,6 +96,13 @@ const HOME_FOLDERS: [&str; 12] = [
     "Library",
 ];
 
+/// Whether a folder named `name` is a package (an app, a Photos library…),
+/// whose files belong together and must not be removed one by one.
+pub(crate) fn is_bundle(name: &str) -> bool {
+    name.rsplit_once('.')
+        .is_some_and(|(_, e)| BUNDLES.contains(&e.to_ascii_lowercase().as_str()))
+}
+
 /// Whether the search goes into folder `id` (also used by the similar
 /// images search).
 pub(crate) fn searched(tree: &Tree, id: NodeId, path: &Path) -> bool {
@@ -103,8 +110,7 @@ pub(crate) fn searched(tree: &Tree, id: NodeId, path: &Path) -> bool {
     if name.starts_with('.') || KEEP_OUT.contains(&name) {
         return false;
     }
-    let ext = name.rsplit_once('.').map(|(_, e)| e.to_ascii_lowercase());
-    if ext.is_some_and(|e| BUNDLES.contains(&e.as_str())) {
+    if is_bundle(name) {
         return false;
     }
     // Build output and dependencies (Cargo `target`, `Pods`, `.venv`…): their

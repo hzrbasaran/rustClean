@@ -228,10 +228,18 @@ impl Browser {
     pub(crate) fn no_duplicates_list(&self, base: NodeId) -> ResultList {
         let mut list = ResultList::new(ReportKind::Duplicates.label().into(), base, Vec::new());
         let min = crate::config::fmt_mib(crate::config::get().duplicates_min_mib);
-        list.note = tf!(
-            "{min} üzerinde aynı boyutta iki dosya yok.",
-            "No two files of {min} or more have the same size.",
-        );
+        list.note = if duplicates::inside_kept_whole(&self.tree, base) {
+            t!(
+                "Bu klasör bir paketin (uygulama, Fotoğraflar arşivi…) ya da bir deponun (.git) içinde: dosyaları birlikte çalışır, tek tek silinmemeli. Kopyalar burada aranmaz.",
+                "This folder is inside a package (an app, a Photos library…) or a repository (.git): its files work together and must not be deleted one by one. Duplicates are not searched here.",
+            )
+            .into()
+        } else {
+            tf!(
+                "{min} üzerinde aynı boyutta iki dosya yok.",
+                "No two files of {min} or more have the same size.",
+            )
+        };
         list.source = Source::Duplicates;
         list
     }

@@ -22,7 +22,7 @@ use backups::backups;
 pub use backups::{with_fake_backups, BackupInfo};
 use caches::caches;
 use clutter::clutter;
-pub(crate) use clutter::searched;
+pub(crate) use clutter::{is_bundle, searched};
 use dev_junk::dev_junk;
 use downloads::downloads;
 use names::repeated_names;

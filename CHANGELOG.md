@@ -47,6 +47,13 @@ follows [Semantic Versioning](https://semver.org/).
   ([#79](https://github.com/hzrbasaran/rustClean/issues/79)).
 
 ### Fixed
+- The duplicates report no longer looks inside packages or version control
+  folders: apps, frameworks, a Photos library, Logic and iMovie libraries,
+  and `.git`, `.hg` and `.svn` folders. A file in them could be listed as a
+  copy and offered for deletion, which breaks the package or repository even
+  when the same bytes exist elsewhere. Run from inside such a folder, the
+  report says why it finds nothing
+  ([#83](https://github.com/hzrbasaran/rustClean/issues/83)).
 - The menu fits small terminals. At 80×24 its lower items and the
   description of the selected one were cut off. Now the list scrolls with
   the selection and shows how many items are above or below. The
