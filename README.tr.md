@@ -108,10 +108,12 @@ harekete geçmenizi sağlar:
 | ![Kopya dosyalar](docs/screenshots/duplicates-tr.svg) | ![Sepet](docs/screenshots/basket-tr.svg) |
 | **Boş klasörler, kırık bağlantılar, geçici dosyalar** | **Silme kaydı** |
 | ![Boş klasörler raporu](docs/screenshots/clutter-tr.svg) | ![Silme kaydı](docs/screenshots/deletion-log-tr.svg) |
+| **iPhone / iPad yedekleri** | **Listeyi kaydetme (`o`)** |
+| ![iPhone / iPad yedekleri](docs/screenshots/device-backups-tr.svg) | ![Dışa aktarma](docs/screenshots/export-tr.svg) |
 | **Açık tema** | **Renk körü dostu tema** |
 | ![Açık tema](docs/screenshots/theme-light-tr.svg) | ![Renk körü dostu tema](docs/screenshots/theme-colorblind-tr.svg) |
-| **Yardım (`?`)** | |
-| ![Yardım](docs/screenshots/help-tr.svg) | |
+| **Yardım (`?`)** | **Web sayfası olarak harita (`w`)** |
+| ![Yardım](docs/screenshots/help-tr.svg) | ![Tarayıcıda harita sayfası](docs/screenshots/html-treemap.png) |
 
 ## Önce güvenlik
 

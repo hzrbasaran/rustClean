@@ -4,12 +4,14 @@
     scripts/screenshots/make-demo.py <empty folder>
 
 Files are sparse, so the folder takes almost no space; the screenshots show
-apparent sizes. Ages are relative to now, so the date colors stay the same.
+apparent sizes. An entry with "text" is written with that content instead;
+"{date-N}" in it becomes the time N seconds ago (ISO 8601, UTC), as in the
+backups' Info.plist. Ages are relative to now, so the date colors stay the same.
 On macOS, setting a time before the creation date also moves the creation
 date back, so each entry gets its creation time first and then its
 modification time.
 """
-import json, os, sys, time
+import json, os, re, sys, time
 
 root = sys.argv[1]
 spec = json.load(open(os.path.join(os.path.dirname(__file__), "demo.json")))
@@ -31,6 +33,15 @@ for e in spec["entries"]:
     elif e.get("dir"):
         os.makedirs(p, exist_ok=True)
         dirs.append((p, e))
+    elif "text" in e:
+        text = re.sub(
+            r"\{date-(\d+)\}",
+            lambda m: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now - int(m.group(1)))),
+            e["text"],
+        )
+        with open(p, "w") as f:
+            f.write(text)
+        stamp(p, e)
     else:
         with open(p, "wb") as f:
             f.truncate(e["size"])

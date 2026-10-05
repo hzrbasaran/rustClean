@@ -9,7 +9,7 @@ ESC, SPACE, BACKSPACE, QM (`?`), SLEEPn (wait n seconds). Environment: ROWS,
 COLS, WAIT (seconds after a key), START (seconds before the first key),
 LIGHT=1 (a white terminal), REPLACE ("prefix=>text||…": shortens paths).
 """
-import os, pty, sys, time, select, fcntl, termios, struct, html
+import copy, os, pty, sys, time, select, fcntl, termios, struct, html
 import pyte
 ROWS, COLS = int(os.environ.get("ROWS", 32)), int(os.environ.get("COLS", 120))
 WAIT = float(os.environ.get("WAIT", 1.2))
@@ -35,6 +35,8 @@ for k in [k for k in keys.split(",") if k]:
     if k.startswith("SLEEP"):
         pump(float(k[5:])); continue
     os.write(fd, names.get(k, k.encode())); pump(WAIT)
+# The screen as the keys left it: `q` would close an open popup first.
+shown = copy.deepcopy(screen.buffer)
 os.write(fd, b"q"); pump(0.3)
 
 # A dark theme for the 16 named colors; 256-color/hex values pass through.
@@ -64,7 +66,7 @@ def style(c):
     fg = color(c.fg, FG) if not c.reverse else color(c.bg, BG)
     return (bg, fg, c.bold)
 for y in range(ROWS):
-    row = screen.buffer[y]
+    row = shown[y]
     cells = [(row[x].data, style(row[x])) for x in range(COLS)]
     # One character per cell (the second half of a wide character is empty),
     # so positions in `line` are positions in `cells`.

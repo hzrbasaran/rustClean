@@ -929,6 +929,90 @@
 "age": 534210,
 "created": 534210,
 "size": 52428
+},
+{
+"path": "Library/Application Support/MobileSync",
+"age": 259200,
+"created": 77760000,
+"dir": true
+},
+{
+"path": "Library/Application Support/MobileSync/Backup",
+"age": 259200,
+"created": 77760000,
+"dir": true
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60",
+"age": 259200,
+"created": 259200,
+"dir": true
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60/Info.plist",
+"age": 259200,
+"created": 259200,
+"text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n<dict>\n<key>Device Name</key><string>Demo iPhone</string>\n<key>Display Name</key><string>Demo iPhone</string>\n<key>Product Name</key><string>iPhone 15 Pro</string>\n<key>Product Version</key><string>18.6</string>\n<key>Target Identifier</key><string>00008130-000A1B2C3D4E5F60</string>\n<key>Last Backup Date</key><date>{date-259200}</date>\n</dict>\n</plist>\n"
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60/Manifest.plist",
+"age": 259200,
+"created": 259200,
+"text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n<dict>\n<key>IsEncrypted</key><false/>\n</dict>\n</plist>\n"
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60/Manifest.db",
+"age": 259200,
+"created": 259200,
+"size": 1610612736
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60-20250310-101500",
+"age": 18057600,
+"created": 18057600,
+"dir": true
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60-20250310-101500/Info.plist",
+"age": 18057600,
+"created": 18057600,
+"text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n<dict>\n<key>Device Name</key><string>Demo iPhone</string>\n<key>Display Name</key><string>Demo iPhone</string>\n<key>Product Name</key><string>iPhone 15 Pro</string>\n<key>Product Version</key><string>18.3</string>\n<key>Target Identifier</key><string>00008130-000A1B2C3D4E5F60</string>\n<key>Last Backup Date</key><date>{date-18057600}</date>\n</dict>\n</plist>\n"
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60-20250310-101500/Manifest.plist",
+"age": 18057600,
+"created": 18057600,
+"text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n<dict>\n<key>IsEncrypted</key><false/>\n</dict>\n</plist>\n"
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008130-000A1B2C3D4E5F60-20250310-101500/Manifest.db",
+"age": 18057600,
+"created": 18057600,
+"size": 1395864371
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008027-001122334455667A",
+"age": 35596800,
+"created": 35596800,
+"dir": true
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008027-001122334455667A/Info.plist",
+"age": 35596800,
+"created": 35596800,
+"text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n<dict>\n<key>Device Name</key><string>Demo iPad</string>\n<key>Display Name</key><string>Demo iPad</string>\n<key>Product Name</key><string>iPad Air (5th generation)</string>\n<key>Product Version</key><string>17.7</string>\n<key>Target Identifier</key><string>00008027-001122334455667A</string>\n<key>Last Backup Date</key><date>{date-35596800}</date>\n</dict>\n</plist>\n"
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008027-001122334455667A/Manifest.plist",
+"age": 35596800,
+"created": 35596800,
+"text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n<dict>\n<key>IsEncrypted</key><true/>\n</dict>\n</plist>\n"
+},
+{
+"path": "Library/Application Support/MobileSync/Backup/00008027-001122334455667A/Manifest.db",
+"age": 35596800,
+"created": 35596800,
+"size": 966367641
 }
 ]
 }

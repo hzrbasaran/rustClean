@@ -53,41 +53,52 @@
 <text x="576.0" y="166.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">17.04.2024 10:14</text>
 <text x="729.0" y="166.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs">Music/</text>
 <text x="0.0" y="185.0" fill="#cdd6f4" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      117.3 MiB </text>
-<text x="252.0" y="185.0" fill="#cdd6f4" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %0.4 </text>
-<text x="324.0" y="185.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">        33</text>
-<text x="423.0" y="185.0" fill="#00cd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">05.10.2026 14:13</text>
-<text x="576.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">09.09.2026 10:14</text>
-<text x="729.0" y="185.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">Pictures/</text>
+<text x="144.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">  ┌</text>
+<text x="171.0" y="185.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> Dışa aktar </text>
+<text x="279.0" y="185.0" fill="#00cdcd" xml:space="preserve" textLength="639.0" lengthAdjust="spacingAndGlyphs">──────────────────────────────────────────────────────────────────────┐</text>
+<text x="162.0" y="204.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="909.0" y="204.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="223.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="171.0" y="223.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="360.0" lengthAdjust="spacingAndGlyphs"> Bu liste dosyaya kaydedilecek: 7 satır.</text>
+<text x="909.0" y="223.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="242.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="909.0" y="242.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="261.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<rect x="171.0" y="247.0" width="36.0" height="19.0" fill="#e5e5e5"/>
+<text x="171.0" y="261.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">  c </text>
+<text x="207.0" y="261.0" fill="#ffffff" xml:space="preserve" textLength="288.0" lengthAdjust="spacingAndGlyphs">  CSV   (tablo programları için)</text>
+<text x="909.0" y="261.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="280.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<rect x="171.0" y="266.0" width="36.0" height="19.0" fill="#e5e5e5"/>
+<text x="171.0" y="280.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs">  j </text>
+<text x="207.0" y="280.0" fill="#ffffff" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">  JSON  (betikler için)</text>
+<text x="909.0" y="280.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="299.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<rect x="171.0" y="285.0" width="45.0" height="19.0" fill="#e5e5e5"/>
+<text x="171.0" y="299.0" fill="#000000" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Esc </text>
+<text x="216.0" y="299.0" fill="#ffffff" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  vazgeç</text>
+<text x="909.0" y="299.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="318.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="909.0" y="318.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="337.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="171.0" y="337.0" fill="#e5e5e5" xml:space="preserve" textLength="558.0" lengthAdjust="spacingAndGlyphs"> Çalışma klasörüne kaydedilir; oraya yazılamazsa ev klasörüne.</text>
+<text x="909.0" y="337.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="356.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="171.0" y="356.0" fill="#e5e5e5" xml:space="preserve" textLength="342.0" lengthAdjust="spacingAndGlyphs"> Var olan dosyaların üzerine yazılmaz.</text>
+<text x="909.0" y="356.0" fill="#00cdcd" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">│</text>
+<text x="162.0" y="375.0" fill="#00cdcd" xml:space="preserve" textLength="756.0" lengthAdjust="spacingAndGlyphs">└──────────────────────────────────────────────────────────────────────────────────┘</text>
 <text x="0.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
 <text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">170 öğe tarandı, 0.0 sn</text>
 <rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
 <text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
 <text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> yardım  </text>
-<rect x="108.0" y="551.0" width="36.0" height="19.0" fill="#e5e5e5"/>
-<text x="108.0" y="565.0" fill="#000000" xml:space="preserve" textLength="36.0" lengthAdjust="spacingAndGlyphs"> ↑↓ </text>
-<text x="144.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> gez  </text>
-<rect x="198.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
-<text x="198.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
-<text x="261.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> gir  </text>
-<rect x="315.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="315.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ⌫ </text>
-<text x="342.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> geri  </text>
-<rect x="405.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="405.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> t </text>
-<text x="432.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> harita  </text>
-<rect x="513.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="513.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> / </text>
-<text x="540.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> ara  </text>
-<rect x="594.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="594.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> m </text>
-<text x="621.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> raporlar  </text>
-<rect x="720.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="720.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> i </text>
-<text x="747.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> özet  </text>
-<rect x="810.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="810.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> s </text>
-<text x="837.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> sırala  </text>
-<rect x="918.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
-<text x="918.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> a </text>
-<text x="945.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="135.0" lengthAdjust="spacingAndGlyphs"> görünen/diskte</text>
+<rect x="108.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="108.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> c </text>
+<text x="135.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs"> CSV  </text>
+<rect x="189.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="189.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> j </text>
+<text x="216.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> JSON  </text>
+<rect x="279.0" y="551.0" width="45.0" height="19.0" fill="#e5e5e5"/>
+<text x="279.0" y="565.0" fill="#000000" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Esc </text>
+<text x="324.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="756.0" lengthAdjust="spacingAndGlyphs"> vazgeç                                                                             </text>
 </g></svg>

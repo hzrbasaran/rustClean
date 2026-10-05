@@ -3,7 +3,7 @@
 <g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
 <rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#005faf"/>
 <text x="0.0" y="14.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
-<text x="99.0" y="14.0" fill="#1d1d1f" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo  │  21.9 GiB (görünen)  │  105 dosya  │  sıralama: boyut                                             </text>
+<text x="99.0" y="14.0" fill="#1d1d1f" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> ~/demo  │  25.6 GiB (görünen)  │  114 dosya  │  sıralama: boyut                                             </text>
 <text x="0.0" y="33.0" fill="#1d1d1f" xml:space="preserve" textLength="531.0" lengthAdjust="spacingAndGlyphs">───────────────────────────────────────────────────────────</text>
 <text x="531.0" y="33.0" fill="#1d1d1f" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs"> Tarih: </text>
 <text x="603.0" y="33.0" fill="#008700" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
@@ -15,68 +15,67 @@
 <text x="963.0" y="33.0" fill="#d70000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
 <text x="981.0" y="33.0" fill="#1d1d1f" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 yıl   </text>
 <text x="0.0" y="52.0" fill="#1d1d1f" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">    Boyut       Oran                Dosya      Son değişiklik   Oluşturma        Ad                                     </text>
-<rect x="0.0" y="57.0" width="144.0" height="19.0" fill="#dadada"/>
-<text x="0.0" y="71.0" fill="#1d1d1f" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">▶       9.7 GiB </text>
-<rect x="144.0" y="57.0" width="108.0" height="19.0" fill="#dadada"/>
-<text x="144.0" y="71.0" fill="#005faf" font-weight="bold" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">█████▎      </text>
-<rect x="252.0" y="57.0" width="72.0" height="19.0" fill="#dadada"/>
-<text x="252.0" y="71.0" fill="#1d1d1f" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %44.1 </text>
-<rect x="324.0" y="57.0" width="90.0" height="19.0" fill="#dadada"/>
-<text x="324.0" y="71.0" fill="#6c6c6c" font-weight="bold" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         7</text>
-<rect x="414.0" y="57.0" width="9.0" height="19.0" fill="#dadada"/>
-<rect x="423.0" y="57.0" width="144.0" height="19.0" fill="#dadada"/>
-<text x="423.0" y="71.0" fill="#008700" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">04.10.2026 20:59</text>
-<rect x="567.0" y="57.0" width="9.0" height="19.0" fill="#dadada"/>
-<rect x="576.0" y="57.0" width="144.0" height="19.0" fill="#dadada"/>
-<text x="576.0" y="71.0" fill="#0087af" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">13.09.2026 17:01</text>
-<rect x="720.0" y="57.0" width="9.0" height="19.0" fill="#dadada"/>
-<rect x="729.0" y="57.0" width="90.0" height="19.0" fill="#dadada"/>
+<text x="0.0" y="71.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        9.7 GiB </text>
+<text x="144.0" y="71.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">████▌       </text>
+<text x="252.0" y="71.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %37.7 </text>
+<text x="324.0" y="71.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         7</text>
+<text x="423.0" y="71.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">05.10.2026 14:13</text>
+<text x="576.0" y="71.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">14.09.2026 10:14</text>
 <text x="729.0" y="71.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">Downloads/</text>
-<rect x="819.0" y="57.0" width="261.0" height="19.0" fill="#dadada"/>
-<text x="0.0" y="90.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.6 GiB </text>
-<text x="144.0" y="90.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">██          </text>
-<text x="252.0" y="90.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %16.2 </text>
-<text x="324.0" y="90.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">        25</text>
-<text x="423.0" y="90.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">04.10.2026 20:59</text>
-<text x="576.0" y="90.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">01.10.2026 17:01</text>
-<text x="729.0" y="90.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">Projects/</text>
-<text x="0.0" y="109.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.2 GiB </text>
-<text x="144.0" y="109.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">█▊          </text>
-<text x="252.0" y="109.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %14.6 </text>
-<text x="324.0" y="109.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         2</text>
-<text x="423.0" y="109.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">27.09.2026 17:01</text>
-<text x="576.0" y="109.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">27.09.2026 17:01</text>
-<text x="729.0" y="109.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs">Movies/</text>
-<text x="0.0" y="128.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.0 GiB </text>
-<text x="144.0" y="128.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">█▋          </text>
-<text x="252.0" y="128.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %13.6 </text>
-<text x="324.0" y="128.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         3</text>
-<text x="423.0" y="128.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">02.10.2026 17:01</text>
-<text x="576.0" y="128.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">02.10.2026 17:01</text>
-<text x="729.0" y="128.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">Library/</text>
+<rect x="0.0" y="76.0" width="144.0" height="19.0" fill="#dadada"/>
+<text x="0.0" y="90.0" fill="#1d1d1f" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">▶       6.7 GiB </text>
+<rect x="144.0" y="76.0" width="108.0" height="19.0" fill="#dadada"/>
+<text x="144.0" y="90.0" fill="#005faf" font-weight="bold" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">███▏        </text>
+<rect x="252.0" y="76.0" width="72.0" height="19.0" fill="#dadada"/>
+<text x="252.0" y="90.0" fill="#1d1d1f" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %26.1 </text>
+<rect x="324.0" y="76.0" width="90.0" height="19.0" fill="#dadada"/>
+<text x="324.0" y="90.0" fill="#6c6c6c" font-weight="bold" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">        12</text>
+<rect x="414.0" y="76.0" width="9.0" height="19.0" fill="#dadada"/>
+<rect x="423.0" y="76.0" width="144.0" height="19.0" fill="#dadada"/>
+<text x="423.0" y="90.0" fill="#008700" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">03.10.2026 10:14</text>
+<rect x="567.0" y="76.0" width="9.0" height="19.0" fill="#dadada"/>
+<rect x="576.0" y="76.0" width="144.0" height="19.0" fill="#dadada"/>
+<text x="576.0" y="90.0" fill="#008700" font-weight="bold" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">03.10.2026 10:14</text>
+<rect x="720.0" y="76.0" width="9.0" height="19.0" fill="#dadada"/>
+<rect x="729.0" y="76.0" width="72.0" height="19.0" fill="#dadada"/>
+<text x="729.0" y="90.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">Library/</text>
+<rect x="801.0" y="76.0" width="279.0" height="19.0" fill="#dadada"/>
+<text x="0.0" y="109.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.6 GiB </text>
+<text x="144.0" y="109.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">█▋          </text>
+<text x="252.0" y="109.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %13.9 </text>
+<text x="324.0" y="109.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">        25</text>
+<text x="423.0" y="109.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">05.10.2026 14:13</text>
+<text x="576.0" y="109.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">02.10.2026 10:14</text>
+<text x="729.0" y="109.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">Projects/</text>
+<text x="0.0" y="128.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        3.2 GiB </text>
+<text x="144.0" y="128.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">█▌          </text>
+<text x="252.0" y="128.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">  %12.5 </text>
+<text x="324.0" y="128.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         2</text>
+<text x="423.0" y="128.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">28.09.2026 10:14</text>
+<text x="576.0" y="128.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">28.09.2026 10:14</text>
+<text x="729.0" y="128.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs">Movies/</text>
 <text x="0.0" y="147.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">        1.5 GiB </text>
 <text x="144.0" y="147.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">▊           </text>
-<text x="252.0" y="147.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %6.7 </text>
+<text x="252.0" y="147.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %5.7 </text>
 <text x="324.0" y="147.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">        34</text>
-<text x="423.0" y="147.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">04.10.2026 20:59</text>
-<text x="576.0" y="147.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">01.10.2026 17:01</text>
+<text x="423.0" y="147.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">05.10.2026 14:13</text>
+<text x="576.0" y="147.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">02.10.2026 10:14</text>
 <text x="729.0" y="147.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">Documents/</text>
 <text x="0.0" y="166.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      950.0 MiB </text>
-<text x="144.0" y="166.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">▌           </text>
-<text x="252.0" y="166.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %4.2 </text>
+<text x="144.0" y="166.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">▍           </text>
+<text x="252.0" y="166.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %3.6 </text>
 <text x="324.0" y="166.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         1</text>
-<text x="423.0" y="166.0" fill="#d70000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">16.04.2024 17:01</text>
-<text x="576.0" y="166.0" fill="#d70000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">16.04.2024 17:01</text>
+<text x="423.0" y="166.0" fill="#d70000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">17.04.2024 10:14</text>
+<text x="576.0" y="166.0" fill="#d70000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">17.04.2024 10:14</text>
 <text x="729.0" y="166.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="54.0" lengthAdjust="spacingAndGlyphs">Music/</text>
 <text x="0.0" y="185.0" fill="#1d1d1f" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">      117.3 MiB </text>
-<text x="144.0" y="185.0" fill="#005faf" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">▏           </text>
-<text x="252.0" y="185.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %0.5 </text>
+<text x="252.0" y="185.0" fill="#1d1d1f" xml:space="preserve" textLength="72.0" lengthAdjust="spacingAndGlyphs">   %0.4 </text>
 <text x="324.0" y="185.0" fill="#6c6c6c" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">        33</text>
-<text x="423.0" y="185.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">04.10.2026 20:59</text>
-<text x="576.0" y="185.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">08.09.2026 17:01</text>
+<text x="423.0" y="185.0" fill="#008700" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">05.10.2026 14:13</text>
+<text x="576.0" y="185.0" fill="#0087af" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">09.09.2026 10:14</text>
 <text x="729.0" y="185.0" fill="#005fd7" font-weight="bold" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs">Pictures/</text>
 <text x="0.0" y="527.0" fill="#1d1d1f" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
-<text x="0.0" y="546.0" fill="#6c6c6c" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">156 öğe tarandı, 0.0 sn</text>
+<text x="0.0" y="546.0" fill="#6c6c6c" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">170 öğe tarandı, 0.0 sn</text>
 <rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#6c6c6c"/>
 <text x="0.0" y="565.0" fill="#ffffff" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
 <text x="27.0" y="565.0" fill="#1d1d1f" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> yardım  </text>
