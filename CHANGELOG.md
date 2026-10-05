@@ -6,6 +6,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-05
+
 ### Added
 - "Similar images" report, after the duplicates in the menu (the reports
   and tools below it move down by one).
@@ -40,6 +42,9 @@ follows [Semantic Versioning](https://semver.org/).
   ([#23](https://github.com/hzrbasaran/rustClean/issues/23))
 
 ### Changed
+- For contributors: `o` and `w` save files through one module,
+  `newfile.rs` ([#74](https://github.com/hzrbasaran/rustClean/issues/74)).
+  CI also checks the build without the `similar-images` feature.
 - The Playwright cleanup moves the browsers folder's contents to the trash
   instead of running `npx --yes playwright uninstall --all`, which could
   download Playwright first just to remove the browsers. It works offline,
@@ -301,7 +306,8 @@ First public release.
 - Turkish and English interface (`L`, `--lang`).
 - `--list-disks` and `--summary` command line modes.
 
-[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/hzrbasaran/rustClean/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/hzrbasaran/rustClean/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/hzrbasaran/rustClean/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/hzrbasaran/rustClean/compare/v0.1.0...v0.2.0
