@@ -195,11 +195,11 @@ impl Browser {
     /// The duplicates report when no two large files share a size.
     pub(crate) fn no_duplicates_list(&self, base: NodeId) -> ResultList {
         let mut list = ResultList::new(ReportKind::Duplicates.label().into(), base, Vec::new());
-        list.note = t!(
-            "1 MiB üzerinde aynı boyutta iki dosya yok.",
-            "No two files of 1 MiB or more have the same size.",
-        )
-        .into();
+        let min = crate::config::fmt_mib(crate::config::get().duplicates_min_mib);
+        list.note = tf!(
+            "{min} üzerinde aynı boyutta iki dosya yok.",
+            "No two files of {min} or more have the same size.",
+        );
         list.source = Source::Duplicates;
         list
     }

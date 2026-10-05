@@ -8,6 +8,7 @@
 mod apps;
 mod backups;
 mod clutter;
+mod config;
 mod deletion;
 mod export;
 mod history;

@@ -22,7 +22,9 @@ cargo run --release -- ~/some/folder
 ```
 
 Use `RUSTCLEAN_DATA_DIR=/tmp/rc-dev` while developing, so test runs do not
-mix with your real scan history and settings.
+mix with your real scan history and settings, and your own `config.toml`
+does not change what you see. Put a `config.toml` there to try the
+[configuration file](docs/USAGE.md#configuration-file).
 
 ## Checks
 

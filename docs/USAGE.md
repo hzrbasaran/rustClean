@@ -19,6 +19,7 @@ need to look anything up.
 - [Reports from the command line](#reports-from-the-command-line)
 - [Mouse](#mouse)
 - [Command line](#command-line)
+- [Configuration file](#configuration-file)
 
 ## Starting
 
@@ -190,9 +191,9 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Orphaned app leftovers | data folders that belong to no installed app (installed apps are read from `/Applications` as well, so scanning your home folder is enough) |
 | Developer junk | `node_modules`, Cargo `target`, `build`, `dist`, `Pods`, `.build`, `DerivedData`, `.gradle`, `.venv`, `__pycache__`, `vendor`, .NET `bin`/`obj`… only when the project's marker file is present |
 | Cache folders | entries of `Caches` / `.cache`, and `GPUCache`, `Code Cache`… |
-| Old and large files | ≥ 100 MiB and unchanged for over a year |
+| Old and large files | ≥ 100 MiB and unchanged for over a year (both [configurable](#configuration-file)) |
 | Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
-| Duplicate files | files with identical content (≥ 1 MiB); `Space` on a group adds all but the oldest copy |
+| Duplicate files | files with identical content (≥ 1 MiB, [configurable](#configuration-file)); `Space` on a group adds all but the oldest copy |
 | Empty folders, broken links, temporary files | three groups: folders with nothing below them (only the topmost is listed), symbolic links whose target is gone, and temporary files (`.DS_Store`, `Thumbs.db`, `*.tmp`, Office `~$…` locks, unfinished downloads) untouched for a day; `Enter` opens a group, `Space` adds it whole |
 | iPhone / iPad backups | one row per backup folder in `MobileSync/Backup`: the device name and model, then the date of the backup, `newest` on the newest backup of each device, `encrypted`, and the iOS version, read from the backup's `Info.plist` and `Manifest.plist`; see below |
 
@@ -467,6 +468,7 @@ The exit code is 0 on success, 2 for a wrong command line (an unknown kind
 lists the valid ones), and 1 when the folder cannot be scanned or `--older`
 is given to a report without an age filter; the reason goes to stderr. A
 folder literally named `report` can be scanned as `rustclean ./report`.
+
 ## Mouse
 
 rustClean is made for the keyboard; the mouse is optional and **off by
@@ -502,7 +504,7 @@ also when it stops because of an error.
 
 ```text
 rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
-          [--list-disks] [--summary]
+          [--list-disks] [--summary] [--config]
 rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
           [--lang tr|en]
 ```
@@ -510,6 +512,78 @@ rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
 - `PATH`: scan this folder directly instead of choosing a disk.
 - `--list-disks`: print the disks and exit.
 - `--summary`: scan `PATH` without the interface and print the totals.
+  Folders excluded in the [configuration file](#configuration-file) are
+  skipped here too.
+- `--config`: print where the configuration file is and the values in
+  effect, then exit.
 - `report`: print one report without the interface; see
-  [Reports from the command line](#reports-from-the-command-line).
-- `RUSTCLEAN_DATA_DIR`: where history and settings are stored.
+  [Reports from the command line](#reports-from-the-command-line). Excluded
+  folders are skipped here too.
+- `RUSTCLEAN_DATA_DIR`: where history, settings and `config.toml` are stored.
+
+## Configuration file
+
+rustClean reads `config.toml` from its data directory when it starts
+(`~/Library/Application Support/rustClean/config.toml` on macOS,
+`~/.local/share/rustClean/config.toml` on Linux,
+`%APPDATA%\rustClean\config.toml` on Windows, or `$RUSTCLEAN_DATA_DIR/config.toml`).
+The file is optional and so is every key: without it rustClean behaves as
+described in this guide. rustClean never writes the file.
+
+`rustclean --config` prints the file's path and the values in effect, in the
+same format, so its output is a good start:
+
+```bash
+rustclean --config > /tmp/config.toml   # then edit, and move it to the path on the first line
+```
+
+Every key, with its default:
+
+```toml
+[scan]
+# Folders the scan does not go into. They still appear in the list, as
+# empty. "~" is your home folder; other paths must be absolute. Scanning an
+# excluded folder directly (rustclean ~/Library/Containers) still works.
+# Also applies to --summary, to report and to R (rescan the current folder).
+exclude = []
+# exclude = ["~/Library/Containers", "/Volumes/Backup"]
+
+[reports]
+# "Old and large files": at least this many MiB...
+old_big_min_mib = 100
+# ...and unchanged for more than this many days.
+old_big_min_days = 365
+# The smallest file the duplicate search reads, in MiB.
+duplicates_min_mib = 1
+
+[view]
+# The size a scan opens with: "disk" (what du reports) or "apparent"
+# (the file length). The a key still switches.
+size = "disk"
+# The order a scan opens with: "size", "name", "count" (file count) or
+# "modified" (oldest change first). The s key still cycles.
+sort = "size"
+```
+
+The numbers are whole numbers of 1 or more. The menu line and the note of
+"Old and large files" and of the duplicate search show the values in effect.
+
+Theme and language are not in this file: `T` and `L` save them in the
+`settings` file next to it, and `--theme` / `--lang` override them for one
+run.
+
+**Precedence.** Command-line flags come first, then the configuration file,
+then the defaults. Keys switched in the interface (`a`, `s`) last until the
+next scan.
+
+**Mistakes never stop rustClean.**
+- A file that is not valid TOML is ignored as a whole: rustClean starts with
+  the defaults and says so, with the file and the line and column of the
+  error.
+- A key with an invalid value (`sort = "biggest"`, `old_big_min_mib = 0`)
+  keeps its default; the other keys still apply.
+- An unknown key (a typo such as `[veiw]`) is ignored with a warning.
+
+The message is shown on the status line (on the disk list, and when the first
+scan opens; with several problems, the first one and how many more), and on
+stderr for `--summary` and `--config`. `rustclean --config` lists them all.

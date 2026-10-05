@@ -13,7 +13,7 @@ use crate::export::{self, Format, Meta};
 use crate::lists::ResultList;
 use crate::reports::ReportKind;
 use crate::tree::{SizeMode, Tree, ROOT};
-use crate::{disks, duplicates, scanner, ui};
+use crate::{config, duplicates, scanner, ui};
 
 impl clap::ValueEnum for ReportKind {
     fn value_variants<'a>() -> &'a [Self] {
@@ -71,15 +71,12 @@ pub fn report(args: &ReportArgs) -> Result<()> {
         Some(p) => p.clone(),
         None => std::env::current_dir()?,
     };
-    let res = scanner::scan(
-        &path,
-        disks::all_mount_points(),
-        &Default::default(),
-        |_| {},
-    )?;
+    let res = scanner::scan(&path, config::scan_skip(), &Default::default(), |_| {})?;
     // The interface's own report code, over a browser that is never shown
-    // (it starts in on-disk sizes and records no history).
-    let browser = Browser::new(res);
+    // and records no history. The table shows sizes on disk, so the reports
+    // rank by them too, whatever size the configuration opens scans with.
+    let mut browser = Browser::new(res);
+    browser.size_mode = SizeMode::Disk;
     let tree = &browser.tree;
     let mut list = build(&browser, kind, min_age);
     if let Some(n) = args.limit {

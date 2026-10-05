@@ -242,3 +242,95 @@ fn report_of_the_current_folder() {
     assert!(out.status.success(), "{out:?}");
     assert_eq!(stdout(&out).lines().count(), 5, "{out:?}");
 }
+/// Runs rustclean with `config` as its `config.toml`. Returns the output,
+/// the file, and the data directory (removed when dropped).
+fn with_config(config: &str, args: &[&str]) -> (Output, std::path::PathBuf, tempfile::TempDir) {
+    let data = tempfile::tempdir().unwrap();
+    let file = data.path().join("config.toml");
+    std::fs::write(&file, config).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_rustclean"))
+        .args(args)
+        .env("RUSTCLEAN_DATA_DIR", data.path())
+        .output()
+        .unwrap();
+    (out, file, data)
+}
+
+fn stderr(o: &Output) -> String {
+    String::from_utf8_lossy(&o.stderr).into_owned()
+}
+
+#[test]
+fn summary_skips_excluded_folders() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir(dir.path().join("skip")).unwrap();
+    std::fs::write(dir.path().join("a.bin"), vec![0u8; 5000]).unwrap();
+    std::fs::write(dir.path().join("skip/b.bin"), vec![1u8; 3000]).unwrap();
+    let skip = std::path::absolute(dir.path().join("skip")).unwrap();
+    // A literal string, so Windows backslashes stay as they are.
+    let config = format!("[scan]\nexclude = ['{}']\n", skip.display());
+    let path = dir.path().to_str().unwrap();
+    let (out, _, _data) = with_config(&config, &["--summary", "--lang", "en", path]);
+    assert!(out.status.success(), "{out:?}");
+    let text = stdout(&out);
+    assert!(text.contains("apparent: 4.9 KiB (5000 B)"), "{text}");
+    assert!(text.contains("1 file, 2 entries"), "{text}");
+    assert_eq!(stderr(&out), "");
+}
+
+#[test]
+fn report_skips_excluded_folders() {
+    let dir = report_fixture();
+    let skip = std::path::absolute(dir.path().join("app")).unwrap();
+    let config = format!("[scan]\nexclude = ['{}']\n", skip.display());
+    let root = dir.path().to_str().unwrap();
+    let (out, _, _data) = with_config(&config, &["report", "dev-junk", root, "--lang", "en"]);
+    assert!(out.status.success(), "{out:?}");
+    // The build output inside the excluded project is not found.
+    let text = stdout(&out);
+    assert!(!text.replace('\\', "/").contains("app/target"), "{text}");
+    assert_eq!(stderr(&out), "");
+}
+
+#[test]
+fn a_broken_config_does_not_stop_the_summary() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("a.bin"), vec![0u8; 1000]).unwrap();
+    let path = dir.path().to_str().unwrap();
+    let (out, file, _data) = with_config("[scan\n", &["--summary", "--lang", "en", path]);
+    assert!(out.status.success(), "{out:?}");
+    assert!(stdout(&out).contains("1 file, 1 entry"), "{out:?}");
+    let err = stderr(&out);
+    assert!(err.contains(&file.display().to_string()), "{err}");
+    assert!(err.contains("using the defaults"), "{err}");
+    assert!(err.contains("line 1, column"), "{err}");
+}
+
+#[test]
+fn config_prints_the_path_and_the_values() {
+    // No file: the path and the defaults.
+    let out = rustclean(&["--config", "--lang", "en"]);
+    assert!(out.status.success(), "{out:?}");
+    let text = stdout(&out);
+    assert!(text.contains("config.toml"), "{text}");
+    assert!(text.contains("No file; the defaults apply"), "{text}");
+    assert!(text.contains("old_big_min_mib = 100"), "{text}");
+    assert!(text.contains("size = \"disk\""), "{text}");
+
+    // A file with a value and an unknown key.
+    let (out, file, _data) = with_config(
+        "[reports]\nold_big_min_days = 30\nnope = 1\n",
+        &["--config", "--lang", "en"],
+    );
+    assert!(out.status.success(), "{out:?}");
+    let text = stdout(&out);
+    assert!(
+        text.starts_with(&format!("# {}\n", file.display())),
+        "{text}"
+    );
+    assert!(text.contains("old_big_min_days = 30"), "{text}");
+    assert!(
+        stderr(&out).contains("Unknown key ignored: reports.nope"),
+        "{out:?}"
+    );
+}
