@@ -180,7 +180,9 @@ empty and needed), app and package bundles (`.app`, `.framework`,
 (`target`, `Pods`, `node_modules`, `vendor`…) and system folders,
 and it never lists the standard folders of your home folder (`Desktop`,
 `Documents`, `Downloads`…). A folder that holds only such a folder is not
-empty. Temporary files changed in the last day may be in use (an open
+empty. Neither is a folder rustClean could not look into (no permission,
+another disk, or a skipped path), nor one around it: it may hold anything.
+Temporary files changed in the last day may be in use (an open
 document's lock file, a running download) and are left out; `.DS_Store` and
 `Thumbs.db` are listed at any age, as the system writes them again.
 

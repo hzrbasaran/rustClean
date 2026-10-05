@@ -21,6 +21,11 @@ follows [Semantic Versioning](https://semver.org/).
 - English counts use the singular for one: "1 item", "1 row", "1 file"
   instead of "1 items" (and "1 item was inaccessible", "the parent folder of
   1 item").
+- The clutter report no longer lists a folder it could not look into as
+  empty. A folder without read permission, on another disk or skipped by
+  the scan showed nothing below it and was offered as an empty folder,
+  although it may hold files. Such folders, and the folders around them,
+  are now never counted as empty.
 
 ## [0.3.0] - 2026-10-04
 
