@@ -31,6 +31,9 @@ one go.
 - **Explore** — a navigable list with size bars, file counts and color-coded
   modification dates, a **treemap** view (`t`), and a per-folder
   **summary** with file types, age distribution and the largest items (`i`).
+- **Treemap as a web page** (`w`) — saves the current folder as a single,
+  self-contained HTML file with a zoomable treemap four levels deep, to open
+  in any browser (also offline, also on a phone) or to share.
 - **Reports** (`m`)
   - largest files and folders
   - most repeated file names
@@ -47,6 +50,10 @@ one go.
   - **empty folders, broken links and temporary files** (`.DS_Store`,
     `*.tmp`, Office locks, unfinished downloads), leaving alone hidden
     folders, bundles, `Library`, build output and system folders
+  - **iPhone / iPad backups** made by Finder or iTunes (`MobileSync/Backup`):
+    the device, model, iOS version and date of each backup, encrypted ones
+    and the newest backup of each device marked; explains when the folder
+    needs Full Disk Access
 - **Age filter** (`f`) on reports: show only what has not been touched for
   30 / 90 / 180 / 365 days. For developer junk, the age is the *project's*,
   not the dependency folder's.
@@ -69,6 +76,9 @@ one go.
 - **Themes** for dark and light terminals and a color-blind friendly palette
   (`T` to switch), or no colors at all (`--no-color`, `NO_COLOR`).
 - **Help** (`?`) — every key on one screen, the current screen's first.
+- **Optional mouse** (`M`) — click to select a row or a treemap block,
+  double-click to open, scroll with the wheel. Off by default, so the
+  terminal can still select text; confirmations stay keyboard-only.
 
 ## Screenshots
 
@@ -166,6 +176,7 @@ Every screen lists its keys at the bottom. The most important ones:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | move · open · go back |
 | `t` | list ↔ treemap |
+| `w` | save the treemap as an HTML page |
 | `i` | summary of the current folder |
 | `m` | reports and tools |
 | `/` | find by name (`*` and `?` wildcards) |
@@ -175,6 +186,7 @@ Every screen lists its keys at the bottom. The most important ones:
 | `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
 | `T` | theme: dark → light → color-blind |
+| `M` | mouse on / off (off by default) |
 | `?` | every key, for the current screen first |
 | `q` | quit |
 

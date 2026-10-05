@@ -7,7 +7,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Row, Table};
 use ratatui::Frame;
 
-use crate::app::{App, Browser, View};
+use crate::app::{App, Browser, Hit, Mouse, View};
 use crate::lists::ResultList;
 use crate::tree::SizeMode;
 
@@ -21,7 +21,9 @@ use super::style::{date_cell, highlight, Themed};
 use super::system::render_system;
 use super::theme::theme;
 use super::tools::render_tools;
-use super::{bar, keys, keys_without_help, table_block, title, DATE_WIDTH, SPINNER, WIDE};
+use super::{
+    bar, keys, keys_without_help, table_block, table_rows, title, DATE_WIDTH, SPINNER, WIDE,
+};
 
 pub(super) fn render_browser(
     f: &mut Frame<'_>,
@@ -30,6 +32,7 @@ pub(super) fn render_browser(
     body: Rect,
     footer: Rect,
 ) {
+    let mouse = &mut app.mouse;
     let Some(b) = &mut app.browser else { return };
     let mode = b.size_mode;
     let mode_label = match mode {
@@ -100,22 +103,22 @@ pub(super) fn render_browser(
         Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).areas(body);
 
     if let Some(view) = &mut b.tools {
-        render_tools(f, view, app.tick, table_area);
+        render_tools(f, view, app.tick, table_area, mouse);
     } else if let Some(log) = &mut b.deletion_log {
         super::log::render_log(f, log, mode, table_area);
     } else if let Some(sys) = &b.system {
         render_system(f, b, sys, table_area);
     } else if let Some(d) = &mut b.dashboard {
-        render_dashboard(f, &b.tree, d, mode, b.errors, table_area);
+        render_dashboard(f, &b.tree, d, mode, b.errors, table_area, mouse);
     } else if let Some(r) = &b.results {
         let checks: Vec<bool> = r.rows.iter().map(|row| b.row_in_basket(r, row)).collect();
         if let Some(r) = &mut b.results {
-            render_results(f, &b.tree, r, &checks, table_area);
+            render_results(f, &b.tree, r, &checks, table_area, mouse);
         }
     } else if b.view == View::Map {
-        render_map(f, b, table_area);
+        render_map(f, b, table_area, mouse);
     } else {
-        render_entries(f, b, table_area);
+        render_entries(f, b, table_area, mouse);
     }
 
     let status = if let Some(r) = &b.rescan {
@@ -257,11 +260,15 @@ pub(super) fn render_browser(
     }
 
     if let Some(sel) = b.report_menu {
-        render_report_menu(f, sel, f.area());
+        render_report_menu(f, sel, f.area(), mouse);
     }
     if let Some((saved, sel)) = &b.snapshot_picker {
         let total = b.tree.node(crate::tree::ROOT).size.disk;
-        render_snapshot_picker(f, saved, *sel, total, f.area());
+        render_snapshot_picker(f, saved, *sel, total, f.area(), mouse);
+    }
+    // Confirmations and the error list take no clicks.
+    if b.confirm.is_some() || b.uninstall.is_some() || b.failures.is_some() {
+        mouse.clear();
     }
     if let Some(ids) = &b.confirm {
         render_confirm(f, &b.tree, ids, mode, f.area());
@@ -274,7 +281,7 @@ pub(super) fn render_browser(
     }
 }
 
-fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
+fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect, mouse: &mut Mouse) {
     let tree = &b.tree;
     let mode = b.size_mode;
     let now = now_secs();
@@ -346,6 +353,12 @@ fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
         .highlight_symbol("▶ ")
         .block(table_block());
     f.render_stateful_widget(table, area, &mut b.table);
+    mouse.add_rows(
+        table_rows(area),
+        b.table.offset(),
+        b.entries.len(),
+        Hit::Entry,
+    );
 }
 
 /// The key hints of the bottom line for what the browser shows.
@@ -474,6 +487,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("S", t!("sepet", "basket")),
             ("R", t!("klasörü yenile", "refresh folder")),
             ("m", t!("raporlar", "reports")),
+            ("w", t!("HTML", "HTML")),
             ("q", t!("çık", "quit")),
         ]
     } else {
@@ -493,6 +507,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("R", t!("klasörü yenile", "refresh folder")),
             ("r", t!("tümünü tara", "rescan all")),
             ("d", t!("diskler", "disks")),
+            ("w", t!("HTML", "HTML")),
             ("q", t!("çık", "quit")),
         ]
     };

@@ -72,6 +72,9 @@ pub struct Node {
     pub is_dir: bool,
     /// A symbolic link (never followed; counted as a file).
     pub is_link: bool,
+    /// A directory whose contents were not read: it could not be opened, is
+    /// on another file system, or was skipped. It may hold anything.
+    pub unread: bool,
 }
 
 #[derive(Debug)]
@@ -128,6 +131,7 @@ impl Tree {
             name_len: name.len() as u16,
             is_dir,
             is_link: false,
+            unread: false,
         });
         id
     }
@@ -207,6 +211,7 @@ impl Tree {
             new.modified = n.modified;
             new.created = n.created;
             new.is_link = n.is_link;
+            new.unread = n.unread;
             map[sid] = id;
             if let Some(&c) = sub.clones.get(&(sid as NodeId)) {
                 self.clones.insert(id, c);
@@ -240,6 +245,10 @@ impl Tree {
 
     pub fn set_link(&mut self, id: NodeId) {
         self.nodes[id as usize].is_link = true;
+    }
+
+    pub fn set_unread(&mut self, id: NodeId) {
+        self.nodes[id as usize].unread = true;
     }
 
     pub fn set_times(&mut self, id: NodeId, modified: u32, created: u32) {

@@ -32,6 +32,10 @@ harekete geçmenizi sağlar:
 - **Keşif:**
   - boyut çubukları, dosya sayıları ve renkli değişiklik tarihleri olan bir liste
   - **ağaç haritası** görünümü (`t`)
+  - ağaç haritasını **web sayfası** olarak kaydetme (`w`): bulunulan klasör,
+    dört seviyeye kadar yakınlaştırılabilir haritasıyla tek ve kendi içinde
+    tam bir HTML dosyasına yazılır; her tarayıcıda (çevrimdışı ve telefonda
+    da) açılır, paylaşılabilir
   - dosya türleri, yaş dağılımı ve en büyük öğelerle klasör **özeti** (`i`)
 - **Raporlar** (`m`):
   - en büyük dosyalar ve klasörler
@@ -50,6 +54,10 @@ harekete geçmenizi sağlar:
     `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
     paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
     dokunmaz
+  - Finder ya da iTunes ile alınmış **iPhone / iPad yedekleri**
+    (`MobileSync/Backup`): her yedeğin cihazı, modeli, iOS sürümü ve tarihi;
+    şifreli yedekler ve her cihazın en yeni yedeği işaretlenir; klasör için
+    Tam Disk Erişimi gerekiyorsa söyler
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık
   klasörünün değil *projenin* yaşıdır.
@@ -73,6 +81,9 @@ harekete geçmenizi sağlar:
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 - **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
+- **İsteğe bağlı fare** (`M`): tıklayınca satır ya da harita bloğu seçilir,
+  çift tıklayınca açılır, tekerlekle kaydırılır. Terminalde metin seçmek
+  mümkün kalsın diye başlangıçta kapalıdır; onaylar yalnızca klavyeyle verilir.
 
 ## Ekran görüntüleri
 
@@ -171,6 +182,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | gezin · aç · geri |
 | `t` | liste ↔ ağaç haritası |
+| `w` | ağaç haritasını HTML sayfası olarak kaydet |
 | `i` | bulunulan klasörün özeti |
 | `m` | raporlar ve araçlar |
 | `/` | ada göre ara (`*` ve `?` joker karakterleri) |
@@ -180,6 +192,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |
+| `M` | fareyi aç / kapat (başlangıçta kapalı) |
 | `?` | bütün tuşlar, önce bulunduğunuz ekranınkiler |
 | `q` | çık |
 
