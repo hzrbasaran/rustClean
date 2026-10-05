@@ -319,12 +319,11 @@ mod tests {
         t.finalize();
         // The files inside the library, the app and the repository are never
         // offered; the two in Pictures stay (they share a size).
-        let mut names: Vec<String> = candidates(&t, ROOT)
-            .iter()
-            .map(|c| t.path_of(c.id).display().to_string())
-            .collect();
-        names.sort();
-        assert_eq!(names, ["/r/Pictures/IMG_1.jpg", "/r/Pictures/pack.bin"]);
+        let found = candidates(&t, ROOT);
+        assert!(found.iter().all(|c| t.parent(c.id) == Some(pics)));
+        let mut names: Vec<&str> = found.iter().map(|c| t.name(c.id)).collect();
+        names.sort_unstable();
+        assert_eq!(names, ["IMG_1.jpg", "pack.bin"]);
         // Run from inside a package, nothing is offered.
         assert!(candidates(&t, originals).is_empty());
         assert!(inside_kept_whole(&t, originals));
