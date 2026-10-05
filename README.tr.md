@@ -69,6 +69,12 @@ harekete geçmenizi sağlar:
 - **Komut satırından raporlar:** `rustclean report dev-junk ~/Projects
   --older 90 --json` her raporu tablo, CSV ya da JSON olarak yazdırır;
   betikler ve zamanlanmış görevler için. Yalnızca okur, hiçbir şey silmez.
+- **Disk dolmak üzere uyarısı:** `rustclean check`, ev klasörünüzün
+  bulunduğu disk (ve eklediğiniz diğerleri) %90'dan doluysa söyler.
+  `rustclean check --install` bunu arka planda saatte bir çalıştırır
+  (macOS'ta launchd, Linux'ta systemd zamanlayıcısı) ve her disk için en
+  fazla günde bir bildirim gösterir
+  ([ayrıntılar](docs/USAGE.md#disk-space-check), İngilizce).
 - **Silme kaydı:** çöp kutusuna taşınan her şey, günlere göre ve nasıl
   silindiğiyle (menü → Silme kaydı).
 - **Geliştirici araçları temizliği:** Docker, Xcode (simülatörler,
@@ -193,6 +199,10 @@ rustclean --config        # config.toml'un yeri ve geçerli değerler
 # arayüz açmadan bir rapor: tablo ya da --csv / --json (yalnızca okur)
 rustclean report dev-junk ~/Projects --older 90 --json
 rustclean report largest-files ~ --limit 20 --csv > buyukler.csv
+
+# bir disk %90'dan doluysa uyar (çıkış kodu 3); --install: saatte bir
+rustclean check
+rustclean check --install
 ```
 
 Rapor türleri: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
@@ -250,13 +260,18 @@ Araçlar ekranında platforma özel satırlar vardır:
   gösterilir) ve Geri Dönüşüm Kutusunun boyutu. Windows desteği en az denenmiş
   olanıdır; gerçek makinelerden gelen geri bildirimler çok işe yarar.
 
+`rustclean check --install` macOS'ta bir launchd ajanı, Linux'ta kullanıcının
+systemd zamanlayıcısını kurar. Windows'ta görevi kendisi kaydetmez, çalıştırmanız
+gereken `schtasks` komutunu gösterir.
+
 ## Bilgisayarınızda saklanan veriler
 
 rustClean hiçbir ağ bağlantısı kurmaz. Yalnızca şunları yazar:
 
 - geçmiş özelliği için tarama özetleri (taranan her klasör için en yeni 10),
-- seçilen arayüz dili ve tema, ve
-- çöp kutusuna taşınanların kaydı (en yeni 10 000 öğe).
+- seçilen arayüz dili ve tema,
+- çöp kutusuna taşınanların kaydı (en yeni 10 000 öğe), ve
+- `rustclean check`'in dolu diskler için en son ne zaman bildirim gösterdiği.
 
 Bunlar platformun veri klasöründe tutulur: macOS'ta
 `~/Library/Application Support/rustClean`, Linux'ta `~/.local/share/rustClean`,
@@ -266,6 +281,11 @@ ortam değişkenini kullanın.
 Ayar dosyası `config.toml` da aynı klasördedir
 ([ayrıntılar](docs/USAGE.md#configuration-file), İngilizce). rustClean onu
 yalnızca okur; dosya ancak siz oluşturursanız vardır.
+
+`rustclean check --install` bu klasörün dışına da bir dosya yazar;
+`--uninstall` onu yeniden siler: macOS'ta
+`~/Library/LaunchAgents/io.github.hzrbasaran.rustclean.check.plist`, Linux'ta
+`~/.config/systemd/user` içindeki `rustclean-check.service` ve `.timer`.
 
 ## Katkı
 

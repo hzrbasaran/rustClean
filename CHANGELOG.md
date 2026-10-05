@@ -6,6 +6,21 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `rustclean check` warns when a disk is fuller than a threshold: 90 % by
+  default, or `--threshold`, or `[watch] threshold` in `config.toml`.
+  - It watches the disk with your home folder, plus the ones listed under
+    `[watch] disks`. It prints one line per disk and exits with code 3 when
+    one is over.
+  - `rustclean check --install` runs it every hour in the background: a
+    launchd agent on macOS, a systemd user timer on Linux. Before doing
+    anything it shows what it will write and run, and asks you to type
+    `yes` (`evet`). On Windows it shows the `schtasks` command instead.
+    `--uninstall` removes it.
+  - Background runs show a system notification (`osascript` / `notify-send`)
+    at most once a day per disk while the disk stays over.
+  ([#23](https://github.com/hzrbasaran/rustClean/issues/23))
+
 ### Changed
 - The Playwright cleanup moves the browsers folder's contents to the trash
   instead of running `npx --yes playwright uninstall --all`, which could

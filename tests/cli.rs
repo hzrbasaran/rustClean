@@ -334,3 +334,45 @@ fn config_prints_the_path_and_the_values() {
         "{out:?}"
     );
 }
+
+#[test]
+fn check_reports_disks_over_the_threshold() {
+    // Every disk is at least 1 % full; nothing is shown as a notification.
+    let out = rustclean(&["check", "--no-notify", "--threshold", "1", "--lang", "en"]);
+    let text = stdout(&out);
+    if text.contains("No disk to watch") {
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        return;
+    }
+    assert_eq!(out.status.code(), Some(3), "{out:?}");
+    assert!(text.contains("% full"), "{text}");
+    assert!(text.contains("over the threshold (1 %)"), "{text}");
+}
+
+#[test]
+fn check_takes_the_threshold_from_the_config() {
+    let (out, _, data) = with_config(
+        "[watch]\nthreshold = 1\n",
+        &["check", "--no-notify", "--lang", "en"],
+    );
+    let text = stdout(&out);
+    assert!(
+        text.contains("No disk to watch") || text.contains("over the threshold (1 %)"),
+        "{text}"
+    );
+    // A check without notifications leaves no notification memory behind.
+    assert!(!data.path().join("check-state").exists());
+}
+
+#[test]
+fn check_refuses_bad_thresholds_and_paths() {
+    for args in [
+        &["check", "--threshold", "100"][..],
+        &["check", "--threshold", "0"],
+        &["check", "--install", "--uninstall"],
+        &["/tmp", "check"],
+    ] {
+        let out = rustclean(args);
+        assert_eq!(out.status.code(), Some(2), "{args:?}: {out:?}");
+    }
+}

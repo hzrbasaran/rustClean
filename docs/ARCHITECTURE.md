@@ -50,6 +50,9 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ export.rs ── lists as CSV / JSON records
    ├─ newfile.rs ─ saving a new file that never replaces one (`o`, `w`)
    ├─ cli.rs ───── `rustclean report`: scan, run one report, print it
+   ├─ check/ ───── `rustclean check`: warn when a disk is too full
+   │    ├─ mod.rs        watched disks, the lines, the exit code, notifications
+   │    └─ agent.rs      --install / --uninstall: launchd agent, systemd timer
    ├─ treemap.rs ─ squarified layout and block navigation
    ├─ htmlmap/ ─── the treemap as a self-contained HTML page (`w`)
    │    ├─ mod.rs        picks the blocks (depth, block and "other" limits),
@@ -67,7 +70,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ trashlog.rs  the deletion log (deletions.jsonl)
    ├─ disks.rs ─── disk discovery (sysinfo)
-   ├─ paths.rs ─── data directory (history, settings, deletion log, config)
+   ├─ paths.rs ─── data directory (history, settings, deletion log, config,
+   │               check state)
    ├─ settings.rs  saved choices (language, theme) as key=value lines
    │               (rewritten under a lock, via a temp file and a rename)
    ├─ config.rs ── config.toml: excluded folders, report thresholds, the
@@ -238,11 +242,43 @@ Where the values are used:
 | `reports.old_big_min_mib`, `old_big_min_days` | `reports::size::old_big`, its note and `ReportKind::description` | `OLD_BIG_SIZE`, `OLD_BIG_AGE` |
 | `reports.duplicates_min_mib` | `duplicates::candidates`, the "no duplicates" note, `ReportKind::description` | `duplicates::MIN_SIZE` |
 | `view.size`, `view.sort` | `Browser::new` | on disk, by size |
+| `watch.threshold`, `watch.disks` | `check::run` | 90 %, the home folder's disk |
 
 The constants stay as the defaults. Texts that name a threshold build it from
 the configuration, so they always show the value in effect. Theme and
 language stay in `settings` (saved by `T` / `L`); the configuration file is
 only read, never written.
+
+## The disk check
+
+`rustclean check` (`check/mod.rs`) works without a scan. It gets the disks
+from `disks::list_disks`. `watched` keeps the disk of the home folder and
+those of `[watch] disks`, using `disks::disk_for`, the longest matching
+mount point. `percent` rounds down, so a disk counts as over only once it
+really is. The exit code is 3 when one is over.
+
+Notifications are only for background runs, when stdout is not a terminal.
+`State` (`check-state` in the data directory, one `<time> <mount point>` line
+each) remembers when each disk over the threshold was last notified:
+- a disk is due again a day later;
+- a disk no longer over is forgotten.
+
+Only runs that notify read or write it. The notification goes through
+`osascript` or `notify-send` with the texts as arguments (`on run argv`),
+never inside a script, so a disk name cannot change what runs.
+
+`check/agent.rs` builds a `Plan` (files to write or remove, commands to
+run, commands only to show) and prints it before doing anything. It needs
+the confirmation word, or `--yes`.
+- **macOS:** a launchd plist and `launchctl bootout` / `bootstrap
+  gui/<uid>`. The uid is the home folder's owner.
+- **Linux:** a systemd service and timer, plus `systemctl --user`.
+- **Windows:** the `schtasks` command, shown only.
+
+The program path is the `PATH` entry when it resolves to the running binary
+(Homebrew's link survives upgrades); paths with a quote or a line break are
+refused. Unit tests check the plans and `apply` on temporary files. Nothing
+in the tests installs anything.
 
 ## Interface texts
 
@@ -285,11 +321,9 @@ tree in a temp directory with distinct file sizes and set ages. The tests scan
 it with the real scanner and drive `App` by key presses, as the interface
 does: reports, duplicates, the basket, moving to the trash, uninstalling,
 comparing with a saved scan, and exporting with `o`. `tests/cli.rs` runs the
-binary itself (`--summary`, `report` in every format, `--help`, errors).
-does: reports, duplicates, the basket, moving to the trash, uninstalling, and
-comparing with a saved scan. `tests/cli.rs` runs the binary itself
-(`--summary`, `--config`, `--help`, errors), each run with its own
-`RUSTCLEAN_DATA_DIR`.
+binary itself (`--summary`, `--config`, `report` in every format, `check`,
+`--help`, errors), each run with its own `RUSTCLEAN_DATA_DIR`. Its `check`
+runs pass `--no-notify`, so no notification ever shows during tests.
 
 Tests that need other settings use `config::with`, another per-thread
 switch; `config::load` is never called with the real data directory, so a

@@ -11,6 +11,9 @@
 //! [view]
 //! size = "disk"      # or "apparent"
 //! sort = "size"      # size | name | count | modified
+//! [watch]
+//! threshold = 90     # rustclean check: warn at this percentage full
+//! disks = ["/Volumes/Data"]   # watched besides the home folder's disk
 //! ```
 //!
 //! A broken file never stops the program: invalid TOML means the defaults,
@@ -45,6 +48,11 @@ pub struct Config {
     pub size: SizeMode,
     /// The order of the folder list when a scan opens.
     pub sort: SortMode,
+    /// `rustclean check` warns from this percentage full on.
+    pub watch_threshold: u8,
+    /// Disks `rustclean check` watches besides the home folder's, as a
+    /// folder on each (`~` expanded).
+    pub watch_disks: Vec<PathBuf>,
 }
 
 impl Default for Config {
@@ -56,6 +64,8 @@ impl Default for Config {
             duplicates_min_mib: crate::duplicates::MIN_SIZE / MIB,
             size: SizeMode::Disk,
             sort: SortMode::Size,
+            watch_threshold: 90,
+            watch_disks: Vec::new(),
         }
     }
 }
@@ -84,6 +94,7 @@ pub enum Expected {
     PathList,
     Path,
     PositiveInt,
+    Percent,
     OneOf(&'static [&'static str]),
 }
 
@@ -104,6 +115,11 @@ impl Expected {
             Expected::PositiveInt => t!(
                 "1 ya da daha büyük bir tam sayı olmalı",
                 "must be a whole number of 1 or more"
+            )
+            .into(),
+            Expected::Percent => t!(
+                "1 ile 99 arasında bir tam sayı olmalı",
+                "must be a whole number from 1 to 99"
             )
             .into(),
             Expected::OneOf(values) => tf!(
@@ -266,6 +282,7 @@ pub fn parse(text: &str, home: Option<&Path>) -> (Config, Vec<Problem>) {
             "scan" => &["exclude"],
             "reports" => &["old_big_min_mib", "old_big_min_days", "duplicates_min_mib"],
             "view" => &["size", "sort"],
+            "watch" => &["threshold", "disks"],
             _ => {
                 problems.push(Problem::UnknownKey(section.clone()));
                 continue;
@@ -289,16 +306,29 @@ pub fn parse(text: &str, home: Option<&Path>) -> (Config, Vec<Problem>) {
                 expected,
             };
             match key.as_str() {
-                "exclude" => match value.as_array() {
+                "exclude" | "disks" => match value.as_array() {
                     Some(items) => {
+                        let list = if key == "exclude" {
+                            &mut config.exclude
+                        } else {
+                            &mut config.watch_disks
+                        };
                         for item in items {
                             match item.as_str().and_then(|p| expand(p, home)) {
-                                Some(p) => config.exclude.push(p),
+                                Some(p) => list.push(p),
                                 None => problems.push(bad(Expected::Path)),
                             }
                         }
                     }
                     None => problems.push(bad(Expected::PathList)),
+                },
+                "threshold" => match value
+                    .as_integer()
+                    .and_then(|n| u8::try_from(n).ok())
+                    .filter(|n| (1..=99).contains(n))
+                {
+                    Some(n) => config.watch_threshold = n,
+                    None => problems.push(bad(Expected::Percent)),
                 },
                 "old_big_min_mib" | "old_big_min_days" | "duplicates_min_mib" => {
                     let unit = if key == "old_big_min_days" {
@@ -410,6 +440,7 @@ pub fn to_toml(config: &Config) -> String {
         format!("\"{s}\"")
     };
     let exclude: Vec<String> = config.exclude.iter().map(|p| quote(p)).collect();
+    let watch: Vec<String> = config.watch_disks.iter().map(|p| quote(p)).collect();
     format!(
         "[scan]\n\
          exclude = [{}]\n\
@@ -421,13 +452,19 @@ pub fn to_toml(config: &Config) -> String {
          \n\
          [view]\n\
          size = \"{}\"\n\
-         sort = \"{}\"\n",
+         sort = \"{}\"\n\
+         \n\
+         [watch]\n\
+         threshold = {}\n\
+         disks = [{}]\n",
         exclude.join(", "),
         config.old_big_min_mib,
         config.old_big_min_days,
         config.duplicates_min_mib,
         size_code(config.size),
         sort_code(config.sort),
+        config.watch_threshold,
+        watch.join(", "),
     )
 }
 
@@ -666,6 +703,8 @@ mod tests {
             duplicates_min_mib: 5,
             size: SizeMode::Apparent,
             sort: SortMode::Count,
+            watch_threshold: 85,
+            watch_disks: vec![home().join("Data")],
         };
         assert_eq!(parse_ok(&to_toml(&c)), c);
         assert_eq!(parse_ok(&to_toml(&Config::default())), Config::default());
