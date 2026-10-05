@@ -114,6 +114,13 @@ impl Topic {
                     ),
                     ("t", t!("harita görünümü", "map view")),
                     (
+                        "w",
+                        t!(
+                            "haritayı HTML sayfası olarak kaydet",
+                            "save the treemap as an HTML page"
+                        ),
+                    ),
+                    (
                         "/",
                         t!(
                             "ada göre ara (* ve ? joker karakter)",
@@ -143,6 +150,13 @@ impl Topic {
                     ("⌫", t!("üst klasör", "parent folder")),
                     ("c", t!("renk: türe / yaşa göre", "color: by type / by age")),
                     ("t  Esc", t!("listeye dön", "back to the list")),
+                    (
+                        "w",
+                        t!(
+                            "HTML sayfası olarak kaydet (tarayıcıda yakınlaştırılır)",
+                            "save as an HTML page (zoomable in a browser)"
+                        ),
+                    ),
                     ("m", t!("raporlar menüsü", "reports menu")),
                 ]);
                 keys.extend(cleaning);

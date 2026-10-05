@@ -32,6 +32,10 @@ harekete geçmenizi sağlar:
 - **Keşif:**
   - boyut çubukları, dosya sayıları ve renkli değişiklik tarihleri olan bir liste
   - **ağaç haritası** görünümü (`t`)
+  - ağaç haritasını **web sayfası** olarak kaydetme (`w`): bulunulan klasör,
+    dört seviyeye kadar yakınlaştırılabilir haritasıyla tek ve kendi içinde
+    tam bir HTML dosyasına yazılır; her tarayıcıda (çevrimdışı ve telefonda
+    da) açılır, paylaşılabilir
   - dosya türleri, yaş dağılımı ve en büyük öğelerle klasör **özeti** (`i`)
 - **Raporlar** (`m`):
   - en büyük dosyalar ve klasörler
@@ -172,6 +176,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | gezin · aç · geri |
 | `t` | liste ↔ ağaç haritası |
+| `w` | ağaç haritasını HTML sayfası olarak kaydet |
 | `i` | bulunulan klasörün özeti |
 | `m` | raporlar ve araçlar |
 | `/` | ada göre ara (`*` ve `?` joker karakterleri) |

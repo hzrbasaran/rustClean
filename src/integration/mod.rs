@@ -10,6 +10,7 @@ mod backups;
 mod clutter;
 mod deletion;
 mod history;
+mod htmlmap;
 mod language;
 mod mouse;
 mod reports;

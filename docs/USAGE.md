@@ -74,6 +74,7 @@ The list shows the current folder's entries with:
 | `R` | rescan only the current folder (e.g. after a cleanup), in the background; `Esc` cancels |
 | `r` | rescan everything from the root |
 | `d` | back to the disk list |
+| `w` | save the treemap of this folder as an HTML page ([below](#saving-the-treemap-as-a-web-page)) |
 
 ## Treemap
 
@@ -87,8 +88,40 @@ strip at the bottom ("other"). The selection is shared with the list.
 | `Enter` / `⌫` | open a folder / go back |
 | `c` | color by type (folders each get their own color) or by age |
 | `t` / `Esc` | back to the list |
+| `w` | save as an HTML page (see below) |
 
 `Enter` on the "other" strip opens the list at the first small entry.
+
+### Saving the treemap as a web page
+
+`w`, in the list or the treemap, writes the current folder as a web page:
+`rustclean-treemap-YYYYMMDD-HHMMSS.html` in the folder rustClean was started
+from, or in your home folder if that one cannot be written. An existing file
+is never replaced; the name gets `-1`, `-2`, … instead. The status line shows
+where the file went.
+
+The page is a single, self-contained file: the data, the script and the
+styles are inside it, and it makes no network requests and loads no other
+files (a Content Security Policy forbids it). It works offline in current
+browsers, also on a phone, and can be shared as it is. It only shows; it
+changes nothing.
+
+![The treemap page in a browser](screenshots/html-treemap.png)
+
+- Click a folder to zoom in; the path at the top, the **↑** button, `Esc` or
+  `⌫` go back. Folders big enough show their contents one level down.
+- Each block shows its name, size and share of its folder; hovering (or
+  tapping a file) shows the share of the whole page, the type and the age.
+- **By type** / **By age** switch the colors as `c` does in the terminal.
+- Sizes follow the size mode of the list when you pressed `w` (`a`:
+  apparent or on disk), and the texts follow the current language.
+
+To keep the file small on a full disk, the page holds at most **4 levels**
+below the folder and **3,000 blocks**. Entries under 0.2 % of their folder,
+and all after the 60 largest, share an "other" block per folder. When the
+block budget runs out, the deepest and smallest folders are left without
+their contents; such folders, and those at the depth limit, are striped.
+The page says these limits at the bottom.
 
 ## Summary
 

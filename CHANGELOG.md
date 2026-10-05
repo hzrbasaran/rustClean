@@ -26,6 +26,15 @@ follows [Semantic Versioning](https://semver.org/).
   ([#11](https://github.com/hzrbasaran/rustClean/issues/11)).
 - An empty report shows its note (why nothing was found) in place of the
   list; before, only "No results." was shown.
+- `w` in the folder list and the treemap saves the current folder as a
+  self-contained HTML page with a zoomable treemap (click a folder to zoom
+  in, the path or `Esc` to go back), colored by type or by age, in the
+  current language. The data and script are inside the file and it makes no
+  network requests, so it works offline and on a phone. At most 4 levels and
+  3,000 blocks; small entries share an "other" block. The file goes to the
+  working directory (else the home folder) as
+  `rustclean-treemap-YYYYMMDD-HHMMSS.html` and never replaces an existing one
+  ([#27](https://github.com/hzrbasaran/rustClean/issues/27)).
 
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"
