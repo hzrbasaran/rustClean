@@ -326,7 +326,7 @@ pub fn run(kind: ToolKind, steps: Vec<Step>) -> Receiver<RunEvent> {
         for step in steps {
             let desc = step.describe();
             let _ = tx.send(RunEvent::Started(desc.clone()));
-            let ok = run_step(kind, &step, &tx);
+            let ok = run_step(kind, &step, &tx, home().as_deref());
             let _ = tx.send(RunEvent::Done { step: desc, ok });
         }
         let _ = tx.send(RunEvent::Finished);
@@ -334,7 +334,18 @@ pub fn run(kind: ToolKind, steps: Vec<Step>) -> Receiver<RunEvent> {
     rx
 }
 
-fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
+/// Runs one step. `home` is the user's home folder, for `safe_target`.
+fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>, home: Option<&Path>) -> bool {
+    if let Step::TrashContents(path) | Step::Trash(path) = step {
+        if !safe_target(path, home) {
+            let _ = tx.send(RunEvent::Output(tf!(
+                "rustClean bu klasörü boşaltmaz: {}",
+                "rustClean does not empty this folder: {}",
+                path.display()
+            )));
+            return false;
+        }
+    }
     match step {
         Step::Command(args) => {
             let child = Command::new(&args[0])
@@ -483,6 +494,81 @@ fn home() -> Option<PathBuf> {
     dirs::home_dir()
 }
 
+/// Whether rustClean may empty or trash `path`. Folders often come from
+/// environment variables (`PUB_CACHE`, `BUN_INSTALL`, `ANDROID_HOME`…), and
+/// a wrong one must not empty the home folder. Refused: relative paths and
+/// paths with `..`, roots (no parent), the home folder and its ancestors, and
+/// the home folder's standard folders themselves (Desktop, Documents,
+/// Library, `.config`…); what is inside them is allowed.
+pub fn safe_target(path: &Path, home: Option<&Path>) -> bool {
+    use std::path::Component;
+    if !path.is_absolute()
+        || path.components().any(|c| c == Component::ParentDir)
+        || path.parent().is_none()
+    {
+        return false;
+    }
+    // Compare real paths, so a symbolic link to the home folder is caught.
+    let real = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+    let target = real(path);
+    if target.parent().is_none() {
+        return false;
+    }
+    let Some(home) = home else {
+        return true;
+    };
+    let home_real = real(home);
+    if home.starts_with(path) || home_real.starts_with(&target) {
+        return false;
+    }
+    let names = [
+        "Desktop",
+        "Documents",
+        "Downloads",
+        "Pictures",
+        "Music",
+        "Movies",
+        "Videos",
+        "Public",
+        "Library",
+        "AppData",
+        ".config",
+        ".local",
+        ".cache",
+    ];
+    let standard = [
+        dirs::desktop_dir(),
+        dirs::document_dir(),
+        dirs::download_dir(),
+        dirs::picture_dir(),
+        dirs::audio_dir(),
+        dirs::video_dir(),
+        dirs::public_dir(),
+    ];
+    !names
+        .iter()
+        .map(|n| home.join(n))
+        .chain(standard.into_iter().flatten())
+        .any(|d| d == path || real(&d) == target)
+}
+
+/// `dir` when `safe_target` allows it; otherwise the "refused" status to
+/// show instead of offering it.
+fn guarded(dir: PathBuf) -> Result<PathBuf, (Status, Vec<CleanAction>)> {
+    if safe_target(&dir, home().as_deref()) {
+        Ok(dir)
+    } else {
+        Err((
+            Status::Unavailable(tf!(
+                "reddedildi, korunan klasör: {}",
+                "refused, protected folder: {}",
+                dir.display()
+            )),
+            Vec::new(),
+        ))
+    }
+}
+
 /// Full path of a program found in PATH.
 pub fn which(program: &str) -> Option<PathBuf> {
     let path = std::env::var_os("PATH")?;
@@ -595,6 +681,10 @@ fn cache_command(
 fn trash_folder(dir: Option<PathBuf>, risk: Risk, label: &str) -> (Status, Vec<CleanAction>) {
     let Some(dir) = dir.filter(|d| d.is_dir()) else {
         return missing(t!("klasör yok", "no folder"));
+    };
+    let dir = match guarded(dir) {
+        Ok(dir) => dir,
+        Err(refused) => return refused,
     };
     let size = dir_size(&dir).unwrap_or(0);
     ready(
@@ -1028,6 +1118,43 @@ mod tests {
             .collect();
         assert_eq!(done, vec![true, false, false]);
         assert_eq!(events.last(), Some(&RunEvent::Finished));
+    }
+
+    #[test]
+    fn guard_refuses_home_roots_and_standard_folders() {
+        let home = std::env::temp_dir().join("rc-guard-home");
+        let h = Some(home.as_path());
+        let root = if cfg!(windows) { "C:\\" } else { "/" };
+        assert!(!safe_target(Path::new(root), h), "root");
+        assert!(!safe_target(&home, h), "home");
+        assert!(!safe_target(home.parent().unwrap(), h), "a parent of home");
+        assert!(!safe_target(&home.join("Desktop"), h), "Desktop");
+        assert!(!safe_target(&home.join("Library"), h), "Library");
+        assert!(!safe_target(&home.join(".cache"), h), ".cache");
+        assert!(!safe_target(&home.join("x/.."), h), "..");
+        assert!(!safe_target(Path::new("relative/cache"), h), "relative");
+        assert!(safe_target(&home.join(".m2/repository"), h));
+        assert!(safe_target(&home.join("Library/Caches/ms-playwright"), h));
+        assert!(safe_target(&home.join("Desktop/project/cache"), h));
+    }
+
+    #[test]
+    fn refused_folders_keep_their_contents() {
+        let home = tempfile::tempdir().unwrap();
+        std::fs::write(home.path().join("notes.txt"), b"keep").unwrap();
+        let (tx, rx) = mpsc::channel();
+        let step = Step::TrashContents(home.path().to_path_buf());
+        assert!(!run_step(ToolKind::Pub, &step, &tx, Some(home.path())));
+        assert!(home.path().join("notes.txt").exists());
+        let out: Vec<RunEvent> = rx.try_iter().collect();
+        assert!(
+            matches!(&out[..], [RunEvent::Output(l)] if l.starts_with("rustClean bu klasörü boşaltmaz")),
+            "{out:?}"
+        );
+        let step = Step::Trash(home.path().join("Documents"));
+        std::fs::create_dir(home.path().join("Documents")).unwrap();
+        assert!(!run_step(ToolKind::Pub, &step, &tx, Some(home.path())));
+        assert!(home.path().join("Documents").exists());
     }
 
     #[cfg(unix)]

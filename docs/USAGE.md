@@ -230,6 +230,21 @@ log. The tool is then measured again.
 | CocoaPods · Homebrew | `pod cache clean --all` · `brew cleanup --prune=all` |
 | Cargo | move downloaded `.crate` files to the trash (re-downloaded) |
 
+**Protected folders.** Many cache folders come from environment variables
+(`PUB_CACHE`, `BUN_INSTALL`, `PLAYWRIGHT_BROWSERS_PATH`, `ANDROID_HOME`…),
+so a wrong value could point at an important folder. rustClean never
+empties or trashes:
+- a relative path, or one with `..`
+- a root (a drive or `/`)
+- the home folder or any folder above it
+- the home folder's standard folders themselves: Desktop, Documents,
+  Downloads, Pictures, Music, Movies / Videos, Public, `Library`, `AppData`,
+  `.config`, `.local`, `.cache`
+
+What is inside them is allowed (`~/Library/Caches/ms-playwright` is fine).
+A tool whose folder is refused shows "refused, protected folder" instead of
+a size, and the check runs again right before each step.
+
 Long lists of actions scroll in the picker. A step chosen twice (a
 simulator in "all never used" and on its own) runs once.
 

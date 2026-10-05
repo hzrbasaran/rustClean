@@ -24,6 +24,10 @@ follows [Semantic Versioning](https://semver.org/).
 - Docker Desktop's `Docker.raw`: its size on disk next to its apparent size,
   and a note on how the space comes back after pruning
   ([#17](https://github.com/hzrbasaran/rustClean/issues/17)).
+- Tool cleanups refuse to empty or trash a relative path, a root, the
+  home folder or a folder above it, or a standard folder such as Desktop,
+  Documents or `~/Library`, for example when `PUB_CACHE` points to the
+  home folder.
 - The tools screen shortens long step lists to fit, the action picker
   scrolls, and a step chosen twice runs once. Some tools show a note under
   their actions.

@@ -11,7 +11,8 @@ use crate::i18n::count;
 use crate::ui::fmt_size;
 
 use super::{
-    action, command, dir_size, home, missing, ready, which, CleanAction, Risk, Status, Step,
+    action, command, dir_size, guarded, home, missing, ready, safe_target, which, CleanAction,
+    Risk, Status, Step,
 };
 
 fn env_dir(name: &str) -> Option<PathBuf> {
@@ -242,6 +243,15 @@ pub fn measure() -> (Status, Vec<CleanAction>) {
     if sdk.is_none() && avd_dir.is_none() {
         return missing(t!("kurulu değil", "not installed"));
     }
+    // Both may come from environment variables; a wrong one (the home
+    // folder, say) is refused rather than offered.
+    let (sdk, avd_dir) = match (
+        sdk.map(guarded).transpose(),
+        avd_dir.map(guarded).transpose(),
+    ) {
+        (Ok(sdk), Ok(avd)) => (sdk, avd),
+        (Err(refused), _) | (_, Err(refused)) => return refused,
+    };
     let home = avd_dir.as_deref().map(read_avd_home).unwrap_or_default();
     let images = sdk.as_deref().map(list_system_images).unwrap_or_default();
     let unused = unused_images(&images, &home.avds);
@@ -249,7 +259,13 @@ pub fn measure() -> (Status, Vec<CleanAction>) {
 
     let mut actions = Vec::new();
     let mut reclaimable = 0;
-    for avd in &home.avds {
+    let user_home = super::home();
+    let allowed = |p: &Path| safe_target(p, user_home.as_deref());
+    for avd in home
+        .avds
+        .iter()
+        .filter(|a| allowed(&a.dir) && allowed(&a.ini))
+    {
         actions.push(action(
             tf!(
                 "{} emülatörünü uygulama ve verileriyle sil ({})",
@@ -261,7 +277,7 @@ pub fn measure() -> (Status, Vec<CleanAction>) {
             delete_avd_steps(avdmanager.as_deref(), avd),
         ));
     }
-    for (dir, size) in &home.orphans {
+    for (dir, size) in home.orphans.iter().filter(|(d, _)| allowed(d)) {
         reclaimable += size;
         let name = dir.file_name().unwrap_or_default().to_string_lossy();
         actions.push(action(
@@ -274,7 +290,11 @@ pub fn measure() -> (Status, Vec<CleanAction>) {
             vec![Step::Trash(dir.clone())],
         ));
     }
-    for image in unused.iter().flatten().filter(|i| i.size > 0) {
+    for image in unused
+        .iter()
+        .flatten()
+        .filter(|i| i.size > 0 && allowed(&i.path))
+    {
         reclaimable += image.size;
         actions.push(action(
             tf!(

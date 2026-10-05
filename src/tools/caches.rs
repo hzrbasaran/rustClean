@@ -11,8 +11,8 @@ use std::time::Duration;
 use crate::ui::fmt_size;
 
 use super::{
-    action, cache_command, command, dir_size, home, missing, output, ready, trash_folder, which,
-    CleanAction, Risk, Status, Step,
+    action, cache_command, command, dir_size, guarded, home, missing, output, ready, trash_folder,
+    which, CleanAction, Risk, Status, Step,
 };
 
 /// A folder from an environment variable, when it is set and not empty.
@@ -224,6 +224,10 @@ pub fn dart_pub() -> (Status, Vec<CleanAction>) {
     let Some(dir) = dir.filter(|d| d.is_dir()) else {
         return missing(t!("klasör yok", "no folder"));
     };
+    let dir = match guarded(dir) {
+        Ok(dir) => dir,
+        Err(refused) => return refused,
+    };
     let size = dir_size(&dir).unwrap_or(0);
     ready(
         size,
@@ -257,6 +261,10 @@ pub fn playwright() -> (Status, Vec<CleanAction>) {
         .or_else(|| dirs::cache_dir().map(|d| d.join("ms-playwright")));
     let Some(dir) = dir.filter(|d| d.is_dir()) else {
         return missing(t!("klasör yok", "no folder"));
+    };
+    let dir = match guarded(dir) {
+        Ok(dir) => dir,
+        Err(refused) => return refused,
     };
     let size = dir_size(&dir).unwrap_or(0);
     let step = match which("npx") {
