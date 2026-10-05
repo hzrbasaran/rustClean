@@ -134,7 +134,7 @@ impl Browser {
         };
         let dirs = match &self.export_dir {
             Some(dir) => vec![dir.clone()],
-            None => export::default_dirs(),
+            None => crate::newfile::default_dirs(),
         };
         match export::save(&dirs, &src.what, format, &src.meta, &src.records) {
             Ok(path) => self.set_status(

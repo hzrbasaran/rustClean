@@ -8,12 +8,12 @@
 //! the squarified layout of `treemap.rs`. This module only picks the data,
 //! within limits that keep the file small on a full disk.
 
-use std::fs::{File, OpenOptions};
-use std::io::{self, Write};
-use std::path::{Path, PathBuf};
+use std::io;
+use std::path::PathBuf;
 
 use serde_json::{json, Value};
 
+use crate::newfile;
 use crate::stats::{self, Category};
 use crate::tree::{NodeId, SizeMode, Tree};
 
@@ -354,67 +354,17 @@ fn script_json(v: &Value) -> String {
 }
 
 /// Writes `page` as `rustclean-treemap-<stamp>.html` into the first of
-/// `dirs` that takes it. An existing file is never replaced: the name gets
-/// `-1`, `-2`, … instead.
+/// `dirs` that takes it. An existing file is never replaced (see `newfile`).
 pub fn save(page: &str, stamp: &str, dirs: &[PathBuf]) -> io::Result<PathBuf> {
-    let mut last = io::Error::new(io::ErrorKind::NotFound, "no folder to write to");
-    for dir in dirs {
-        match save_in(page, stamp, dir) {
-            Ok(path) => return Ok(path),
-            Err(e) => last = e,
-        }
-    }
-    Err(last)
-}
-
-fn save_in(page: &str, stamp: &str, dir: &Path) -> io::Result<PathBuf> {
-    for n in 0..1000 {
-        let name = if n == 0 {
-            format!("rustclean-treemap-{stamp}.html")
-        } else {
-            format!("rustclean-treemap-{stamp}-{n}.html")
-        };
-        let path = dir.join(name);
-        let mut file: File = match OpenOptions::new().write(true).create_new(true).open(&path) {
-            Ok(f) => f,
-            Err(e) if e.kind() == io::ErrorKind::AlreadyExists => continue,
-            Err(e) => return Err(e),
-        };
-        if let Err(e) = file
-            .write_all(page.as_bytes())
-            .and_then(|()| file.sync_all())
-        {
-            drop(file);
-            let _ = std::fs::remove_file(&path);
-            return Err(e);
-        }
-        return Ok(path);
-    }
-    Err(io::Error::new(
-        io::ErrorKind::AlreadyExists,
-        "too many files with this name",
-    ))
-}
-
-/// Where `w` writes: the working directory, else the home folder. Test
-/// builds use a folder under the temp directory instead, so `cargo test`
-/// never writes into the repository or the home folder.
-pub fn default_dirs() -> Vec<PathBuf> {
-    if cfg!(test) {
-        let name = format!("rustclean-test-export-{}", std::process::id());
-        let dir = std::env::temp_dir().join(name);
-        let _ = std::fs::create_dir_all(&dir);
-        return vec![dir];
-    }
-    std::env::current_dir()
-        .ok()
-        .into_iter()
-        .chain(dirs::home_dir())
-        .collect()
+    newfile::create(dirs, &format!("rustclean-treemap-{stamp}"), "html", |w| {
+        w.write_all(page.as_bytes())
+    })
 }
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
     use crate::tree::Size;
 
@@ -593,21 +543,14 @@ mod tests {
     }
 
     #[test]
-    fn never_overwrites() {
+    fn saves_as_a_treemap_page() {
         let dir = tempfile::tempdir().unwrap();
         let dirs = [dir.path().to_path_buf()];
         let a = save("one", "20261005-120000", &dirs).unwrap();
         let b = save("two", "20261005-120000", &dirs).unwrap();
-        let c = save("three", "20261005-120000", &dirs).unwrap();
         let name = |p: &Path| p.file_name().unwrap().to_string_lossy().into_owned();
         assert_eq!(name(&a), "rustclean-treemap-20261005-120000.html");
         assert_eq!(name(&b), "rustclean-treemap-20261005-120000-1.html");
-        assert_eq!(name(&c), "rustclean-treemap-20261005-120000-2.html");
         assert_eq!(std::fs::read_to_string(&a).unwrap(), "one");
-        // A folder that cannot be written falls back to the next one.
-        let missing = dir.path().join("missing");
-        let d = save("four", "x", &[missing, dir.path().to_path_buf()]).unwrap();
-        assert_eq!(d.parent(), Some(dir.path()));
-        assert!(save("five", "x", &[]).is_err());
     }
 }

@@ -14,6 +14,7 @@ mod export;
 mod history;
 mod htmlmap;
 mod lists;
+mod newfile;
 mod paths;
 mod reports;
 mod scanner;

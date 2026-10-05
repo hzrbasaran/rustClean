@@ -47,12 +47,13 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ stats.rs ─── summary statistics, age groups, file categories
    ├─ search.rs ── name patterns
    ├─ lists.rs ─── generic result list (rows, groups, drill-down)
-   ├─ export.rs ── lists as CSV / JSON records, files that never overwrite
+   ├─ export.rs ── lists as CSV / JSON records
+   ├─ newfile.rs ─ saving a new file that never replaces one (`o`, `w`)
    ├─ cli.rs ───── `rustclean report`: scan, run one report, print it
    ├─ treemap.rs ─ squarified layout and block navigation
    ├─ htmlmap/ ─── the treemap as a self-contained HTML page (`w`)
    │    ├─ mod.rs        picks the blocks (depth, block and "other" limits),
-   │    │                fills the page, writes the file without overwriting
+   │    │                fills the page, saves it with `newfile`
    │    └─ page.html     the page: styles, JSON data, layout and zoom script
    │
    ├─ history.rs ─ scan snapshots and "what changed"
@@ -140,8 +141,7 @@ the apps change.
 gives its entries, a result list its rows, and a group row one record per
 member with the group's label. The same records are written as CSV or JSON
 by `o` in the interface (`app/export.rs` picks the list on screen and saves
-it with `export::save`, which opens files with `create_new` so nothing is
-ever overwritten) and by `rustclean report` (`cli.rs`), which scans like
+it with `export::save`) and by `rustclean report` (`cli.rs`), which scans like
 `--summary`, runs the report with the interface's own code (the report
 methods of a `Browser` that is never drawn; duplicates with
 `duplicates::find_groups` on the same thread) and prints to stdout. Column names are fixed English identifiers, so scripts do not
@@ -213,6 +213,13 @@ element; the script inserts names with `textContent` only. A Content
 Security Policy (`default-src 'none'`) keeps the page from loading anything.
 Test builds write into the temp directory unless a test sets
 `Browser::html_dir`.
+
+Both `o` and `w` save through `newfile::create`. It opens the file with
+`create_new`, so nothing is ever replaced: a taken name gets `-1`, `-2`…
+The file goes to the first folder of `newfile::default_dirs` that takes it
+(the working folder, else the home folder). The content is buffered and
+synced to disk. A write that fails removes the half-written file and tries
+the next folder.
 
 ## Configuration
 
@@ -297,8 +304,9 @@ UTC, so snapshots match on every machine.
 Test builds never touch the user's data. `paths::data_dir` points to a
 folder under the temp directory, `Deletion` renames entries into
 `delete::test_trash` instead of calling the real trash, and `o` saves into a
-folder under the temp directory (`export::default_dirs`), or into
-`Browser::export_dir` when a test sets it.
+folder under the temp directory (`newfile::default_dirs`, also used by
+`w`), or into `Browser::export_dir` / `Browser::html_dir` when a test sets
+them.
 
 Tests run in the default language (Turkish) and must pass on macOS, Linux and
 Windows. Compare paths with `/` normalized, and gate Unix-only tests with

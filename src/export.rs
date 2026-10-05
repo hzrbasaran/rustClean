@@ -6,11 +6,11 @@
 //! group row (same name, same content, an app and its data) becomes one
 //! record per member, with the group's label in `group`.
 
-use std::fs::{self, OpenOptions};
-use std::io::{self, BufWriter, Write};
-use std::path::{Path, PathBuf};
+use std::io::{self, Write};
+use std::path::PathBuf;
 
 use crate::lists::{ResultList, Source};
+use crate::newfile;
 use crate::tree::{NodeId, Tree};
 
 /// The columns, in order. The JSON keys use the same names.
@@ -202,23 +202,6 @@ pub fn write(
     }
 }
 
-/// Where `o` saves: the working folder, else the home folder. Test builds
-/// use a folder under the temp directory instead, so `cargo test` never
-/// writes into the repository or the home folder.
-pub fn default_dirs() -> Vec<PathBuf> {
-    if cfg!(test) {
-        let dir =
-            std::env::temp_dir().join(format!("rustclean-test-export-{}", std::process::id()));
-        let _ = fs::create_dir_all(&dir);
-        return vec![dir];
-    }
-    std::env::current_dir()
-        .ok()
-        .into_iter()
-        .chain(dirs::home_dir())
-        .collect()
-}
-
 /// `rustclean-<what>-20261001-120000`, with `what` reduced to lowercase
 /// letters, digits and dashes.
 fn base_name(what: &str, stamp: &str) -> String {
@@ -236,8 +219,7 @@ fn base_name(what: &str, stamp: &str) -> String {
 }
 
 /// Writes the list to a new file in the first of `dirs` that takes it and
-/// returns its path. An existing file is never replaced: `-1`, `-2`… are
-/// added to the name instead.
+/// returns its path. An existing file is never replaced (see `newfile`).
 pub fn save(
     dirs: &[PathBuf],
     what: &str,
@@ -245,54 +227,17 @@ pub fn save(
     meta: &Meta,
     records: &[Record],
 ) -> io::Result<PathBuf> {
-    let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
-    let base = base_name(what, &stamp);
-    let mut last = io::Error::new(io::ErrorKind::NotFound, "no folder to write to");
-    for dir in dirs {
-        match save_in(dir, &base, format, meta, records) {
-            Ok(path) => return Ok(path),
-            Err(e) => last = e,
-        }
-    }
-    Err(last)
-}
-
-fn save_in(
-    dir: &Path,
-    base: &str,
-    format: Format,
-    meta: &Meta,
-    records: &[Record],
-) -> io::Result<PathBuf> {
-    for n in 0..1000 {
-        let name = match n {
-            0 => format!("{base}.{}", format.extension()),
-            n => format!("{base}-{n}.{}", format.extension()),
-        };
-        let path = dir.join(name);
-        let file = match OpenOptions::new().write(true).create_new(true).open(&path) {
-            Ok(f) => f,
-            Err(e) if e.kind() == io::ErrorKind::AlreadyExists => continue,
-            Err(e) => return Err(e),
-        };
-        let mut w = BufWriter::new(file);
-        let written = write(&mut w, format, meta, records).and_then(|()| w.flush());
-        if let Err(e) = written {
-            // Leave no half-written file behind.
-            drop(w);
-            let _ = fs::remove_file(&path);
-            return Err(e);
-        }
-        return Ok(path);
-    }
-    Err(io::Error::new(
-        io::ErrorKind::AlreadyExists,
-        "too many files with the same name",
-    ))
+    let base = base_name(what, &newfile::stamp());
+    newfile::create(dirs, &base, format.extension(), |mut w| {
+        write(&mut w, format, meta, records)
+    })
 }
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+    use std::path::Path;
+
     use super::*;
     use crate::lists::{Row, RowSize};
     use crate::tree::{Size, ROOT};
@@ -419,38 +364,20 @@ mod tests {
     }
 
     #[test]
-    fn saving_never_overwrites() {
+    fn saves_under_the_list_name() {
         let dir = tempfile::tempdir().unwrap();
         let (t, ids) = tree();
-        let recs = entries(&t, &ids);
         let meta = Meta {
             title: "t".into(),
             root: "/r".into(),
             truncated: false,
         };
         let dirs = [dir.path().to_path_buf()];
-        let first = save_in(dir.path(), "rustclean-x", Format::Csv, &meta, &recs).unwrap();
-        let second = save_in(dir.path(), "rustclean-x", Format::Csv, &meta, &recs).unwrap();
-        assert_eq!(first.file_name().unwrap(), "rustclean-x.csv");
-        assert_eq!(second.file_name().unwrap(), "rustclean-x-1.csv");
-        let json = save(&dirs, "Dev junk!", Format::Json, &meta, &recs).unwrap();
+        let json = save(&dirs, "Dev junk!", Format::Json, &meta, &entries(&t, &ids)).unwrap();
         let name = json.file_name().unwrap().to_string_lossy().into_owned();
         assert!(name.starts_with("rustclean-dev-junk-"), "{name}");
         assert!(name.ends_with(".json"), "{name}");
-    }
-
-    #[test]
-    fn falls_back_to_the_next_folder() {
-        let dir = tempfile::tempdir().unwrap();
-        let missing = dir.path().join("missing");
-        let (t, ids) = tree();
-        let meta = Meta {
-            title: "t".into(),
-            root: "/r".into(),
-            truncated: false,
-        };
-        let dirs = [missing, dir.path().to_path_buf()];
-        let path = save(&dirs, "folder", Format::Csv, &meta, &entries(&t, &ids)).unwrap();
-        assert_eq!(path.parent().unwrap(), dir.path());
+        let text = fs::read_to_string(&json).unwrap();
+        assert!(text.starts_with("{\n  \"title\": \"t\""), "{text}");
     }
 }
