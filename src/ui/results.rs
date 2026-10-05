@@ -3,13 +3,13 @@
 use ratatui::layout::{Constraint, Rect};
 use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Cell, Row, Table};
+use ratatui::widgets::{Cell, Paragraph, Row, Table};
 use ratatui::Frame;
 
 use crate::lists::ResultList;
 use crate::tree::Tree;
 
-use super::format::{fmt_count, fmt_size, now_secs};
+use super::format::{fmt_count, fmt_size, now_secs, wrap_indented};
 use super::style::{date_cell, highlight, Themed};
 use super::theme::theme;
 use super::{table_block, DATE_WIDTH, WIDE};
@@ -21,6 +21,18 @@ pub(super) fn render_results(
     checks: &[bool],
     area: Rect,
 ) {
+    // An empty report explains why (nothing scanned there, no access…):
+    // the note gets the whole area, as it may not fit the status line.
+    if r.rows.is_empty() && !r.note.is_empty() {
+        let lines: Vec<Line<'_>> =
+            wrap_indented(&r.note, usize::from(area.width.saturating_sub(1)), " ", " ")
+                .into_iter()
+                .map(|l| Line::from(l).normal())
+                .collect();
+        let text = Paragraph::new(lines).block(table_block());
+        f.render_widget(text, area);
+        return;
+    }
     let now = now_secs();
     let wide = area.width >= WIDE;
     let detail_width = r

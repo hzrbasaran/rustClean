@@ -18,18 +18,18 @@ expression: screen
         │   9. İndirilen kurulum dosyaları ve arşivler                                     │
         │  10. Kopya dosyalar (içeriği aynı)                                               │
         │  11. Boş klasörler, kırık bağlantılar, geçici dosyalar                           │
+        │  12. iPhone / iPad yedekleri                                                     │
         │                                                                                  │
         │ Araçlar                                                                          │
-        │  12. Son taramadan bu yana değişenler                                            │
-        │  13. Silinmiş uygulama artıkları                                                 │
-        │  14. Geliştirici araçları temizliği                                              │
-        │  15. Sistem verileri                                                             │
-        │  16. Silme kaydı                                                                 │
+        │  13. Son taramadan bu yana değişenler                                            │
+        │  14. Silinmiş uygulama artıkları                                                 │
+        │  15. Geliştirici araçları temizliği                                              │
+        │  16. Sistem verileri                                                             │
+        │  17. Silme kaydı                                                                 │
         │                                                                                  │
         │ Bu klasörün altındaki en büyük 200 dosya                                         │
         │ Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama). L: Engl│
-        └──────────────────────────────────────────────────────────────────────────────────┘
-────────────────────────────────────────────────────────────────────────────────────────────────────
+────────└──────────────────────────────────────────────────────────────────────────────────┘────────
 37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
  ?  yardım   ↑↓  seç   Enter  çalıştır   Esc  kapat
 --- styles (column+width foreground/background modifiers) ---
@@ -49,16 +49,17 @@ expression: screen
 13: 8+1 Cyan/- | 11+4 Gray/- | 15+39 White/- BOLD | 91+1 Cyan/-
 14: 8+1 Cyan/- | 11+4 Gray/- | 15+29 White/- BOLD | 91+1 Cyan/-
 15: 8+1 Cyan/- | 11+4 Gray/- | 15+49 White/- BOLD | 91+1 Cyan/-
-16: 8+1 Cyan/- | 91+1 Cyan/-
-17: 8+1 Cyan/- | 9+8 Cyan/- BOLD | 91+1 Cyan/-
-18: 8+1 Cyan/- | 11+4 Gray/- | 15+32 White/- BOLD | 91+1 Cyan/-
-19: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
-20: 8+1 Cyan/- | 11+4 Gray/- | 15+30 White/- BOLD | 91+1 Cyan/-
-21: 8+1 Cyan/- | 11+4 Gray/- | 15+15 White/- BOLD | 91+1 Cyan/-
-22: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
-23: 8+1 Cyan/- | 91+1 Cyan/-
-24: 8+1 Cyan/- | 9+41 Yellow/- | 91+1 Cyan/-
-25: 8+1 Cyan/- | 9+82 Gray/- | 91+1 Cyan/-
-26: 8+84 Cyan/-
+16: 8+1 Cyan/- | 11+4 Gray/- | 15+23 White/- BOLD | 91+1 Cyan/-
+17: 8+1 Cyan/- | 91+1 Cyan/-
+18: 8+1 Cyan/- | 9+8 Cyan/- BOLD | 91+1 Cyan/-
+19: 8+1 Cyan/- | 11+4 Gray/- | 15+32 White/- BOLD | 91+1 Cyan/-
+20: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
+21: 8+1 Cyan/- | 11+4 Gray/- | 15+30 White/- BOLD | 91+1 Cyan/-
+22: 8+1 Cyan/- | 11+4 Gray/- | 15+15 White/- BOLD | 91+1 Cyan/-
+23: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
+24: 8+1 Cyan/- | 91+1 Cyan/-
+25: 8+1 Cyan/- | 9+41 Yellow/- | 91+1 Cyan/-
+26: 8+1 Cyan/- | 9+82 Gray/- | 91+1 Cyan/-
+27: 8+84 Cyan/-
 28: 0+22 Gray/- | 22+24 Yellow/-
 29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 40+5 Black/Gray

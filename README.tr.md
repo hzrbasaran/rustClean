@@ -50,6 +50,10 @@ harekete geçmenizi sağlar:
     `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
     paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
     dokunmaz
+  - Finder ya da iTunes ile alınmış **iPhone / iPad yedekleri**
+    (`MobileSync/Backup`): her yedeğin cihazı, modeli, iOS sürümü ve tarihi;
+    şifreli yedekler ve her cihazın en yeni yedeği işaretlenir; klasör için
+    Tam Disk Erişimi gerekiyorsa söyler
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık
   klasörünün değil *projenin* yaşıdır.

@@ -47,6 +47,10 @@ one go.
   - **empty folders, broken links and temporary files** (`.DS_Store`,
     `*.tmp`, Office locks, unfinished downloads), leaving alone hidden
     folders, bundles, `Library`, build output and system folders
+  - **iPhone / iPad backups** made by Finder or iTunes (`MobileSync/Backup`):
+    the device, model, iOS version and date of each backup, encrypted ones
+    and the newest backup of each device marked; explains when the folder
+    needs Full Disk Access
 - **Age filter** (`f`) on reports: show only what has not been touched for
   30 / 90 / 180 / 365 days. For developer junk, the age is the *project's*,
   not the dependency folder's.
