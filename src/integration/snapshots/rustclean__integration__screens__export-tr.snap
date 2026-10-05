@@ -1,0 +1,57 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  En büyük dosyalar — /Users/demo  │  17 satır, 8.6 GiB (diskte)
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+      Boyut       Adet       Son değişiklik   Konum
+▶ [ ]     3.0 GiB            27.08.2025 12:00 Downloads/Xcode_16.xip
+  [ ]     2.3 GiB            28.02.2025 12:00 Movies/holiday-2024.mp4
+  [ ]   900.0 MiB            22.08.2026 12:00 Movies/screen-recording.mov
+  [ ]   820.0 MiB            03.06.2026 12:00 Projects/api/target/debug/api
+  [ ]   610.0 MiB            30.09.2026 12:00 Library/Caches/com.example.browser/cache.db
+  [ ]   450.0 MiB            15.03.2026 12:00 Downloads/setup.dmg
+  [ ]   ┌ Dışa aktar ──────────────────────────────────────────────────────────────────────┐
+  [ ]   │                                                                                  │chpad
+  [ ]   │ Bu liste dosyaya kaydedilecek: 17 satır.                                         │
+  [ ]   │                                                                                  │pad/stat
+  [ ]   │  c   CSV   (tablo programları için)                                              │
+  [ ]   │  j   JSON  (betikler için)                                                       │
+  [ ]   │ Esc   vazgeç                                                                     │
+  [ ]   │                                                                                  │
+  [ ]   │ Çalışma klasörüne kaydedilir; oraya yazılamazsa ev klasörüne.                    │
+  [ ]   │ Var olan dosyaların üzerine yazılmaz.                                            │
+  [ ]   └──────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Enter: dosyanın bulunduğu klasörü aç
+ ?  yardım   c  CSV   j  JSON   Esc  vazgeç
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 White/Indexed(238) BOLD
+ 4: 2+3 Gray/- | 29+16 Red/-
+ 5: 2+3 Gray/- | 29+16 Yellow/-
+ 6: 2+3 Gray/- | 29+16 Yellow/-
+ 7: 2+3 Gray/- | 29+16 Green/-
+ 8: 2+3 Gray/- | 29+16 Yellow/-
+ 9: 2+3 Gray/- | 8+1 Cyan/- | 9+12 White/- BOLD | 21+71 Cyan/-
+10: 2+3 Gray/- | 8+1 Cyan/- | 91+1 Cyan/-
+11: 2+3 Gray/- | 8+1 Cyan/- | 9+41 White/- BOLD | 91+1 Cyan/-
+12: 2+3 Gray/- | 8+1 Cyan/- | 91+1 Cyan/-
+13: 2+3 Gray/- | 8+1 Cyan/- | 9+4 Black/Gray | 13+32 White/- | 91+1 Cyan/-
+14: 2+3 Gray/- | 8+1 Cyan/- | 9+4 Black/Gray | 13+23 White/- | 91+1 Cyan/-
+15: 2+3 Gray/- | 8+1 Cyan/- | 9+5 Black/Gray | 14+8 White/- | 91+1 Cyan/-
+16: 2+3 Gray/- | 8+1 Cyan/- | 91+1 Cyan/-
+17: 2+3 Gray/- | 8+1 Cyan/- | 9+62 Gray/- | 91+1 Cyan/-
+18: 2+3 Gray/- | 8+1 Cyan/- | 9+38 Gray/- | 91+1 Cyan/-
+19: 2+3 Gray/- | 8+84 Cyan/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+3 Black/Gray | 21+3 Black/Gray | 31+5 Black/Gray

@@ -14,6 +14,7 @@ expression: screen
         │ ?             bu yardım                                                          │
         │ L             Türkçe ↔ English                                                   │
         │ T             tema: koyu, açık, renk körü                                        │
+        │ M             fare aç / kapat (kapalıyken terminalde metin seçilebilir)          │
         │ q  Ctrl-C     çık                                                                │
         │                                                                                  │
         │Klasör listesi                                                                    │
@@ -25,13 +26,12 @@ expression: screen
         │ s             sırala: boyut, ad, dosya sayısı, tarih                             │
         │ a             görünen / diskteki boyut                                           │
         │ t             harita görünümü                                                    │
+        │ w             haritayı HTML sayfası olarak kaydet                                │
         │ /             ada göre ara (* ve ? joker karakter)                               │
         │ i             bu klasörün özeti                                                  │
-        │ m             raporlar menüsü                                                    │
-        │ Space         sepete ekle / çıkar                                                │
-────────│ S             sepeti göster                                                      │────────
+────────│ m             raporlar menüsü                                                    │────────
         └───────────────────── ↑↓ PgUp PgDn: kaydır · Esc / ?: kapat ──────────────────────┘
- ?  yardım   ↑↓  seç   Enter  tara   r  yenile   L  English   T  tema   q  çık
+ ?  yardım   ↑↓  seç   Enter  tara   r  yenile   L  English   T  tema   M  fare   q  çık
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
  1: 8+1 Cyan/- | 9+8 White/- BOLD | 17+75 Cyan/-
@@ -45,21 +45,21 @@ expression: screen
  9: 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
 10: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
 11: 8+16 Cyan/- | 24+27 White/- | 91+1 Cyan/-
-12: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
-13: 8+1 Cyan/- | 91+1 Cyan/-
-14: 8+1 Cyan/- | 9+14 White/- BOLD | 91+1 Cyan/-
-15: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
-16: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
-17: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
-18: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
-19: 8+16 Cyan/- | 24+10 White/- | 91+1 Cyan/-
-20: 8+16 Cyan/- | 24+38 White/- | 91+1 Cyan/-
-21: 8+16 Cyan/- | 24+24 White/- | 91+1 Cyan/-
-22: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
-23: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
-24: 8+16 Cyan/- | 24+17 White/- | 91+1 Cyan/-
-25: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
-26: 8+16 Cyan/- | 24+19 White/- | 91+1 Cyan/-
-27: 8+16 Cyan/- | 24+13 White/- | 91+1 Cyan/-
+12: 8+16 Cyan/- | 24+57 White/- | 91+1 Cyan/-
+13: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
+14: 8+1 Cyan/- | 91+1 Cyan/-
+15: 8+1 Cyan/- | 9+14 White/- BOLD | 91+1 Cyan/-
+16: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
+17: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
+18: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+19: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
+20: 8+16 Cyan/- | 24+10 White/- | 91+1 Cyan/-
+21: 8+16 Cyan/- | 24+38 White/- | 91+1 Cyan/-
+22: 8+16 Cyan/- | 24+24 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+24: 8+16 Cyan/- | 24+35 White/- | 91+1 Cyan/-
+25: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+17 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
 28: 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
-29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 36+3 Black/Gray | 48+3 Black/Gray | 61+3 Black/Gray | 71+3 Black/Gray
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 36+3 Black/Gray | 48+3 Black/Gray | 61+3 Black/Gray | 71+3 Black/Gray | 81+3 Black/Gray

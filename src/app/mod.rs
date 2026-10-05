@@ -28,6 +28,9 @@ use rescan::Rescan;
 mod basket;
 mod browser;
 mod dashboard;
+mod export;
+mod htmlmap;
+mod mouse;
 mod rescan;
 mod results;
 mod snapshots;
@@ -35,6 +38,7 @@ mod trash;
 mod uninstall;
 
 pub use dashboard::{Dashboard, Pane};
+pub use mouse::{Hit, Mouse};
 pub use trash::FailureDialog;
 pub use uninstall::UninstallDialog;
 
@@ -173,8 +177,16 @@ pub struct Browser {
     batch_via: crate::trashlog::Via,
     /// Entries that could not be trashed, shown in a dialog until dismissed.
     pub failures: Option<FailureDialog>,
+    /// `o` asks whether to save the list as CSV or JSON; the number of
+    /// entries it would save.
+    pub export_prompt: Option<usize>,
+    /// Where `o` saves instead of the working or home folder (tests).
+    pub export_dir: Option<PathBuf>,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
+    /// Where `w` writes the treemap page. `None`: the working directory,
+    /// else the home folder (tests set a temp directory).
+    pub html_dir: Option<PathBuf>,
 }
 
 impl Browser {
@@ -214,7 +226,10 @@ impl Browser {
             batch_failures: Vec::new(),
             batch_via: crate::trashlog::Via::List,
             failures: None,
+            export_prompt: None,
+            export_dir: None,
             history: Vec::new(),
+            html_dir: None,
         };
         b.load(ROOT, 0);
         b
@@ -237,6 +252,8 @@ pub struct App {
     /// A problem with the configuration file, shown on the disk list and
     /// on the status line of the first scan opened.
     config_notice: Option<String>,
+    /// Mouse support (`M`) and where the last frame drew its clickable rows.
+    pub mouse: Mouse,
 }
 
 impl App {
@@ -254,6 +271,7 @@ impl App {
             should_quit: false,
             help: None,
             config_notice: None,
+            mouse: Mouse::default(),
         };
         app.refresh_disks();
         if let Some(path) = start_path {
@@ -342,6 +360,7 @@ impl App {
                 KeyCode::Home => *scroll = 0,
                 KeyCode::Char('L') => self.switch_language(),
                 KeyCode::Char('T') => self.switch_theme(),
+                KeyCode::Char('M') => self.toggle_mouse(),
                 KeyCode::Char('q') => self.should_quit = true,
                 _ => self.help = None,
             }
@@ -357,6 +376,10 @@ impl App {
         }
         if key.code == KeyCode::Char('T') && !self.typing() {
             self.switch_theme();
+            return;
+        }
+        if key.code == KeyCode::Char('M') && !self.typing() {
+            self.toggle_mouse();
             return;
         }
         match self.screen {

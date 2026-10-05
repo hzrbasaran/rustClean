@@ -1,0 +1,43 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  iPhone / iPad yedekleri — /Users/demo  │  3 satır, 81.0 GiB (diskte)
+─────────────────────────────────────── Tarih: ██ ≤ 7 gün   ██ ≤ 30 gün   ██ ≤ 1 yıl   ██ > 1 yıl
+      Boyut       Adet       Son değişiklik   Konum                          Ayrıntı
+▶ [ ]    38.0 GiB          1 21.09.2026 12:00 Demo iPhone · iPhone 13 Pro    19.09.2026 · en yenisi
+  [ ]    31.0 GiB          1 21.09.2026 12:00 Demo iPhone · iPhone 13 Pro    08.06.2025 · şifreli ·
+  [ ]    12.0 GiB          1 21.09.2026 12:00 Studio iPad · iPad13,4         15.03.2026 · en yenisi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Silinen yedekle cihaz geri yüklenemez: her cihazın en yeni yedeğini saklayın.
+ ?  yardım   ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 39+8 White/- BOLD | 47+2 Green/- | 49+11 White/- | 60+2 Cyan/- | 62+12 White/- | 74+2 Yellow/- | 76+11 White/- | 87+2 Red/- | 89+11 White/-
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 White/Indexed(238) BOLD
+ 4: 2+3 Gray/- | 18+10 Gray/- | 29+16 Cyan/- | 46+27 LightBlue/- BOLD | 77+23 Gray/-
+ 5: 2+3 Gray/- | 18+10 Gray/- | 29+16 Cyan/- | 46+22 LightBlue/- BOLD | 77+23 Gray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 38+3 Black/Gray | 48+3 Black/Gray | 66+3 Black/Gray | 81+3 Black/Gray | 92+7 Black/Gray

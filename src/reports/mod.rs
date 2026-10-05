@@ -9,6 +9,7 @@ use crate::lists::{ResultList, Row, Source};
 use crate::stats::DAY;
 use crate::tree::{NodeId, SizeMode, Tree};
 
+mod backups;
 mod caches;
 mod clutter;
 mod dev_junk;
@@ -16,6 +17,9 @@ mod downloads;
 mod names;
 mod size;
 
+use backups::backups;
+#[cfg(all(test, unix))]
+pub use backups::{with_fake_backups, BackupInfo};
 use caches::caches;
 use clutter::clutter;
 use dev_junk::dev_junk;
@@ -41,10 +45,12 @@ pub enum ReportKind {
     Duplicates,
     /// Empty folders, broken links and temporary files.
     Clutter,
+    /// iPhone and iPad backups in `MobileSync/Backup`.
+    DeviceBackups,
 }
 
 impl ReportKind {
-    pub const ALL: [ReportKind; 11] = [
+    pub const ALL: [ReportKind; 12] = [
         ReportKind::LargestFiles,
         ReportKind::LargestDirs,
         ReportKind::RepeatedNames,
@@ -56,12 +62,32 @@ impl ReportKind {
         ReportKind::Downloads,
         ReportKind::Duplicates,
         ReportKind::Clutter,
+        ReportKind::DeviceBackups,
     ];
 
     /// A name that does not depend on the language (the variant's), for
     /// files.
     pub fn code(self) -> String {
         format!("{self:?}")
+    }
+
+    /// The kebab-case name used on the command line (`rustclean report
+    /// dev-junk`) and in exported file names.
+    pub fn slug(self) -> &'static str {
+        match self {
+            ReportKind::LargestFiles => "largest-files",
+            ReportKind::LargestDirs => "largest-dirs",
+            ReportKind::RepeatedNames => "repeated-names",
+            ReportKind::Apps => "apps",
+            ReportKind::Orphans => "orphans",
+            ReportKind::DevJunk => "dev-junk",
+            ReportKind::Caches => "caches",
+            ReportKind::OldBig => "old-big",
+            ReportKind::Downloads => "downloads",
+            ReportKind::Duplicates => "duplicates",
+            ReportKind::Clutter => "clutter",
+            ReportKind::DeviceBackups => "device-backups",
+        }
     }
 
     pub fn from_code(code: &str) -> Option<ReportKind> {
@@ -93,6 +119,7 @@ impl ReportKind {
                 "Boş klasörler, kırık bağlantılar, geçici dosyalar",
                 "Empty folders, broken links, temporary files"
             ),
+            ReportKind::DeviceBackups => t!("iPhone / iPad yedekleri", "iPhone / iPad backups"),
         }
     }
 
@@ -108,6 +135,7 @@ impl ReportKind {
                 | ReportKind::Orphans
                 | ReportKind::Downloads
                 | ReportKind::Clutter
+                | ReportKind::DeviceBackups
         )
     }
 
@@ -170,6 +198,10 @@ impl ReportKind {
                 "Gizli klasörler, paketler, Library ve sistem dışında; geçici dosyalar 1 günden eski",
                 "Outside hidden folders, bundles, Library and system; temporary files over a day old"
             ),
+            ReportKind::DeviceBackups => t!(
+                "Finder / iTunes cihaz yedekleri (MobileSync/Backup): cihaz, sürüm, son yedek tarihi",
+                "Finder / iTunes device backups (MobileSync/Backup): device, version, last backup date"
+            ),
         }
     }
 }
@@ -188,7 +220,7 @@ pub enum MenuItem {
 }
 
 impl MenuItem {
-    pub const ALL: [MenuItem; 16] = [
+    pub const ALL: [MenuItem; 17] = [
         MenuItem::Report(ReportKind::LargestFiles),
         MenuItem::Report(ReportKind::LargestDirs),
         MenuItem::Report(ReportKind::RepeatedNames),
@@ -200,6 +232,7 @@ impl MenuItem {
         MenuItem::Report(ReportKind::Downloads),
         MenuItem::Report(ReportKind::Duplicates),
         MenuItem::Report(ReportKind::Clutter),
+        MenuItem::Report(ReportKind::DeviceBackups),
         MenuItem::Changes,
         MenuItem::Leftovers,
         MenuItem::Tools,
@@ -309,12 +342,19 @@ pub fn run(
         ReportKind::OldBig => old_big(tree, base, mode, now),
         ReportKind::Downloads => downloads(tree, base, mode, age),
         ReportKind::Clutter => clutter(tree, base, mode, age, now),
+        ReportKind::DeviceBackups => backups(tree, base, mode, age),
         ReportKind::Apps | ReportKind::Orphans | ReportKind::Duplicates => {
             unreachable!("{kind:?} is computed elsewhere")
         }
     };
     let mut title = kind.label().to_string();
-    if age.min_days > 0 {
+    if age.min_days > 0 && kind == ReportKind::DeviceBackups {
+        title.push_str(&tf!(
+            " · son yedek ≥ {} gün önce",
+            " · last backup ≥ {} days ago",
+            age.min_days
+        ));
+    } else if age.min_days > 0 {
         title.push_str(&tf!(
             " · ≥ {} gündür dokunulmamış",
             " · untouched for ≥ {} days",

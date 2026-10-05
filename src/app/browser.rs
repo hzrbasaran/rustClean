@@ -146,17 +146,20 @@ impl Browser {
         let rects: Vec<Rect> = blocks.iter().map(|(_, r)| *r).collect();
         match treemap::neighbor(&rects, from, dir).map(|i| blocks[i].0) {
             Some(Slot::Item(i)) => self.table.select(Some(i)),
-            Some(Slot::Other { .. }) => {
-                // The first entry too small for its own block.
-                let shown = blocks
-                    .iter()
-                    .filter(|(s, _)| matches!(s, Slot::Item(_)))
-                    .count();
-                self.table
-                    .select(Some(shown.min(self.entries.len().saturating_sub(1))));
-            }
+            Some(Slot::Other { .. }) => self.select_first_small(),
             None => {}
         }
+    }
+
+    /// Selects the first entry too small for its own block ("other").
+    pub(super) fn select_first_small(&mut self) {
+        let shown = self
+            .map_blocks()
+            .iter()
+            .filter(|(s, _)| matches!(s, Slot::Item(_)))
+            .count();
+        self.table
+            .select(Some(shown.min(self.entries.len().saturating_sub(1))));
     }
 
     pub(super) fn on_key(&mut self, code: KeyCode) -> Action {
@@ -238,6 +241,10 @@ impl Browser {
             return Action::None;
         }
         self.status = None;
+        if self.export_prompt.is_some() {
+            self.on_key_export(code);
+            return Action::None;
+        }
         if let Some(sel) = &mut self.report_menu {
             let n = MenuItem::ALL.len();
             match code {
@@ -343,13 +350,7 @@ impl Browser {
                 {
                     // Small entries are only reachable from the list.
                     self.view = View::List;
-                    let shown = self
-                        .map_blocks()
-                        .iter()
-                        .filter(|(s, _)| matches!(s, Slot::Item(_)))
-                        .count();
-                    self.table
-                        .select(Some(shown.min(self.entries.len().saturating_sub(1))));
+                    self.select_first_small();
                     return Action::None;
                 }
                 _ => {}
@@ -384,9 +385,11 @@ impl Browser {
                 }
             }
             KeyCode::Char('S') => self.open_basket(),
+            KeyCode::Char('o') => self.start_export(),
             KeyCode::Char('r') => return Action::Rescan,
             KeyCode::Char('R') => self.start_rescan(),
             KeyCode::Char('d') => return Action::Disks,
+            KeyCode::Char('w') => self.export_html(),
             _ => {}
         }
         Action::None

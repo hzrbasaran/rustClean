@@ -13,6 +13,9 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ browser.rs    navigation, treemap moves, the key dispatcher
    │    ├─ one module per job, each adding an `impl Browser` block:
    │    │  results, dashboard, basket, trash, uninstall, snapshots, rescan
+   │    ├─ mouse.rs      optional mouse (`M`): clicks, double clicks, wheel
+   │    │  results, dashboard, basket, trash, uninstall, snapshots, rescan,
+   │    │  export (`o`)
    │    ├─ toolsview.rs   developer tools screen state and keys
    │    └─ basket.rs      entries collected for deletion
    │
@@ -33,7 +36,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ mod.rs        report kinds, menu items, age filter, run(), shared
    │    │                walk / top-N helpers
    │    └─ one module per report group: size, downloads, dev_junk, caches,
-   │       names, clutter (empty folders, broken links, temporary files)
+   │       names, clutter (empty folders, broken links, temporary files),
+   │       backups (iPhone / iPad backups, read from their Info.plist)
    ├─ apps/ ────── apps and their data, orphaned leftovers
    │    ├─ mod.rs        App, DataDir, the Apps report, uninstall checks
    │    ├─ find.rs       installed apps (in the scan and on disk)
@@ -43,10 +47,18 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ stats.rs ─── summary statistics, age groups, file categories
    ├─ search.rs ── name patterns
    ├─ lists.rs ─── generic result list (rows, groups, drill-down)
+   ├─ export.rs ── lists as CSV / JSON records, files that never overwrite
+   ├─ cli.rs ───── `rustclean report`: scan, run one report, print it
    ├─ treemap.rs ─ squarified layout and block navigation
+   ├─ htmlmap/ ─── the treemap as a self-contained HTML page (`w`)
+   │    ├─ mod.rs        picks the blocks (depth, block and "other" limits),
+   │    │                fills the page, writes the file without overwriting
+   │    └─ page.html     the page: styles, JSON data, layout and zoom script
    │
    ├─ history.rs ─ scan snapshots and "what changed"
    ├─ tools.rs ─── developer tool measurement and cleanup commands
+   │    ├─ tools_linux.rs    apt/dnf/pacman caches, journal, snaps (#18)
+   │    └─ tools_windows.rs  %TEMP%, Windows temp, update cache, Recycle Bin (#19)
    ├─ system.rs ── macOS system data (diskutil, tmutil, sysctl)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ trashlog.rs  the deletion log (deletions.jsonl)
@@ -118,6 +130,19 @@ re-opening groups level by level. It runs after `L` (so titles and details
 follow the language), after the age filter changes, and after the basket or
 the apps change.
 
+## Exporting and the report command
+
+`export.rs` turns a list into `Record`s, one per entry: the folder list
+gives its entries, a result list its rows, and a group row one record per
+member with the group's label. The same records are written as CSV or JSON
+by `o` in the interface (`app/export.rs` picks the list on screen and saves
+it with `export::save`, which opens files with `create_new` so nothing is
+ever overwritten) and by `rustclean report` (`cli.rs`), which scans like
+`--summary`, runs the report with the interface's own code (the report
+methods of a `Browser` that is never drawn; duplicates with
+`duplicates::find_groups` on the same thread) and prints to stdout. Column names are fixed English identifiers, so scripts do not
+depend on the language.
+
 ## Background work
 
 Long operations run on their own threads and report through channels. The UI
@@ -139,6 +164,45 @@ step. A failed move is never written.
 Reports that only read the tree run synchronously. They take under a second
 even on a full disk. A "preparing" message is drawn first so the UI never looks
 frozen.
+
+## Mouse
+
+Mouse support is off until `M`. `App::mouse` (`app/mouse.rs`) holds whether
+it is on and the clickable areas of the last frame: while drawing, the
+screens record a `(Rect, Hit)` for every visible table row (from the area
+they drew into and `TableState::offset`), treemap block and menu line
+(`Mouse::add_rows`, `ui::table_rows`, `ui::panel_rows`). `ui::render` clears
+them first; a popup clears what it covers, and the confirmation, uninstall
+and failure dialogs and the help record nothing. A click looks up the
+topmost area under it (`Mouse::hit_at`), checks that the screen it belongs
+to is still showing, and moves the selection; a second click on the same
+`Hit` within 500 ms sends `Enter` through `on_key`. The wheel sends `↑`/`↓`
+to lists and scrolls text views directly. While a question is open, text is
+typed or work runs, `App::mouse_blocked` drops every mouse event, so nothing
+can be confirmed by mouse. All of this works on a `TestBackend` without a
+terminal, which the tests in `src/integration/mouse.rs` use.
+
+`main.rs` turns the terminal's mouse capture on and off to follow
+`app.mouse.on` after each event, and off again on quit and in the panic hook
+(ratatui's own hook restores the terminal but not mouse capture). Pointer
+motion events are read in a row without redrawing.
+
+## The treemap page
+
+`w` writes the current folder as an HTML page (`htmlmap`, called from
+`app/htmlmap.rs`). Rust only picks the data: breadth first and largest first
+within `htmlmap::LIMITS` (4 levels, 3,000 blocks, 60 per folder, small
+entries merged into "other"), so a full disk still gives a small file. The
+layout runs in the page: it is redone on every zoom and window size, and
+only the browser knows the pixel size, so the script ports the squarified
+layout of `treemap.rs` instead of shipping precomputed rectangles.
+
+The data is inlined as JSON in a `<script type="application/json">`
+element, with `<`, `>` and `&` escaped, so a file name cannot end the
+element; the script inserts names with `textContent` only. A Content
+Security Policy (`default-src 'none'`) keeps the page from loading anything.
+Test builds write into the temp directory unless a test sets
+`Browser::html_dir`.
 
 ## Configuration
 
@@ -202,6 +266,9 @@ Integration tests live in `src/integration/` (test builds only, so they can
 reach the internals without a library target). `Fixture` builds a real folder
 tree in a temp directory with distinct file sizes and set ages. The tests scan
 it with the real scanner and drive `App` by key presses, as the interface
+does: reports, duplicates, the basket, moving to the trash, uninstalling,
+comparing with a saved scan, and exporting with `o`. `tests/cli.rs` runs the
+binary itself (`--summary`, `report` in every format, `--help`, errors).
 does: reports, duplicates, the basket, moving to the trash, uninstalling, and
 comparing with a saved scan. `tests/cli.rs` runs the binary itself
 (`--summary`, `--config`, `--help`, errors), each run with its own
@@ -218,8 +285,10 @@ disks, tools and system data, and two test-only, per-thread switches:
 UTC, so snapshots match on every machine.
 
 Test builds never touch the user's data. `paths::data_dir` points to a
-folder under the temp directory, and `Deletion` renames entries into
-`delete::test_trash` instead of calling the real trash.
+folder under the temp directory, `Deletion` renames entries into
+`delete::test_trash` instead of calling the real trash, and `o` saves into a
+folder under the temp directory (`export::default_dirs`), or into
+`Browser::export_dir` when a test sets it.
 
 Tests run in the default language (Turkish) and must pass on macOS, Linux and
 Windows. Compare paths with `/` normalized, and gate Unix-only tests with

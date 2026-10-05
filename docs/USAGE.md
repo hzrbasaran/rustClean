@@ -15,6 +15,9 @@ need to look anything up.
 - [Language](#language)
 - [Deletion log](#deletion-log)
 - [Themes and colors](#themes-and-colors)
+- [Saving a list (CSV / JSON)](#saving-a-list-csv--json)
+- [Reports from the command line](#reports-from-the-command-line)
+- [Mouse](#mouse)
 - [Command line](#command-line)
 - [Configuration file](#configuration-file)
 
@@ -46,8 +49,10 @@ with `?  help` and shows the most used keys.
 | `e` or `y` | yes, in a question (Turkish *evet* / English *yes*; both work in either language) |
 | `h`, `n` or `Esc` | no |
 | `m` | the menu of reports and tools |
+| `o` | save the list on screen as CSV or JSON ([more](#saving-a-list-csv--json)) |
 | `?` | every key |
 | `L` · `T` | Türkçe ↔ English · theme |
+| `M` | mouse on / off; see [Mouse](#mouse) |
 | `q` or `Ctrl-C` | quit |
 
 ## Browsing
@@ -72,7 +77,9 @@ The list shows the current folder's entries with:
 | `a` | apparent size (file length) ↔ size on disk (what `du` reports; on APFS, pure clones are counted once) |
 | `R` | rescan only the current folder (e.g. after a cleanup), in the background; `Esc` cancels |
 | `r` | rescan everything from the root |
+| `o` | save the list as CSV or JSON ([more](#saving-a-list-csv--json)) |
 | `d` | back to the disk list |
+| `w` | save the treemap of this folder as an HTML page ([below](#saving-the-treemap-as-a-web-page)) |
 
 ## Treemap
 
@@ -86,8 +93,41 @@ strip at the bottom ("other"). The selection is shared with the list.
 | `Enter` / `⌫` | open a folder / go back |
 | `c` | color by type (folders each get their own color) or by age |
 | `t` / `Esc` | back to the list |
+| `o` | save the folder's entries as CSV or JSON |
+| `w` | save as an HTML page (see below) |
 
 `Enter` on the "other" strip opens the list at the first small entry.
+
+### Saving the treemap as a web page
+
+`w`, in the list or the treemap, writes the current folder as a web page:
+`rustclean-treemap-YYYYMMDD-HHMMSS.html` in the folder rustClean was started
+from, or in your home folder if that one cannot be written. An existing file
+is never replaced; the name gets `-1`, `-2`, … instead. The status line shows
+where the file went.
+
+The page is a single, self-contained file: the data, the script and the
+styles are inside it, and it makes no network requests and loads no other
+files (a Content Security Policy forbids it). It works offline in current
+browsers, also on a phone, and can be shared as it is. It only shows; it
+changes nothing.
+
+![The treemap page in a browser](screenshots/html-treemap.png)
+
+- Click a folder to zoom in; the path at the top, the **↑** button, `Esc` or
+  `⌫` go back. Folders big enough show their contents one level down.
+- Each block shows its name, size and share of its folder; hovering (or
+  tapping a file) shows the share of the whole page, the type and the age.
+- **By type** / **By age** switch the colors as `c` does in the terminal.
+- Sizes follow the size mode of the list when you pressed `w` (`a`:
+  apparent or on disk), and the texts follow the current language.
+
+To keep the file small on a full disk, the page holds at most **4 levels**
+below the folder and **3,000 blocks**. Entries under 0.2 % of their folder,
+and all after the 60 largest, share an "other" block per folder. When the
+block budget runs out, the deepest and smallest folders are left without
+their contents; such folders, and those at the depth limit, are striped.
+The page says these limits at the bottom.
 
 ## Summary
 
@@ -102,7 +142,7 @@ strip at the bottom ("other"). The selection is shared with the list.
 total size would only list chains of nested parents.
 
 `Tab` switches between the two lists, `Enter` goes to the entry, `Space`/`x`
-work as everywhere else.
+work as everywhere else. `o` saves the focused list as CSV or JSON.
 
 ## Finding by name
 
@@ -138,6 +178,9 @@ what to do about it.
 
 `m` opens the menu. Reports cover the folder you are in. Rows start
 unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
+`o` saves the report as CSV or JSON ([more](#saving-a-list-csv--json)), and
+`rustclean report` prints any of them without the interface
+([more](#reports-from-the-command-line)).
 
 | Report | What it lists |
 |---|---|
@@ -152,6 +195,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
 | Duplicate files | files with identical content (≥ 1 MiB, [configurable](#configuration-file)); `Space` on a group adds all but the oldest copy |
 | Empty folders, broken links, temporary files | three groups: folders with nothing below them (only the topmost is listed), symbolic links whose target is gone, and temporary files (`.DS_Store`, `Thumbs.db`, `*.tmp`, Office `~$…` locks, unfinished downloads) untouched for a day; `Enter` opens a group, `Space` adds it whole |
+| iPhone / iPad backups | one row per backup folder in `MobileSync/Backup`: the device name and model, then the date of the backup, `newest` on the newest backup of each device, `encrypted`, and the iOS version, read from the backup's `Info.plist` and `Manifest.plist`; see below |
 
 **Age filter.** In most reports `f` cycles a minimum age: none → 30 → 90 → 180
 → 365 days since the last change. For developer junk the age is the
@@ -188,6 +232,27 @@ document's lock file, a running download) and are left out; `.DS_Store` and
 
 ![The clutter report: temporary files, empty folders and broken links](screenshots/clutter.svg)
 
+**iPhone / iPad backups.** Finder (and iTunes before it) keeps device backups
+in `~/Library/Application Support/MobileSync/Backup`; on Windows, iTunes and
+Apple Devices use `%APPDATA%\Apple Computer\MobileSync\Backup` or
+`%USERPROFILE%\Apple\MobileSync\Backup`. Each backup is one folder, often
+tens of GB. Scan your home folder to see them. The age filter (`f`) goes by
+the date of the backup, not by the folder's last change.
+
+A deleted backup cannot restore the device. Keep the newest backup of each
+device (marked `newest`) unless the device is gone or backs up to iCloud;
+older ones, and those of devices you no longer have, are the usual
+candidates. `x` and the basket move a backup to the trash as usual, so it
+can still be put back until the trash is emptied.
+
+On macOS the backup folder is protected: without Full Disk Access the scan
+sees it empty, and the report says so instead of listing nothing. To grant
+it, open System Settings → Privacy & Security → Full Disk Access, turn on
+your terminal app (Terminal, iTerm, …; add it with `+` if it is not listed),
+restart the terminal and scan again. When the scan does not include the
+backup folder at all (you scanned another folder), the report says to scan
+your home folder.
+
 **Duplicates and APFS.** Copies that are APFS clones (made by `cp -c`, Finder's
 Duplicate and many apps) share their blocks. The group's detail says how many
 copies are clones, and deleting them frees nothing. In disk size mode the
@@ -223,6 +288,31 @@ log. The tool is then measured again.
 | Gradle | stop daemons, move the cache to the trash |
 | CocoaPods · Homebrew | `pod cache clean --all` · `brew cleanup --prune=all` |
 | Cargo | move downloaded `.crate` files to the trash |
+
+**Linux and Windows system caches.** On these platforms the same screen also
+lists system folders. Measuring still only reads. Actions that need root
+(Linux) or administrator rights (Windows) are marked "rustClean does not run
+this; run the command yourself" and show the exact command; they cannot be
+selected, and rustClean never runs `sudo` or an elevated shell.
+
+| Platform | Row | Measured from | Action |
+|---|---|---|---|
+| Linux | apt package cache | size of `/var/cache/apt` | `sudo apt-get clean` (you run it) |
+| Linux | dnf package cache | `cachedir` in `/etc/dnf/dnf.conf`, else `/var/cache/libdnf5` and `/var/cache/dnf` | `sudo dnf clean all` (you run it) |
+| Linux | pacman package cache | `CacheDir` in `/etc/pacman.conf`, else `/var/cache/pacman/pkg/` | `sudo paccache -rk1` (when pacman-contrib is installed) · `sudo pacman -Scc` (you run them) |
+| Linux | systemd journal | `journalctl --disk-usage` (as your user: the journals you can read) | `sudo journalctl --vacuum-time=2weeks` (you run it) |
+| Linux | disabled snap revisions | `snap list --all`, sizes of `/var/lib/snapd/snaps/<name>_<rev>.snap` | `sudo snap remove <name> --revision=<rev>` per revision (you run them) |
+| Windows | temporary files (`%TEMP%`) | size of `%TEMP%` | move the contents to the Recycle Bin, entry by entry; files in use are skipped (rustClean runs this after you confirm) |
+| Windows | Windows temp folder | size of `C:\Windows\Temp`, if readable | in an administrator PowerShell: `Remove-Item C:\Windows\Temp\* -Recurse -Force` |
+| Windows | Windows Update downloads | size of `C:\Windows\SoftwareDistribution\Download`, if readable | in an administrator PowerShell: `Stop-Service -Name wuauserv, bits -Force`, `Remove-Item C:\Windows\SoftwareDistribution\Download\* -Recurse -Force`, `Start-Service -Name wuauserv, bits` |
+| Windows | Recycle Bin | sizes of `X:\$Recycle.Bin` on every drive (other users' folders are not readable and are left out) | in PowerShell: `Clear-RecycleBin` (deletes for good, so rustClean leaves it to you) |
+
+`%TEMP%` is only offered when it looks like a temporary folder: its name
+is exactly `Temp` or `tmp` (in any case), and it is not a drive root, your home folder or one
+of its parents. When `C:\Windows\Temp` or the update cache cannot be read
+without administrator rights, the row says so and still shows the command.
+Windows' own Disk Cleanup (`cleanmgr`, "Clean up system files") cleans the
+same folders too.
 
 **System data** (macOS). Shows:
 - the APFS container and every volume's usage
@@ -273,11 +363,150 @@ borders. `T` then leaves the colors off.
 |---|---|
 | ![Light theme](screenshots/theme-light.svg) | ![Color-blind friendly theme](screenshots/theme-colorblind.svg) |
 
+## Saving a list (CSV / JSON)
+
+`o` saves the list on screen to a file: the folder list, the treemap (the
+same entries as the list), the focused list of the summary, and every report,
+search result, comparison and the basket. A small window asks for the format:
+`c` CSV (for spreadsheets), `j` JSON (for scripts), `Esc` cancels.
+
+The file goes to the folder rustClean was started from (the working folder);
+if that folder is not writable, to your home folder. Its name says what it
+holds and when: `rustclean-<list>-YYYYMMDD-HHMMSS.csv`, e.g.
+`rustclean-dev-junk-20261005-143012.csv` or `rustclean-folder-….json`. An
+existing file is never overwritten: `-1`, `-2`… is added to the name. The
+bottom line shows where the file went.
+
+Saving only reads; it changes nothing on disk except writing the new file.
+
+### Columns
+
+Every file has the same columns, in this order (CSV header and JSON keys):
+
+| Column | Meaning |
+|---|---|
+| `path` | absolute path of the file or folder |
+| `apparent_size` | size in bytes (file length) |
+| `disk_size` | bytes allocated on disk |
+| `files` | 1 for a file; the number of files below a folder |
+| `modified` | last change, ISO 8601 in UTC (`2026-10-01T12:00:00Z`); for a folder the newest change inside; empty (`null` in JSON) when unknown |
+| `created` | creation time, the same way |
+| `group` | the label of the group the entry belongs to (same name, same content, an app and its data); empty for single entries |
+| `detail` | the row's extra text in reports (e.g. "Rust build output · project: …") |
+
+A group row is saved as one line per member, each with the group's label in
+`group`, so a duplicates report lists every copy. Inside an opened group the
+entries get the group's label too. Rows are saved in the order shown; a
+report saves what it lists (at most 200 rows).
+
+CSV follows RFC 4180: a field with a comma, a quote or a line break is put
+in quotes, and quotes inside are doubled. JSON looks like this, one entry per
+line:
+
+```json
+{
+  "title": "Developer junk",
+  "root": "/Users/you/Projects",
+  "truncated": false,
+  "entries": [
+    {"path": "/Users/you/Projects/web/node_modules", "apparent_size": 310000000, "disk_size": 325058560, "files": 4120, "modified": "2026-09-28T12:00:00Z", "created": "2026-01-02T09:00:00Z", "group": null, "detail": "npm dependencies · project: …"}
+  ]
+}
+```
+
+`truncated` is `true` when the list had more results than it shows.
+
+## Reports from the command line
+
+`rustclean report <kind> [PATH]` scans `PATH` (default: the current folder),
+runs one report and prints it, without the interface. It only reads: nothing
+is ever deleted or moved, so it is safe in scripts and cron jobs.
+
+```bash
+rustclean report dev-junk ~/Projects                 # a readable table
+rustclean report dev-junk ~/Projects --older 90 --json
+rustclean report largest-files ~ --limit 20 --csv > big.csv
+rustclean report duplicates ~/Pictures --json | jq '.entries[].path'
+rustclean report old-big /Volumes/Backup --lang en
+```
+
+The kinds are the reports of the `m` menu:
+
+| Kind | Report | `--older` |
+|---|---|---|
+| `largest-files` | largest files | yes |
+| `largest-dirs` | largest folders | yes |
+| `repeated-names` | most repeated file names | yes |
+| `apps` | applications and their data | no |
+| `orphans` | orphaned app leftovers | yes |
+| `dev-junk` | developer junk | yes |
+| `caches` | cache folders | yes |
+| `old-big` | old and large files (already over a year) | no |
+| `downloads` | installers and archives in Downloads | yes |
+| `duplicates` | duplicate files (same content; reads the files) | no |
+| `clutter` | empty folders, broken links, temporary files | yes |
+| `device-backups` | iPhone / iPad backups (by the backup date) | yes |
+
+Options:
+
+- `--older DAYS`: only entries untouched for at least `DAYS` days (as `f` in
+  the interface; for developer junk, the project's age). A report without an
+  age filter stops with an error instead of ignoring it.
+- `--json` / `--csv`: print JSON or CSV with the
+  [columns above](#columns) instead of the table.
+- `--limit N`: at most `N` rows (a group counts as one row; its members all
+  come with it). Reports list at most 200 rows anyway.
+- `--lang tr|en`: the language of the table, titles and details. The column
+  names of CSV and JSON never change.
+
+The table shows the size on disk, the file count of folders, the last change,
+the path relative to `PATH` and the row's detail; a group's members follow it,
+indented (the first 10; CSV and JSON have all of them). When a report finds
+nothing, the table says why (e.g. no Downloads folder below `PATH`).
+
+The exit code is 0 on success, 2 for a wrong command line (an unknown kind
+lists the valid ones), and 1 when the folder cannot be scanned or `--older`
+is given to a report without an age filter; the reason goes to stderr. A
+folder literally named `report` can be scanned as `rustclean ./report`.
+
+## Mouse
+
+rustClean is made for the keyboard; the mouse is optional and **off by
+default**. `M` turns it on anywhere (except while typing), and `M` again
+turns it off. A message says which it is. The choice is not saved:
+every start begins with the mouse off.
+
+With the mouse on:
+
+- **Click** a row to select it: the folder list, a report or search result,
+  the basket, the two lists of the summary, the report menu, the list of
+  saved scans, the disk list and the developer tools list. In the treemap,
+  a click selects a block.
+- **Double-click** opens what you clicked, like `Enter`: a folder, a group,
+  a report from the menu, a disk to scan, a summary entry's location.
+- **The wheel** moves the selection of a list one row at a time, and scrolls
+  the help screen, the deletion log and the list of failed moves three lines
+  at a time. On the treemap it does nothing; use the arrow keys there.
+
+Clicks outside these rows do nothing. **Questions stay keyboard-only**: while
+rustClean asks whether to move something to the trash, uninstall an app or
+run a cleanup command (and while you choose what a tool should clean), every
+click and wheel turn is ignored, so a stray click can never delete anything.
+Answer with `e`/`y` or `h`/`n`/`Esc` as usual.
+
+While the mouse is on, the terminal sends clicks to rustClean instead of
+selecting text. To copy a path from the screen, turn the mouse off with `M`
+(many terminals also select text while you hold `Shift` or `Option`). The
+terminal's mouse mode is always switched off again when rustClean quits,
+also when it stops because of an error.
+
 ## Command line
 
 ```text
 rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
           [--list-disks] [--summary] [--config]
+rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
+          [--lang tr|en]
 ```
 
 - `PATH`: scan this folder directly instead of choosing a disk.
@@ -287,6 +516,9 @@ rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
   skipped here too.
 - `--config`: print where the configuration file is and the values in
   effect, then exit.
+- `report`: print one report without the interface; see
+  [Reports from the command line](#reports-from-the-command-line). Excluded
+  folders are skipped here too.
 - `RUSTCLEAN_DATA_DIR`: where history, settings and `config.toml` are stored.
 
 ## Configuration file
@@ -312,7 +544,7 @@ Every key, with its default:
 # Folders the scan does not go into. They still appear in the list, as
 # empty. "~" is your home folder; other paths must be absolute. Scanning an
 # excluded folder directly (rustclean ~/Library/Containers) still works.
-# Also applies to --summary and to R (rescan the current folder).
+# Also applies to --summary, to report and to R (rescan the current folder).
 exclude = []
 # exclude = ["~/Library/Containers", "/Volumes/Backup"]
 

@@ -7,9 +7,65 @@ follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Optional mouse support: `M` turns it on or off (off by default and not
+  saved, as mouse capture stops the terminal from selecting text). A click
+  selects a row in the lists, the menu and the summary, or a treemap block; a
+  double click opens it like `Enter`; the wheel moves through lists and
+  scrolls the help, the deletion log and the failure list. Questions before
+  deleting, uninstalling or running a cleanup take no mouse input
+  ([#24](https://github.com/hzrbasaran/rustClean/issues/24)).
+- "iPhone / iPad backups" report, the last of the reports in the menu (the
+  tools move down by one): one row per backup folder in `MobileSync/Backup`
+  (macOS, and iTunes / Apple Devices on Windows) with the device name and
+  model, the date of the backup, the iOS version and whether it is
+  encrypted, read from the backup's `Info.plist` and `Manifest.plist`. The
+  newest backup of each device is marked, and the note warns that a deleted
+  backup cannot restore the device. The age filter goes by the backup date.
+  When the folder cannot be read (Full Disk Access) or was not scanned, the
+  report says so and how to fix it
+  ([#11](https://github.com/hzrbasaran/rustClean/issues/11)).
+- An empty report shows its note (why nothing was found) in place of the
+  list; before, only "No results." was shown.
+- `w` in the folder list and the treemap saves the current folder as a
+  self-contained HTML page with a zoomable treemap (click a folder to zoom
+  in, the path or `Esc` to go back), colored by type or by age, in the
+  current language. The data and script are inside the file and it makes no
+  network requests, so it works offline and on a phone. At most 4 levels and
+  3,000 blocks; small entries share an "other" block. The file goes to the
+  working directory (else the home folder) as
+  `rustclean-treemap-YYYYMMDD-HHMMSS.html` and never replaces an existing one
+  ([#27](https://github.com/hzrbasaran/rustClean/issues/27)).
+- Linux system caches on the tools screen: the apt, dnf and pacman package
+  caches, the systemd journal (`journalctl --disk-usage`) and disabled snap
+  revisions (`snap list --all`). They need root, so rustClean shows the exact
+  `sudo` command (`apt-get clean`, `dnf clean all`, `paccache -rk1` /
+  `pacman -Scc`, `journalctl --vacuum-time=2weeks`,
+  `snap remove <name> --revision=<rev>`) for you to run instead of running it
+  ([#18](https://github.com/hzrbasaran/rustClean/issues/18)).
+- Windows folders on the tools screen: `%TEMP%` is moved to the Recycle Bin
+  after you confirm, entry by entry, skipping files in use;
+  `C:\Windows\Temp` and the Windows Update download cache are measured when
+  readable and show the commands for an administrator PowerShell; the Recycle
+  Bin shows its size per drive, with `Clear-RecycleBin` to run yourself
+  ([#19](https://github.com/hzrbasaran/rustClean/issues/19)).
+- `rustclean report <kind> [PATH]` runs a report without the interface and
+  prints it as a readable table, or with `--csv` / `--json` for scripts.
+  Every report has a kebab-case name (`largest-files`, `dev-junk`,
+  `duplicates`…); `--older DAYS` applies the age filter where the report has
+  one, and `--limit N` caps the rows. `PATH` defaults to the current folder.
+  It only reads: nothing is deleted
+  ([#20](https://github.com/hzrbasaran/rustClean/issues/20)).
+- `o` saves the list on screen as CSV or JSON: the folder list, the treemap,
+  the summary lists and every result list. The file goes to the working
+  folder (or the home folder when that is not writable) as
+  `rustclean-<list>-YYYYMMDD-HHMMSS.csv|json` and never replaces an existing
+  file. Columns: absolute path, apparent size, size on disk, file count,
+  modified and created (ISO 8601, UTC), the group and the row's detail; a
+  group is saved as its members
+  ([#21](https://github.com/hzrbasaran/rustClean/issues/21)).
 - Configuration file: an optional `config.toml` in the data directory sets
   folders the scan skips (`[scan] exclude`, `~` allowed; also for
-  `--summary`), the thresholds of "Old and large files" and of the duplicate
+  `--summary` and `report`), the thresholds of "Old and large files" and of the duplicate
   search (`[reports]`), and the size and sort order a scan opens with
   (`[view]`). The menu and report notes show the values in effect. A broken
   file never stops rustClean: it starts with the defaults and names the file

@@ -1,0 +1,50 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer tools cleanup  │  reclaimable: 10.0 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Tool                               Reclaimable  Details
+  Temporary files (%TEMP%)                3.0 GiB C:\Users\demo\AppData\Local\Temp
+  Windows temp folder                —            needs administrator rights to measure
+▶ Windows Update downloads                2.0 GiB C:\Windows\SoftwareDistribution\Download
+  Recycle Bin                             5.0 GiB C: 5.0 GiB
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
+│ re-downloaded  Delete downloaded updates (in an administrator PowerShell)                        │
+│    rustClean does not run this; run the command yourself:                                        │
+│    $ Stop-Service -Name wuauserv, bits -Force                                                    │
+│    $ Remove-Item C:\Windows\SoftwareDistribution\Download\* -Recurse -Force                      │
+│    $ Start-Service -Name wuauserv, bits                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Measuring only reads. No command runs without your confirmation.
+ ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 2+24 White/- BOLD | 37+12 -/- BOLD
+ 4: 2+19 White/- BOLD | 37+12 Yellow/- | 50+37 Yellow/-
+ 5: 0+100 White/Indexed(238) BOLD
+ 6: 2+11 White/- BOLD | 37+12 -/- BOLD
+21: 0+1 DarkGray/- | 1+9 White/- BOLD | 10+90 DarkGray/-
+22: 0+1 DarkGray/- | 1+15 Black/Yellow | 16+59 White/- BOLD | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+58 Yellow/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+46 White/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+76 White/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+40 White/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 38+3 Black/Gray | 57+3 Black/Gray | 67+5 Black/Gray | 79+3 Black/Gray

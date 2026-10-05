@@ -31,6 +31,9 @@ one go.
 - **Explore** — a navigable list with size bars, file counts and color-coded
   modification dates, a **treemap** view (`t`), and a per-folder
   **summary** with file types, age distribution and the largest items (`i`).
+- **Treemap as a web page** (`w`) — saves the current folder as a single,
+  self-contained HTML file with a zoomable treemap four levels deep, to open
+  in any browser (also offline, also on a phone) or to share.
 - **Reports** (`m`)
   - largest files and folders
   - most repeated file names
@@ -47,16 +50,31 @@ one go.
   - **empty folders, broken links and temporary files** (`.DS_Store`,
     `*.tmp`, Office locks, unfinished downloads), leaving alone hidden
     folders, bundles, `Library`, build output and system folders
+  - **iPhone / iPad backups** made by Finder or iTunes (`MobileSync/Backup`):
+    the device, model, iOS version and date of each backup, encrypted ones
+    and the newest backup of each device marked; explains when the folder
+    needs Full Disk Access
 - **Age filter** (`f`) on reports: show only what has not been touched for
   30 / 90 / 180 / 365 days. For developer junk, the age is the *project's*,
   not the dependency folder's.
 - **Basket** — collect entries with `Space` anywhere, review them with `S`,
   move them all to the trash with `x`.
+- **Export** — `o` saves the list on screen (folder, treemap, summary, any
+  report or search) as **CSV or JSON**, with absolute paths, both sizes and
+  ISO 8601 dates.
+- **Reports from the command line** — `rustclean report dev-junk ~/Projects
+  --older 90 --json` prints any report as a table, CSV or JSON, for scripts
+  and cron jobs. It only reads; nothing is deleted.
 - **Deletion log** — everything moved to the trash, by day, with how it was
   deleted (menu → Deletion log).
 - **Developer tools cleanup** — measures what Docker, Xcode simulators,
   DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew and Cargo
   could free, and runs **their own cleanup commands** after you confirm.
+  On Linux it also measures the apt, dnf and pacman package caches, the
+  systemd journal and disabled snap revisions; on Windows `%TEMP%`,
+  `C:\Windows\Temp`, the Windows Update download cache and the Recycle Bin.
+  What needs root or administrator rights is shown as a command for you to
+  run.
 - **Scan history** — every scan is summarized; see what grew since last time.
 - **System data panel** (macOS) — APFS volumes, Time Machine local snapshots,
   swap, and why the scan total differs from what the disk reports.
@@ -69,6 +87,9 @@ one go.
   the size and sort order a scan opens with. `rustclean --config` shows where
   it goes and what is in effect
   ([details](docs/USAGE.md#configuration-file)).
+- **Optional mouse** (`M`) — click to select a row or a treemap block,
+  double-click to open, scroll with the wheel. Off by default, so the
+  terminal can still select text; confirmations stay keyboard-only.
 
 ## Screenshots
 
@@ -95,7 +116,9 @@ rustClean deletes nothing on its own:
 - Mount points and folders on other volumes are refused.
 - Developer tool cleanups show the **exact commands** before running them. They
   are started directly, never through a shell and never with `sudo`. Actions
-  that can lose data (Docker volumes) require typing `yes`.
+  that can lose data (Docker volumes) require typing `yes`. Cleanups that need
+  root or administrator rights (Linux package caches, the journal, snaps,
+  Windows system folders) are only shown, for you to run yourself.
 - Reports start with nothing selected. Where a guess is involved (which data
   belongs to which app), the report says so and errs on the side of keeping
   things.
@@ -157,7 +180,16 @@ rustclean --no-color      # no colors; NO_COLOR=1 works too
 rustclean --list-disks    # list disks and exit
 rustclean --summary ~     # scan without the interface and print totals
 rustclean --config        # where config.toml goes, and the values in effect
+
+# a report without the interface: a table, or --csv / --json (read-only)
+rustclean report dev-junk ~/Projects --older 90 --json
+rustclean report largest-files ~ --limit 20 --csv > big.csv
 ```
+
+Report kinds: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
+`orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
+`clutter`, `device-backups`. See the [usage guide](docs/USAGE.md#reports-from-the-command-line)
+for the options and the columns.
 
 Every screen lists its keys at the bottom. The most important ones:
 
@@ -165,15 +197,18 @@ Every screen lists its keys at the bottom. The most important ones:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | move · open · go back |
 | `t` | list ↔ treemap |
+| `w` | save the treemap as an HTML page |
 | `i` | summary of the current folder |
 | `m` | reports and tools |
 | `/` | find by name (`*` and `?` wildcards) |
 | `Space` · `S` · `x` | add to basket · show basket · move to trash |
 | `f` | age filter (in reports) |
 | `s` · `a` | sort · apparent / on-disk size |
+| `o` | save the list on screen as CSV or JSON |
 | `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
 | `T` | theme: dark → light → color-blind |
+| `M` | mouse on / off (off by default) |
 | `?` | every key, for the current screen first |
 | `q` | quit |
 
@@ -193,6 +228,16 @@ rustClean is developed and used on **macOS**. It builds and its tests pass on
 use. Some features are macOS-only: the system data panel, Xcode and simulator
 cleanup, and app/data matching through bundle identifiers (Linux and Windows
 use simpler name-based matching).
+
+The tools screen has platform-specific rows:
+- **Linux:** apt, dnf and pacman package caches, the systemd journal and
+  disabled snap revisions. They need root, so rustClean shows the `sudo`
+  command instead of running it.
+- **Windows:** `%TEMP%` (moved to the Recycle Bin after you confirm; files in
+  use are skipped), `C:\Windows\Temp` and the Windows Update download cache
+  (measured when readable; the commands for an administrator PowerShell are
+  shown), and the Recycle Bin size. Windows support is the least tested;
+  reports from real machines are welcome.
 
 ## Data stored on your computer
 

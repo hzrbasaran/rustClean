@@ -164,7 +164,7 @@ fn changes_are_compared_again() {
     tick_until(&mut app, "the scan to be saved", |_| {
         history::list(&dir).len() == 2
     });
-    menu(&mut app, 11);
+    menu(&mut app, super::index_of(crate::reports::MenuItem::Changes));
     press(&mut app, KeyCode::Enter);
     assert!(
         list(&app).title.starts_with("Değişenler"),

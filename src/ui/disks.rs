@@ -6,11 +6,11 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Cell, Row, Table};
 use ratatui::Frame;
 
-use crate::app::App;
+use crate::app::{App, Hit};
 
 use super::format::{fmt_pct, fmt_size};
 use super::style::{highlight, usage_color, Themed};
-use super::{bar, keys, title};
+use super::{bar, keys, table_rows, title};
 
 pub(super) fn render_disks(
     f: &mut Frame<'_>,
@@ -82,6 +82,12 @@ pub(super) fn render_disks(
     .highlight_symbol("▶ ")
     .block(Block::new().borders(Borders::TOP | Borders::BOTTOM));
     f.render_stateful_widget(table, table_area, &mut app.disk_table);
+    app.mouse.add_rows(
+        table_rows(table_area),
+        app.disk_table.offset(),
+        app.disks.len(),
+        Hit::Disk,
+    );
 
     if let Some(msg) = &app.message {
         f.render_widget(Line::from(msg.clone()).warn(), msg_area);
@@ -99,6 +105,7 @@ pub(super) fn render_disks(
             ("r", t!("yenile", "refresh")),
             ("L", t!("English", "Türkçe")),
             ("T", t!("tema", "theme")),
+            ("M", t!("fare", "mouse")),
             ("q", t!("çık", "quit")),
         ]),
         footer,
