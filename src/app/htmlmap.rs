@@ -26,11 +26,11 @@ impl Browser {
                 limits: htmlmap::LIMITS,
             },
         );
-        let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
+        let stamp = crate::newfile::stamp();
         let dirs = self
             .html_dir
             .clone()
-            .map_or_else(htmlmap::default_dirs, |d| vec![d]);
+            .map_or_else(crate::newfile::default_dirs, |d| vec![d]);
         match htmlmap::save(&page, &stamp, &dirs) {
             Ok(file) => self.set_status(
                 tf!(
