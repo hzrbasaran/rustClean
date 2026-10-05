@@ -22,6 +22,7 @@ use dev_junk::dev_junk;
 use downloads::downloads;
 use names::repeated_names;
 use size::{largest_dirs, largest_files, old_big};
+pub use size::{OLD_BIG_AGE, OLD_BIG_SIZE};
 
 /// Maximum number of rows a report shows.
 pub const LIMIT: usize = 200;
@@ -110,7 +111,27 @@ impl ReportKind {
         )
     }
 
-    pub fn description(self) -> &'static str {
+    /// The menu's line for this report. The thresholds of "old and large
+    /// files" and of the duplicates come from the configuration.
+    pub fn description(self) -> String {
+        let config = crate::config::get();
+        match self {
+            ReportKind::OldBig => tf!(
+                "{}'tan büyük, {} değişmemiş dosyalar",
+                "Files over {}, unchanged for {}",
+                crate::config::fmt_mib(config.old_big_min_mib),
+                size::age_for(config.old_big_min_days)
+            ),
+            ReportKind::Duplicates => tf!(
+                "İçeriği birebir aynı dosyalar (≥ {}); dosyalar okunur, sürebilir",
+                "Files with identical content (≥ {}); files are read, may take a while",
+                crate::config::fmt_mib(config.duplicates_min_mib)
+            ),
+            _ => self.fixed_description().into(),
+        }
+    }
+
+    fn fixed_description(self) -> &'static str {
         match self {
             ReportKind::LargestFiles => t!(
                 "Bu klasörün altındaki en büyük 200 dosya",
@@ -138,19 +159,12 @@ impl ReportKind {
                 "Caches ve .cache içindeki uygulama önbellekleri",
                 "App caches inside Caches and .cache"
             ),
-            ReportKind::OldBig => t!(
-                "100 MiB'tan büyük, 1 yıldır değişmemiş dosyalar",
-                "Files over 100 MiB, unchanged for a year"
-            ),
             ReportKind::Downloads => t!(
                 "Downloads klasörlerindeki .dmg, .pkg, .iso, .zip… dosyaları",
                 ".dmg, .pkg, .iso, .zip… files in Downloads folders"
             ),
-            ReportKind::Duplicates => {
-                t!(
-                    "İçeriği birebir aynı dosyalar (≥ 1 MiB); dosyalar okunur, sürebilir",
-                    "Files with identical content (≥ 1 MiB); files are read, may take a while"
-                )
+            ReportKind::OldBig | ReportKind::Duplicates => {
+                unreachable!("{self:?} is described with its thresholds")
             }
             ReportKind::Clutter => t!(
                 "Gizli klasörler, paketler, Library ve sistem dışında; geçici dosyalar 1 günden eski",
@@ -207,9 +221,16 @@ impl MenuItem {
         }
     }
 
-    pub fn description(self) -> &'static str {
+    pub fn description(self) -> String {
         match self {
             MenuItem::Report(k) => k.description(),
+            other => other.tool_description().into(),
+        }
+    }
+
+    fn tool_description(self) -> &'static str {
+        match self {
+            MenuItem::Report(_) => unreachable!("reports describe themselves"),
             MenuItem::Changes => {
                 t!(
                     "Kayıtlı bir taramayla karşılaştırır: büyüyen, yeni ve silinen klasörler",
@@ -302,7 +323,11 @@ pub fn run(
     }
     let mut list = ResultList::new(title, base, rows);
     list.truncated = truncated;
-    list.note = note.to_string();
+    list.note = if kind == ReportKind::OldBig {
+        size::old_big_note() // names the configured thresholds
+    } else {
+        note.to_string()
+    };
     list.source = Source::Report {
         kind,
         min_age_days: age.min_days,

@@ -19,7 +19,8 @@ use xxhash_rust::xxh3::{xxh3_128, Xxh3};
 
 use crate::tree::{NodeId, Tree};
 
-/// Smaller files are ignored: plenty of them, little space to win.
+/// Smaller files are ignored: plenty of them, little space to win. This is
+/// the default; `duplicates_min_mib` in the configuration changes it.
 pub const MIN_SIZE: u64 = 1024 * 1024;
 const EDGE: u64 = 64 * 1024;
 
@@ -30,8 +31,11 @@ pub struct Candidate {
     pub size: u64,
 }
 
-/// Files below `base` that share their size with at least one other file.
+/// Files below `base` of at least the configured size that share their
+/// size with at least one other file.
 pub fn candidates(tree: &Tree, base: NodeId) -> Vec<Candidate> {
+    // Never 0: extra hard links have size 0 and must not become "copies".
+    let min_size = crate::config::get().duplicates_min_size().max(1);
     let mut by_size: HashMap<u64, Vec<NodeId>> = HashMap::new();
     let mut stack = vec![base];
     while let Some(dir) = stack.pop() {
@@ -39,7 +43,7 @@ pub fn candidates(tree: &Tree, base: NodeId) -> Vec<Candidate> {
             let n = tree.node(id);
             if n.is_dir {
                 stack.push(id);
-            } else if n.size.apparent >= MIN_SIZE {
+            } else if n.size.apparent >= min_size {
                 // Extra hard links were recorded with size 0, so each file
                 // is only considered once.
                 by_size.entry(n.size.apparent).or_default().push(id);
@@ -246,6 +250,24 @@ mod tests {
             .collect();
         named.sort();
         (named, tree)
+    }
+
+    #[test]
+    fn minimum_size_follows_the_configuration() {
+        let mut t = Tree::new(Path::new("/r"));
+        let size = crate::tree::Size {
+            apparent: 2 * MIN_SIZE,
+            disk: 2 * MIN_SIZE,
+        };
+        t.push(ROOT, "a", false, size);
+        t.push(ROOT, "b", false, size);
+        t.finalize();
+        assert_eq!(candidates(&t, ROOT).len(), 2);
+        let config = crate::config::Config {
+            duplicates_min_mib: 3,
+            ..Default::default()
+        };
+        assert!(crate::config::with(config, || candidates(&t, ROOT)).is_empty());
     }
 
     #[test]

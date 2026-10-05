@@ -64,6 +64,11 @@ one go.
 - **Themes** for dark and light terminals and a color-blind friendly palette
   (`T` to switch), or no colors at all (`--no-color`, `NO_COLOR`).
 - **Help** (`?`) — every key on one screen, the current screen's first.
+- **Configuration file** — an optional `config.toml`: folders the scan skips,
+  the thresholds of "old and large files" and of the duplicate search, and
+  the size and sort order a scan opens with. `rustclean --config` shows where
+  it goes and what is in effect
+  ([details](docs/USAGE.md#configuration-file)).
 
 ## Screenshots
 
@@ -151,6 +156,7 @@ rustclean --theme light   # dark, light or colorblind (also: T in the app)
 rustclean --no-color      # no colors; NO_COLOR=1 works too
 rustclean --list-disks    # list disks and exit
 rustclean --summary ~     # scan without the interface and print totals
+rustclean --config        # where config.toml goes, and the values in effect
 ```
 
 Every screen lists its keys at the bottom. The most important ones:
@@ -199,6 +205,10 @@ rustClean makes no network connections. It writes only:
 in the platform data directory (`~/Library/Application Support/rustClean` on
 macOS, `~/.local/share/rustClean` on Linux, `%APPDATA%\rustClean` on Windows).
 Set `RUSTCLEAN_DATA_DIR` to use another directory.
+
+The same directory holds `config.toml`, the
+[configuration file](docs/USAGE.md#configuration-file). rustClean only reads
+it; it exists only if you create it.
 
 ## Contributing
 

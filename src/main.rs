@@ -5,6 +5,7 @@ mod app;
 mod apps;
 mod basket;
 mod clones;
+mod config;
 mod delete;
 mod disks;
 mod duplicates;
@@ -66,12 +67,25 @@ struct Args {
     /// Arayüz açmadan YOL'u tarayıp özetini yazdır / scan PATH and print a summary, no interface
     #[arg(long, requires = "path")]
     summary: bool,
+
+    /// Ayar dosyasının yerini ve geçerli değerleri yazdır / print the config file's path and the
+    /// values in effect
+    #[arg(long)]
+    config: bool,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
     i18n::init(args.lang.as_deref());
     ui::theme::init(args.theme.as_deref(), args.no_color);
+    // A broken file never stops the program: the defaults apply instead.
+    let loaded = config::load();
+    config::init(loaded.config.clone());
+
+    if args.config {
+        print_config(&loaded);
+        return Ok(());
+    }
 
     if args.list_disks {
         for d in disks::list_disks() {
@@ -88,12 +102,19 @@ fn main() -> Result<()> {
     }
 
     if args.summary {
+        for message in loaded.messages() {
+            eprintln!("{message}");
+        }
         return print_summary(&args.path.expect("clap enforces path"));
     }
 
+    let mut app = App::new(args.path);
+    if let Some(text) = loaded.status() {
+        app.config_notice(text);
+    }
     // ratatui::init installs a panic hook that restores the terminal.
     let mut terminal = ratatui::init();
-    let result = run(&mut terminal, App::new(args.path));
+    let result = run(&mut terminal, app);
     ratatui::restore();
     result
 }
@@ -101,7 +122,7 @@ fn main() -> Result<()> {
 fn print_summary(path: &std::path::Path) -> Result<()> {
     use tree::{SizeMode, ROOT};
 
-    let res = scanner::scan(path, disks::all_mount_points(), &Default::default(), |_| {})?;
+    let res = scanner::scan(path, config::scan_skip(), &Default::default(), |_| {})?;
     let t = &res.tree;
     let root = t.node(ROOT);
     println!("{}", t.root_path().display());
@@ -133,6 +154,35 @@ fn print_summary(path: &std::path::Path) -> Result<()> {
     );
     println!("{counts}");
     Ok(())
+}
+
+/// `--config`: where the file is, then the values in effect as a file that
+/// can be copied there. Problems go to stderr.
+fn print_config(loaded: &config::Loaded) {
+    let path = loaded.path.as_ref().map_or_else(
+        || t!("(veri klasörü bulunamadı)", "(no data directory)").to_string(),
+        |p| p.display().to_string(),
+    );
+    println!("# {path}");
+    let state = if !loaded.found {
+        t!(
+            "Dosya yok; varsayılanlar geçerli. Aşağıdakiler bu dosyaya kopyalanabilir.",
+            "No file; the defaults apply. What follows can be copied into it."
+        )
+    } else if loaded.problems.is_empty() {
+        t!("Geçerli değerler:", "Values in effect:")
+    } else {
+        t!(
+            "Geçerli değerler (sorunlar stderr'de):",
+            "Values in effect (problems on stderr):"
+        )
+    };
+    println!("# {state}");
+    println!();
+    print!("{}", config::to_toml(&loaded.config));
+    for message in loaded.messages() {
+        eprintln!("{message}");
+    }
 }
 
 fn run(terminal: &mut ratatui::DefaultTerminal, mut app: App) -> Result<()> {

@@ -69,6 +69,11 @@ harekete geçmenizi sağlar:
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 - **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
+- **Ayar dosyası:** isteğe bağlı bir `config.toml` ile taramada atlanacak
+  klasörler, "eski ve büyük dosyalar" ile kopya aramasının eşikleri ve
+  taramanın hangi boyut ve sıralamayla açılacağı belirlenir.
+  `rustclean --config` dosyanın yerini ve geçerli değerleri gösterir
+  ([ayrıntılar](docs/USAGE.md#configuration-file), İngilizce).
 
 ## Ekran görüntüleri
 
@@ -157,6 +162,7 @@ rustclean --theme light   # dark, light ya da colorblind (programda: T)
 rustclean --no-color      # renksiz; NO_COLOR=1 de olur
 rustclean --list-disks    # diskleri listeleyip çık
 rustclean --summary ~     # arayüz açmadan tarayıp toplamları yazdır
+rustclean --config        # config.toml'un yeri ve geçerli değerler
 ```
 
 Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
@@ -208,6 +214,10 @@ Bunlar platformun veri klasöründe tutulur: macOS'ta
 `~/Library/Application Support/rustClean`, Linux'ta `~/.local/share/rustClean`,
 Windows'ta `%APPDATA%\rustClean`. Başka bir klasör için `RUSTCLEAN_DATA_DIR`
 ortam değişkenini kullanın.
+
+Ayar dosyası `config.toml` da aynı klasördedir
+([ayrıntılar](docs/USAGE.md#configuration-file), İngilizce). rustClean onu
+yalnızca okur; dosya ancak siz oluşturursanız vardır.
 
 ## Katkı
 

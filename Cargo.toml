@@ -24,6 +24,7 @@ ratatui = "0.30.2"
 rayon = "1.12.0"
 serde_json = "1.0.151"
 sysinfo = "0.39.6"
+toml = { version = "1.1.6", default-features = false, features = ["parse", "std", "serde"] }
 trash = "5.2.9"
 xxhash-rust = { version = "0.8.19", features = ["xxh3"] }
 

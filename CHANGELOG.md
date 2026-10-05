@@ -6,6 +6,17 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Configuration file: an optional `config.toml` in the data directory sets
+  folders the scan skips (`[scan] exclude`, `~` allowed; also for
+  `--summary`), the thresholds of "Old and large files" and of the duplicate
+  search (`[reports]`), and the size and sort order a scan opens with
+  (`[view]`). The menu and report notes show the values in effect. A broken
+  file never stops rustClean: it starts with the defaults and names the file
+  and the error's line and column; unknown keys only give a warning.
+  `rustclean --config` prints the file's path and the values in effect
+  ([#22](https://github.com/hzrbasaran/rustClean/issues/22)).
+
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"
   instead of "1 items" (and "1 item was inaccessible", "the parent folder of

@@ -7,6 +7,7 @@
 
 mod apps;
 mod clutter;
+mod config;
 mod deletion;
 mod history;
 mod language;

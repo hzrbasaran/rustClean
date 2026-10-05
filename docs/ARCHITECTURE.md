@@ -51,8 +51,10 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ trashlog.rs  the deletion log (deletions.jsonl)
    ├─ disks.rs ─── disk discovery (sysinfo)
-   ├─ paths.rs ─── data directory (history, settings, deletion log)
+   ├─ paths.rs ─── data directory (history, settings, deletion log, config)
    ├─ settings.rs  saved choices (language, theme) as key=value lines
+   ├─ config.rs ── config.toml: excluded folders, report thresholds, the
+   │               starting size and sort (read once at start)
    └─ i18n.rs ──── Turkish / English texts, counts with their nouns
 ```
 
@@ -69,6 +71,9 @@ Rules applied while scanning:
 - Symlinks are not followed.
 - Other filesystems and other volumes' mount points are not entered. The latter
   matters on macOS, where `/` and `/System/Volumes/Data` share a device id.
+- Folders excluded in `config.toml` are not entered either. Both go into the
+  scanner's skip list, built by `config::scan_skip` for the full scan, the
+  `R` rescan and `--summary`. The scan root itself is never skipped.
 - Hard-linked files count once, by `(dev, inode)`.
 - Both the apparent size and the allocated size are recorded.
 - APFS pure clones count once on disk (macOS). For files of at least 64 KiB,
@@ -135,6 +140,29 @@ Reports that only read the tree run synchronously. They take under a second
 even on a full disk. A "preparing" message is drawn first so the UI never looks
 frozen.
 
+## Configuration
+
+`main` reads `config.toml` once (`config::load`) before anything else and
+stores it with `config::init`; code asks `config::get()`. Nothing in the file
+can stop the program: invalid TOML gives the defaults, a bad value gives that
+key's default, and an unknown key is ignored. Each case is a
+`config::Problem`, shown by `App::config_notice` on the status line or
+printed to stderr by `--summary` and `--config`.
+
+Where the values are used:
+
+| Key | Read by | Default |
+|---|---|---|
+| `scan.exclude` | `config::scan_skip` (scanner skip list) | none |
+| `reports.old_big_min_mib`, `old_big_min_days` | `reports::size::old_big`, its note and `ReportKind::description` | `OLD_BIG_SIZE`, `OLD_BIG_AGE` |
+| `reports.duplicates_min_mib` | `duplicates::candidates`, the "no duplicates" note, `ReportKind::description` | `duplicates::MIN_SIZE` |
+| `view.size`, `view.sort` | `Browser::new` | on disk, by size |
+
+The constants stay as the defaults. Texts that name a threshold build it from
+the configuration, so they always show the value in effect. Theme and
+language stay in `settings` (saved by `T` / `L`); the configuration file is
+only read, never written.
+
 ## Interface texts
 
 Every text shown to the user is written in both languages where it is used:
@@ -176,7 +204,12 @@ tree in a temp directory with distinct file sizes and set ages. The tests scan
 it with the real scanner and drive `App` by key presses, as the interface
 does: reports, duplicates, the basket, moving to the trash, uninstalling, and
 comparing with a saved scan. `tests/cli.rs` runs the binary itself
-(`--summary`, `--help`, errors).
+(`--summary`, `--config`, `--help`, errors), each run with its own
+`RUSTCLEAN_DATA_DIR`.
+
+Tests that need other settings use `config::with`, another per-thread
+switch; `config::load` is never called with the real data directory, so a
+`config.toml` there cannot change test results.
 
 `src/integration/screens.rs` stores a snapshot of every screen (text plus the
 styles of each line) in Turkish and English. It uses a hand-built tree, fake

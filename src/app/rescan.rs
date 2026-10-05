@@ -2,7 +2,6 @@
 
 use std::sync::mpsc::TryRecvError;
 
-use crate::disks;
 use crate::scanner::{self, ScanHandle, ScanMsg, ScanProgress, ScanResult};
 use crate::tree::NodeId;
 
@@ -27,7 +26,7 @@ impl Browser {
         );
         self.rescan = Some(Rescan {
             dir,
-            handle: scanner::start(path, disks::all_mount_points()),
+            handle: scanner::start(path, crate::config::scan_skip()),
             progress: ScanProgress::default(),
         });
     }

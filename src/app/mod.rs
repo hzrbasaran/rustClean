@@ -179,6 +179,7 @@ pub struct Browser {
 
 impl Browser {
     pub(crate) fn new(res: ScanResult) -> Self {
+        let config = crate::config::get();
         let mut b = Self {
             tree: res.tree,
             errors: res.errors,
@@ -186,8 +187,8 @@ impl Browser {
             current: ROOT,
             entries: Vec::new(),
             table: TableState::default(),
-            sort: SortMode::Size,
-            size_mode: SizeMode::Disk,
+            sort: config.sort,
+            size_mode: config.size,
             input: None,
             results: None,
             dashboard: None,
@@ -233,6 +234,9 @@ pub struct App {
     pub should_quit: bool,
     /// The help screen (`?`) is open, scrolled this far.
     pub help: Option<u16>,
+    /// A problem with the configuration file, shown on the disk list and
+    /// on the status line of the first scan opened.
+    config_notice: Option<String>,
 }
 
 impl App {
@@ -249,12 +253,22 @@ impl App {
             tick: 0,
             should_quit: false,
             help: None,
+            config_notice: None,
         };
         app.refresh_disks();
         if let Some(path) = start_path {
             app.start_scan(path);
         }
         app
+    }
+
+    /// Shows a problem with the configuration file: on the disk list now,
+    /// and on the status line when the scan opens.
+    pub fn config_notice(&mut self, text: String) {
+        if !matches!(self.screen, Screen::Scanning) {
+            self.message = Some(text.clone());
+        }
+        self.config_notice = Some(text);
     }
 
     fn refresh_disks(&mut self) {
@@ -266,7 +280,7 @@ impl App {
     fn start_scan(&mut self, root: PathBuf) {
         self.message = None;
         self.progress = ScanProgress::default();
-        self.scan = Some(scanner::start(root.clone(), disks::all_mount_points()));
+        self.scan = Some(scanner::start(root.clone(), crate::config::scan_skip()));
         self.scan_root = root;
         self.screen = Screen::Scanning;
     }
@@ -291,6 +305,9 @@ impl App {
                     self.scan = None;
                     let mut browser = Browser::new(res);
                     browser.record_history();
+                    if let Some(text) = self.config_notice.take() {
+                        browser.set_status(text, true);
+                    }
                     self.browser = Some(browser);
                     self.screen = Screen::Browser;
                     return;
