@@ -13,6 +13,7 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ browser.rs    navigation, treemap moves, the key dispatcher
    │    ├─ one module per job, each adding an `impl Browser` block:
    │    │  results, dashboard, basket, trash, uninstall, snapshots, rescan
+   │    ├─ mouse.rs      optional mouse (`M`): clicks, double clicks, wheel
    │    ├─ toolsview.rs   developer tools screen state and keys
    │    └─ basket.rs      entries collected for deletion
    │
@@ -134,6 +135,28 @@ step. A failed move is never written.
 Reports that only read the tree run synchronously. They take under a second
 even on a full disk. A "preparing" message is drawn first so the UI never looks
 frozen.
+
+## Mouse
+
+Mouse support is off until `M`. `App::mouse` (`app/mouse.rs`) holds whether
+it is on and the clickable areas of the last frame: while drawing, the
+screens record a `(Rect, Hit)` for every visible table row (from the area
+they drew into and `TableState::offset`), treemap block and menu line
+(`Mouse::add_rows`, `ui::table_rows`, `ui::panel_rows`). `ui::render` clears
+them first; a popup clears what it covers, and the confirmation, uninstall
+and failure dialogs and the help record nothing. A click looks up the
+topmost area under it (`Mouse::hit_at`), checks that the screen it belongs
+to is still showing, and moves the selection; a second click on the same
+`Hit` within 500 ms sends `Enter` through `on_key`. The wheel sends `↑`/`↓`
+to lists and scrolls text views directly. While a question is open, text is
+typed or work runs, `App::mouse_blocked` drops every mouse event, so nothing
+can be confirmed by mouse. All of this works on a `TestBackend` without a
+terminal, which the tests in `src/integration/mouse.rs` use.
+
+`main.rs` turns the terminal's mouse capture on and off to follow
+`app.mouse.on` after each event, and off again on quit and in the panic hook
+(ratatui's own hook restores the terminal but not mouse capture). Pointer
+motion events are read in a row without redrawing.
 
 ## Interface texts
 
