@@ -34,7 +34,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ mod.rs        report kinds, menu items, age filter, run(), shared
    │    │                walk / top-N helpers
    │    └─ one module per report group: size, downloads, dev_junk, caches,
-   │       names, clutter (empty folders, broken links, temporary files)
+   │       names, clutter (empty folders, broken links, temporary files),
+   │       backups (iPhone / iPad backups, read from their Info.plist)
    ├─ apps/ ────── apps and their data, orphaned leftovers
    │    ├─ mod.rs        App, DataDir, the Apps report, uninstall checks
    │    ├─ find.rs       installed apps (in the scan and on disk)

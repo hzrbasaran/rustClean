@@ -65,5 +65,5 @@ cat > "$LOGFILE" <<JSON
 {"time":$((now-600)),"path":"$HOME/demo/Projects/web-app/node_modules","apparent":524288000,"disk":524288000,"via":"report","detail":"DevJunk"}
 JSON
 export LOGFILE
-both deletion-log dark "m,$(down 15)ENTER,"
+both deletion-log dark "m,$(down 16)ENTER,"
 echo "wrote $(ls "$OUT"/*.svg | wc -l | tr -d ' ') screenshots to $OUT"

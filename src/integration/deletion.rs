@@ -156,8 +156,11 @@ fn moves_are_logged_with_how_they_were_made() {
     assert_eq!(log[1].via, Via::Report(ReportKind::Downloads));
     assert_eq!(log[1].size.apparent, 300 * super::KIB);
 
-    // Menu item 16: the log shows them.
-    menu(&mut app, 15);
+    // The deletion log shows them.
+    menu(
+        &mut app,
+        super::index_of(crate::reports::MenuItem::DeletionLog),
+    );
     let view = browser(&app).deletion_log.as_ref().expect("the log");
     assert!(view.entries.iter().any(|e| e.path.ends_with("setup.dmg")));
 }

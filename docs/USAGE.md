@@ -153,6 +153,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
 | Duplicate files | files with identical content (≥ 1 MiB); `Space` on a group adds all but the oldest copy |
 | Empty folders, broken links, temporary files | three groups: folders with nothing below them (only the topmost is listed), symbolic links whose target is gone, and temporary files (`.DS_Store`, `Thumbs.db`, `*.tmp`, Office `~$…` locks, unfinished downloads) untouched for a day; `Enter` opens a group, `Space` adds it whole |
+| iPhone / iPad backups | one row per backup folder in `MobileSync/Backup`: the device name and model, then the date of the backup, `newest` on the newest backup of each device, `encrypted`, and the iOS version, read from the backup's `Info.plist` and `Manifest.plist`; see below |
 
 **Age filter.** In most reports `f` cycles a minimum age: none → 30 → 90 → 180
 → 365 days since the last change. For developer junk the age is the
@@ -188,6 +189,27 @@ document's lock file, a running download) and are left out; `.DS_Store` and
 `Thumbs.db` are listed at any age, as the system writes them again.
 
 ![The clutter report: temporary files, empty folders and broken links](screenshots/clutter.svg)
+
+**iPhone / iPad backups.** Finder (and iTunes before it) keeps device backups
+in `~/Library/Application Support/MobileSync/Backup`; on Windows, iTunes and
+Apple Devices use `%APPDATA%\Apple Computer\MobileSync\Backup` or
+`%USERPROFILE%\Apple\MobileSync\Backup`. Each backup is one folder, often
+tens of GB. Scan your home folder to see them. The age filter (`f`) goes by
+the date of the backup, not by the folder's last change.
+
+A deleted backup cannot restore the device. Keep the newest backup of each
+device (marked `newest`) unless the device is gone or backs up to iCloud;
+older ones, and those of devices you no longer have, are the usual
+candidates. `x` and the basket move a backup to the trash as usual, so it
+can still be put back until the trash is emptied.
+
+On macOS the backup folder is protected: without Full Disk Access the scan
+sees it empty, and the report says so instead of listing nothing. To grant
+it, open System Settings → Privacy & Security → Full Disk Access, turn on
+your terminal app (Terminal, iTerm, …; add it with `+` if it is not listed),
+restart the terminal and scan again. When the scan does not include the
+backup folder at all (you scanned another folder), the report says to scan
+your home folder.
 
 **Duplicates and APFS.** Copies that are APFS clones (made by `cp -c`, Finder's
 Duplicate and many apps) share their blocks. The group's detail says how many

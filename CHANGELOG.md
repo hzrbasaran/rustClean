@@ -14,6 +14,18 @@ follows [Semantic Versioning](https://semver.org/).
   scrolls the help, the deletion log and the failure list. Questions before
   deleting, uninstalling or running a cleanup take no mouse input
   ([#24](https://github.com/hzrbasaran/rustClean/issues/24)).
+- "iPhone / iPad backups" report, the last of the reports in the menu (the
+  tools move down by one): one row per backup folder in `MobileSync/Backup`
+  (macOS, and iTunes / Apple Devices on Windows) with the device name and
+  model, the date of the backup, the iOS version and whether it is
+  encrypted, read from the backup's `Info.plist` and `Manifest.plist`. The
+  newest backup of each device is marked, and the note warns that a deleted
+  backup cannot restore the device. The age filter goes by the backup date.
+  When the folder cannot be read (Full Disk Access) or was not scanned, the
+  report says so and how to fix it
+  ([#11](https://github.com/hzrbasaran/rustClean/issues/11)).
+- An empty report shows its note (why nothing was found) in place of the
+  list; before, only "No results." was shown.
 
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"

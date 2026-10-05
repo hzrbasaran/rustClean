@@ -47,6 +47,11 @@ const GIB: u64 = 1024 * MIB;
 /// A home folder with something for every report. Disk sizes are a little
 /// larger than apparent ones, as allocation rounds up.
 fn demo_tree() -> Tree {
+    demo_tree_with(&[])
+}
+
+/// The demo tree with more `(folder, file, size, age in days)` entries.
+fn demo_tree_with(extra: &[(&str, &str, u64, u64)]) -> Tree {
     let mut t = Tree::new(Path::new("/Users/demo"));
     let mut dirs: Vec<(String, NodeId)> = Vec::new();
     let mut dir = |t: &mut Tree, rel: &str| -> NodeId {
@@ -103,7 +108,7 @@ fn demo_tree() -> Tree {
         ("Documents", "notes.md", 12_345, 1),
         ("Documents", "README.md", 1_100, 90),
     ];
-    for &(parent, name, size, age_days) in files {
+    for &(parent, name, size, age_days) in files.iter().chain(extra) {
         let p = dir(&mut t, parent);
         let disk = size.div_ceil(4096) * 4096;
         let id = t.push(
@@ -128,10 +133,14 @@ fn demo_tree() -> Tree {
 
 /// The app on the browser screen over the demo tree.
 fn app() -> App {
+    app_over(demo_tree())
+}
+
+fn app_over(tree: Tree) -> App {
     let mut app = App::new(None);
     app.disks = disks();
     app.browser = Some(Browser::new(ScanResult {
-        tree: demo_tree(),
+        tree,
         errors: 2,
         elapsed: Duration::from_millis(1234),
     }));
@@ -401,6 +410,85 @@ fn reports() {
         let mut app = app();
         menu(&mut app, 8);
         press(&mut app, KeyCode::Char('f'));
+        app
+    });
+}
+
+/// Three backups of two devices; their details stand in for `Info.plist`.
+#[test]
+fn device_backups() {
+    use crate::reports::{with_fake_backups, BackupInfo, MenuItem};
+    use std::collections::HashMap;
+
+    const BACKUP: &str = "Library/Application Support/MobileSync/Backup";
+    let folders: [(&str, &str, &str, &str, u64, bool, u64); 3] = [
+        (
+            "00008110-000A1B2C3D4E5F60",
+            "Demo iPhone",
+            "iPhone 13 Pro",
+            "17.5.1",
+            12,
+            true,
+            38 * GIB,
+        ),
+        (
+            "00008110-000A1B2C3D4E5F60-20250610-081500",
+            "Demo iPhone",
+            "iPhone 13 Pro",
+            "16.7",
+            480,
+            true,
+            31 * GIB,
+        ),
+        (
+            "00008027-0011223344556677",
+            "Studio iPad",
+            "iPad13,4",
+            "18.0",
+            200,
+            false,
+            12 * GIB,
+        ),
+    ];
+    let files: Vec<(String, u64, u64)> = folders
+        .iter()
+        .map(|&(dir, .., days, _, size)| (format!("{BACKUP}/{dir}"), size, days))
+        .collect();
+    let extra: Vec<(&str, &str, u64, u64)> = files
+        .iter()
+        .map(|(dir, size, days)| (dir.as_str(), "Manifest.db", *size, *days))
+        .collect();
+    let infos: HashMap<String, BackupInfo> = folders
+        .iter()
+        .map(|&(dir, device, model, version, days, encrypted, _)| {
+            let id = dir.split('-').take(2).collect::<Vec<_>>().join("-");
+            let info = BackupInfo {
+                device: Some(device.into()),
+                model: Some(model.into()),
+                product_type: Some(model.into()),
+                version: Some(version.into()),
+                date: Some(u32::try_from(NOW - days * DAY).unwrap()),
+                encrypted,
+                device_id: Some(id),
+            };
+            (dir.to_string(), info)
+        })
+        .collect();
+    let index = MenuItem::ALL
+        .iter()
+        .position(|&i| i == MenuItem::Report(ReportKind::DeviceBackups))
+        .unwrap();
+    snap("report-device-backups", || {
+        with_fake_backups(infos.clone(), || {
+            let mut app = app_over(demo_tree_with(&extra));
+            menu(&mut app, index);
+            app
+        })
+    });
+    // Without backups, the note says why in place of the list.
+    snap("report-device-backups-empty", || {
+        let mut app = app();
+        menu(&mut app, index);
         app
     });
 }
