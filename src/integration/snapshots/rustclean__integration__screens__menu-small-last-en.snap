@@ -1,0 +1,53 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  /Users/demo  │  8.6 GiB (on disk)  │  17 files  │  sort: size
+──┌ Menu ────────────────────────────────────────────────────────────────────┐
+  │ ▲ 4 more items                                                           │
+▶ │   5. Orphaned app leftovers                                              │
+  │   6. Developer junk                                                      │
+  │   7. Cache folders                                                       │
+  │   8. Old and large files                                                 │
+  │   9. Installers and archives in Downloads                                │
+  │  10. Duplicate files (same content)                                      │
+  │  11. Empty folders, broken links, temporary files                        │
+  │  12. iPhone / iPad backups                                               │
+  │                                                                          │
+  │ Tools                                                                    │
+  │  13. Changes since the last scan                                         │
+  │  14. Removed app leftovers                                               │
+  │  15. Developer tools cleanup                                             │
+  │  16. System data                                                         │
+  │▶ 17. Deletion log                                                        │
+  │                                                                          │
+  │                                                                          │
+  │ What was moved to the trash, by day, newest first                        │
+──│ Reports cover the folder you are in (apps: the whole scan). L: Türkçe    │──
+37└──────────────────────────────────────────────────────────────────────────┘
+ ?  help   ↑↓  select   Enter  run   Esc  close
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 2+1 Cyan/- | 3+6 White/- BOLD | 9+69 Cyan/- | 78+2 White/-
+ 2: 0+2 -/- BOLD | UNDERLINED | 2+1 Cyan/- | 3+74 Gray/- | 77+1 Cyan/- | 78+2 -/- BOLD | UNDERLINED
+ 3: 0+2 White/Indexed(238) BOLD | 2+1 Cyan/- | 5+4 Gray/- | 9+22 White/- BOLD | 77+1 Cyan/- | 78+2 White/Indexed(238) BOLD
+ 4: 2+1 Cyan/- | 5+4 Gray/- | 9+14 White/- BOLD | 77+1 Cyan/-
+ 5: 2+1 Cyan/- | 5+4 Gray/- | 9+13 White/- BOLD | 77+1 Cyan/-
+ 6: 2+1 Cyan/- | 5+4 Gray/- | 9+19 White/- BOLD | 77+1 Cyan/-
+ 7: 2+1 Cyan/- | 5+4 Gray/- | 9+36 White/- BOLD | 77+1 Cyan/-
+ 8: 2+1 Cyan/- | 5+4 Gray/- | 9+30 White/- BOLD | 77+1 Cyan/-
+ 9: 2+1 Cyan/- | 5+4 Gray/- | 9+44 White/- BOLD | 77+1 Cyan/-
+10: 2+1 Cyan/- | 5+4 Gray/- | 9+21 White/- BOLD | 77+1 Cyan/-
+11: 2+1 Cyan/- | 77+1 Cyan/-
+12: 2+1 Cyan/- | 3+6 Cyan/- BOLD | 77+1 Cyan/-
+13: 2+1 Cyan/- | 5+4 Gray/- | 9+27 White/- BOLD | 77+1 Cyan/-
+14: 2+1 Cyan/- | 5+4 Gray/- | 9+21 White/- BOLD | 77+1 Cyan/-
+15: 2+1 Cyan/- | 5+4 Gray/- | 9+23 White/- BOLD | 77+1 Cyan/-
+16: 2+1 Cyan/- | 5+4 Gray/- | 9+11 White/- BOLD | 77+1 Cyan/-
+17: 2+1 Cyan/- | 3+2 White/Indexed(238) BOLD | 5+4 Gray/Indexed(238) BOLD | 9+12 White/Indexed(238) BOLD | 77+1 Cyan/-
+18: 2+1 Cyan/- | 77+1 Cyan/-
+19: 2+1 Cyan/- | 77+1 Cyan/-
+20: 2+1 Cyan/- | 4+49 Yellow/- | 77+1 Cyan/-
+21: 2+1 Cyan/- | 4+69 Gray/- | 77+1 Cyan/-
+22: 0+2 Gray/- | 2+76 Cyan/-
+23: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 36+5 Black/Gray

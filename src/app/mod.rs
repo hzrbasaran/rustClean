@@ -140,6 +140,10 @@ pub struct Browser {
     pub dashboard: Option<Dashboard>,
     /// Selected row of the open report menu.
     pub report_menu: Option<usize>,
+    /// The first line of the report menu's list that is shown, when the
+    /// list does not fit (kept by the drawing, so the view only moves when
+    /// the selection reaches an edge).
+    pub menu_scroll: usize,
     /// Saved scans to compare with, and the selected one.
     pub snapshot_picker: Option<(Vec<history::Saved>, usize)>,
     /// Open "system data" panel.
@@ -205,6 +209,7 @@ impl Browser {
             results: None,
             dashboard: None,
             report_menu: None,
+            menu_scroll: 0,
             snapshot_picker: None,
             system: None,
             deletion_log: None,

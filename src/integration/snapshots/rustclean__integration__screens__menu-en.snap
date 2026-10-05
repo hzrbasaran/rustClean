@@ -58,8 +58,8 @@ expression: screen
 22: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
 23: 8+1 Cyan/- | 11+4 Gray/- | 15+12 White/- BOLD | 91+1 Cyan/-
 24: 8+1 Cyan/- | 91+1 Cyan/-
-25: 8+1 Cyan/- | 9+40 Yellow/- | 91+1 Cyan/-
-26: 8+1 Cyan/- | 9+70 Gray/- | 91+1 Cyan/-
+25: 8+1 Cyan/- | 10+39 Yellow/- | 91+1 Cyan/-
+26: 8+1 Cyan/- | 10+69 Gray/- | 91+1 Cyan/-
 27: 8+84 Cyan/-
 28: 0+23 Gray/- | 23+25 Yellow/-
 29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 36+5 Black/Gray

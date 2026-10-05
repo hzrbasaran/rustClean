@@ -16,12 +16,16 @@ const HEIGHT: u16 = 40;
 
 /// Draws the app like the event loop does; the screen lines.
 fn draw(app: &mut App) -> Vec<Vec<String>> {
-    let mut term = Terminal::new(TestBackend::new(WIDTH, HEIGHT)).unwrap();
+    draw_at(app, WIDTH, HEIGHT)
+}
+
+fn draw_at(app: &mut App, width: u16, height: u16) -> Vec<Vec<String>> {
+    let mut term = Terminal::new(TestBackend::new(width, height)).unwrap();
     term.draw(|f| crate::ui::render(f, app)).unwrap();
     let buf = term.backend().buffer();
-    (0..HEIGHT)
+    (0..height)
         .map(|y| {
-            (0..WIDTH)
+            (0..width)
                 .map(|x| buf[(x, y)].symbol().to_string())
                 .collect()
         })
@@ -32,7 +36,10 @@ fn draw(app: &mut App) -> Vec<Vec<String>> {
 /// searching from the bottom (popups are drawn in the middle, lists above
 /// the status line, so the last match is the one in front).
 fn locate(app: &mut App, text: &str) -> (u16, u16) {
-    let screen = draw(app);
+    locate_in(&draw(app), text)
+}
+
+fn locate_in(screen: &[Vec<String>], text: &str) -> (u16, u16) {
     for (y, cells) in screen.iter().enumerate().rev() {
         for x in 0..cells.len() {
             let rest: String = cells[x..].concat();
@@ -184,6 +191,30 @@ fn treemap_blocks_are_clicked_and_opened() {
     double_click(&mut app, at);
     let b = browser(&app);
     assert_eq!(b.current, find(&b.tree, "Media"));
+}
+
+#[test]
+fn a_scrolled_menu_is_clicked_where_it_is_drawn() {
+    let f = Fixture::standard();
+    let mut app = open(f.root());
+    mouse_on(&mut app);
+    press(&mut app, KeyCode::Char('m'));
+    // The last item: at 80×24 the list scrolls to show it.
+    press(&mut app, KeyCode::Up);
+    let last = MenuItem::ALL.len() - 1;
+    let screen = draw_at(&mut app, 80, 24);
+    let text: Vec<String> = screen.iter().map(|l| l.concat()).collect();
+    assert!(
+        !text.iter().any(|l| l.contains(MenuItem::ALL[0].label())),
+        "the first item is scrolled away:\n{}",
+        text.join("\n")
+    );
+    // A click on an item that is drawn selects that item, not the one the
+    // row would hold without scrolling.
+    let item = last - 2;
+    let at = locate_in(&screen, MenuItem::ALL[item].label());
+    click(&mut app, at, Instant::now(), 0);
+    assert_eq!(browser(&app).report_menu, Some(item));
 }
 
 #[test]

@@ -176,7 +176,10 @@ what to do about it.
 
 ## Reports
 
-`m` opens the menu. Reports cover the folder you are in. Rows start
+`m` opens the menu. Below its list it says what the selected item does. On
+a small terminal the list scrolls with the selection, and "▲ 3 more items" /
+"▼ 5 more items" say how much is out of view. Reports cover the folder you
+are in. Rows start
 unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 `o` saves the report as CSV or JSON ([more](#saving-a-list-csv--json)), and
 `rustclean report` prints any of them without the interface

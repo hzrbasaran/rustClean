@@ -394,6 +394,29 @@ fn report_menu() {
     });
 }
 
+/// The menu on an 80×24 terminal: the list scrolls, the description and
+/// the note stay below it.
+#[test]
+fn report_menu_scrolls_when_small() {
+    for (name, ups) in [("menu-small-first", 0), ("menu-small-last", 1)] {
+        for (lang, code) in [(Lang::Tr, "tr"), (Lang::En, "en")] {
+            let screen = with_lang(lang, || {
+                with_fixed_now(NOW, || {
+                    let mut app = app();
+                    press(&mut app, KeyCode::Char('m'));
+                    for _ in 0..ups {
+                        press(&mut app, KeyCode::Up);
+                    }
+                    let mut term = Terminal::new(TestBackend::new(80, 24)).unwrap();
+                    term.draw(|f| crate::ui::render(f, &mut app)).unwrap();
+                    describe(term.backend().buffer())
+                })
+            });
+            insta::assert_snapshot!(format!("{name}-{code}"), screen);
+        }
+    }
+}
+
 #[test]
 fn reports() {
     snap("report-largest-files", || {
