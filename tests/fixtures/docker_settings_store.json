@@ -1,0 +1,16 @@
+{
+  "AutoStart": false,
+  "BackupData": false,
+  "Cpus": 10,
+  "DataFolder": "/Users/demo/Library/Containers/com.docker.docker/Data/vms/0/data",
+  "DiskFlush": "",
+  "DiskSizeMiB": 122070,
+  "DiskStats": "",
+  "DiskTRIM": true,
+  "MemoryMiB": 16640,
+  "SettingsVersion": 45,
+  "SwapMiB": 1024,
+  "UseVirtualizationFramework": true,
+  "UseVirtualizationFrameworkVirtioFS": true,
+  "WslDiskCompactionThresholdGb": 0
+}

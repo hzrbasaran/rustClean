@@ -213,13 +213,68 @@ log. The tool is then measured again.
 
 | Tool | Actions |
 |---|---|
-| Docker | stopped containers + dangling images + build cache · all unused images · unused volumes (data loss) |
-| Xcode simulators | delete unavailable simulators · delete individual runtimes |
-| DerivedData / DeviceSupport | move contents to the trash |
-| npm · pnpm · Yarn · pip | the tool's own cache commands |
-| Gradle | stop daemons, move the cache to the trash |
+| Docker | stopped containers + dangling images + build cache (safe) · all unused images (re-downloaded) · unused volumes (data loss) |
+| Xcode simulators | delete unavailable simulators (safe) · delete individual runtimes (re-downloaded) · delete simulators never used (safe) or not used for over a year (data loss: their app data), all at once or one by one |
+| DerivedData / DeviceSupport | move contents to the trash (safe) |
+| Xcode archives | move archives older than 12 months to the trash (data loss) |
+| npm · pnpm · Yarn · pip | the tool's own cache commands (re-downloaded; `pnpm store prune` is safe) |
+| uv | `uv cache clean` (re-downloaded) |
+| conda | `conda clean --all --yes` (re-downloaded) |
+| Bun | move the global cache to the trash (re-downloaded) |
+| Gradle | stop daemons, move the cache to the trash (re-downloaded) |
+| Maven | move `~/.m2/repository` to the trash (re-downloaded) |
+| Go | `go clean -modcache` (re-downloaded) · `go clean -cache` (safe) |
+| Flutter / Dart pub | `flutter pub cache clean --force` (re-downloaded) |
+| Playwright | `npx --yes playwright uninstall --all` (re-downloaded) |
+| Android emulators and images | delete an emulator (data loss) · move a leftover `.avd` folder to the trash (data loss) · move an unused system image to the trash (re-downloaded) |
 | CocoaPods · Homebrew | `pod cache clean --all` · `brew cleanup --prune=all` |
-| Cargo | move downloaded `.crate` files to the trash |
+| Cargo | move downloaded `.crate` files to the trash (re-downloaded) |
+
+Long lists of actions scroll in the picker. A step chosen twice (a
+simulator in "all never used" and on its own) runs once.
+
+Notes on the newer tools:
+- **Measuring.** Every folder is found the way the tool finds it: Go asks
+  `go env GOMODCACHE GOCACHE`, uv `uv cache dir`, conda its own dry run
+  (`conda clean --all --dry-run --json`, which also gives the size it would
+  free). Bun follows `BUN_INSTALL_CACHE_DIR` and `BUN_INSTALL`, pub
+  `PUB_CACHE`, Playwright `PLAYWRIGHT_BROWSERS_PATH`; otherwise the default
+  folder of the platform is used.
+- **Bun.** `bun pm cache rm` refuses to run outside a project (it needs a
+  `package.json`), so rustClean moves the cache folder's contents to the
+  trash, which is what that command removes.
+- **Flutter / Dart pub.** `flutter` is used when installed, otherwise `dart`,
+  otherwise the folder's contents go to the trash. Globally activated
+  packages (`dart pub global activate`) live in the same cache and go too.
+- **Playwright.** Without `npx` in `PATH` (also on Windows, where it is a
+  `.cmd` script) the browsers folder's contents go to the trash.
+- **Xcode archives** are read from `~/Library/Developer/Xcode/Archives`,
+  one folder per day; the folder's date is the archive's date. An archive
+  holds the dSYM files needed to symbolicate crash reports of a shipped
+  build, so keep those of versions still in use.
+- **Simulators.** `simctl list devices` gives each device's last use
+  (`lastUsedAt`, or `lastBootedAt` on older Xcode versions). Devices that
+  are running, or whose date cannot be read, are never offered. Deleted
+  ones can be added again in Xcode › Window › Devices and Simulators.
+- **Android.** The SDK is looked for in `ANDROID_HOME`, `ANDROID_SDK_ROOT`,
+  then `~/Library/Android/sdk` (macOS), `~/Android/Sdk` (Linux) or
+  `%LOCALAPPDATA%\Android\Sdk` (Windows); emulators in `ANDROID_AVD_HOME`,
+  `ANDROID_USER_HOME/avd` or `~/.android/avd`. An emulator is deleted with
+  `avdmanager delete avd -n <name>` from the SDK's command-line tools (the
+  old `tools/bin` one does not start on current Java). Without it, the
+  emulator's folder and `.ini` file are moved to the trash. Close the
+  emulator first. A system image counts as used when an emulator's
+  `config.ini` names it (`image.sysdir.1`); when any emulator's `config.ini`
+  cannot be read, no image is offered.
+- **Docker Desktop's disk.** The details show `Docker.raw`'s size on disk
+  next to its apparent (maximum) size. Docker Desktop gives the space freed
+  by pruning back to the disk by itself (TRIM); it can take a few minutes.
+  Its [documentation](https://docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs/)
+  also describes a manual reclaim,
+  `docker run --privileged --pid=host docker/desktop-reclaim-space`, but that
+  runs a privileged container from an image last updated in 2019 and built
+  for amd64 only, so rustClean does not offer it. Lowering the disk limit in
+  Docker Desktop's settings deletes every image and container.
 
 **System data** (macOS). Shows:
 - the APFS container and every volume's usage

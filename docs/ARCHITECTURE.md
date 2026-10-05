@@ -47,6 +47,9 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │
    ├─ history.rs ─ scan snapshots and "what changed"
    ├─ tools.rs ─── developer tool measurement and cleanup commands
+   ├─ tools/ ───── later tools: caches (Go, Maven, Bun, uv, conda, pub,
+   │               Playwright), xcode (archives, old simulators), android,
+   │               docker_vm (Docker.raw sizes)
    ├─ system.rs ── macOS system data (diskutil, tmutil, sysctl)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ trashlog.rs  the deletion log (deletions.jsonl)

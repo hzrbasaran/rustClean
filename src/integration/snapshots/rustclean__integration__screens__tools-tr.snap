@@ -21,14 +21,14 @@ expression: screen
 
 
 
-
-
-
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌ İşlemler ────────────────────────────────────────────────────────────────────────────────────────┐
 │ yeniden indirilir  docker system prune                                                           │
 │    $ docker system prune                                                                         │
+│Docker Desktop, temizlikle boşalan alanı diske kendisi geri verir (TRIM, birkaç dakika sürebilir).│
+│Belgelerdeki elle geri kazanma komutu eski, yalnızca amd64 bir imajdan ayrıcalıklı container      │
+│çalıştırdığı için sunulmuyor. Ayrıntı:                                                            │
+│docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs                                     │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
  ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
@@ -40,9 +40,13 @@ expression: screen
  5: 2+23 White/- BOLD | 37+12 Cyan/- | 50+10 Cyan/-
  6: 2+13 Gray/- | 37+12 Gray/- | 50+13 Gray/-
  7: 2+16 White/- BOLD | 37+12 Yellow/- | 50+18 Yellow/-
-24: 0+1 DarkGray/- | 1+10 White/- BOLD | 11+89 DarkGray/-
-25: 0+1 DarkGray/- | 1+19 Black/Yellow | 20+20 White/- BOLD | 99+1 DarkGray/-
-26: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
+20: 0+1 DarkGray/- | 1+10 White/- BOLD | 11+89 DarkGray/-
+21: 0+1 DarkGray/- | 1+19 Black/Yellow | 20+20 White/- BOLD | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+98 Gray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+92 Gray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+38 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+61 Gray/- | 99+1 DarkGray/-
 27: 0+100 DarkGray/-
 28: 0+100 Gray/-
 29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 39+3 Black/Gray | 56+3 Black/Gray | 66+5 Black/Gray | 78+3 Black/Gray

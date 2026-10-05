@@ -21,14 +21,14 @@ expression: screen
 
 
 
-
-
-
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌ İşlemler ────────────────────────────────────────────────────────────────────────────────────────┐
 │ yeniden indirilir  docker system prune                                                           │
 │    $ docker system prune                                                                         │
+│Docker Desktop, temizlikle boşalan alanı diske kendisi geri verir (TRIM, birkaç dakika sürebilir).│
+│Belgelerdeki elle geri kazanma komutu eski, yalnızca amd64 bir imajdan ayrıcalıklı container      │
+│çalıştırdığı için sunulmuyor. Ayrıntı:                                                            │
+│docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs                                     │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
  ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
@@ -40,9 +40,13 @@ expression: screen
  5: 2+23 -/- BOLD | 37+12 Indexed(25)/- | 50+10 Indexed(25)/-
  6: 2+13 Indexed(242)/- | 37+12 Indexed(242)/- | 50+13 Indexed(242)/-
  7: 2+16 -/- BOLD | 37+12 Indexed(130)/- | 50+18 Indexed(130)/-
-24: 0+1 Indexed(248)/- | 1+10 -/- BOLD | 11+89 Indexed(248)/-
-25: 0+1 Indexed(248)/- | 1+19 Indexed(16)/Indexed(220) | 20+20 -/- BOLD | 99+1 Indexed(248)/-
-26: 0+1 Indexed(248)/- | 1+25 Indexed(242)/- | 99+1 Indexed(248)/-
+20: 0+1 Indexed(248)/- | 1+10 -/- BOLD | 11+89 Indexed(248)/-
+21: 0+1 Indexed(248)/- | 1+19 Indexed(16)/Indexed(220) | 20+20 -/- BOLD | 99+1 Indexed(248)/-
+22: 0+1 Indexed(248)/- | 1+25 Indexed(242)/- | 99+1 Indexed(248)/-
+23: 0+1 Indexed(248)/- | 1+98 Indexed(242)/- | 99+1 Indexed(248)/-
+24: 0+1 Indexed(248)/- | 1+92 Indexed(242)/- | 99+1 Indexed(248)/-
+25: 0+1 Indexed(248)/- | 1+38 Indexed(242)/- | 99+1 Indexed(248)/-
+26: 0+1 Indexed(248)/- | 1+61 Indexed(242)/- | 99+1 Indexed(248)/-
 27: 0+100 Indexed(248)/-
 28: 0+100 Indexed(242)/-
 29: 0+3 Indexed(231)/Indexed(242) | 12+4 Indexed(231)/Indexed(242) | 22+7 Indexed(231)/Indexed(242) | 39+3 Indexed(231)/Indexed(242) | 56+3 Indexed(231)/Indexed(242) | 66+5 Indexed(231)/Indexed(242) | 78+3 Indexed(231)/Indexed(242)

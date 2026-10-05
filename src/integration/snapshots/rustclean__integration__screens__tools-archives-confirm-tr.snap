@@ -1,0 +1,64 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Geliştirici araçları temizliği  │  geri kazanılabilir: 9.1 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Araç                               Kazanılır    Ayrıntı
+  Xcode simülatörleri                     4.0 GiB unavailable devices 0 (0 B) · unused for a year 40
+▶ Xcode arşivleri                       310.0 MiB 5 archives (742.0 MiB) · 2 older than 12 months (3
+  Android emülatör ve imajları            3.0 GiB 1 emulator (23.0 GiB) · 3 system images (5.4 GiB),
+  Go modül ve derleme önbelleği      —            not installed
+  ┌ Xcode arşivleri — onay ──────────────────────────────────────────────────────────────────────┐on
+  │                                                                                              │
+  │Şu komutlar sırayla çalışacak:                                                                │
+  │ VERİ KAYBI  Move 2 archives older than 12 months to the trash (310.0 MiB)                    │
+  │    $ /Users/demo/Library/Developer/Xcode/Archives/2024-09-07/App 07.09.2024, 10.00.xcarchive │
+  │→ çöp kutusu                                                                                  │
+  │    $ /Users/demo/Library/Developer/Xcode/Archives/2025-03-17/App 17.03.2025, 16.20.xcarchive │
+  │→ çöp kutusu                                                                                  │
+  │                                                                                              │
+  │Arşivler, yayımlanmış sürümlerin çökme raporlarını sembolize etmek için gereken dSYM          │
+  │dosyalarını tutar. Hâlâ kullanılan sürümlerinkini saklayın.                                   │
+──│                                                                                              │──
+┌ │Seçimde VERİ KAYBI olan bir işlem var. Onaylamak için „evet” yazıp Enter'a basın:             │─┐
+│ │ > e█                                                                                         │ │
+│ │ Esc: vazgeç                                                                                  │ │
+│ç└──────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│    $ /Users/demo/Library/Developer/Xcode/Archives/2025-03-17/App 17.03.2025, 16.20.xcarchive →   │
+│çöp kutusu                                                                                        │
+│Arşivler, yayımlanmış sürümlerin çökme raporlarını sembolize etmek için gereken dSYM dosyalarını  │
+│tutar. Hâlâ kullanılan sürümlerinkini saklayın.                                                   │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
+ ?  yardım   Esc  vazgeç
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 2+19 White/- BOLD | 37+12 -/- BOLD
+ 4: 0+100 White/Indexed(238) BOLD
+ 5: 2+28 White/- BOLD | 37+12 -/- BOLD
+ 6: 2+29 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 7: 2+1 Red/- | 3+24 White/- BOLD | 27+71 Red/-
+ 8: 2+1 Red/- | 97+1 Red/-
+ 9: 2+1 Red/- | 3+30 White/- | 97+1 Red/-
+10: 2+1 Red/- | 3+12 White/Red BOLD | 15+62 White/- BOLD | 97+1 Red/-
+11: 2+1 Red/- | 3+93 Gray/- | 97+1 Red/-
+12: 2+1 Red/- | 3+12 Gray/- | 97+1 Red/-
+13: 2+1 Red/- | 3+93 Gray/- | 97+1 Red/-
+14: 2+1 Red/- | 3+12 Gray/- | 97+1 Red/-
+15: 2+1 Red/- | 97+1 Red/-
+16: 2+1 Red/- | 3+84 Yellow/- | 97+1 Red/-
+17: 2+1 Red/- | 3+59 Yellow/- | 97+1 Red/-
+18: 2+1 Red/- | 97+1 Red/-
+19: 0+1 DarkGray/- | 1+1 White/- BOLD | 2+1 Red/- | 3+81 Red/- BOLD | 97+1 Red/- | 98+2 DarkGray/-
+20: 0+1 DarkGray/- | 1+1 White/Red BOLD | 2+1 Red/- | 6+2 White/- BOLD | 97+1 Red/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 1+1 Gray/- | 2+1 Red/- | 3+12 Gray/- | 97+1 Red/- | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 1+1 Gray/- | 2+96 Red/- | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+95 Gray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+10 Gray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+96 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+47 Gray/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+5 Black/Gray

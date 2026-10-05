@@ -1,0 +1,55 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Geliştirici araçları temizliği  │  geri kazanılabilir: 9.1 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Araç                               Kazanılır    Ayrıntı
+  Xcode simülatörleri                     4.0 GiB unavailable devices 0 (0 B) · unused for a year 40
+  Xcode arşivleri                       310.0 MiB 5 archives (742.0 MiB) · 2 older than 12 months (3
+▶ Android emülatör ve imajları            3.0 GiB 1 emulator (23.0 GiB) · 3 system images (5.4 GiB),
+  Go modül ve derleme önbelleği      —            not installed
+  conda paketleri                       790.0 MiB packages 116.0 MiB · tarballs 674.0 MiB · /opt/con
+  Playwright tarayıcıları                 1.0 GiB /Users/demo/Library/Caches/ms-playwright
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ İşlemler ────────────────────────────────────────────────────────────────────────────────────────┐
+│ VERİ KAYBI  Delete the Pixel 9 Pro XL emulator with its apps and data (23.0 GiB)                 │
+│    $ avdmanager delete avd -n Pixel_9_Pro_XL                                                     │
+│ yeniden indirilir  Unused image android-34/google_apis_playstore/arm64-v8a (3.1 GiB)             │
+│    $ /Users/demo/Library/Android/sdk/system-images/android-34/google_apis_playstore/arm64-v8a →  │
+│çöp kutusu                                                                                        │
+│Önce emülatörü kapatın: silinince içindeki uygulamalar ve veriler de gider. avdmanager bulunamazsa│
+│klasörü ve .ini dosyası çöp kutusuna taşınır. Kullanılmayan imajlar çöp kutusuna taşınır; SDK     │
+│Manager yeniden indirir.                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
+ ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 2+19 White/- BOLD | 37+12 -/- BOLD
+ 4: 2+15 White/- BOLD | 37+12 -/- BOLD
+ 5: 0+100 White/Indexed(238) BOLD
+ 6: 2+29 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 7: 2+15 White/- BOLD | 37+12 -/- BOLD
+ 8: 2+23 White/- BOLD | 37+12 -/- BOLD
+18: 0+1 DarkGray/- | 1+10 White/- BOLD | 11+89 DarkGray/-
+19: 0+1 DarkGray/- | 1+12 White/Red BOLD | 13+69 White/- BOLD | 99+1 DarkGray/-
+20: 0+1 DarkGray/- | 1+45 Gray/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 1+19 Black/Yellow | 20+66 White/- BOLD | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 1+96 Gray/- | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+10 Gray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+98 Gray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+93 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+24 Gray/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 39+3 Black/Gray | 56+3 Black/Gray | 66+5 Black/Gray | 78+3 Black/Gray

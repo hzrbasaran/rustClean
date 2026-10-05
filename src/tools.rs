@@ -4,6 +4,15 @@
 //! Measuring only reads: it runs listing commands (`docker system df`,
 //! `simctl list`, `brew cleanup -n`, `npm config get cache`…) and sizes
 //! cache folders. Cleaning runs only the actions the user confirmed.
+//!
+//! The submodules hold the tools added later: more package caches
+//! (`caches`), Xcode archives and old simulators (`xcode`), the Android SDK
+//! (`android`) and the Docker Desktop disk (`docker_vm`).
+
+mod android;
+mod caches;
+mod docker_vm;
+pub(crate) mod xcode;
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -31,6 +40,8 @@ pub enum Step {
     Command(Vec<String>),
     /// Move everything inside this folder to the trash.
     TrashContents(PathBuf),
+    /// Move this file or folder to the trash.
+    Trash(PathBuf),
 }
 
 impl Step {
@@ -48,6 +59,7 @@ impl Step {
                 args.join(" ")
             }
             Step::TrashContents(dir) => tf!("{}/* → çöp kutusu", "{}/* → trash", dir.display()),
+            Step::Trash(path) => tf!("{} → çöp kutusu", "{} → trash", path.display()),
         }
     }
 }
@@ -85,11 +97,20 @@ pub enum ToolKind {
     CocoaPods,
     Homebrew,
     Cargo,
+    Go,
+    Maven,
+    Bun,
+    Uv,
+    Conda,
+    Pub,
+    Playwright,
+    XcodeArchives,
+    Android,
 }
 
 impl ToolKind {
     /// Every tool, on any platform.
-    pub const ALL: [ToolKind; 11] = [
+    pub const ALL: [ToolKind; 20] = [
         ToolKind::Docker,
         ToolKind::Simulators,
         ToolKind::XcodeData,
@@ -101,6 +122,15 @@ impl ToolKind {
         ToolKind::CocoaPods,
         ToolKind::Homebrew,
         ToolKind::Cargo,
+        ToolKind::Go,
+        ToolKind::Maven,
+        ToolKind::Bun,
+        ToolKind::Uv,
+        ToolKind::Conda,
+        ToolKind::Pub,
+        ToolKind::Playwright,
+        ToolKind::XcodeArchives,
+        ToolKind::Android,
     ];
 
     /// A name that does not depend on the language (the variant's), for
@@ -117,8 +147,9 @@ impl ToolKind {
     pub fn available() -> Vec<ToolKind> {
         use ToolKind::*;
         let mut all = vec![Docker, Npm, Pnpm, Yarn, Pip, Gradle, Cargo];
+        all.extend([Go, Maven, Bun, Uv, Conda, Pub, Playwright, Android]);
         if cfg!(target_os = "macos") {
-            all.splice(1..1, [Simulators, XcodeData]);
+            all.splice(1..1, [Simulators, XcodeData, XcodeArchives]);
             all.extend([CocoaPods, Homebrew]);
         } else if cfg!(target_os = "linux") {
             all.push(Homebrew);
@@ -139,6 +170,39 @@ impl ToolKind {
             ToolKind::CocoaPods => t!("CocoaPods önbelleği", "CocoaPods cache"),
             ToolKind::Homebrew => "Homebrew",
             ToolKind::Cargo => t!("Cargo indirme önbelleği", "Cargo download cache"),
+            ToolKind::Go => t!("Go modül ve derleme önbelleği", "Go module and build cache"),
+            ToolKind::Maven => t!("Maven yerel deposu", "Maven local repository"),
+            ToolKind::Bun => t!("Bun önbelleği", "Bun cache"),
+            ToolKind::Uv => t!("uv önbelleği", "uv cache"),
+            ToolKind::Conda => t!("conda paketleri", "conda packages"),
+            ToolKind::Pub => t!("Flutter / Dart pub önbelleği", "Flutter / Dart pub cache"),
+            ToolKind::Playwright => t!("Playwright tarayıcıları", "Playwright browsers"),
+            ToolKind::XcodeArchives => t!("Xcode arşivleri", "Xcode archives"),
+            ToolKind::Android => t!(
+                "Android emülatör ve imajları",
+                "Android emulators and images"
+            ),
+        }
+    }
+
+    /// A note shown under the tool's actions: what to know before cleaning,
+    /// or what rustClean leaves to the tool itself.
+    pub fn hint(self) -> Option<&'static str> {
+        match self {
+            ToolKind::Docker => Some(docker_vm::hint()),
+            ToolKind::Simulators => Some(t!(
+                "Silinen simülatörler Xcode › Window › Devices and Simulators'tan yeniden eklenebilir; bir yıldır kullanılmayanlar içlerindeki uygulama verilerini de götürür.",
+                "Deleted simulators can be added again in Xcode › Window › Devices and Simulators; those unused for a year take their app data with them.",
+            )),
+            ToolKind::XcodeArchives => Some(t!(
+                "Arşivler, yayımlanmış sürümlerin çökme raporlarını sembolize etmek için gereken dSYM dosyalarını tutar. Hâlâ kullanılan sürümlerinkini saklayın.",
+                "Archives hold the dSYM files needed to symbolicate crash reports of shipped builds. Keep those of versions still in use.",
+            )),
+            ToolKind::Android => Some(t!(
+                "Önce emülatörü kapatın: silinince içindeki uygulamalar ve veriler de gider. avdmanager bulunamazsa klasörü ve .ini dosyası çöp kutusuna taşınır. Kullanılmayan imajlar çöp kutusuna taşınır; SDK Manager yeniden indirir.",
+                "Close the emulator first: deleting it also deletes the apps and data in it. Without avdmanager, its folder and .ini file are moved to the trash. Unused images are moved to the trash; SDK Manager downloads them again.",
+            )),
+            _ => None,
         }
     }
 }
@@ -229,6 +293,15 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
                 "Move downloaded .crate files to the trash",
             ),
         ),
+        ToolKind::Go => caches::go(),
+        ToolKind::Maven => caches::maven(),
+        ToolKind::Bun => caches::bun(),
+        ToolKind::Uv => caches::uv(),
+        ToolKind::Conda => caches::conda(),
+        ToolKind::Pub => caches::dart_pub(),
+        ToolKind::Playwright => caches::playwright(),
+        ToolKind::XcodeArchives => xcode::archives(),
+        ToolKind::Android => android::measure(),
     }
 }
 
@@ -330,28 +403,45 @@ fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
                 "moving {} to the trash…",
                 crate::i18n::count(entries.len() as u64, "öğe", "item", "items")
             )));
-            // Measured before the move, for the deletion log.
-            let size = entries
-                .iter()
-                .fold(crate::tree::Size::default(), |mut total, e| {
-                    total += size_on_disk(e);
-                    total
-                });
-            match crate::delete::trash_all(&entries) {
-                Ok(()) => {
-                    crate::trashlog::append(&[crate::trashlog::Entry {
-                        time: crate::ui::now_secs(),
-                        path: dir.display().to_string(),
-                        size,
-                        via: crate::trashlog::Via::Tool(kind),
-                    }]);
-                    true
-                }
-                Err(e) => {
-                    let _ = tx.send(RunEvent::Output(tf!("hata: {e}", "error: {e}")));
-                    false
-                }
+            trash_logged(kind, dir, &entries, tx)
+        }
+        Step::Trash(path) => {
+            if std::fs::symlink_metadata(path).is_err() {
+                let _ = tx.send(RunEvent::Output(t!("zaten yok", "already gone").into()));
+                return true;
             }
+            trash_logged(kind, path, std::slice::from_ref(path), tx)
+        }
+    }
+}
+
+/// Moves `entries` to the trash and writes one line for `logged` to the
+/// deletion log, with their size measured before the move.
+fn trash_logged(
+    kind: ToolKind,
+    logged: &Path,
+    entries: &[PathBuf],
+    tx: &mpsc::Sender<RunEvent>,
+) -> bool {
+    let size = entries
+        .iter()
+        .fold(crate::tree::Size::default(), |mut total, e| {
+            total += size_on_disk(e);
+            total
+        });
+    match crate::delete::trash_all(entries) {
+        Ok(()) => {
+            crate::trashlog::append(&[crate::trashlog::Entry {
+                time: crate::ui::now_secs(),
+                path: logged.display().to_string(),
+                size,
+                via: crate::trashlog::Via::Tool(kind),
+            }]);
+            true
+        }
+        Err(e) => {
+            let _ = tx.send(RunEvent::Output(tf!("hata: {e}", "error: {e}")));
+            false
         }
     }
 }
@@ -525,16 +615,22 @@ fn docker() -> (Status, Vec<CleanAction>) {
         &["system", "df", "--format", "{{json .}}"],
         Duration::from_secs(15),
     ) else {
-        return (
-            Status::Unavailable(t!("Docker çalışmıyor", "Docker is not running").into()),
-            Vec::new(),
-        );
+        let mut why = t!("Docker çalışmıyor", "Docker is not running").to_string();
+        if let Some(disk) = docker_vm::describe() {
+            why = format!("{why} · {disk}");
+        }
+        return (Status::Unavailable(why), Vec::new());
     };
     let parts = parse_docker_df(&out);
     let total = parts.iter().map(|p| p.1).sum();
-    let detail = parts
-        .iter()
-        .map(|(kind, size)| format!("{kind} {}", fmt_size(*size)))
+    // The disk image first: the parts add up to the size column already.
+    let detail = docker_vm::describe()
+        .into_iter()
+        .chain(
+            parts
+                .iter()
+                .map(|(kind, size)| format!("{kind} {}", fmt_size(*size))),
+        )
         .collect::<Vec<_>>()
         .join(" · ");
     let actions = vec![
@@ -629,6 +725,8 @@ fn simulators() -> (Status, Vec<CleanAction>) {
         return missing(t!("simctl çalıştırılamadı", "could not run simctl"));
     };
     let (count, size) = parse_unavailable_devices(&devices);
+    let stale = xcode::parse_stale_devices(&devices, crate::ui::now_secs());
+    let stale_size: u64 = stale.iter().map(|d| d.size).sum();
     let runtimes = runtimes.map(|r| parse_runtimes(&r)).unwrap_or_default();
     let runtime_total: u64 = runtimes.iter().map(|r| r.size).sum();
 
@@ -656,14 +754,17 @@ fn simulators() -> (Status, Vec<CleanAction>) {
             vec![command(&xcrun, &["simctl", "runtime", "delete", &r.id])],
         ));
     }
+    actions.extend(xcode::stale_device_actions(&xcrun, &stale));
     let detail = tf!(
-        "kullanılamayan cihaz {count} ({}) · çalışma zamanı {} ({})",
-        "unavailable devices {count} ({}) · runtimes {} ({})",
+        "kullanılamayan cihaz {count} ({}) · bir yıldır kullanılmayan {} ({}) · çalışma zamanı {} ({})",
+        "unavailable devices {count} ({}) · unused for a year {} ({}) · runtimes {} ({})",
         fmt_size(size),
+        stale.len(),
+        fmt_size(stale_size),
         runtimes.len(),
         fmt_size(runtime_total)
     );
-    ready(size, detail, actions)
+    ready(size + stale_size, detail, actions)
 }
 
 /// Count and data size of simulator devices whose runtime is gone.
@@ -927,6 +1028,29 @@ mod tests {
             .collect();
         assert_eq!(done, vec![true, false, false]);
         assert_eq!(events.last(), Some(&RunEvent::Finished));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn trashes_single_entries() {
+        let tmp = tempfile::tempdir().unwrap();
+        let archive = tmp.path().join("App.xcarchive");
+        std::fs::create_dir_all(archive.join("dSYMs")).unwrap();
+        let gone = tmp.path().join("gone.ini");
+        let events = collect(&run(
+            ToolKind::XcodeArchives,
+            vec![Step::Trash(archive.clone()), Step::Trash(gone)],
+        ));
+        assert!(!archive.exists(), "moved to the (test) trash");
+        let done: Vec<bool> = events
+            .iter()
+            .filter_map(|e| match e {
+                RunEvent::Done { ok, .. } => Some(*ok),
+                _ => None,
+            })
+            .collect();
+        // A path that is already gone is not a failure.
+        assert_eq!(done, vec![true, true]);
     }
 
     #[test]

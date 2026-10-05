@@ -22,13 +22,13 @@ expression: screen
 
 
 
-
-
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
 │ re-downloaded  docker system prune                                                               │
 │    $ docker system prune                                                                         │
+│Docker Desktop gives the space freed by pruning back to the disk by itself (TRIM, may take a few  │
+│minutes). Its documented manual reclaim runs a privileged container from an old amd64-only image, │
+│so it is not offered. See docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs           │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Measuring only reads. No command runs without your confirmation.
  ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
@@ -40,9 +40,12 @@ Measuring only reads. No command runs without your confirmation.
  5: 2+20 White/- BOLD | 37+12 Indexed(74)/- | 50+10 Indexed(74)/-
  6: 2+9 Gray/- | 37+12 Gray/- | 50+13 Gray/-
  7: 2+12 White/- BOLD | 37+12 Indexed(214)/- | 50+18 Indexed(214)/-
-24: 0+1 DarkGray/- | 1+9 White/- BOLD | 10+90 DarkGray/-
-25: 0+1 DarkGray/- | 1+15 Black/Indexed(214) | 16+20 White/- BOLD | 99+1 DarkGray/-
-26: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 1+9 White/- BOLD | 10+90 DarkGray/-
+22: 0+1 DarkGray/- | 1+15 Black/Indexed(214) | 16+20 White/- BOLD | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+25 Gray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+96 Gray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+97 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+87 Gray/- | 99+1 DarkGray/-
 27: 0+100 DarkGray/-
 28: 0+100 Gray/-
 29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 38+3 Black/Gray | 57+3 Black/Gray | 67+5 Black/Gray | 79+3 Black/Gray
