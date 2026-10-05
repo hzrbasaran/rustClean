@@ -460,7 +460,8 @@ Options:
 
 The table shows the size on disk, the file count of folders, the last change,
 the path relative to `PATH` and the row's detail; a group's members follow it,
-indented (the first 10; CSV and JSON have all of them).
+indented (the first 10; CSV and JSON have all of them). When a report finds
+nothing, the table says why (e.g. no Downloads folder below `PATH`).
 
 The exit code is 0 on success, 2 for a wrong command line (an unknown kind
 lists the valid ones), and 1 when the folder cannot be scanned or `--older`

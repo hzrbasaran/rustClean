@@ -142,7 +142,13 @@ fn print_table(w: &mut impl Write, tree: &Tree, list: &ResultList) -> io::Result
     let mode = SizeMode::Disk;
     writeln!(w, "{} — {}", list.title, tree.path_of(list.base).display())?;
     if list.rows.is_empty() {
-        return writeln!(w, "{}", t!("Sonuç yok.", "No results."));
+        // The note says why nothing was found, as in the interface.
+        let why = if list.note.is_empty() {
+            t!("Sonuç yok.", "No results.")
+        } else {
+            list.note.as_str()
+        };
+        return writeln!(w, "{why}");
     }
     writeln!(
         w,

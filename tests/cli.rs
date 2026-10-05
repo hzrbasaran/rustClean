@@ -128,6 +128,19 @@ fn report_prints_a_table() {
     assert!(dir.path().join("app/target/debug/app").exists());
 }
 
+#[test]
+fn an_empty_report_says_why() {
+    let dir = report_fixture();
+    let root = dir.path().to_str().unwrap();
+    let out = rustclean(&["report", "downloads", root, "--lang", "en"]);
+    assert!(out.status.success(), "{out:?}");
+    let text = stdout(&out);
+    assert!(
+        text.contains("No Downloads folder below this one"),
+        "{text}"
+    );
+}
+
 #[cfg(unix)] // the file name has a `"`, and paths use `/`
 #[test]
 fn report_as_csv_quotes_paths() {
