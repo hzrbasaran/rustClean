@@ -6,6 +6,15 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Optional mouse support: `M` turns it on or off (off by default and not
+  saved, as mouse capture stops the terminal from selecting text). A click
+  selects a row in the lists, the menu and the summary, or a treemap block; a
+  double click opens it like `Enter`; the wheel moves through lists and
+  scrolls the help, the deletion log and the failure list. Questions before
+  deleting, uninstalling or running a cleanup take no mouse input
+  ([#24](https://github.com/hzrbasaran/rustClean/issues/24)).
+
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"
   instead of "1 items" (and "1 item was inaccessible", "the parent folder of

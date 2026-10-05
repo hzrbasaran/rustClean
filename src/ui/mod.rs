@@ -49,12 +49,15 @@ pub fn render(f: &mut Frame<'_>, app: &mut App) {
     ])
     .areas(f.area());
 
+    app.mouse.clear();
     match app.screen {
         Screen::DiskSelect => render_disks(f, app, header, body, footer),
         Screen::Scanning => render_scanning(f, app, header, body, footer),
         Screen::Browser => render_browser(f, app, header, body, footer),
     }
     if let Some(mut scroll) = app.help {
+        // Nothing behind the help is clickable.
+        app.mouse.clear();
         help::render_help(f, app, &mut scroll);
         app.help = Some(scroll);
     }
@@ -123,6 +126,21 @@ fn popup(f: &mut Frame<'_>, title: &str, color: Color, lines: Vec<Line<'_>>, max
         ),
         rect,
     );
+}
+
+/// Where the rows of a table drawn with `table_block` (or
+/// `table_block_plain`) and a header line are, for mouse clicks.
+fn table_rows(area: Rect) -> Rect {
+    Rect {
+        y: area.y.saturating_add(2),
+        height: area.height.saturating_sub(3),
+        ..area
+    }
+}
+
+/// Where the rows of a table without a header inside `panel` are.
+fn panel_rows(area: Rect) -> Rect {
+    area.inner(ratatui::layout::Margin::new(1, 1))
 }
 
 fn table_block_plain() -> Block<'static> {

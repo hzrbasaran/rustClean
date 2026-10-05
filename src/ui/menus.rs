@@ -6,6 +6,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::Frame;
 
+use crate::app::{Hit, Mouse};
 use crate::reports::MenuItem;
 
 use super::format::{fmt_ago, fmt_date, fmt_delta, fmt_size, now_secs};
@@ -18,11 +19,15 @@ pub(super) fn render_snapshot_picker(
     selected: usize,
     total_now: u64,
     area: Rect,
+    mouse: &mut Mouse,
 ) {
     let width = area.width.saturating_sub(4).min(84);
     let now = now_secs();
     let mut lines = vec![Line::from("")];
+    // The line each saved scan is on.
+    let mut rows = Vec::new();
     for (i, s) in saved.iter().enumerate() {
+        rows.push(lines.len());
         let h = &s.header;
         let style = if i == selected {
             highlight()
@@ -62,6 +67,7 @@ pub(super) fn render_snapshot_picker(
         width,
         height,
     };
+    record_lines(mouse, popup, &rows, Hit::Snapshot);
     f.render_widget(Clear, popup);
     f.render_widget(
         Paragraph::new(lines).block(
@@ -80,9 +86,16 @@ pub(super) fn render_snapshot_picker(
     );
 }
 
-pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect) {
+pub(super) fn render_report_menu(
+    f: &mut Frame<'_>,
+    selected: usize,
+    area: Rect,
+    mouse: &mut Mouse,
+) {
     let width = area.width.saturating_sub(4).min(84);
     let mut lines = Vec::new();
+    // The line each item is on.
+    let mut rows = Vec::new();
     for (i, item) in MenuItem::ALL.iter().enumerate() {
         if i == 0 || item.is_tool() != MenuItem::ALL[i - 1].is_tool() {
             let heading = if item.is_tool() {
@@ -93,6 +106,7 @@ pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect)
             lines.push(Line::from(""));
             lines.push(Line::from(heading).accent().bold());
         }
+        rows.push(lines.len());
         let marker = if i == selected { "▶ " } else { "  " };
         let style = if i == selected {
             highlight()
@@ -125,6 +139,7 @@ pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect)
         width,
         height,
     };
+    record_lines(mouse, popup, &rows, Hit::Menu);
     f.render_widget(Clear, popup);
     f.render_widget(
         Paragraph::new(lines).block(
@@ -134,4 +149,25 @@ pub(super) fn render_report_menu(f: &mut Frame<'_>, selected: usize, area: Rect)
         ),
         popup,
     );
+}
+
+/// Makes the lines of a bordered popup clickable: `rows[i]` is the line of
+/// item `i`. The popup covers what is behind it, so that stops being clickable.
+fn record_lines(mouse: &mut Mouse, popup: Rect, rows: &[usize], hit: impl Fn(usize) -> Hit) {
+    mouse.clear();
+    let inner = popup.inner(ratatui::layout::Margin::new(1, 1));
+    for (i, &line) in rows.iter().enumerate() {
+        let Ok(line) = u16::try_from(line) else { break };
+        if line >= inner.height {
+            break;
+        }
+        mouse.add(
+            Rect {
+                y: inner.y + line,
+                height: 1,
+                ..inner
+            },
+            hit(i),
+        );
+    }
 }
