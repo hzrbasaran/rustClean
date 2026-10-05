@@ -104,10 +104,12 @@ one go.
 | ![Duplicates](docs/screenshots/duplicates.svg) | ![Basket](docs/screenshots/basket.svg) |
 | **Empty folders, broken links, temporary files** | **Deletion log** |
 | ![Clutter report](docs/screenshots/clutter.svg) | ![Deletion log](docs/screenshots/deletion-log.svg) |
+| **iPhone / iPad backups** | **Saving a list (`o`)** |
+| ![iPhone / iPad backups](docs/screenshots/device-backups.svg) | ![Export](docs/screenshots/export.svg) |
 | **Light theme** | **Color-blind friendly theme** |
 | ![Light theme](docs/screenshots/theme-light.svg) | ![Color-blind friendly theme](docs/screenshots/theme-colorblind.svg) |
-| **Help (`?`)** | |
-| ![Help](docs/screenshots/help.svg) | |
+| **Help (`?`)** | **The treemap as a web page (`w`)** |
+| ![Help](docs/screenshots/help.svg) | ![The treemap page in a browser](docs/screenshots/html-treemap.png) |
 
 ## Safety first
 

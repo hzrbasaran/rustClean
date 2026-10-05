@@ -245,6 +245,8 @@ older ones, and those of devices you no longer have, are the usual
 candidates. `x` and the basket move a backup to the trash as usual, so it
 can still be put back until the trash is emptied.
 
+![The iPhone / iPad backups report: two backups of one iPhone and an old iPad backup](screenshots/device-backups.svg)
+
 On macOS the backup folder is protected: without Full Disk Access the scan
 sees it empty, and the report says so instead of listing nothing. To grant
 it, open System Settings → Privacy & Security → Full Disk Access, turn on
@@ -440,6 +442,8 @@ borders. `T` then leaves the colors off.
 same entries as the list), the focused list of the summary, and every report,
 search result, comparison and the basket. A small window asks for the format:
 `c` CSV (for spreadsheets), `j` JSON (for scripts), `Esc` cancels.
+
+![The export window over the folder list](screenshots/export.svg)
 
 The file goes to the folder rustClean was started from (the working folder);
 if that folder is not writable, to your home folder. Its name says what it

@@ -3,7 +3,7 @@
 <g transform="translate(12,12)" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
 <rect x="0.0" y="0.0" width="99.0" height="19.0" fill="#00cdcd"/>
 <text x="0.0" y="14.0" fill="#000000" font-weight="bold" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> rustClean </text>
-<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> Duplicate files (same content) — ~/demo  │  4 rows, 341.6 MiB (apparent)                                    </text>
+<text x="99.0" y="14.0" fill="#cdd6f4" xml:space="preserve" textLength="981.0" lengthAdjust="spacingAndGlyphs"> iPhone / iPad backups — ~/demo  │  3 rows, 3.7 GiB (apparent)                                               </text>
 <text x="0.0" y="33.0" fill="#cdd6f4" xml:space="preserve" textLength="504.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────</text>
 <text x="504.0" y="33.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Date: </text>
 <text x="567.0" y="33.0" fill="#00cd00" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
@@ -14,32 +14,25 @@
 <text x="846.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> ≤ 1 year   </text>
 <text x="954.0" y="33.0" fill="#cd0000" xml:space="preserve" textLength="18.0" lengthAdjust="spacingAndGlyphs">██</text>
 <text x="972.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 year   </text>
-<text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">      Size        Count      Modified         Created          Location                         Details                 </text>
+<text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">      Size        Count      Modified         Created          Location                       Details                   </text>
 <rect x="0.0" y="57.0" width="1080.0" height="19.0" fill="#444444"/>
-<text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">▶ [ ]   220.0 MiB    5 items 2026-10-02 10:14 —                dist.js                          5 copies · 55.0 MiB each</text>
+<text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">▶ [ ]     1.5 GiB          3 2026-10-02 14:38 2026-10-02 14:38 Demo iPhone · iPhone 15 Pro    2026-10-02 · newest · iOS </text>
 <text x="18.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">[ ]</text>
-<text x="45.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">    73.6 MiB </text>
-<text x="162.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">  24 items</text>
-<text x="261.0" y="90.0" fill="#cdcd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2025-12-08 10:14</text>
-<text x="414.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">—</text>
-<text x="567.0" y="90.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">IMG_1012.HEIC</text>
-<text x="864.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="216.0" lengthAdjust="spacingAndGlyphs">24 copies · 3.2 MiB each</text>
+<text x="45.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">     1.3 GiB </text>
+<text x="162.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         3</text>
+<text x="261.0" y="90.0" fill="#cdcd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-03-10 14:38</text>
+<text x="414.0" y="90.0" fill="#cdcd00" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-03-10 14:38</text>
+<text x="567.0" y="90.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="243.0" lengthAdjust="spacingAndGlyphs">Demo iPhone · iPhone 15 Pro</text>
+<text x="846.0" y="90.0" fill="#e5e5e5" xml:space="preserve" textLength="189.0" lengthAdjust="spacingAndGlyphs">2026-03-10 · iOS 18.3</text>
 <text x="18.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">[ ]</text>
-<text x="45.0" y="109.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">    36.0 MiB </text>
-<text x="162.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">   9 items</text>
-<text x="261.0" y="109.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-09-09 10:14</text>
-<text x="414.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">—</text>
-<text x="567.0" y="109.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="108.0" lengthAdjust="spacingAndGlyphs">IMG_2008.jpg</text>
-<text x="864.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="207.0" lengthAdjust="spacingAndGlyphs">9 copies · 4.5 MiB each</text>
-<text x="18.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">[ ]</text>
-<text x="45.0" y="128.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">    12.0 MiB </text>
-<text x="162.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">   2 items</text>
-<text x="261.0" y="128.0" fill="#00cdcd" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2026-09-14 10:14</text>
-<text x="414.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="9.0" lengthAdjust="spacingAndGlyphs">—</text>
-<text x="567.0" y="128.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="180.0" lengthAdjust="spacingAndGlyphs">report-final (1).pdf</text>
-<text x="864.0" y="128.0" fill="#e5e5e5" xml:space="preserve" textLength="216.0" lengthAdjust="spacingAndGlyphs">2 copies · 12.0 MiB each</text>
+<text x="45.0" y="109.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs">   921.6 MiB </text>
+<text x="162.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="90.0" lengthAdjust="spacingAndGlyphs">         3</text>
+<text x="261.0" y="109.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2025-08-19 14:38</text>
+<text x="414.0" y="109.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">2025-08-19 14:38</text>
+<text x="567.0" y="109.0" fill="#5c5cff" font-weight="bold" xml:space="preserve" textLength="270.0" lengthAdjust="spacingAndGlyphs">Demo iPad · iPad Air (5th gene</text>
+<text x="846.0" y="109.0" fill="#e5e5e5" xml:space="preserve" textLength="234.0" lengthAdjust="spacingAndGlyphs">2025-08-19 · newest · encr</text>
 <text x="0.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
-<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">Size: space freed by deleting the copies. Space: add all but the oldest copy to the basket · Enter: see the copies. APFS</text>
+<text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">A deleted backup cannot restore the device: keep each device&#x27;s newest backup.                                           </text>
 <rect x="0.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
 <text x="0.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> ? </text>
 <text x="27.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> help  </text>

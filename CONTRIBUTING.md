@@ -114,8 +114,10 @@ scripts/screenshots/make-shots.sh
 ```
 
 The script rebuilds the demo folder from `scripts/screenshots/demo.json`
-(sparse files, so it takes no space), takes each screen in English and
-Turkish at 120×30, and writes the SVGs. Look at the changed images before
+(sparse files, so it takes no space; an entry with `text` is written with
+that content, where `{date-N}` becomes the time N seconds ago, as the demo
+backups' `Info.plist` needs), takes each screen in English and Turkish at
+120×30, and writes the SVGs. Look at the changed images before
 committing them. A new screen gets a line in `make-shots.sh` and a place in
 both READMEs.
 

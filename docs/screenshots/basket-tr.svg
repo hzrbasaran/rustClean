@@ -16,11 +16,11 @@
 <text x="981.0" y="33.0" fill="#ffffff" xml:space="preserve" textLength="99.0" lengthAdjust="spacingAndGlyphs"> &gt; 1 yıl   </text>
 <text x="0.0" y="52.0" fill="#cdd6f4" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">      Boyut       Adet       Son değişiklik   Oluşturma        Konum                                                    </text>
 <rect x="0.0" y="57.0" width="1080.0" height="19.0" fill="#444444"/>
-<text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">▶ [✓]     5.7 GiB            21.05.2025 17:01 21.05.2025 17:01 Downloads/ubuntu-24.04-desktop-amd64.iso                 </text>
+<text x="0.0" y="71.0" fill="#ffffff" font-weight="bold" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">▶ [✓]     5.7 GiB            22.05.2025 10:14 22.05.2025 10:14 Downloads/ubuntu-24.04-desktop-amd64.iso                 </text>
 <text x="18.0" y="90.0" fill="#00cd00" font-weight="bold" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs">[✓]</text>
 <text x="45.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="216.0" lengthAdjust="spacingAndGlyphs">     3.3 GiB            </text>
-<text x="261.0" y="90.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">18.09.2025 17:01</text>
-<text x="414.0" y="90.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">18.09.2025 17:01</text>
+<text x="261.0" y="90.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">19.09.2025 10:14</text>
+<text x="414.0" y="90.0" fill="#cd0000" xml:space="preserve" textLength="144.0" lengthAdjust="spacingAndGlyphs">19.09.2025 10:14</text>
 <text x="558.0" y="90.0" fill="#cdd6f4" xml:space="preserve" textLength="522.0" lengthAdjust="spacingAndGlyphs"> Downloads/Xcode_16.xip                                   </text>
 <text x="0.0" y="527.0" fill="#cdd6f4" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</text>
 <text x="0.0" y="546.0" fill="#e5e5e5" xml:space="preserve" textLength="1080.0" lengthAdjust="spacingAndGlyphs">Space: sepetten çıkar · c: sepeti boşalt · x: hepsini çöpe taşı                                                         </text>
@@ -42,7 +42,7 @@
 <rect x="792.0" y="551.0" width="63.0" height="19.0" fill="#e5e5e5"/>
 <text x="792.0" y="565.0" fill="#000000" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> Enter </text>
 <text x="855.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="117.0" lengthAdjust="spacingAndGlyphs"> konuma git  </text>
-<rect x="972.0" y="551.0" width="45.0" height="19.0" fill="#e5e5e5"/>
-<text x="972.0" y="565.0" fill="#000000" xml:space="preserve" textLength="45.0" lengthAdjust="spacingAndGlyphs"> Esc </text>
-<text x="1017.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="63.0" lengthAdjust="spacingAndGlyphs"> geri  </text>
+<rect x="972.0" y="551.0" width="27.0" height="19.0" fill="#e5e5e5"/>
+<text x="972.0" y="565.0" fill="#000000" xml:space="preserve" textLength="27.0" lengthAdjust="spacingAndGlyphs"> o </text>
+<text x="999.0" y="565.0" fill="#cdd6f4" xml:space="preserve" textLength="81.0" lengthAdjust="spacingAndGlyphs"> dışa akt</text>
 </g></svg>
