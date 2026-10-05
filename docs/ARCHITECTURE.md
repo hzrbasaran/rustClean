@@ -68,6 +68,7 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ disks.rs ─── disk discovery (sysinfo)
    ├─ paths.rs ─── data directory (history, settings, deletion log, config)
    ├─ settings.rs  saved choices (language, theme) as key=value lines
+   │               (rewritten under a lock, via a temp file and a rename)
    ├─ config.rs ── config.toml: excluded folders, report thresholds, the
    │               starting size and sort (read once at start)
    └─ i18n.rs ──── Turkish / English texts, counts with their nouns

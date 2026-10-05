@@ -6,6 +6,12 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Saving the language or theme can no longer drop the other one when two
+  saves happen at once, and the settings file is replaced in one step, so it
+  is never read half written
+  ([#72](https://github.com/hzrbasaran/rustClean/issues/72)).
+
 ## [0.4.0] - 2026-10-05
 
 ### Added
