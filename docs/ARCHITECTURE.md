@@ -43,7 +43,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ find.rs       installed apps (in the scan and on disk)
    │    ├─ data.rs       data folders and matching them to apps
    │    └─ orphans.rs    leftovers of removed apps (errs on keeping data)
-   ├─ duplicates.rs  identical-content search (background thread)
+   ├─ duplicates.rs  identical-content search (background thread; skips
+   │                 packages and .git / .hg / .svn)
    ├─ similar.rs ─ similar images: gradient hashes, BK-tree, groups
    │               (background thread; `similar-images` feature)
    ├─ stats.rs ─── summary statistics, age groups, file categories

@@ -49,7 +49,8 @@ harekete geçmenizi sağlar:
   - önbellek klasörleri
   - eski ve büyük dosyalar
   - **İndirilenlerdeki kurulum dosyaları ve arşivler** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
-  - içeriği aynı **kopya dosyalar** (en eski kopya korunur)
+  - içeriği aynı **kopya dosyalar** (en eski kopya korunur; uygulama
+    paketlerinin, Fotoğraflar arşivinin ve `.git` klasörlerinin içine bakılmaz)
   - **benzer görseller:** aynı resmin yeniden boyutlandırılmış, yeniden
     sıkıştırılmış ya da başka biçimde kaydedilmiş kopyaları (JPEG, PNG, WebP,
     GIF, TIFF, BMP; HEIC hariç); en büyüğü korunur
