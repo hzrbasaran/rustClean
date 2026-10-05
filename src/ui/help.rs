@@ -62,8 +62,8 @@ impl Topic {
                 "Report menu and saved scans"
             ),
             Topic::Dialogs => t!(
-                "Onay, kaldırma ve hata pencereleri",
-                "Confirm, uninstall and error dialogs"
+                "Onay, dışa aktarma, kaldırma ve hata pencereleri",
+                "Confirm, export, uninstall and error dialogs"
             ),
             Topic::Tools => t!("Geliştirici araçları", "Developer tools"),
             Topic::System => t!("Sistem verileri", "System data"),
@@ -94,6 +94,13 @@ impl Topic {
                 ),
             ),
         ];
+        let export = (
+            "o",
+            t!(
+                "listeyi CSV / JSON dosyasına kaydet",
+                "save the list as a CSV / JSON file"
+            ),
+        );
         let mut keys: Vec<(&str, &str)> = Vec::new();
         match self {
             Topic::List => {
@@ -122,6 +129,7 @@ impl Topic {
                     ),
                     ("i", t!("bu klasörün özeti", "summary of this folder")),
                     ("m", t!("raporlar menüsü", "reports menu")),
+                    export,
                 ]);
                 keys.extend(cleaning);
                 keys.extend([
@@ -144,6 +152,7 @@ impl Topic {
                     ("c", t!("renk: türe / yaşa göre", "color: by type / by age")),
                     ("t  Esc", t!("listeye dön", "back to the list")),
                     ("m", t!("raporlar menüsü", "reports menu")),
+                    export,
                 ]);
                 keys.extend(cleaning);
                 keys.push(("R", t!("bu klasörü yeniden tara", "rescan this folder")));
@@ -185,6 +194,7 @@ impl Topic {
                         t!("görünen / diskteki boyut", "apparent / on-disk size"),
                     ),
                     ("m", t!("raporlar menüsü", "reports menu")),
+                    export,
                 ]);
                 if self == Topic::Apps {
                     keys.insert(
@@ -212,6 +222,7 @@ impl Topic {
                         ),
                     ),
                     ("Enter", t!("konumuna git", "go to its location")),
+                    export,
                     ("Esc  ⌫", t!("geri", "back")),
                 ]);
             }
@@ -232,6 +243,13 @@ impl Topic {
                 (
                     "a",
                     t!("görünen / diskteki boyut", "apparent / on-disk size"),
+                ),
+                (
+                    "o",
+                    t!(
+                        "seçili listeyi CSV / JSON dosyasına kaydet",
+                        "save the focused list as a CSV / JSON file"
+                    ),
                 ),
                 ("Esc  i  ⌫", t!("geri", "back")),
             ]),
@@ -265,6 +283,13 @@ impl Topic {
                 (
                     "↑↓  PgUp PgDn",
                     t!("hata listesini kaydır", "scroll the error list"),
+                ),
+                (
+                    "c  j",
+                    t!(
+                        "dışa aktarırken: CSV / JSON (Esc: vazgeç)",
+                        "when exporting: CSV / JSON (Esc: cancel)"
+                    ),
                 ),
             ]),
             Topic::Tools => keys.extend([
@@ -336,7 +361,11 @@ pub fn topic(app: &App) -> Topic {
 }
 
 fn browser_topic(b: &Browser) -> Topic {
-    if b.failures.is_some() || b.confirm.is_some() || b.uninstall.is_some() {
+    if b.failures.is_some()
+        || b.confirm.is_some()
+        || b.uninstall.is_some()
+        || b.export_prompt.is_some()
+    {
         Topic::Dialogs
     } else if b.report_menu.is_some() || b.snapshot_picker.is_some() {
         Topic::Menu

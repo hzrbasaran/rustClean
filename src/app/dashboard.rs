@@ -107,6 +107,7 @@ impl Browser {
                 }
             }
             KeyCode::Char('S') => self.open_basket(),
+            KeyCode::Char('o') => self.start_export(),
             KeyCode::Enter | KeyCode::Right | KeyCode::Char('l') => {
                 let target = d.selected();
                 let base = d.base;

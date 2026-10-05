@@ -238,6 +238,10 @@ impl Browser {
             return Action::None;
         }
         self.status = None;
+        if self.export_prompt.is_some() {
+            self.on_key_export(code);
+            return Action::None;
+        }
         if let Some(sel) = &mut self.report_menu {
             let n = MenuItem::ALL.len();
             match code {
@@ -384,6 +388,7 @@ impl Browser {
                 }
             }
             KeyCode::Char('S') => self.open_basket(),
+            KeyCode::Char('o') => self.start_export(),
             KeyCode::Char('r') => return Action::Rescan,
             KeyCode::Char('R') => self.start_rescan(),
             KeyCode::Char('d') => return Action::Disks,

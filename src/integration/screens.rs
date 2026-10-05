@@ -483,6 +483,21 @@ fn delete_confirmation() {
     });
 }
 
+/// `o` over a report: CSV or JSON?
+#[test]
+fn export_prompt() {
+    snap("export", || {
+        let mut app = app();
+        let largest = crate::reports::MenuItem::ALL
+            .iter()
+            .position(|&i| i == crate::reports::MenuItem::Report(ReportKind::LargestFiles))
+            .unwrap();
+        menu(&mut app, largest);
+        press(&mut app, KeyCode::Char('o'));
+        app
+    });
+}
+
 #[test]
 fn uninstall_dialog() {
     snap("uninstall", || {
@@ -942,6 +957,14 @@ fn help_lists_every_key_of_the_bottom_line() {
                     cursor: 0,
                     running: false,
                 });
+                app
+            }),
+        ),
+        (
+            "export",
+            Box::new(|| {
+                let mut app = app();
+                press(&mut app, KeyCode::Char('o'));
                 app
             }),
         ),

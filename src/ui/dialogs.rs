@@ -302,3 +302,46 @@ pub(super) fn render_uninstall(
         popup,
     );
 }
+
+/// `o`: which format to save the list in.
+pub(super) fn render_export(f: &mut Frame<'_>, rows: usize) {
+    let lines = vec![
+        Line::from(""),
+        Line::from(tf!(
+            " Bu liste dosyaya kaydedilecek: {}.",
+            " This list will be saved to a file: {}.",
+            crate::i18n::count(rows as u64, "satır", "row", "rows")
+        ))
+        .normal()
+        .bold(),
+        Line::from(""),
+        Line::from(vec![
+            Span::raw("  c ").key(),
+            Span::raw(t!(
+                "  CSV   (tablo programları için)",
+                "  CSV   (for spreadsheets)"
+            ))
+            .normal(),
+        ]),
+        Line::from(vec![
+            Span::raw("  j ").key(),
+            Span::raw(t!("  JSON  (betikler için)", "  JSON  (for scripts)")).normal(),
+        ]),
+        Line::from(vec![
+            Span::raw(" Esc ").key(),
+            Span::raw(t!("  vazgeç", "  cancel")).normal(),
+        ]),
+        Line::from(""),
+        Line::from(t!(
+            " Çalışma klasörüne kaydedilir; oraya yazılamazsa ev klasörüne.",
+            " Saved in the working folder, or in your home folder if that is not writable.",
+        ))
+        .muted(),
+        Line::from(t!(
+            " Var olan dosyaların üzerine yazılmaz.",
+            " Existing files are never overwritten.",
+        ))
+        .muted(),
+    ];
+    super::popup(f, t!(" Dışa aktar ", " Export "), theme().accent, lines, 84);
+}

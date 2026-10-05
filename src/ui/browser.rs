@@ -12,7 +12,7 @@ use crate::lists::ResultList;
 use crate::tree::SizeMode;
 
 use super::dashboard::render_dashboard;
-use super::dialogs::{render_confirm, render_failures, render_uninstall};
+use super::dialogs::{render_confirm, render_export, render_failures, render_uninstall};
 use super::format::{fmt_count, fmt_pct, fmt_size, now_secs};
 use super::map::render_map;
 use super::menus::{render_report_menu, render_snapshot_picker};
@@ -272,6 +272,9 @@ pub(super) fn render_browser(
     if let Some(dialog) = &mut b.failures {
         render_failures(f, dialog, f.area());
     }
+    if let Some(rows) = b.export_prompt {
+        render_export(f, rows);
+    }
 }
 
 fn render_entries(f: &mut Frame<'_>, b: &mut Browser, area: Rect) {
@@ -359,6 +362,8 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
         ]
     } else if b.dup_job.is_some() {
         &[("Esc", t!("iptal", "cancel")), ("q", t!("çık", "quit"))]
+    } else if b.export_prompt.is_some() {
+        &[("c", "CSV"), ("j", "JSON"), ("Esc", t!("vazgeç", "cancel"))]
     } else if b.report_menu.is_some() || b.snapshot_picker.is_some() {
         &[
             ("↑↓", t!("seç", "select")),
@@ -423,6 +428,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("Space", t!("sepete", "to basket")),
             ("x", t!("çöpe taşı", "move to trash")),
             ("a", t!("görünen/diskte", "apparent/on disk")),
+            ("o", t!("dışa aktar", "export")),
             ("Esc", t!("geri", "back")),
             ("q", t!("çık", "quit")),
         ]
@@ -433,6 +439,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("c", t!("sepeti boşalt", "empty the basket")),
             ("x", t!("hepsini çöpe taşı", "move all to the trash")),
             ("Enter", t!("konuma git", "go to")),
+            ("o", t!("dışa aktar", "export")),
             ("Esc", t!("geri", "back")),
             ("q", t!("çık", "quit")),
         ]
@@ -444,6 +451,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("x", t!("çöpe taşı", "move to trash")),
             ("S", t!("sepet", "basket")),
             ("Enter", t!("aç / konuma git", "open / go to")),
+            ("o", t!("dışa aktar", "export")),
             ("m", t!("raporlar", "reports")),
             ("Esc", t!("geri", "back")),
             ("q", t!("çık", "quit")),
@@ -458,6 +466,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("S", t!("sepet", "basket")),
             ("Enter", t!("aç / konuma git", "open / go to")),
             ("/", t!("ara", "find")),
+            ("o", t!("dışa aktar", "export")),
             ("m", t!("raporlar", "reports")),
             ("Esc", t!("geri", "back")),
             ("q", t!("çık", "quit")),
@@ -474,6 +483,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("S", t!("sepet", "basket")),
             ("R", t!("klasörü yenile", "refresh folder")),
             ("m", t!("raporlar", "reports")),
+            ("o", t!("dışa aktar", "export")),
             ("q", t!("çık", "quit")),
         ]
     } else {
@@ -492,6 +502,7 @@ pub fn footer_keys(b: &Browser) -> Vec<(&'static str, &'static str)> {
             ("S", t!("sepet", "basket")),
             ("R", t!("klasörü yenile", "refresh folder")),
             ("r", t!("tümünü tara", "rescan all")),
+            ("o", t!("dışa aktar", "export")),
             ("d", t!("diskler", "disks")),
             ("q", t!("çık", "quit")),
         ]

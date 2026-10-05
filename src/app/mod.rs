@@ -28,6 +28,7 @@ use rescan::Rescan;
 mod basket;
 mod browser;
 mod dashboard;
+mod export;
 mod rescan;
 mod results;
 mod snapshots;
@@ -173,6 +174,11 @@ pub struct Browser {
     batch_via: crate::trashlog::Via,
     /// Entries that could not be trashed, shown in a dialog until dismissed.
     pub failures: Option<FailureDialog>,
+    /// `o` asks whether to save the list as CSV or JSON; the number of
+    /// entries it would save.
+    pub export_prompt: Option<usize>,
+    /// Where `o` saves instead of the working or home folder (tests).
+    pub export_dir: Option<PathBuf>,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
 }
@@ -213,6 +219,8 @@ impl Browser {
             batch_failures: Vec::new(),
             batch_via: crate::trashlog::Via::List,
             failures: None,
+            export_prompt: None,
+            export_dir: None,
             history: Vec::new(),
         };
         b.load(ROOT, 0);

@@ -8,6 +8,7 @@
 mod apps;
 mod clutter;
 mod deletion;
+mod export;
 mod history;
 mod language;
 mod reports;

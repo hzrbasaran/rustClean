@@ -28,8 +28,8 @@ expression: screen
         │ /             ada göre ara (* ve ? joker karakter)                               │
         │ i             bu klasörün özeti                                                  │
         │ m             raporlar menüsü                                                    │
-        │ Space         sepete ekle / çıkar                                                │
-────────│ S             sepeti göster                                                      │────────
+        │ o             listeyi CSV / JSON dosyasına kaydet                                │
+────────│ Space         sepete ekle / çıkar                                                │────────
         └───────────────────── ↑↓ PgUp PgDn: kaydır · Esc / ?: kapat ──────────────────────┘
  ?  yardım   ↑↓  seç   Enter  tara   r  yenile   L  English   T  tema   q  çık
 --- styles (column+width foreground/background modifiers) ---
@@ -59,7 +59,7 @@ expression: screen
 23: 8+16 Cyan/- | 24+36 White/- | 91+1 Cyan/-
 24: 8+16 Cyan/- | 24+17 White/- | 91+1 Cyan/-
 25: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
-26: 8+16 Cyan/- | 24+19 White/- | 91+1 Cyan/-
-27: 8+16 Cyan/- | 24+13 White/- | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+35 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+19 White/- | 91+1 Cyan/-
 28: 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/-
 29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 36+3 Black/Gray | 48+3 Black/Gray | 61+3 Black/Gray | 71+3 Black/Gray

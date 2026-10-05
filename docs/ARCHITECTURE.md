@@ -12,7 +12,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    │                so the submodules can use its private fields)
    │    ├─ browser.rs    navigation, treemap moves, the key dispatcher
    │    ├─ one module per job, each adding an `impl Browser` block:
-   │    │  results, dashboard, basket, trash, uninstall, snapshots, rescan
+   │    │  results, dashboard, basket, trash, uninstall, snapshots, rescan,
+   │    │  export (`o`)
    │    ├─ toolsview.rs   developer tools screen state and keys
    │    └─ basket.rs      entries collected for deletion
    │
@@ -43,6 +44,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ stats.rs ─── summary statistics, age groups, file categories
    ├─ search.rs ── name patterns
    ├─ lists.rs ─── generic result list (rows, groups, drill-down)
+   ├─ export.rs ── lists as CSV / JSON records, files that never overwrite
+   ├─ cli.rs ───── `rustclean report`: scan, run one report, print it
    ├─ treemap.rs ─ squarified layout and block navigation
    │
    ├─ history.rs ─ scan snapshots and "what changed"
@@ -113,6 +116,19 @@ re-opening groups level by level. It runs after `L` (so titles and details
 follow the language), after the age filter changes, and after the basket or
 the apps change.
 
+## Exporting and the report command
+
+`export.rs` turns a list into `Record`s, one per entry: the folder list
+gives its entries, a result list its rows, and a group row one record per
+member with the group's label. The same records are written as CSV or JSON
+by `o` in the interface (`app/export.rs` picks the list on screen and saves
+it with `export::save`, which opens files with `create_new` so nothing is
+ever overwritten) and by `rustclean report` (`cli.rs`), which scans like
+`--summary`, runs the report with the interface's own code (the report
+methods of a `Browser` that is never drawn; duplicates with
+`duplicates::find_groups` on the same thread) and prints to stdout. Column names are fixed English identifiers, so scripts do not
+depend on the language.
+
 ## Background work
 
 Long operations run on their own threads and report through channels. The UI
@@ -174,9 +190,9 @@ Integration tests live in `src/integration/` (test builds only, so they can
 reach the internals without a library target). `Fixture` builds a real folder
 tree in a temp directory with distinct file sizes and set ages. The tests scan
 it with the real scanner and drive `App` by key presses, as the interface
-does: reports, duplicates, the basket, moving to the trash, uninstalling, and
-comparing with a saved scan. `tests/cli.rs` runs the binary itself
-(`--summary`, `--help`, errors).
+does: reports, duplicates, the basket, moving to the trash, uninstalling,
+comparing with a saved scan, and exporting with `o`. `tests/cli.rs` runs the
+binary itself (`--summary`, `report` in every format, `--help`, errors).
 
 `src/integration/screens.rs` stores a snapshot of every screen (text plus the
 styles of each line) in Turkish and English. It uses a hand-built tree, fake
@@ -185,8 +201,10 @@ disks, tools and system data, and two test-only, per-thread switches:
 UTC, so snapshots match on every machine.
 
 Test builds never touch the user's data. `paths::data_dir` points to a
-folder under the temp directory, and `Deletion` renames entries into
-`delete::test_trash` instead of calling the real trash.
+folder under the temp directory, `Deletion` renames entries into
+`delete::test_trash` instead of calling the real trash, and `o` saves into a
+folder under the temp directory (`export::default_dirs`), or into
+`Browser::export_dir` when a test sets it.
 
 Tests run in the default language (Turkish) and must pass on macOS, Linux and
 Windows. Compare paths with `/` normalized, and gate Unix-only tests with
