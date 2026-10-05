@@ -673,7 +673,8 @@ mod tests {
 
     #[test]
     fn the_documented_example_is_the_defaults() {
-        let usage = include_str!("../docs/USAGE.md");
+        // Windows checkouts may have CRLF line ends.
+        let usage = include_str!("../docs/USAGE.md").replace("\r\n", "\n");
         let section = &usage[usage.find("## Configuration file").unwrap()..];
         let start = section.find("```toml\n").unwrap() + "```toml\n".len();
         let example = &section[start..start + section[start..].find("```").unwrap()];
