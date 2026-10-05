@@ -6,13 +6,14 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
+use crate::app::{Hit, Mouse};
 use crate::tools::{CleanAction, Status as ToolStatus};
 use crate::toolsview::{confirm_word, ToolsView};
 
 use super::format::fmt_size;
 use super::style::{highlight, risk_style, Themed};
 use super::theme::theme;
-use super::{panel, popup, table_block_plain, wrapped_rows, SPINNER};
+use super::{panel, popup, table_block_plain, table_rows, wrapped_rows, SPINNER};
 
 /// The actions with their steps, in at most `max` rows at `width`: when
 /// they do not fit, each action shows fewer steps and a "… more" line, and
@@ -26,8 +27,23 @@ fn action_lines(actions: &[CleanAction], max: usize, width: u16) -> Vec<Line<'st
                 Span::styled(text, style),
                 Span::raw(format!(" {}", a.label)).normal().bold(),
             ]));
+            if a.manual() {
+                lines.push(
+                    Line::from(t!(
+                        "    rustClean bunu çalıştırmaz; komutu kendiniz çalıştırın:",
+                        "    rustClean does not run this; run the command yourself:",
+                    ))
+                    .warn(),
+                );
+            }
             for step in a.steps.iter().take(shown) {
-                lines.push(Line::from(format!("    $ {}", step.describe())).muted());
+                let line = Line::from(format!("    $ {}", step.describe()));
+                // The command to copy reads as text, not as a hint.
+                lines.push(if a.manual() {
+                    line.normal()
+                } else {
+                    line.muted()
+                });
             }
             let rest = a.steps.len().saturating_sub(shown);
             if rest > 0 {
@@ -57,7 +73,13 @@ fn action_lines(actions: &[CleanAction], max: usize, width: u16) -> Vec<Line<'st
     lines
 }
 
-pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize, area: Rect) {
+pub(super) fn render_tools(
+    f: &mut Frame<'_>,
+    view: &mut ToolsView,
+    tick: usize,
+    area: Rect,
+    mouse: &mut Mouse,
+) {
     let inner = area.width.saturating_sub(2);
     let max_rows = usize::from((area.height / 2).saturating_sub(2));
     let hint = view.selected().and_then(|t| t.kind.hint());
@@ -130,6 +152,12 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
     .highlight_symbol("▶ ")
     .block(table_block_plain());
     f.render_stateful_widget(table, list_area, &mut view.table);
+    mouse.add_rows(
+        table_rows(list_area),
+        view.table.offset(),
+        view.tools.len(),
+        Hit::Tool,
+    );
 
     let mut lines = Vec::new();
     match view.selected() {
@@ -199,6 +227,10 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
         );
     }
 
+    if view.picker.is_some() || view.confirm.is_some() {
+        // Choosing and confirming what to clean is keyboard-only.
+        mouse.clear();
+    }
     if let Some(p) = &view.picker {
         let tool = &view.tools[p.tool];
         // Long lists scroll with the cursor; the popup keeps its border, the
@@ -221,12 +253,22 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
         for (i, a) in tool.actions.iter().enumerate().take(last).skip(first) {
             let (style, text) = risk_style(a.risk);
             let check = if p.checked[i] { "[✓] " } else { "[ ] " };
-            let row = Line::from(vec![
-                Span::raw(if i == p.cursor { "▶ " } else { "  " }),
-                Span::raw(check).bold(),
-                Span::styled(text, style),
-                Span::raw(format!(" {}", a.label)).normal(),
-            ]);
+            let row = if a.manual() {
+                Line::from(vec![
+                    Span::raw(if i == p.cursor { "▶ " } else { "  " }),
+                    Span::raw("    "),
+                    Span::styled(text, style),
+                    Span::raw(format!(" {}", a.label)).muted(),
+                    Span::raw(t!(" — kendiniz çalıştırın", " — run it yourself")).muted(),
+                ])
+            } else {
+                Line::from(vec![
+                    Span::raw(if i == p.cursor { "▶ " } else { "  " }),
+                    Span::raw(check).bold(),
+                    Span::styled(text, style),
+                    Span::raw(format!(" {}", a.label)).normal(),
+                ])
+            };
             lines.push(if i == p.cursor {
                 row.style(highlight())
             } else {

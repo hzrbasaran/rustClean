@@ -28,6 +28,9 @@ use rescan::Rescan;
 mod basket;
 mod browser;
 mod dashboard;
+mod export;
+mod htmlmap;
+mod mouse;
 mod rescan;
 mod results;
 mod snapshots;
@@ -35,6 +38,7 @@ mod trash;
 mod uninstall;
 
 pub use dashboard::{Dashboard, Pane};
+pub use mouse::{Hit, Mouse};
 pub use trash::FailureDialog;
 pub use uninstall::UninstallDialog;
 
@@ -173,12 +177,21 @@ pub struct Browser {
     batch_via: crate::trashlog::Via,
     /// Entries that could not be trashed, shown in a dialog until dismissed.
     pub failures: Option<FailureDialog>,
+    /// `o` asks whether to save the list as CSV or JSON; the number of
+    /// entries it would save.
+    pub export_prompt: Option<usize>,
+    /// Where `o` saves instead of the working or home folder (tests).
+    pub export_dir: Option<PathBuf>,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
+    /// Where `w` writes the treemap page. `None`: the working directory,
+    /// else the home folder (tests set a temp directory).
+    pub html_dir: Option<PathBuf>,
 }
 
 impl Browser {
     pub(crate) fn new(res: ScanResult) -> Self {
+        let config = crate::config::get();
         let mut b = Self {
             tree: res.tree,
             errors: res.errors,
@@ -186,8 +199,8 @@ impl Browser {
             current: ROOT,
             entries: Vec::new(),
             table: TableState::default(),
-            sort: SortMode::Size,
-            size_mode: SizeMode::Disk,
+            sort: config.sort,
+            size_mode: config.size,
             input: None,
             results: None,
             dashboard: None,
@@ -213,7 +226,10 @@ impl Browser {
             batch_failures: Vec::new(),
             batch_via: crate::trashlog::Via::List,
             failures: None,
+            export_prompt: None,
+            export_dir: None,
             history: Vec::new(),
+            html_dir: None,
         };
         b.load(ROOT, 0);
         b
@@ -233,6 +249,11 @@ pub struct App {
     pub should_quit: bool,
     /// The help screen (`?`) is open, scrolled this far.
     pub help: Option<u16>,
+    /// A problem with the configuration file, shown on the disk list and
+    /// on the status line of the first scan opened.
+    config_notice: Option<String>,
+    /// Mouse support (`M`) and where the last frame drew its clickable rows.
+    pub mouse: Mouse,
 }
 
 impl App {
@@ -249,12 +270,23 @@ impl App {
             tick: 0,
             should_quit: false,
             help: None,
+            config_notice: None,
+            mouse: Mouse::default(),
         };
         app.refresh_disks();
         if let Some(path) = start_path {
             app.start_scan(path);
         }
         app
+    }
+
+    /// Shows a problem with the configuration file: on the disk list now,
+    /// and on the status line when the scan opens.
+    pub fn config_notice(&mut self, text: String) {
+        if !matches!(self.screen, Screen::Scanning) {
+            self.message = Some(text.clone());
+        }
+        self.config_notice = Some(text);
     }
 
     fn refresh_disks(&mut self) {
@@ -266,7 +298,7 @@ impl App {
     fn start_scan(&mut self, root: PathBuf) {
         self.message = None;
         self.progress = ScanProgress::default();
-        self.scan = Some(scanner::start(root.clone(), disks::all_mount_points()));
+        self.scan = Some(scanner::start(root.clone(), crate::config::scan_skip()));
         self.scan_root = root;
         self.screen = Screen::Scanning;
     }
@@ -291,6 +323,9 @@ impl App {
                     self.scan = None;
                     let mut browser = Browser::new(res);
                     browser.record_history();
+                    if let Some(text) = self.config_notice.take() {
+                        browser.set_status(text, true);
+                    }
                     self.browser = Some(browser);
                     self.screen = Screen::Browser;
                     return;
@@ -325,6 +360,7 @@ impl App {
                 KeyCode::Home => *scroll = 0,
                 KeyCode::Char('L') => self.switch_language(),
                 KeyCode::Char('T') => self.switch_theme(),
+                KeyCode::Char('M') => self.toggle_mouse(),
                 KeyCode::Char('q') => self.should_quit = true,
                 _ => self.help = None,
             }
@@ -340,6 +376,10 @@ impl App {
         }
         if key.code == KeyCode::Char('T') && !self.typing() {
             self.switch_theme();
+            return;
+        }
+        if key.code == KeyCode::Char('M') && !self.typing() {
+            self.toggle_mouse();
             return;
         }
         match self.screen {

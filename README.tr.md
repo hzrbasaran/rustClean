@@ -32,6 +32,10 @@ harekete geçmenizi sağlar:
 - **Keşif:**
   - boyut çubukları, dosya sayıları ve renkli değişiklik tarihleri olan bir liste
   - **ağaç haritası** görünümü (`t`)
+  - ağaç haritasını **web sayfası** olarak kaydetme (`w`): bulunulan klasör,
+    dört seviyeye kadar yakınlaştırılabilir haritasıyla tek ve kendi içinde
+    tam bir HTML dosyasına yazılır; her tarayıcıda (çevrimdışı ve telefonda
+    da) açılır, paylaşılabilir
   - dosya türleri, yaş dağılımı ve en büyük öğelerle klasör **özeti** (`i`)
 - **Raporlar** (`m`):
   - en büyük dosyalar ve klasörler
@@ -50,11 +54,21 @@ harekete geçmenizi sağlar:
     `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
     paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
     dokunmaz
+  - Finder ya da iTunes ile alınmış **iPhone / iPad yedekleri**
+    (`MobileSync/Backup`): her yedeğin cihazı, modeli, iOS sürümü ve tarihi;
+    şifreli yedekler ve her cihazın en yeni yedeği işaretlenir; klasör için
+    Tam Disk Erişimi gerekiyorsa söyler
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık
   klasörünün değil *projenin* yaşıdır.
 - **Sepet:** `Space` ile her yerden öğe toplayın, `S` ile gözden geçirin, `x`
   ile hepsini çöp kutusuna taşıyın.
+- **Dışa aktarma:** `o`, ekrandaki listeyi (klasör, ağaç haritası, özet, her
+  rapor ya da arama) **CSV veya JSON** dosyasına kaydeder: tam yollar, iki
+  boyut da, ISO 8601 tarihler.
+- **Komut satırından raporlar:** `rustclean report dev-junk ~/Projects
+  --older 90 --json` her raporu tablo, CSV ya da JSON olarak yazdırır;
+  betikler ve zamanlanmış görevler için. Yalnızca okur, hiçbir şey silmez.
 - **Silme kaydı:** çöp kutusuna taşınan her şey, günlere göre ve nasıl
   silindiğiyle (menü → Silme kaydı).
 - **Geliştirici araçları temizliği:** Docker, Xcode (simülatörler,
@@ -62,6 +76,10 @@ harekete geçmenizi sağlar:
   pnpm, Yarn, Bun, pip, uv, conda, Gradle, Maven, Go, Flutter / Dart pub,
   Playwright, CocoaPods, Homebrew ve Cargo'nun ne kadar yer açabileceğini
   ölçer; onayınızdan sonra **araçların kendi temizlik komutlarını** çalıştırır.
+  Linux'ta apt, dnf ve pacman paket önbelleklerini, systemd günlüğünü ve
+  devre dışı snap sürümlerini; Windows'ta `%TEMP%`, `C:\Windows\Temp`,
+  Windows Update indirme önbelleğini ve Geri Dönüşüm Kutusunu da ölçer. Root
+  ya da yönetici izni gerekenler için komutu gösterir, siz çalıştırırsınız.
 - **Tarama geçmişi:** Her tarama özetlenir; son taramadan beri neyin
   büyüdüğünü görürsünüz.
 - **Sistem verileri paneli** (macOS): APFS bölümleri, Time Machine yerel anlık
@@ -70,6 +88,14 @@ harekete geçmenizi sağlar:
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 - **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
+- **Ayar dosyası:** isteğe bağlı bir `config.toml` ile taramada atlanacak
+  klasörler, "eski ve büyük dosyalar" ile kopya aramasının eşikleri ve
+  taramanın hangi boyut ve sıralamayla açılacağı belirlenir.
+  `rustclean --config` dosyanın yerini ve geçerli değerleri gösterir
+  ([ayrıntılar](docs/USAGE.md#configuration-file), İngilizce).
+- **İsteğe bağlı fare** (`M`): tıklayınca satır ya da harita bloğu seçilir,
+  çift tıklayınca açılır, tekerlekle kaydırılır. Terminalde metin seçmek
+  mümkün kalsın diye başlangıçta kapalıdır; onaylar yalnızca klavyeyle verilir.
 
 ## Ekran görüntüleri
 
@@ -97,7 +123,9 @@ rustClean kendiliğinden hiçbir şey silmez:
 - Geliştirici araçları temizliği çalıştıracağı **komutları birebir** gösterir.
   Komutlar kabuk üzerinden değil doğrudan ve asla `sudo` ile çalıştırılmaz.
   Veri kaybettirebilecek işlemler (Docker volume'ları, emülatörler, eski
-  Xcode arşivleri) için `evet` yazmak gerekir.
+  Xcode arşivleri) için `evet` yazmak gerekir. Root ya da yönetici izni
+  gereken temizlikler (Linux paket önbellekleri, günlük, snap'ler, Windows
+  sistem klasörleri) yalnızca gösterilir; onları siz çalıştırırsınız.
 - Raporlarda başta hiçbir şey seçili değildir. Tahmin içeren yerlerde (hangi
   verinin hangi uygulamaya ait olduğu) rapor bunu açıkça söyler ve şüphede
   silmemekten yana karar verir.
@@ -158,7 +186,17 @@ rustclean --theme light   # dark, light ya da colorblind (programda: T)
 rustclean --no-color      # renksiz; NO_COLOR=1 de olur
 rustclean --list-disks    # diskleri listeleyip çık
 rustclean --summary ~     # arayüz açmadan tarayıp toplamları yazdır
+rustclean --config        # config.toml'un yeri ve geçerli değerler
+
+# arayüz açmadan bir rapor: tablo ya da --csv / --json (yalnızca okur)
+rustclean report dev-junk ~/Projects --older 90 --json
+rustclean report largest-files ~ --limit 20 --csv > buyukler.csv
 ```
+
+Rapor türleri: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
+`orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
+`clutter`, `device-backups`. Seçenekler ve sütunlar için
+[kullanım kılavuzu](docs/USAGE.md#reports-from-the-command-line).
 
 Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 
@@ -166,15 +204,18 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | gezin · aç · geri |
 | `t` | liste ↔ ağaç haritası |
+| `w` | ağaç haritasını HTML sayfası olarak kaydet |
 | `i` | bulunulan klasörün özeti |
 | `m` | raporlar ve araçlar |
 | `/` | ada göre ara (`*` ve `?` joker karakterleri) |
 | `Space` · `S` · `x` | sepete ekle · sepeti göster · çöpe taşı |
 | `f` | yaş filtresi (raporlarda) |
 | `s` · `a` | sırala · görünen / diskte boyut |
+| `o` | ekrandaki listeyi CSV ya da JSON olarak kaydet |
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |
+| `M` | fareyi aç / kapat (başlangıçta kapalı) |
 | `?` | bütün tuşlar, önce bulunduğunuz ekranınkiler |
 | `q` | çık |
 
@@ -197,6 +238,16 @@ kullanımda daha az denenmiştir. Bazı özellikler yalnızca macOS'ta vardır:
 - paket kimliğiyle uygulama/veri eşleştirmesi (Linux ve Windows'ta daha basit,
   ada dayalı eşleştirme kullanılır)
 
+Araçlar ekranında platforma özel satırlar vardır:
+- **Linux:** apt, dnf ve pacman paket önbellekleri, systemd günlüğü ve devre
+  dışı snap sürümleri. Bunlar root gerektirdiği için rustClean `sudo`
+  komutunu çalıştırmaz, gösterir.
+- **Windows:** `%TEMP%` (onayınızdan sonra Geri Dönüşüm Kutusuna taşınır;
+  kullanımdaki dosyalar atlanır), `C:\Windows\Temp` ve Windows Update indirme
+  önbelleği (okunabiliyorsa ölçülür; yönetici PowerShell'i için komutlar
+  gösterilir) ve Geri Dönüşüm Kutusunun boyutu. Windows desteği en az denenmiş
+  olanıdır; gerçek makinelerden gelen geri bildirimler çok işe yarar.
+
 ## Bilgisayarınızda saklanan veriler
 
 rustClean hiçbir ağ bağlantısı kurmaz. Yalnızca şunları yazar:
@@ -209,6 +260,10 @@ Bunlar platformun veri klasöründe tutulur: macOS'ta
 `~/Library/Application Support/rustClean`, Linux'ta `~/.local/share/rustClean`,
 Windows'ta `%APPDATA%\rustClean`. Başka bir klasör için `RUSTCLEAN_DATA_DIR`
 ortam değişkenini kullanın.
+
+Ayar dosyası `config.toml` da aynı klasördedir
+([ayrıntılar](docs/USAGE.md#configuration-file), İngilizce). rustClean onu
+yalnızca okur; dosya ancak siz oluşturursanız vardır.
 
 ## Katkı
 

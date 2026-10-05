@@ -100,6 +100,8 @@ struct Listing {
     entries: Vec<Entry>,
     /// Entries (or the directory itself) that could not be read.
     errors: u64,
+    /// The directory itself could not be read (or the scan was cancelled).
+    unread: bool,
 }
 
 struct Entry {
@@ -189,6 +191,9 @@ pub fn scan(
         };
         pending -= 1;
         progress.errors += listing.errors;
+        if listing.unread {
+            tree.set_unread(listing.node);
+        }
 
         for entry in listing.entries {
             #[allow(unused_mut)]
@@ -221,6 +226,9 @@ pub fn scan(
             if let Some(dir) = entry.descend {
                 spawn(Job { dir, node: id });
                 pending += 1;
+            } else if entry.is_dir {
+                // Another file system or a skipped path: not looked into.
+                tree.set_unread(id);
             }
         }
 
@@ -246,12 +254,15 @@ fn read_dir(job: Job, ctx: &Ctx) -> Listing {
         node: job.node,
         entries: Vec::new(),
         errors: 0,
+        unread: false,
     };
     if ctx.cancel.load(Ordering::Relaxed) {
+        listing.unread = true;
         return listing;
     }
     let Ok(read) = fs::read_dir(&listing.dir) else {
         listing.errors = 1;
+        listing.unread = true;
         return listing;
     };
     // Opened on the first file: clone lookups go through it.
@@ -382,6 +393,30 @@ mod tests {
         let skip = vec![std::path::absolute(r.join("mnt")).unwrap()];
         let res = scan(r, skip, &Arc::default(), |_| {}).unwrap();
         assert_eq!(res.tree.node(ROOT).size.apparent, 10);
+        // Not looked into, so not known to be empty.
+        let t = &res.tree;
+        assert!(t.node(child(t, ROOT, "mnt")).unread);
+        assert!(!t.node(ROOT).unread);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn marks_unreadable_folders() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let r = dir.path();
+        fs::create_dir_all(r.join("locked")).unwrap();
+        write(&r.join("locked/important.txt"), 10);
+        fs::create_dir(r.join("open")).unwrap();
+        fs::set_permissions(r.join("locked"), fs::Permissions::from_mode(0o000)).unwrap();
+        let res = run(r);
+        fs::set_permissions(r.join("locked"), fs::Permissions::from_mode(0o755)).unwrap();
+        let t = &res.tree;
+        // Root can read anything; the check only means something otherwise.
+        if fs::read_dir(r.join("locked")).is_err() || res.errors > 0 {
+            assert!(t.node(child(t, ROOT, "locked")).unread);
+        }
+        assert!(!t.node(child(t, ROOT, "open")).unread);
     }
 
     #[cfg(unix)]

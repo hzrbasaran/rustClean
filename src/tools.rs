@@ -24,6 +24,14 @@ use std::time::{Duration, Instant};
 use crate::scanner;
 use crate::ui::fmt_size;
 
+// System caches of Linux and Windows (#18, #19). Plain std code, so they
+// build and test everywhere; `ToolKind::available` shows them only on their
+// platform.
+#[path = "tools_linux.rs"]
+pub(crate) mod linux;
+#[path = "tools_windows.rs"]
+pub(crate) mod windows;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Risk {
     /// Nothing of value is lost.
@@ -42,6 +50,12 @@ pub enum Step {
     TrashContents(PathBuf),
     /// Move this file or folder to the trash.
     Trash(PathBuf),
+    /// A command that needs root or administrator rights. rustClean never
+    /// runs it; it only shows it, exactly as the user should type it.
+    Manual(String),
+    /// Move the entries inside this folder to the trash one by one, skipping
+    /// the ones that cannot be moved (files in use).
+    TrashEach(PathBuf),
 }
 
 impl Step {
@@ -58,9 +72,20 @@ impl Step {
                 }
                 args.join(" ")
             }
-            Step::TrashContents(dir) => tf!("{}/* → çöp kutusu", "{}/* → trash", dir.display()),
+            Step::TrashContents(dir) | Step::TrashEach(dir) => {
+                tf!("{}/* → çöp kutusu", "{}/* → trash", dir.display())
+            }
             Step::Trash(path) => tf!("{} → çöp kutusu", "{} → trash", path.display()),
+            Step::Manual(line) => line.clone(),
         }
+    }
+}
+
+impl CleanAction {
+    /// Whether the user has to run this action themselves (it needs root or
+    /// administrator rights).
+    pub fn manual(&self) -> bool {
+        self.steps.iter().any(|s| matches!(s, Step::Manual(_)))
     }
 }
 
@@ -106,11 +131,20 @@ pub enum ToolKind {
     Playwright,
     XcodeArchives,
     Android,
+    AptCache,
+    DnfCache,
+    PacmanCache,
+    Journal,
+    Snaps,
+    WinTemp,
+    WinSystemTemp,
+    WinUpdate,
+    RecycleBin,
 }
 
 impl ToolKind {
     /// Every tool, on any platform.
-    pub const ALL: [ToolKind; 20] = [
+    pub const ALL: [ToolKind; 29] = [
         ToolKind::Docker,
         ToolKind::Simulators,
         ToolKind::XcodeData,
@@ -131,6 +165,15 @@ impl ToolKind {
         ToolKind::Playwright,
         ToolKind::XcodeArchives,
         ToolKind::Android,
+        ToolKind::AptCache,
+        ToolKind::DnfCache,
+        ToolKind::PacmanCache,
+        ToolKind::Journal,
+        ToolKind::Snaps,
+        ToolKind::WinTemp,
+        ToolKind::WinSystemTemp,
+        ToolKind::WinUpdate,
+        ToolKind::RecycleBin,
     ];
 
     /// A name that does not depend on the language (the variant's), for
@@ -153,6 +196,11 @@ impl ToolKind {
             all.extend([CocoaPods, Homebrew]);
         } else if cfg!(target_os = "linux") {
             all.push(Homebrew);
+        }
+        if cfg!(target_os = "linux") {
+            all.extend(linux::KINDS);
+        } else if cfg!(windows) {
+            all.extend(windows::KINDS);
         }
         all
     }
@@ -182,6 +230,15 @@ impl ToolKind {
                 "Android emülatör ve imajları",
                 "Android emulators and images"
             ),
+            ToolKind::AptCache
+            | ToolKind::DnfCache
+            | ToolKind::PacmanCache
+            | ToolKind::Journal
+            | ToolKind::Snaps => linux::label(self),
+            ToolKind::WinTemp
+            | ToolKind::WinSystemTemp
+            | ToolKind::WinUpdate
+            | ToolKind::RecycleBin => windows::label(self),
         }
     }
 
@@ -302,6 +359,15 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
         ToolKind::Playwright => caches::playwright(),
         ToolKind::XcodeArchives => xcode::archives(),
         ToolKind::Android => android::measure(),
+        ToolKind::AptCache
+        | ToolKind::DnfCache
+        | ToolKind::PacmanCache
+        | ToolKind::Journal
+        | ToolKind::Snaps => linux::measure(kind),
+        ToolKind::WinTemp
+        | ToolKind::WinSystemTemp
+        | ToolKind::WinUpdate
+        | ToolKind::RecycleBin => windows::measure(kind),
     }
 }
 
@@ -336,7 +402,7 @@ pub fn run(kind: ToolKind, steps: Vec<Step>) -> Receiver<RunEvent> {
 
 /// Runs one step. `home` is the user's home folder, for `safe_target`.
 fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>, home: Option<&Path>) -> bool {
-    if let Step::TrashContents(path) | Step::Trash(path) = step {
+    if let Step::TrashContents(path) | Step::TrashEach(path) | Step::Trash(path) = step {
         if !safe_target(path, home) {
             let _ = tx.send(RunEvent::Output(tf!(
                 "rustClean bu klasörü boşaltmaz: {}",
@@ -392,6 +458,18 @@ fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>, home: Opti
             let _ = err.join();
             status.is_ok_and(|s| s.success())
         }
+        Step::Manual(_) => {
+            // The picker never offers these; refuse anyway.
+            let _ = tx.send(RunEvent::Output(
+                t!(
+                    "rustClean bu komutu çalıştırmaz; kendiniz çalıştırın",
+                    "rustClean does not run this command; run it yourself",
+                )
+                .into(),
+            ));
+            false
+        }
+        Step::TrashEach(dir) => windows::trash_each(kind, dir, tx),
         Step::TrashContents(dir) => {
             let entries: Vec<PathBuf> = match std::fs::read_dir(dir) {
                 Ok(r) => r.flatten().map(|e| e.path()).collect(),
@@ -1155,6 +1233,10 @@ mod tests {
         std::fs::create_dir(home.path().join("Documents")).unwrap();
         assert!(!run_step(ToolKind::Pub, &step, &tx, Some(home.path())));
         assert!(home.path().join("Documents").exists());
+        // Emptying entry by entry (%TEMP%) is guarded the same way.
+        let step = Step::TrashEach(home.path().to_path_buf());
+        assert!(!run_step(ToolKind::WinTemp, &step, &tx, Some(home.path())));
+        assert!(home.path().join("notes.txt").exists());
     }
 
     #[cfg(unix)]

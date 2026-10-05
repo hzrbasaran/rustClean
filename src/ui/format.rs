@@ -113,7 +113,7 @@ pub(super) fn clip(s: &str, width: usize) -> String {
 }
 
 /// The path with the home folder shortened to `~`.
-pub(super) fn tilde(path: &Path) -> std::path::PathBuf {
+pub fn tilde(path: &Path) -> std::path::PathBuf {
     match dirs::home_dir().and_then(|h| path.strip_prefix(h).ok().map(Path::to_path_buf)) {
         Some(rest) => Path::new("~").join(rest),
         None => path.to_path_buf(),
