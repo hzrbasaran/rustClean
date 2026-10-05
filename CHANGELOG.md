@@ -48,6 +48,21 @@ follows [Semantic Versioning](https://semver.org/).
   readable and show the commands for an administrator PowerShell; the Recycle
   Bin shows its size per drive, with `Clear-RecycleBin` to run yourself
   ([#19](https://github.com/hzrbasaran/rustClean/issues/19)).
+- `rustclean report <kind> [PATH]` runs a report without the interface and
+  prints it as a readable table, or with `--csv` / `--json` for scripts.
+  Every report has a kebab-case name (`largest-files`, `dev-junk`,
+  `duplicates`…); `--older DAYS` applies the age filter where the report has
+  one, and `--limit N` caps the rows. `PATH` defaults to the current folder.
+  It only reads: nothing is deleted
+  ([#20](https://github.com/hzrbasaran/rustClean/issues/20)).
+- `o` saves the list on screen as CSV or JSON: the folder list, the treemap,
+  the summary lists and every result list. The file goes to the working
+  folder (or the home folder when that is not writable) as
+  `rustclean-<list>-YYYYMMDD-HHMMSS.csv|json` and never replaces an existing
+  file. Columns: absolute path, apparent size, size on disk, file count,
+  modified and created (ISO 8601, UTC), the group and the row's detail; a
+  group is saved as its members
+  ([#21](https://github.com/hzrbasaran/rustClean/issues/21)).
 
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"

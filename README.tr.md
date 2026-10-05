@@ -63,6 +63,12 @@ harekete geçmenizi sağlar:
   klasörünün değil *projenin* yaşıdır.
 - **Sepet:** `Space` ile her yerden öğe toplayın, `S` ile gözden geçirin, `x`
   ile hepsini çöp kutusuna taşıyın.
+- **Dışa aktarma:** `o`, ekrandaki listeyi (klasör, ağaç haritası, özet, her
+  rapor ya da arama) **CSV veya JSON** dosyasına kaydeder: tam yollar, iki
+  boyut da, ISO 8601 tarihler.
+- **Komut satırından raporlar:** `rustclean report dev-junk ~/Projects
+  --older 90 --json` her raporu tablo, CSV ya da JSON olarak yazdırır;
+  betikler ve zamanlanmış görevler için. Yalnızca okur, hiçbir şey silmez.
 - **Silme kaydı:** çöp kutusuna taşınan her şey, günlere göre ve nasıl
   silindiğiyle (menü → Silme kaydı).
 - **Geliştirici araçları temizliği:** Docker, Xcode simülatörleri,
@@ -174,7 +180,16 @@ rustclean --theme light   # dark, light ya da colorblind (programda: T)
 rustclean --no-color      # renksiz; NO_COLOR=1 de olur
 rustclean --list-disks    # diskleri listeleyip çık
 rustclean --summary ~     # arayüz açmadan tarayıp toplamları yazdır
+
+# arayüz açmadan bir rapor: tablo ya da --csv / --json (yalnızca okur)
+rustclean report dev-junk ~/Projects --older 90 --json
+rustclean report largest-files ~ --limit 20 --csv > buyukler.csv
 ```
+
+Rapor türleri: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
+`orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
+`clutter`, `device-backups`. Seçenekler ve sütunlar için
+[kullanım kılavuzu](docs/USAGE.md#reports-from-the-command-line).
 
 Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 
@@ -189,6 +204,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `Space` · `S` · `x` | sepete ekle · sepeti göster · çöpe taşı |
 | `f` | yaş filtresi (raporlarda) |
 | `s` · `a` | sırala · görünen / diskte boyut |
+| `o` | ekrandaki listeyi CSV ya da JSON olarak kaydet |
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |

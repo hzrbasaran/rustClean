@@ -70,6 +70,25 @@ impl ReportKind {
         format!("{self:?}")
     }
 
+    /// The kebab-case name used on the command line (`rustclean report
+    /// dev-junk`) and in exported file names.
+    pub fn slug(self) -> &'static str {
+        match self {
+            ReportKind::LargestFiles => "largest-files",
+            ReportKind::LargestDirs => "largest-dirs",
+            ReportKind::RepeatedNames => "repeated-names",
+            ReportKind::Apps => "apps",
+            ReportKind::Orphans => "orphans",
+            ReportKind::DevJunk => "dev-junk",
+            ReportKind::Caches => "caches",
+            ReportKind::OldBig => "old-big",
+            ReportKind::Downloads => "downloads",
+            ReportKind::Duplicates => "duplicates",
+            ReportKind::Clutter => "clutter",
+            ReportKind::DeviceBackups => "device-backups",
+        }
+    }
+
     pub fn from_code(code: &str) -> Option<ReportKind> {
         Self::ALL.into_iter().find(|k| k.code() == code)
     }

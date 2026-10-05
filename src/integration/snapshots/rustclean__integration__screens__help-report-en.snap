@@ -18,18 +18,18 @@ expression: screen
   [ ]   │ /             new search                                                         │
   [ ]   │ a             apparent / on-disk size                                            │
   [ ]   │ m             reports menu                                                       │
+  [ ]   │ o             save the list as a CSV / JSON file                                 │
   [ ]   │                                                                                  │
   [ ]   │On every screen                                                                   │
   [ ]   │ ?             this help                                                          │
-  [ ]   │ L             English ↔ Türkçe                                                   │
+        │ L             English ↔ Türkçe                                                   │
         │ T             theme: dark, light, color-blind                                    │
         │ M             mouse on / off (with it off, the terminal can select text)         │
         │ q  Ctrl-C     quit                                                               │
         │                                                                                  │
         │Folder list                                                                       │
         │ ↑↓  j k       move                                                               │
-        │ PgUp PgDn     page up / down                                                     │
-────────│ Home End  g G first / last row                                                   │────────
+────────│ PgUp PgDn     page up / down                                                     │────────
 Enter: o└───────────────────── ↑↓ PgUp PgDn: scroll · Esc / ?: close ──────────────────────┘
  ?  help   ↑↓  move   Space  to basket   t  all   f  age filter   x  move to trash   S  basket   Ent
 --- styles (column+width foreground/background modifiers) ---
@@ -49,17 +49,17 @@ Enter: o└───────────────────── ↑�
 13: 2+3 Gray/- | 8+16 Cyan/- | 24+10 White/- | 91+1 Cyan/-
 14: 2+3 Gray/- | 8+16 Cyan/- | 24+23 White/- | 91+1 Cyan/-
 15: 2+3 Gray/- | 8+16 Cyan/- | 24+12 White/- | 91+1 Cyan/-
-16: 2+3 Gray/- | 8+1 Cyan/- | 91+1 Cyan/-
-17: 2+3 Gray/- | 8+1 Cyan/- | 9+15 White/- BOLD | 91+1 Cyan/-
-18: 2+3 Gray/- | 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
-19: 2+3 Gray/- | 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
-20: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
-21: 8+16 Cyan/- | 24+58 White/- | 91+1 Cyan/-
-22: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
-23: 8+1 Cyan/- | 91+1 Cyan/-
-24: 8+1 Cyan/- | 9+11 White/- BOLD | 91+1 Cyan/-
-25: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
-26: 8+16 Cyan/- | 24+14 White/- | 91+1 Cyan/-
-27: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+16: 2+3 Gray/- | 8+16 Cyan/- | 24+34 White/- | 91+1 Cyan/-
+17: 2+3 Gray/- | 8+1 Cyan/- | 91+1 Cyan/-
+18: 2+3 Gray/- | 8+1 Cyan/- | 9+15 White/- BOLD | 91+1 Cyan/-
+19: 2+3 Gray/- | 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
+20: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
+21: 8+16 Cyan/- | 24+31 White/- | 91+1 Cyan/-
+22: 8+16 Cyan/- | 24+58 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+24: 8+1 Cyan/- | 91+1 Cyan/-
+25: 8+1 Cyan/- | 9+11 White/- BOLD | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+4 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+14 White/- | 91+1 Cyan/-
 28: 0+8 Gray/- | 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/- | 92+8 Gray/-
 29: 0+3 Black/Gray | 10+4 Black/Gray | 21+7 Black/Gray | 40+3 Black/Gray | 49+3 Black/Gray | 65+3 Black/Gray | 84+3 Black/Gray | 96+4 Black/Gray

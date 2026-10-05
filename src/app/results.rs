@@ -178,7 +178,12 @@ impl Browser {
     }
 
     /// Runs a report that needs only the tree (every report but duplicates).
-    fn report_list(&self, kind: ReportKind, base: NodeId, min_age_days: u32) -> ResultList {
+    pub(crate) fn report_list(
+        &self,
+        kind: ReportKind,
+        base: NodeId,
+        min_age_days: u32,
+    ) -> ResultList {
         let (tree, mode, now) = (&self.tree, self.size_mode, crate::ui::now_secs());
         match kind {
             ReportKind::Apps => apps::run(tree, mode),
@@ -188,7 +193,7 @@ impl Browser {
     }
 
     /// The duplicates report when no two large files share a size.
-    fn no_duplicates_list(&self, base: NodeId) -> ResultList {
+    pub(crate) fn no_duplicates_list(&self, base: NodeId) -> ResultList {
         let mut list = ResultList::new(ReportKind::Duplicates.label().into(), base, Vec::new());
         list.note = t!(
             "1 MiB üzerinde aynı boyutta iki dosya yok.",
@@ -212,7 +217,7 @@ impl Browser {
     }
 
     /// The duplicates report for groups of identical files.
-    fn duplicates_list(&self, base: NodeId, groups: Vec<Vec<NodeId>>) -> ResultList {
+    pub(crate) fn duplicates_list(&self, base: NodeId, groups: Vec<Vec<NodeId>>) -> ResultList {
         let (tree, mode) = (&self.tree, self.size_mode);
         let mut rows: Vec<Row> = groups
             .into_iter()
@@ -396,6 +401,7 @@ impl Browser {
             KeyCode::Char('x') | KeyCode::Delete => self.delete_key(),
             KeyCode::Char('S') => self.open_basket(),
             KeyCode::Char('f') => self.cycle_age_filter(),
+            KeyCode::Char('o') => self.start_export(),
             KeyCode::Char('u') => self.start_uninstall(),
             KeyCode::Char('c') if r.is_basket() => {
                 self.basket.clear();

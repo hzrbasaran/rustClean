@@ -59,6 +59,12 @@ one go.
   not the dependency folder's.
 - **Basket** — collect entries with `Space` anywhere, review them with `S`,
   move them all to the trash with `x`.
+- **Export** — `o` saves the list on screen (folder, treemap, summary, any
+  report or search) as **CSV or JSON**, with absolute paths, both sizes and
+  ISO 8601 dates.
+- **Reports from the command line** — `rustclean report dev-junk ~/Projects
+  --older 90 --json` prints any report as a table, CSV or JSON, for scripts
+  and cron jobs. It only reads; nothing is deleted.
 - **Deletion log** — everything moved to the trash, by day, with how it was
   deleted (menu → Deletion log).
 - **Developer tools cleanup** — measures what Docker, Xcode simulators,
@@ -168,7 +174,16 @@ rustclean --theme light   # dark, light or colorblind (also: T in the app)
 rustclean --no-color      # no colors; NO_COLOR=1 works too
 rustclean --list-disks    # list disks and exit
 rustclean --summary ~     # scan without the interface and print totals
+
+# a report without the interface: a table, or --csv / --json (read-only)
+rustclean report dev-junk ~/Projects --older 90 --json
+rustclean report largest-files ~ --limit 20 --csv > big.csv
 ```
+
+Report kinds: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
+`orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
+`clutter`, `device-backups`. See the [usage guide](docs/USAGE.md#reports-from-the-command-line)
+for the options and the columns.
 
 Every screen lists its keys at the bottom. The most important ones:
 
@@ -183,6 +198,7 @@ Every screen lists its keys at the bottom. The most important ones:
 | `Space` · `S` · `x` | add to basket · show basket · move to trash |
 | `f` | age filter (in reports) |
 | `s` · `a` | sort · apparent / on-disk size |
+| `o` | save the list on screen as CSV or JSON |
 | `R` · `r` | refresh the current folder · rescan everything |
 | `L` | Türkçe ↔ English |
 | `T` | theme: dark → light → color-blind |

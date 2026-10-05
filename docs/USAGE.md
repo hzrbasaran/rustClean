@@ -15,6 +15,8 @@ need to look anything up.
 - [Language](#language)
 - [Deletion log](#deletion-log)
 - [Themes and colors](#themes-and-colors)
+- [Saving a list (CSV / JSON)](#saving-a-list-csv--json)
+- [Reports from the command line](#reports-from-the-command-line)
 - [Mouse](#mouse)
 - [Command line](#command-line)
 
@@ -46,6 +48,7 @@ with `?  help` and shows the most used keys.
 | `e` or `y` | yes, in a question (Turkish *evet* / English *yes*; both work in either language) |
 | `h`, `n` or `Esc` | no |
 | `m` | the menu of reports and tools |
+| `o` | save the list on screen as CSV or JSON ([more](#saving-a-list-csv--json)) |
 | `?` | every key |
 | `L` · `T` | Türkçe ↔ English · theme |
 | `M` | mouse on / off; see [Mouse](#mouse) |
@@ -73,6 +76,7 @@ The list shows the current folder's entries with:
 | `a` | apparent size (file length) ↔ size on disk (what `du` reports; on APFS, pure clones are counted once) |
 | `R` | rescan only the current folder (e.g. after a cleanup), in the background; `Esc` cancels |
 | `r` | rescan everything from the root |
+| `o` | save the list as CSV or JSON ([more](#saving-a-list-csv--json)) |
 | `d` | back to the disk list |
 | `w` | save the treemap of this folder as an HTML page ([below](#saving-the-treemap-as-a-web-page)) |
 
@@ -88,6 +92,7 @@ strip at the bottom ("other"). The selection is shared with the list.
 | `Enter` / `⌫` | open a folder / go back |
 | `c` | color by type (folders each get their own color) or by age |
 | `t` / `Esc` | back to the list |
+| `o` | save the folder's entries as CSV or JSON |
 | `w` | save as an HTML page (see below) |
 
 `Enter` on the "other" strip opens the list at the first small entry.
@@ -136,7 +141,7 @@ The page says these limits at the bottom.
 total size would only list chains of nested parents.
 
 `Tab` switches between the two lists, `Enter` goes to the entry, `Space`/`x`
-work as everywhere else.
+work as everywhere else. `o` saves the focused list as CSV or JSON.
 
 ## Finding by name
 
@@ -172,6 +177,9 @@ what to do about it.
 
 `m` opens the menu. Reports cover the folder you are in. Rows start
 unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
+`o` saves the report as CSV or JSON ([more](#saving-a-list-csv--json)), and
+`rustclean report` prints any of them without the interface
+([more](#reports-from-the-command-line)).
 
 | Report | What it lists |
 |---|---|
@@ -354,6 +362,111 @@ borders. `T` then leaves the colors off.
 |---|---|
 | ![Light theme](screenshots/theme-light.svg) | ![Color-blind friendly theme](screenshots/theme-colorblind.svg) |
 
+## Saving a list (CSV / JSON)
+
+`o` saves the list on screen to a file: the folder list, the treemap (the
+same entries as the list), the focused list of the summary, and every report,
+search result, comparison and the basket. A small window asks for the format:
+`c` CSV (for spreadsheets), `j` JSON (for scripts), `Esc` cancels.
+
+The file goes to the folder rustClean was started from (the working folder);
+if that folder is not writable, to your home folder. Its name says what it
+holds and when: `rustclean-<list>-YYYYMMDD-HHMMSS.csv`, e.g.
+`rustclean-dev-junk-20261005-143012.csv` or `rustclean-folder-….json`. An
+existing file is never overwritten: `-1`, `-2`… is added to the name. The
+bottom line shows where the file went.
+
+Saving only reads; it changes nothing on disk except writing the new file.
+
+### Columns
+
+Every file has the same columns, in this order (CSV header and JSON keys):
+
+| Column | Meaning |
+|---|---|
+| `path` | absolute path of the file or folder |
+| `apparent_size` | size in bytes (file length) |
+| `disk_size` | bytes allocated on disk |
+| `files` | 1 for a file; the number of files below a folder |
+| `modified` | last change, ISO 8601 in UTC (`2026-10-01T12:00:00Z`); for a folder the newest change inside; empty (`null` in JSON) when unknown |
+| `created` | creation time, the same way |
+| `group` | the label of the group the entry belongs to (same name, same content, an app and its data); empty for single entries |
+| `detail` | the row's extra text in reports (e.g. "Rust build output · project: …") |
+
+A group row is saved as one line per member, each with the group's label in
+`group`, so a duplicates report lists every copy. Inside an opened group the
+entries get the group's label too. Rows are saved in the order shown; a
+report saves what it lists (at most 200 rows).
+
+CSV follows RFC 4180: a field with a comma, a quote or a line break is put
+in quotes, and quotes inside are doubled. JSON looks like this, one entry per
+line:
+
+```json
+{
+  "title": "Developer junk",
+  "root": "/Users/you/Projects",
+  "truncated": false,
+  "entries": [
+    {"path": "/Users/you/Projects/web/node_modules", "apparent_size": 310000000, "disk_size": 325058560, "files": 4120, "modified": "2026-09-28T12:00:00Z", "created": "2026-01-02T09:00:00Z", "group": null, "detail": "npm dependencies · project: …"}
+  ]
+}
+```
+
+`truncated` is `true` when the list had more results than it shows.
+
+## Reports from the command line
+
+`rustclean report <kind> [PATH]` scans `PATH` (default: the current folder),
+runs one report and prints it, without the interface. It only reads: nothing
+is ever deleted or moved, so it is safe in scripts and cron jobs.
+
+```bash
+rustclean report dev-junk ~/Projects                 # a readable table
+rustclean report dev-junk ~/Projects --older 90 --json
+rustclean report largest-files ~ --limit 20 --csv > big.csv
+rustclean report duplicates ~/Pictures --json | jq '.entries[].path'
+rustclean report old-big /Volumes/Backup --lang en
+```
+
+The kinds are the reports of the `m` menu:
+
+| Kind | Report | `--older` |
+|---|---|---|
+| `largest-files` | largest files | yes |
+| `largest-dirs` | largest folders | yes |
+| `repeated-names` | most repeated file names | yes |
+| `apps` | applications and their data | no |
+| `orphans` | orphaned app leftovers | yes |
+| `dev-junk` | developer junk | yes |
+| `caches` | cache folders | yes |
+| `old-big` | old and large files (already over a year) | no |
+| `downloads` | installers and archives in Downloads | yes |
+| `duplicates` | duplicate files (same content; reads the files) | no |
+| `clutter` | empty folders, broken links, temporary files | yes |
+| `device-backups` | iPhone / iPad backups (by the backup date) | yes |
+
+Options:
+
+- `--older DAYS`: only entries untouched for at least `DAYS` days (as `f` in
+  the interface; for developer junk, the project's age). A report without an
+  age filter stops with an error instead of ignoring it.
+- `--json` / `--csv`: print JSON or CSV with the
+  [columns above](#columns) instead of the table.
+- `--limit N`: at most `N` rows (a group counts as one row; its members all
+  come with it). Reports list at most 200 rows anyway.
+- `--lang tr|en`: the language of the table, titles and details. The column
+  names of CSV and JSON never change.
+
+The table shows the size on disk, the file count of folders, the last change,
+the path relative to `PATH` and the row's detail; a group's members follow it,
+indented (the first 10; CSV and JSON have all of them). When a report finds
+nothing, the table says why (e.g. no Downloads folder below `PATH`).
+
+The exit code is 0 on success, 2 for a wrong command line (an unknown kind
+lists the valid ones), and 1 when the folder cannot be scanned or `--older`
+is given to a report without an age filter; the reason goes to stderr. A
+folder literally named `report` can be scanned as `rustclean ./report`.
 ## Mouse
 
 rustClean is made for the keyboard; the mouse is optional and **off by
@@ -390,9 +503,13 @@ also when it stops because of an error.
 ```text
 rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
           [--list-disks] [--summary]
+rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
+          [--lang tr|en]
 ```
 
 - `PATH`: scan this folder directly instead of choosing a disk.
 - `--list-disks`: print the disks and exit.
 - `--summary`: scan `PATH` without the interface and print the totals.
+- `report`: print one report without the interface; see
+  [Reports from the command line](#reports-from-the-command-line).
 - `RUSTCLEAN_DATA_DIR`: where history and settings are stored.
