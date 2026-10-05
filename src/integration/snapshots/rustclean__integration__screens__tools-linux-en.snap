@@ -1,0 +1,50 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer tools cleanup  │  reclaimable: 4.0 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Tool                               Reclaimable  Details
+  apt package cache                       1.0 GiB /var/cache/apt
+  dnf package cache                  —            not installed
+  pacman package cache               —            not installed
+  systemd journal                         2.0 GiB all journals
+▶ Disabled snap revisions                 1.0 GiB core20 (2015) · firefox (4173)
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
+│ safe  Remove the disabled revisions: 2 revisions, 1.0 GiB (needs root)                           │
+│    rustClean does not run this; run the command yourself:                                        │
+│    $ sudo snap remove core20 --revision=2015                                                     │
+│    $ sudo snap remove firefox --revision=4173                                                    │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Measuring only reads. No command runs without your confirmation.
+ ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 2+17 White/- BOLD | 37+12 -/- BOLD
+ 4: 2+17 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 5: 2+20 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 6: 2+15 White/- BOLD | 37+12 -/- BOLD
+ 7: 0+100 White/Indexed(238) BOLD
+22: 0+1 DarkGray/- | 1+9 White/- BOLD | 10+90 DarkGray/-
+23: 0+1 DarkGray/- | 1+6 Black/Green | 7+65 White/- BOLD | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+58 Yellow/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+45 White/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+46 White/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 38+3 Black/Gray | 57+3 Black/Gray | 67+5 Black/Gray | 79+3 Black/Gray

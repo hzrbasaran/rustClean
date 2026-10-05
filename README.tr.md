@@ -60,7 +60,11 @@ harekete geçmenizi sağlar:
 - **Geliştirici araçları temizliği:** Docker, Xcode simülatörleri,
   DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew ve Cargo'nun ne
   kadar yer açabileceğini ölçer; onayınızdan sonra **araçların kendi temizlik
-  komutlarını** çalıştırır.
+  komutlarını** çalıştırır. Linux'ta apt, dnf ve pacman paket önbelleklerini,
+  systemd günlüğünü ve devre dışı snap sürümlerini; Windows'ta `%TEMP%`,
+  `C:\Windows\Temp`, Windows Update indirme önbelleğini ve Geri Dönüşüm
+  Kutusunu da ölçer. Root ya da yönetici izni gerekenler için komutu gösterir,
+  siz çalıştırırsınız.
 - **Tarama geçmişi:** Her tarama özetlenir; son taramadan beri neyin
   büyüdüğünü görürsünüz.
 - **Sistem verileri paneli** (macOS): APFS bölümleri, Time Machine yerel anlık
@@ -96,7 +100,9 @@ rustClean kendiliğinden hiçbir şey silmez:
 - Geliştirici araçları temizliği çalıştıracağı **komutları birebir** gösterir.
   Komutlar kabuk üzerinden değil doğrudan ve asla `sudo` ile çalıştırılmaz.
   Veri kaybettirebilecek işlemler (Docker volume'ları) için `evet` yazmak
-  gerekir.
+  gerekir. Root ya da yönetici izni gereken temizlikler (Linux paket
+  önbellekleri, günlük, snap'ler, Windows sistem klasörleri) yalnızca
+  gösterilir; onları siz çalıştırırsınız.
 - Raporlarda başta hiçbir şey seçili değildir. Tahmin içeren yerlerde (hangi
   verinin hangi uygulamaya ait olduğu) rapor bunu açıkça söyler ve şüphede
   silmemekten yana karar verir.
@@ -195,6 +201,16 @@ kullanımda daha az denenmiştir. Bazı özellikler yalnızca macOS'ta vardır:
 - Xcode ve simülatör temizliği
 - paket kimliğiyle uygulama/veri eşleştirmesi (Linux ve Windows'ta daha basit,
   ada dayalı eşleştirme kullanılır)
+
+Araçlar ekranında platforma özel satırlar vardır:
+- **Linux:** apt, dnf ve pacman paket önbellekleri, systemd günlüğü ve devre
+  dışı snap sürümleri. Bunlar root gerektirdiği için rustClean `sudo`
+  komutunu çalıştırmaz, gösterir.
+- **Windows:** `%TEMP%` (onayınızdan sonra Geri Dönüşüm Kutusuna taşınır;
+  kullanımdaki dosyalar atlanır), `C:\Windows\Temp` ve Windows Update indirme
+  önbelleği (okunabiliyorsa ölçülür; yönetici PowerShell'i için komutlar
+  gösterilir) ve Geri Dönüşüm Kutusunun boyutu. Windows desteği en az denenmiş
+  olanıdır; gerçek makinelerden gelen geri bildirimler çok işe yarar.
 
 ## Bilgisayarınızda saklanan veriler
 

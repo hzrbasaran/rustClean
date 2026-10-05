@@ -1,0 +1,50 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Geliştirici araçları temizliği  │  geri kazanılabilir: 4.0 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Araç                               Kazanılır    Ayrıntı
+  apt paket önbelleği                     1.0 GiB /var/cache/apt
+  dnf paket önbelleği                —            not installed
+  pacman paket önbelleği             —            not installed
+  systemd günlüğü (journal)               2.0 GiB all journals
+▶ Devre dışı snap sürümleri               1.0 GiB core20 (2015) · firefox (4173)
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ İşlemler ────────────────────────────────────────────────────────────────────────────────────────┐
+│ güvenli  Devre dışı sürümleri kaldır: 2 sürüm, 1.0 GiB (root gerekir)                            │
+│    rustClean bunu çalıştırmaz; komutu kendiniz çalıştırın:                                       │
+│    $ sudo snap remove core20 --revision=2015                                                     │
+│    $ sudo snap remove firefox --revision=4173                                                    │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
+ ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 2+19 White/- BOLD | 37+12 -/- BOLD
+ 4: 2+19 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 5: 2+22 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 6: 2+25 White/- BOLD | 37+12 -/- BOLD
+ 7: 0+100 White/Indexed(238) BOLD
+22: 0+1 DarkGray/- | 1+10 White/- BOLD | 11+89 DarkGray/-
+23: 0+1 DarkGray/- | 1+9 Black/Green | 10+61 White/- BOLD | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+59 Yellow/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+45 White/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+46 White/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 39+3 Black/Gray | 56+3 Black/Gray | 66+5 Black/Gray | 78+3 Black/Gray

@@ -21,7 +21,7 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
         view.selected().map_or(1, |t| {
             t.actions
                 .iter()
-                .map(|a| 1 + a.steps.len() as u16)
+                .map(|a| 1 + u16::from(a.manual()) + a.steps.len() as u16)
                 .sum::<u16>()
                 .max(1)
         })
@@ -90,8 +90,23 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
                     Span::styled(text, style),
                     Span::raw(format!(" {}", a.label)).normal().bold(),
                 ]));
+                if a.manual() {
+                    lines.push(
+                        Line::from(t!(
+                            "    rustClean bunu çalıştırmaz; komutu kendiniz çalıştırın:",
+                            "    rustClean does not run this; run the command yourself:",
+                        ))
+                        .warn(),
+                    );
+                }
                 for step in &a.steps {
-                    lines.push(Line::from(format!("    $ {}", step.describe())).muted());
+                    let line = Line::from(format!("    $ {}", step.describe()));
+                    // The command to copy reads as text, not as a hint.
+                    lines.push(if a.manual() {
+                        line.normal()
+                    } else {
+                        line.muted()
+                    });
                 }
             }
         }
@@ -156,12 +171,22 @@ pub(super) fn render_tools(f: &mut Frame<'_>, view: &mut ToolsView, tick: usize,
         for (i, a) in tool.actions.iter().enumerate() {
             let (style, text) = risk_style(a.risk);
             let check = if p.checked[i] { "[✓] " } else { "[ ] " };
-            let row = Line::from(vec![
-                Span::raw(if i == p.cursor { "▶ " } else { "  " }),
-                Span::raw(check).bold(),
-                Span::styled(text, style),
-                Span::raw(format!(" {}", a.label)).normal(),
-            ]);
+            let row = if a.manual() {
+                Line::from(vec![
+                    Span::raw(if i == p.cursor { "▶ " } else { "  " }),
+                    Span::raw("    "),
+                    Span::styled(text, style),
+                    Span::raw(format!(" {}", a.label)).muted(),
+                    Span::raw(t!(" — kendiniz çalıştırın", " — run it yourself")).muted(),
+                ])
+            } else {
+                Line::from(vec![
+                    Span::raw(if i == p.cursor { "▶ " } else { "  " }),
+                    Span::raw(check).bold(),
+                    Span::styled(text, style),
+                    Span::raw(format!(" {}", a.label)).normal(),
+                ])
+            };
             lines.push(if i == p.cursor {
                 row.style(highlight())
             } else {

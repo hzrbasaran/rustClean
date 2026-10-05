@@ -6,6 +6,21 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Linux system caches on the tools screen: the apt, dnf and pacman package
+  caches, the systemd journal (`journalctl --disk-usage`) and disabled snap
+  revisions (`snap list --all`). They need root, so rustClean shows the exact
+  `sudo` command (`apt-get clean`, `dnf clean all`, `paccache -rk1` /
+  `pacman -Scc`, `journalctl --vacuum-time=2weeks`,
+  `snap remove <name> --revision=<rev>`) for you to run instead of running it
+  ([#18](https://github.com/hzrbasaran/rustClean/issues/18)).
+- Windows folders on the tools screen: `%TEMP%` is moved to the Recycle Bin
+  after you confirm, entry by entry, skipping files in use;
+  `C:\Windows\Temp` and the Windows Update download cache are measured when
+  readable and show the commands for an administrator PowerShell; the Recycle
+  Bin shows its size per drive, with `Clear-RecycleBin` to run yourself
+  ([#19](https://github.com/hzrbasaran/rustClean/issues/19)).
+
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"
   instead of "1 items" (and "1 item was inaccessible", "the parent folder of

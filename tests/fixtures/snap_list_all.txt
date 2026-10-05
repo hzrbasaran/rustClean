@@ -1,0 +1,11 @@
+Name                       Version                     Rev    Tracking         Publisher      Notes
+bare                       1.0                         5      latest/stable    canonical✓     base
+core20                     20240111                    2182   latest/stable    canonical✓     base
+core20                     20230801                    2015   latest/stable    canonical✓     base,disabled
+core22                     20240408                    1380   latest/stable    canonical✓     base
+firefox                    125.0.2-1                   4173   latest/stable/…  mozilla✓       disabled
+firefox                    125.0.3-1                   4259   latest/stable/…  mozilla✓       -
+gnome-42-2204              0+git.510a601               176    latest/stable/…  canonical✓     -
+hello-local                0.1                         x1     -                -              disabled
+snapd                      2.62                        21465  latest/stable    canonical✓     snapd
+snapd                      2.61.3                      21184  latest/stable    canonical✓     snapd,disabled
