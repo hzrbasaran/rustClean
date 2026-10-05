@@ -6,6 +6,13 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- The Playwright cleanup moves the browsers folder's contents to the trash
+  instead of running `npx --yes playwright uninstall --all`, which could
+  download Playwright first just to remove the browsers. It works offline,
+  and the deletion log records it
+  ([#79](https://github.com/hzrbasaran/rustClean/issues/79)).
+
 ### Fixed
 - The menu fits small terminals. At 80×24 its lower items and the
   description of the selected one were cut off. Now the list scrolls with

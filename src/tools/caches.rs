@@ -259,6 +259,11 @@ pub fn playwright() -> (Status, Vec<CleanAction>) {
         // "0" means "inside node_modules", which is not one folder.
         .filter(|d| d.as_os_str() != "0")
         .or_else(|| dirs::cache_dir().map(|d| d.join("ms-playwright")));
+    playwright_in(dir)
+}
+
+/// `playwright` for a given browsers folder.
+fn playwright_in(dir: Option<PathBuf>) -> (Status, Vec<CleanAction>) {
     let Some(dir) = dir.filter(|d| d.is_dir()) else {
         return missing(t!("klasör yok", "no folder"));
     };
@@ -267,18 +272,16 @@ pub fn playwright() -> (Status, Vec<CleanAction>) {
         Err(refused) => return refused,
     };
     let size = dir_size(&dir).unwrap_or(0);
-    let step = match which("npx") {
-        // --yes: npx would otherwise ask before fetching Playwright.
-        Some(npx) => command(&npx, &["--yes", "playwright", "uninstall", "--all"]),
-        None => Step::TrashContents(dir.clone()),
-    };
+    // Not `npx playwright uninstall`: npx may download Playwright itself
+    // first, only to remove the browsers. Their folder holds nothing else.
+    let step = Step::TrashContents(dir.clone());
     ready(
         size,
         dir.display().to_string(),
         vec![action(
             t!(
-                "Tüm Playwright tarayıcılarını kaldır (install yeniden indirir)",
-                "Remove every Playwright browser (install downloads them again)",
+                "Tüm Playwright tarayıcılarını çöpe taşı (npx playwright install yeniden indirir)",
+                "Move every Playwright browser to the trash (npx playwright install downloads them again)",
             ),
             Risk::Redownload,
             vec![step],
@@ -289,6 +292,21 @@ pub fn playwright() -> (Status, Vec<CleanAction>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn playwright_browsers_go_to_the_trash() {
+        let tmp = tempfile::tempdir().unwrap();
+        let dir = tmp.path().join("ms-playwright");
+        std::fs::create_dir_all(dir.join("chromium-1200")).unwrap();
+        let (status, actions) = playwright_in(Some(dir.clone()));
+        assert!(matches!(status, Status::Ready { .. }), "{status:?}");
+        // Never `npx`, which may download Playwright first.
+        assert_eq!(actions.len(), 1);
+        assert_eq!(actions[0].steps, [Step::TrashContents(dir)]);
+        assert_eq!(actions[0].risk, Risk::Redownload);
+        let (status, _) = playwright_in(Some(tmp.path().join("missing")));
+        assert!(matches!(status, Status::Missing(_)), "{status:?}");
+    }
 
     #[test]
     fn go_env_lines() {

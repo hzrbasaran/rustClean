@@ -298,7 +298,7 @@ log. The tool is then measured again.
 | Maven | move `~/.m2/repository` to the trash (re-downloaded) |
 | Go | `go clean -modcache` (re-downloaded) · `go clean -cache` (safe) |
 | Flutter / Dart pub | `flutter pub cache clean --force` (re-downloaded) |
-| Playwright | `npx --yes playwright uninstall --all` (re-downloaded) |
+| Playwright | move the browsers folder's contents to the trash (re-downloaded) |
 | Android emulators and images | delete an emulator (data loss) · move a leftover `.avd` folder to the trash (data loss) · move an unused system image to the trash (re-downloaded) |
 | CocoaPods · Homebrew | `pod cache clean --all` · `brew cleanup --prune=all` |
 | Cargo | move downloaded `.crate` files to the trash (re-downloaded) |
@@ -335,8 +335,9 @@ Notes on the newer tools:
 - **Flutter / Dart pub.** `flutter` is used when installed, otherwise `dart`,
   otherwise the folder's contents go to the trash. Globally activated
   packages (`dart pub global activate`) live in the same cache and go too.
-- **Playwright.** Without `npx` in `PATH` (also on Windows, where it is a
-  `.cmd` script) the browsers folder's contents go to the trash.
+- **Playwright.** The browsers folder's contents go to the trash; `npx
+  playwright install` downloads them again. rustClean does not run `npx
+  playwright uninstall`, which may download Playwright itself first.
 - **Xcode archives** are read from `~/Library/Developer/Xcode/Archives`,
   one folder per day; the folder's date is the archive's date. An archive
   holds the dSYM files needed to symbolicate crash reports of a shipped
