@@ -29,6 +29,8 @@ mod basket;
 mod browser;
 mod dashboard;
 mod export;
+mod htmlmap;
+mod mouse;
 mod rescan;
 mod results;
 mod snapshots;
@@ -36,6 +38,7 @@ mod trash;
 mod uninstall;
 
 pub use dashboard::{Dashboard, Pane};
+pub use mouse::{Hit, Mouse};
 pub use trash::FailureDialog;
 pub use uninstall::UninstallDialog;
 
@@ -181,6 +184,9 @@ pub struct Browser {
     pub export_dir: Option<PathBuf>,
     /// Directories we came from, with the row that was selected there.
     history: Vec<(NodeId, usize)>,
+    /// Where `w` writes the treemap page. `None`: the working directory,
+    /// else the home folder (tests set a temp directory).
+    pub html_dir: Option<PathBuf>,
 }
 
 impl Browser {
@@ -222,6 +228,7 @@ impl Browser {
             export_prompt: None,
             export_dir: None,
             history: Vec::new(),
+            html_dir: None,
         };
         b.load(ROOT, 0);
         b
@@ -241,6 +248,8 @@ pub struct App {
     pub should_quit: bool,
     /// The help screen (`?`) is open, scrolled this far.
     pub help: Option<u16>,
+    /// Mouse support (`M`) and where the last frame drew its clickable rows.
+    pub mouse: Mouse,
 }
 
 impl App {
@@ -257,6 +266,7 @@ impl App {
             tick: 0,
             should_quit: false,
             help: None,
+            mouse: Mouse::default(),
         };
         app.refresh_disks();
         if let Some(path) = start_path {
@@ -333,6 +343,7 @@ impl App {
                 KeyCode::Home => *scroll = 0,
                 KeyCode::Char('L') => self.switch_language(),
                 KeyCode::Char('T') => self.switch_theme(),
+                KeyCode::Char('M') => self.toggle_mouse(),
                 KeyCode::Char('q') => self.should_quit = true,
                 _ => self.help = None,
             }
@@ -348,6 +359,10 @@ impl App {
         }
         if key.code == KeyCode::Char('T') && !self.typing() {
             self.switch_theme();
+            return;
+        }
+        if key.code == KeyCode::Char('M') && !self.typing() {
+            self.toggle_mouse();
             return;
         }
         match self.screen {

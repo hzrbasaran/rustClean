@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Applications</key>
+	<dict/>
+	<key>Build Version</key>
+	<string>21F90</string>
+	<key>Device Name</key>
+	<string>Demo iPhone</string>
+	<key>Display Name</key>
+	<string>Demo iPhone</string>
+	<key>GUID</key>
+	<string>00000000000000000000000000000000</string>
+	<key>ICCID</key>
+	<string>00000000000000000000</string>
+	<key>IMEI</key>
+	<string>000000000000000</string>
+	<key>Installed Applications</key>
+	<array/>
+	<key>Last Backup Date</key>
+	<date>2026-03-14T09:30:00Z</date>
+	<key>Product Name</key>
+	<string>iPhone 13 Pro</string>
+	<key>Product Type</key>
+	<string>iPhone14,2</string>
+	<key>Product Version</key>
+	<string>17.5.1</string>
+	<key>Serial Number</key>
+	<string>XXXXXXXXXXXX</string>
+	<key>Target Identifier</key>
+	<string>00000000-0000000000000000</string>
+	<key>Target Type</key>
+	<string>Device</string>
+	<key>Unique Identifier</key>
+	<string>00000000-0000000000000000</string>
+	<key>iTunes Version</key>
+	<string>12.13.2.3</string>
+</dict>
+</plist>

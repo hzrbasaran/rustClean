@@ -114,17 +114,18 @@ fn searched(tree: &Tree, id: NodeId, path: &Path) -> bool {
     !SYSTEM.iter().any(|s| path == Path::new(s))
 }
 
-/// Whether `id` holds nothing at all: no file, and no folder below it that
-/// the search keeps out (an empty `.app` or `.git` still matters).
+/// Whether `id` holds nothing at all: no file, no folder below it that the
+/// search keeps out (an empty `.app` or `.git` still matters), and no folder
+/// whose contents were not read (it may hold anything).
 fn plainly_empty(tree: &Tree, id: NodeId, path: &Path) -> bool {
-    if tree.node(id).file_count != 0 {
+    if tree.node(id).file_count != 0 || tree.node(id).unread {
         return false;
     }
     let mut stack: Vec<(NodeId, PathBuf)> = vec![(id, path.to_path_buf())];
     while let Some((dir, p)) = stack.pop() {
         for c in tree.children(dir) {
             let cp = p.join(tree.name(c));
-            if !searched(tree, c, &cp) {
+            if tree.node(c).unread || !searched(tree, c, &cp) {
                 return false;
             }
             stack.push((c, cp));
@@ -383,6 +384,24 @@ mod tests {
                 .chain(["Pictures/Old".to_string()])
                 .collect::<Vec<_>>()
         );
+    }
+
+    #[test]
+    fn unread_folders_are_never_empty() {
+        let mut t = tree(&[
+            ("Locked", true, 50),
+            ("Outer/Inner", true, 50),
+            ("Plain", true, 50),
+        ]);
+        // An unreadable or skipped folder may hold anything, and so may a
+        // folder around one.
+        for path in ["Locked", "Outer/Inner"] {
+            let id = path.split('/').fold(ROOT, |dir, name| {
+                t.children(dir).find(|&c| t.name(c) == name).unwrap()
+            });
+            t.set_unread(id);
+        }
+        assert_eq!(names(&t, &run(&t, 0), "Boş klasörler"), ["Plain"]);
     }
 
     #[test]

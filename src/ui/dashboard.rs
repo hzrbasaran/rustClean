@@ -6,7 +6,7 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Cell, Paragraph, Row, Table};
 use ratatui::Frame;
 
-use crate::app::{Dashboard, Pane};
+use crate::app::{Dashboard, Hit, Mouse, Pane};
 use crate::stats;
 use crate::tree::{NodeId, SizeMode, Tree};
 
@@ -15,7 +15,7 @@ use super::style::{
     age_colors, category_color, date_cell, date_span, highlight, usage_color, Themed,
 };
 use super::theme::theme;
-use super::{bar, halves, panel, DATE_WIDTH};
+use super::{bar, halves, panel, panel_rows, DATE_WIDTH};
 
 /// Width of the size and percentage columns of the file types panel, with
 /// their gaps.
@@ -30,6 +30,7 @@ pub(super) fn render_dashboard(
     mode: SizeMode,
     scan_errors: u64,
     area: Rect,
+    mouse: &mut Mouse,
 ) {
     let s = &d.stats;
     let age_rows = if s.ages[stats::AGE_UNKNOWN].files > 0 {
@@ -237,6 +238,12 @@ pub(super) fn render_dashboard(
         table
     };
     f.render_stateful_widget(table, files, &mut d.files);
+    mouse.add_rows(
+        panel_rows(files),
+        d.files.offset(),
+        s.top_files.len(),
+        |i| Hit::Pane(Pane::Files, i),
+    );
 
     let focus_dirs = d.focus == Pane::Dirs;
     let rows = s.top_dirs.iter().map(|&(id, size)| {
@@ -267,4 +274,10 @@ pub(super) fn render_dashboard(
         table
     };
     f.render_stateful_widget(table, dirs, &mut d.dirs);
+    mouse.add_rows(
+        panel_rows(dirs),
+        d.dirs.offset(),
+        d.stats.top_dirs.len(),
+        |i| Hit::Pane(Pane::Dirs, i),
+    );
 }

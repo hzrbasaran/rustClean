@@ -6,11 +6,14 @@
 //! (`delete::test_trash`), so nothing here touches the user's data.
 
 mod apps;
+mod backups;
 mod clutter;
 mod deletion;
 mod export;
 mod history;
+mod htmlmap;
 mod language;
+mod mouse;
 mod reports;
 mod scan;
 mod screens;
@@ -172,6 +175,14 @@ pub fn menu(app: &mut App, index: usize) {
         press(app, KeyCode::Down);
     }
     press(app, KeyCode::Enter);
+}
+
+/// The position of `item` in the `m` menu, for `menu`.
+pub fn index_of(item: crate::reports::MenuItem) -> usize {
+    crate::reports::MenuItem::ALL
+        .iter()
+        .position(|&i| i == item)
+        .expect("a menu item")
 }
 
 /// Ticks the app like the event loop does until `done`, for at most 20 s.

@@ -24,12 +24,12 @@ expression: screen
   [ ]   │ ?             bu yardım                                                          │
         │ L             Türkçe ↔ English                                                   │
         │ T             tema: koyu, açık, renk körü                                        │
+        │ M             fare aç / kapat (kapalıyken terminalde metin seçilebilir)          │
         │ q  Ctrl-C     çık                                                                │
         │                                                                                  │
         │Klasör listesi                                                                    │
         │ ↑↓  j k       gez                                                                │
-        │ PgUp PgDn     sayfa sayfa                                                        │
-────────│ Home End  g G ilk / son satır                                                    │────────
+────────│ PgUp PgDn     sayfa sayfa                                                        │────────
 Enter: d└───────────────────── ↑↓ PgUp PgDn: kaydır · Esc / ?: kapat ──────────────────────┘
  ?  yardım   ↑↓  gez   Space  sepete   t  tümü   f  yaş filtresi   x  çöpe taşı   S  sepet   Enter
 --- styles (column+width foreground/background modifiers) ---
@@ -55,11 +55,11 @@ Enter: d└───────────────────── ↑�
 19: 2+3 Gray/- | 8+16 Cyan/- | 24+9 White/- | 91+1 Cyan/-
 20: 8+16 Cyan/- | 24+16 White/- | 91+1 Cyan/-
 21: 8+16 Cyan/- | 24+27 White/- | 91+1 Cyan/-
-22: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
-23: 8+1 Cyan/- | 91+1 Cyan/-
-24: 8+1 Cyan/- | 9+14 White/- BOLD | 91+1 Cyan/-
-25: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
-26: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
-27: 8+16 Cyan/- | 24+15 White/- | 91+1 Cyan/-
+22: 8+16 Cyan/- | 24+57 White/- | 91+1 Cyan/-
+23: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
+24: 8+1 Cyan/- | 91+1 Cyan/-
+25: 8+1 Cyan/- | 9+14 White/- BOLD | 91+1 Cyan/-
+26: 8+16 Cyan/- | 24+3 White/- | 91+1 Cyan/-
+27: 8+16 Cyan/- | 24+11 White/- | 91+1 Cyan/-
 28: 0+8 Gray/- | 8+22 Cyan/- | 30+39 Gray/- | 69+23 Cyan/- | 92+8 Gray/-
 29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 38+3 Black/Gray | 48+3 Black/Gray | 66+3 Black/Gray | 81+3 Black/Gray | 92+7 Black/Gray

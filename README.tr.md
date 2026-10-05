@@ -32,6 +32,10 @@ harekete geçmenizi sağlar:
 - **Keşif:**
   - boyut çubukları, dosya sayıları ve renkli değişiklik tarihleri olan bir liste
   - **ağaç haritası** görünümü (`t`)
+  - ağaç haritasını **web sayfası** olarak kaydetme (`w`): bulunulan klasör,
+    dört seviyeye kadar yakınlaştırılabilir haritasıyla tek ve kendi içinde
+    tam bir HTML dosyasına yazılır; her tarayıcıda (çevrimdışı ve telefonda
+    da) açılır, paylaşılabilir
   - dosya türleri, yaş dağılımı ve en büyük öğelerle klasör **özeti** (`i`)
 - **Raporlar** (`m`):
   - en büyük dosyalar ve klasörler
@@ -50,6 +54,10 @@ harekete geçmenizi sağlar:
     `*.tmp`, Office kilit dosyaları, yarım indirmeler); gizli klasörlere,
     paketlere, `Library`'ye, derleme çıktılarına ve sistem klasörlerine
     dokunmaz
+  - Finder ya da iTunes ile alınmış **iPhone / iPad yedekleri**
+    (`MobileSync/Backup`): her yedeğin cihazı, modeli, iOS sürümü ve tarihi;
+    şifreli yedekler ve her cihazın en yeni yedeği işaretlenir; klasör için
+    Tam Disk Erişimi gerekiyorsa söyler
 - **Yaş filtresi** (`f`): Raporlarda yalnızca 30 / 90 / 180 / 365 gündür
   dokunulmamış öğeleri gösterir. Geliştirici çöplerinde yaş, bağımlılık
   klasörünün değil *projenin* yaşıdır.
@@ -66,7 +74,11 @@ harekete geçmenizi sağlar:
 - **Geliştirici araçları temizliği:** Docker, Xcode simülatörleri,
   DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew ve Cargo'nun ne
   kadar yer açabileceğini ölçer; onayınızdan sonra **araçların kendi temizlik
-  komutlarını** çalıştırır.
+  komutlarını** çalıştırır. Linux'ta apt, dnf ve pacman paket önbelleklerini,
+  systemd günlüğünü ve devre dışı snap sürümlerini; Windows'ta `%TEMP%`,
+  `C:\Windows\Temp`, Windows Update indirme önbelleğini ve Geri Dönüşüm
+  Kutusunu da ölçer. Root ya da yönetici izni gerekenler için komutu gösterir,
+  siz çalıştırırsınız.
 - **Tarama geçmişi:** Her tarama özetlenir; son taramadan beri neyin
   büyüdüğünü görürsünüz.
 - **Sistem verileri paneli** (macOS): APFS bölümleri, Time Machine yerel anlık
@@ -75,6 +87,9 @@ harekete geçmenizi sağlar:
 - Koyu ve açık terminaller için **temalar**, renk körü dostu bir palet
   (`T` ile değişir) ya da hiç renk kullanmama (`--no-color`, `NO_COLOR`).
 - **Yardım** (`?`): bütün tuşlar tek ekranda, önce bulunduğunuz ekranınkiler.
+- **İsteğe bağlı fare** (`M`): tıklayınca satır ya da harita bloğu seçilir,
+  çift tıklayınca açılır, tekerlekle kaydırılır. Terminalde metin seçmek
+  mümkün kalsın diye başlangıçta kapalıdır; onaylar yalnızca klavyeyle verilir.
 
 ## Ekran görüntüleri
 
@@ -102,7 +117,9 @@ rustClean kendiliğinden hiçbir şey silmez:
 - Geliştirici araçları temizliği çalıştıracağı **komutları birebir** gösterir.
   Komutlar kabuk üzerinden değil doğrudan ve asla `sudo` ile çalıştırılmaz.
   Veri kaybettirebilecek işlemler (Docker volume'ları) için `evet` yazmak
-  gerekir.
+  gerekir. Root ya da yönetici izni gereken temizlikler (Linux paket
+  önbellekleri, günlük, snap'ler, Windows sistem klasörleri) yalnızca
+  gösterilir; onları siz çalıştırırsınız.
 - Raporlarda başta hiçbir şey seçili değildir. Tahmin içeren yerlerde (hangi
   verinin hangi uygulamaya ait olduğu) rapor bunu açıkça söyler ve şüphede
   silmemekten yana karar verir.
@@ -171,7 +188,7 @@ rustclean report largest-files ~ --limit 20 --csv > buyukler.csv
 
 Rapor türleri: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
 `orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
-`clutter`. Seçenekler ve sütunlar için
+`clutter`, `device-backups`. Seçenekler ve sütunlar için
 [kullanım kılavuzu](docs/USAGE.md#reports-from-the-command-line).
 
 Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
@@ -180,6 +197,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 |---|---|
 | `↑` `↓` · `Enter` · `⌫` | gezin · aç · geri |
 | `t` | liste ↔ ağaç haritası |
+| `w` | ağaç haritasını HTML sayfası olarak kaydet |
 | `i` | bulunulan klasörün özeti |
 | `m` | raporlar ve araçlar |
 | `/` | ada göre ara (`*` ve `?` joker karakterleri) |
@@ -190,6 +208,7 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 | `R` · `r` | bulunulan klasörü yenile · tümünü yeniden tara |
 | `L` | Türkçe ↔ English |
 | `T` | tema: koyu → açık → renk körü dostu |
+| `M` | fareyi aç / kapat (başlangıçta kapalı) |
 | `?` | bütün tuşlar, önce bulunduğunuz ekranınkiler |
 | `q` | çık |
 
@@ -211,6 +230,16 @@ kullanımda daha az denenmiştir. Bazı özellikler yalnızca macOS'ta vardır:
 - Xcode ve simülatör temizliği
 - paket kimliğiyle uygulama/veri eşleştirmesi (Linux ve Windows'ta daha basit,
   ada dayalı eşleştirme kullanılır)
+
+Araçlar ekranında platforma özel satırlar vardır:
+- **Linux:** apt, dnf ve pacman paket önbellekleri, systemd günlüğü ve devre
+  dışı snap sürümleri. Bunlar root gerektirdiği için rustClean `sudo`
+  komutunu çalıştırmaz, gösterir.
+- **Windows:** `%TEMP%` (onayınızdan sonra Geri Dönüşüm Kutusuna taşınır;
+  kullanımdaki dosyalar atlanır), `C:\Windows\Temp` ve Windows Update indirme
+  önbelleği (okunabiliyorsa ölçülür; yönetici PowerShell'i için komutlar
+  gösterilir) ve Geri Dönüşüm Kutusunun boyutu. Windows desteği en az denenmiş
+  olanıdır; gerçek makinelerden gelen geri bildirimler çok işe yarar.
 
 ## Bilgisayarınızda saklanan veriler
 

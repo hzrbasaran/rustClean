@@ -121,6 +121,13 @@ impl Topic {
                     ),
                     ("t", t!("harita görünümü", "map view")),
                     (
+                        "w",
+                        t!(
+                            "haritayı HTML sayfası olarak kaydet",
+                            "save the treemap as an HTML page"
+                        ),
+                    ),
+                    (
                         "/",
                         t!(
                             "ada göre ara (* ve ? joker karakter)",
@@ -151,6 +158,13 @@ impl Topic {
                     ("⌫", t!("üst klasör", "parent folder")),
                     ("c", t!("renk: türe / yaşa göre", "color: by type / by age")),
                     ("t  Esc", t!("listeye dön", "back to the list")),
+                    (
+                        "w",
+                        t!(
+                            "HTML sayfası olarak kaydet (tarayıcıda yakınlaştırılır)",
+                            "save as an HTML page (zoomable in a browser)"
+                        ),
+                    ),
                     ("m", t!("raporlar menüsü", "reports menu")),
                     export,
                 ]);
@@ -345,6 +359,13 @@ pub fn global_keys() -> Vec<(&'static str, &'static str)> {
             t!(
                 "tema: koyu, açık, renk körü",
                 "theme: dark, light, color-blind"
+            ),
+        ),
+        (
+            "M",
+            t!(
+                "fare aç / kapat (kapalıyken terminalde metin seçilebilir)",
+                "mouse on / off (with it off, the terminal can select text)"
             ),
         ),
         ("q  Ctrl-C", t!("çık", "quit")),
