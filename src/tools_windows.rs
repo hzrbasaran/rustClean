@@ -88,14 +88,14 @@ pub(crate) fn temp_action(dir: PathBuf) -> CleanAction {
     )
 }
 
-/// Whether `dir` looks like a temporary folder that may be emptied: named
-/// like one (`Temp`, `tmp`…), not a drive root, and neither the home folder
-/// nor one of its parents.
+/// Whether `dir` is a temporary folder that may be emptied: named exactly
+/// `temp` or `tmp` (in any case; `Templates` or `MyTemp` are refused), not
+/// a drive root, and neither the home folder nor one of its parents.
 pub fn is_temp_folder(dir: &Path, home: Option<&Path>) -> bool {
-    let named = dir
-        .file_name()
-        .map(|n| n.to_string_lossy().to_lowercase())
-        .is_some_and(|n| n.contains("temp") || n.contains("tmp"));
+    let named = dir.file_name().is_some_and(|n| {
+        let n = n.to_string_lossy();
+        n.eq_ignore_ascii_case("temp") || n.eq_ignore_ascii_case("tmp")
+    });
     let below_root = dir.parent().is_some();
     let holds_home = home.is_some_and(|h| h.starts_with(dir));
     dir.is_absolute() && named && below_root && !holds_home
@@ -273,6 +273,19 @@ fn recycle_bin_dir(letter: char) -> PathBuf {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Only a folder named exactly `temp` or `tmp`, in any case, is emptied.
+    #[test]
+    fn temp_folder_names_match_exactly() {
+        // An absolute base on every platform.
+        let base = std::env::temp_dir().join("base");
+        for name in ["Temp", "TEMP", "tmp"] {
+            assert!(is_temp_folder(&base.join(name), None), "{name}");
+        }
+        for name in ["Templates", "Contemporary", "MyTemp", "tmpfiles"] {
+            assert!(!is_temp_folder(&base.join(name), None), "{name}");
+        }
+    }
 
     #[cfg(unix)]
     #[test]

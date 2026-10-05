@@ -240,7 +240,7 @@ selected, and rustClean never runs `sudo` or an elevated shell.
 | Windows | Recycle Bin | sizes of `X:\$Recycle.Bin` on every drive (other users' folders are not readable and are left out) | in PowerShell: `Clear-RecycleBin` (deletes for good, so rustClean leaves it to you) |
 
 `%TEMP%` is only offered when it looks like a temporary folder: its name
-contains `temp` or `tmp`, and it is not a drive root, your home folder or one
+is exactly `Temp` or `tmp` (in any case), and it is not a drive root, your home folder or one
 of its parents. When `C:\Windows\Temp` or the update cache cannot be read
 without administrator rights, the row says so and still shows the command.
 Windows' own Disk Cleanup (`cleanmgr`, "Clean up system files") cleans the
