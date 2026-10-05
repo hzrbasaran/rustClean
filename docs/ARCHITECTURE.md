@@ -53,6 +53,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │
    ├─ history.rs ─ scan snapshots and "what changed"
    ├─ tools.rs ─── developer tool measurement and cleanup commands
+   │    ├─ tools_linux.rs    apt/dnf/pacman caches, journal, snaps (#18)
+   │    └─ tools_windows.rs  %TEMP%, Windows temp, update cache, Recycle Bin (#19)
    ├─ system.rs ── macOS system data (diskutil, tmutil, sysctl)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ trashlog.rs  the deletion log (deletions.jsonl)

@@ -280,6 +280,31 @@ log. The tool is then measured again.
 | CocoaPods · Homebrew | `pod cache clean --all` · `brew cleanup --prune=all` |
 | Cargo | move downloaded `.crate` files to the trash |
 
+**Linux and Windows system caches.** On these platforms the same screen also
+lists system folders. Measuring still only reads. Actions that need root
+(Linux) or administrator rights (Windows) are marked "rustClean does not run
+this; run the command yourself" and show the exact command; they cannot be
+selected, and rustClean never runs `sudo` or an elevated shell.
+
+| Platform | Row | Measured from | Action |
+|---|---|---|---|
+| Linux | apt package cache | size of `/var/cache/apt` | `sudo apt-get clean` (you run it) |
+| Linux | dnf package cache | `cachedir` in `/etc/dnf/dnf.conf`, else `/var/cache/libdnf5` and `/var/cache/dnf` | `sudo dnf clean all` (you run it) |
+| Linux | pacman package cache | `CacheDir` in `/etc/pacman.conf`, else `/var/cache/pacman/pkg/` | `sudo paccache -rk1` (when pacman-contrib is installed) · `sudo pacman -Scc` (you run them) |
+| Linux | systemd journal | `journalctl --disk-usage` (as your user: the journals you can read) | `sudo journalctl --vacuum-time=2weeks` (you run it) |
+| Linux | disabled snap revisions | `snap list --all`, sizes of `/var/lib/snapd/snaps/<name>_<rev>.snap` | `sudo snap remove <name> --revision=<rev>` per revision (you run them) |
+| Windows | temporary files (`%TEMP%`) | size of `%TEMP%` | move the contents to the Recycle Bin, entry by entry; files in use are skipped (rustClean runs this after you confirm) |
+| Windows | Windows temp folder | size of `C:\Windows\Temp`, if readable | in an administrator PowerShell: `Remove-Item C:\Windows\Temp\* -Recurse -Force` |
+| Windows | Windows Update downloads | size of `C:\Windows\SoftwareDistribution\Download`, if readable | in an administrator PowerShell: `Stop-Service -Name wuauserv, bits -Force`, `Remove-Item C:\Windows\SoftwareDistribution\Download\* -Recurse -Force`, `Start-Service -Name wuauserv, bits` |
+| Windows | Recycle Bin | sizes of `X:\$Recycle.Bin` on every drive (other users' folders are not readable and are left out) | in PowerShell: `Clear-RecycleBin` (deletes for good, so rustClean leaves it to you) |
+
+`%TEMP%` is only offered when it looks like a temporary folder: its name
+is exactly `Temp` or `tmp` (in any case), and it is not a drive root, your home folder or one
+of its parents. When `C:\Windows\Temp` or the update cache cannot be read
+without administrator rights, the row says so and still shows the command.
+Windows' own Disk Cleanup (`cleanmgr`, "Clean up system files") cleans the
+same folders too.
+
 **System data** (macOS). Shows:
 - the APFS container and every volume's usage
 - how a scan of `/` compares to the System + Data volumes, and why

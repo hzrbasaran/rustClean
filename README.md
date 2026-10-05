@@ -64,6 +64,11 @@ one go.
 - **Developer tools cleanup** — measures what Docker, Xcode simulators,
   DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew and Cargo
   could free, and runs **their own cleanup commands** after you confirm.
+  On Linux it also measures the apt, dnf and pacman package caches, the
+  systemd journal and disabled snap revisions; on Windows `%TEMP%`,
+  `C:\Windows\Temp`, the Windows Update download cache and the Recycle Bin.
+  What needs root or administrator rights is shown as a command for you to
+  run.
 - **Scan history** — every scan is summarized; see what grew since last time.
 - **System data panel** (macOS) — APFS volumes, Time Machine local snapshots,
   swap, and why the scan total differs from what the disk reports.
@@ -100,7 +105,9 @@ rustClean deletes nothing on its own:
 - Mount points and folders on other volumes are refused.
 - Developer tool cleanups show the **exact commands** before running them. They
   are started directly, never through a shell and never with `sudo`. Actions
-  that can lose data (Docker volumes) require typing `yes`.
+  that can lose data (Docker volumes) require typing `yes`. Cleanups that need
+  root or administrator rights (Linux package caches, the journal, snaps,
+  Windows system folders) are only shown, for you to run yourself.
 - Reports start with nothing selected. Where a guess is involved (which data
   belongs to which app), the report says so and errs on the side of keeping
   things.
@@ -199,6 +206,16 @@ rustClean is developed and used on **macOS**. It builds and its tests pass on
 use. Some features are macOS-only: the system data panel, Xcode and simulator
 cleanup, and app/data matching through bundle identifiers (Linux and Windows
 use simpler name-based matching).
+
+The tools screen has platform-specific rows:
+- **Linux:** apt, dnf and pacman package caches, the systemd journal and
+  disabled snap revisions. They need root, so rustClean shows the `sudo`
+  command instead of running it.
+- **Windows:** `%TEMP%` (moved to the Recycle Bin after you confirm; files in
+  use are skipped), `C:\Windows\Temp` and the Windows Update download cache
+  (measured when readable; the commands for an administrator PowerShell are
+  shown), and the Recycle Bin size. Windows support is the least tested;
+  reports from real machines are welcome.
 
 ## Data stored on your computer
 

@@ -697,6 +697,131 @@ fn tools_app() -> App {
 }
 
 #[test]
+fn linux_and_windows_tools() {
+    snap("tools-linux", linux_tools_app);
+    snap("tools-windows", windows_tools_app);
+}
+
+/// A made-up tool row with its actions.
+fn tool_row(kind: ToolKind, status: Status, actions: Vec<CleanAction>) -> Tool {
+    Tool {
+        kind,
+        status,
+        actions,
+    }
+}
+
+fn ready(gib: u64, detail: &str) -> Status {
+    Status::Ready {
+        reclaimable: gib * GIB,
+        detail: detail.into(),
+    }
+}
+
+/// The Linux system caches, with the snap revisions selected: their
+/// commands need root, so they are shown for the user to run.
+fn linux_tools_app() -> App {
+    use crate::tools::linux::{self, SnapRevision};
+    let mut app = app();
+    let revs = [("core20", "2015"), ("firefox", "4173")].map(|(name, rev)| SnapRevision {
+        name: name.into(),
+        rev: rev.into(),
+    });
+    let not_installed = || Status::Missing("not installed".into());
+    let tools = vec![
+        tool_row(
+            ToolKind::AptCache,
+            ready(1, "/var/cache/apt"),
+            vec![linux::apt_action()],
+        ),
+        tool_row(ToolKind::DnfCache, not_installed(), Vec::new()),
+        tool_row(ToolKind::PacmanCache, not_installed(), Vec::new()),
+        tool_row(
+            ToolKind::Journal,
+            ready(2, "all journals"),
+            vec![linux::journal_action()],
+        ),
+        tool_row(
+            ToolKind::Snaps,
+            ready(1, "core20 (2015) · firefox (4173)"),
+            vec![linux::snap_action(&revs, GIB)],
+        ),
+    ];
+    let mut view = ToolsView::with_tools(tools);
+    view.table.select(Some(4));
+    browser(&mut app).tools = Some(view);
+    app
+}
+
+/// The Windows folders, with the update cache selected: only `%TEMP%` is
+/// cleaned by rustClean, the rest is shown as commands.
+fn windows_tools_app() -> App {
+    use crate::tools::windows;
+    let mut app = app();
+    let temp = r"C:\Users\demo\AppData\Local\Temp";
+    let download = r"C:\Windows\SoftwareDistribution\Download";
+    let tools = vec![
+        tool_row(
+            ToolKind::WinTemp,
+            ready(3, temp),
+            vec![windows::temp_action(PathBuf::from(temp))],
+        ),
+        tool_row(
+            ToolKind::WinSystemTemp,
+            Status::Unavailable("needs administrator rights to measure".into()),
+            vec![windows::system_temp_action(Path::new(r"C:\Windows\Temp"))],
+        ),
+        tool_row(
+            ToolKind::WinUpdate,
+            ready(2, download),
+            vec![windows::update_action(Path::new(download))],
+        ),
+        tool_row(
+            ToolKind::RecycleBin,
+            ready(5, "C: 5.0 GiB"),
+            vec![windows::recycle_action()],
+        ),
+    ];
+    let mut view = ToolsView::with_tools(tools);
+    view.table.select(Some(2));
+    browser(&mut app).tools = Some(view);
+    app
+}
+
+/// Commands that need root or an administrator are never offered to run:
+/// Enter on such a tool opens nothing, and Space cannot check them.
+#[test]
+fn manual_commands_cannot_be_run() {
+    let mut app = windows_tools_app();
+    press(&mut app, KeyCode::Enter);
+    let view = browser(&mut app).tools.as_ref().unwrap();
+    assert!(view.picker.is_none() && view.confirm.is_none());
+
+    // %TEMP% goes through the normal flow.
+    let tools = browser(&mut app).tools.as_mut().unwrap();
+    tools.table.select(Some(0));
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Char(' '));
+    press(&mut app, KeyCode::Enter);
+    let view = browser(&mut app).tools.as_ref().unwrap();
+    let confirm = view.confirm.as_ref().expect("asks before trashing");
+    assert!(matches!(confirm.actions[0].steps[0], Step::TrashEach(_)));
+
+    // A tool mixing both: only the runnable action can be chosen.
+    let mut app = windows_tools_app();
+    let tools = browser(&mut app).tools.as_mut().unwrap();
+    tools.tools[0]
+        .actions
+        .push(crate::tools::windows::recycle_action());
+    tools.table.select(Some(0));
+    press(&mut app, KeyCode::Enter);
+    press(&mut app, KeyCode::Down);
+    press(&mut app, KeyCode::Char(' '));
+    let view = browser(&mut app).tools.as_ref().unwrap();
+    assert_eq!(view.picker.as_ref().unwrap().checked, [false, false]);
+}
+
+#[test]
 fn system_data() {
     snap("system", || {
         let mut app = app();

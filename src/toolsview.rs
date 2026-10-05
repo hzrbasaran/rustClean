@@ -176,7 +176,10 @@ impl ToolsView {
             match code {
                 KeyCode::Up | KeyCode::Char('k') => p.cursor = (p.cursor + n - 1) % n,
                 KeyCode::Down | KeyCode::Char('j') => p.cursor = (p.cursor + 1) % n,
-                KeyCode::Char(' ') => p.checked[p.cursor] = !p.checked[p.cursor],
+                // Commands that need root are only shown, never run.
+                KeyCode::Char(' ') if !self.tools[p.tool].actions[p.cursor].manual() => {
+                    p.checked[p.cursor] = !p.checked[p.cursor];
+                }
                 KeyCode::Enter => self.ask_confirmation(),
                 KeyCode::Char('q') => return ToolsKey::Quit,
                 KeyCode::Esc => self.picker = None,
@@ -205,8 +208,11 @@ impl ToolsView {
         let Some(i) = self.table.selected() else {
             return;
         };
-        let n = self.tools[i].actions.len();
-        if n > 0 {
+        let actions = &self.tools[i].actions;
+        let n = actions.len();
+        // Only commands the user runs themselves: the actions panel already
+        // shows them, there is nothing to choose.
+        if actions.iter().any(|a| !a.manual()) {
             self.run = None;
             self.picker = Some(Picker {
                 tool: i,
@@ -224,7 +230,7 @@ impl ToolsView {
             .actions
             .iter()
             .zip(&p.checked)
-            .filter(|(_, &c)| c)
+            .filter(|(a, &c)| c && !a.manual())
             .map(|(a, _)| a.clone())
             .collect();
         if actions.is_empty() {
