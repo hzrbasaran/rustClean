@@ -3,17 +3,75 @@
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::{Style, Stylize};
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Cell, Paragraph, Row, Table};
+use ratatui::widgets::{Cell, Paragraph, Row, Table, Wrap};
 use ratatui::Frame;
 
 use crate::app::{Hit, Mouse};
-use crate::tools::Status as ToolStatus;
+use crate::tools::{CleanAction, Status as ToolStatus};
 use crate::toolsview::{confirm_word, ToolsView};
 
 use super::format::fmt_size;
 use super::style::{highlight, risk_style, Themed};
 use super::theme::theme;
-use super::{panel, popup, table_block_plain, table_rows, SPINNER};
+use super::{panel, popup, table_block_plain, table_rows, wrapped_rows, SPINNER};
+
+/// The actions with their steps, in at most `max` rows at `width`: when
+/// they do not fit, each action shows fewer steps and a "… more" line, and
+/// as a last resort the list is cut with a line saying how much is left out.
+fn action_lines(actions: &[CleanAction], max: usize, width: u16) -> Vec<Line<'static>> {
+    let build = |shown: usize| {
+        let mut lines = Vec::new();
+        for a in actions {
+            let (style, text) = risk_style(a.risk);
+            lines.push(Line::from(vec![
+                Span::styled(text, style),
+                Span::raw(format!(" {}", a.label)).normal().bold(),
+            ]));
+            if a.manual() {
+                lines.push(
+                    Line::from(t!(
+                        "    rustClean bunu çalıştırmaz; komutu kendiniz çalıştırın:",
+                        "    rustClean does not run this; run the command yourself:",
+                    ))
+                    .warn(),
+                );
+            }
+            for step in a.steps.iter().take(shown) {
+                let line = Line::from(format!("    $ {}", step.describe()));
+                // The command to copy reads as text, not as a hint.
+                lines.push(if a.manual() {
+                    line.normal()
+                } else {
+                    line.muted()
+                });
+            }
+            let rest = a.steps.len().saturating_sub(shown);
+            if rest > 0 {
+                let more = if rest == 1 { "step" } else { "steps" };
+                lines.push(
+                    Line::from(tf!("    … {rest} adım daha", "    … {rest} more {more}")).muted(),
+                );
+            }
+        }
+        lines
+    };
+    let rows = |lines: &[Line<'_>]| -> usize { lines.iter().map(|l| wrapped_rows(l, width)).sum() };
+    let most = actions.iter().map(|a| a.steps.len()).max().unwrap_or(0);
+    for shown in (1..=most.max(1)).rev() {
+        let lines = build(shown);
+        if rows(&lines) <= max {
+            return lines;
+        }
+    }
+    let mut lines = build(1);
+    let mut cut = 0;
+    while lines.len() > 1 && rows(&lines) + 1 > max {
+        lines.pop();
+        cut += 1;
+    }
+    lines.push(Line::from(tf!("… {cut} satır daha", "… {cut} more lines")).muted());
+    lines
+}
 
 pub(super) fn render_tools(
     f: &mut Frame<'_>,
@@ -22,20 +80,27 @@ pub(super) fn render_tools(
     area: Rect,
     mouse: &mut Mouse,
 ) {
-    let action_rows: u16 = if view.run.is_some() {
-        area.height / 2
+    let inner = area.width.saturating_sub(2);
+    let max_rows = usize::from((area.height / 2).saturating_sub(2));
+    let hint = view.selected().and_then(|t| t.kind.hint());
+    let hint_rows = hint.map_or(0, |h| wrapped_rows(&Line::from(h), inner));
+    let action_rows = if view.run.is_some() {
+        usize::from(area.height / 2)
     } else {
         view.selected().map_or(1, |t| {
-            t.actions
+            let budget = max_rows.saturating_sub(hint_rows).max(1);
+            let lines = action_lines(&t.actions, budget, inner);
+            lines
                 .iter()
-                .map(|a| 1 + u16::from(a.manual()) + a.steps.len() as u16)
-                .sum::<u16>()
+                .map(|l| wrapped_rows(l, inner))
+                .sum::<usize>()
                 .max(1)
+                + hint_rows
         })
     };
     let [list_area, detail_area] = Layout::vertical([
         Constraint::Min(6),
-        Constraint::Length((action_rows + 2).min(area.height / 2)),
+        Constraint::Length((action_rows as u16 + 2).min(area.height / 2)),
     ])
     .areas(area);
 
@@ -97,31 +162,10 @@ pub(super) fn render_tools(
     let mut lines = Vec::new();
     match view.selected() {
         Some(t) if !t.actions.is_empty() => {
-            for a in &t.actions {
-                let (style, text) = risk_style(a.risk);
-                lines.push(Line::from(vec![
-                    Span::styled(text, style),
-                    Span::raw(format!(" {}", a.label)).normal().bold(),
-                ]));
-                if a.manual() {
-                    lines.push(
-                        Line::from(t!(
-                            "    rustClean bunu çalıştırmaz; komutu kendiniz çalıştırın:",
-                            "    rustClean does not run this; run the command yourself:",
-                        ))
-                        .warn(),
-                    );
-                }
-                for step in &a.steps {
-                    let line = Line::from(format!("    $ {}", step.describe()));
-                    // The command to copy reads as text, not as a hint.
-                    lines.push(if a.manual() {
-                        line.normal()
-                    } else {
-                        line.muted()
-                    });
-                }
-            }
+            let budget = usize::from(detail_area.height.saturating_sub(2))
+                .saturating_sub(hint_rows)
+                .max(1);
+            lines.extend(action_lines(&t.actions, budget, inner));
         }
         Some(t) if t.status == ToolStatus::Measuring => {
             lines.push(Line::from(t!("Ölçülüyor…", "Measuring…")).accent());
@@ -133,6 +177,9 @@ pub(super) fn render_tools(
             ))
             .muted(),
         ),
+    }
+    if let Some(hint) = hint {
+        lines.push(Line::from(hint).muted());
     }
     if let Some(run) = &view.run {
         // Show the end of the log.
@@ -173,7 +220,9 @@ pub(super) fn render_tools(
         );
     } else {
         f.render_widget(
-            Paragraph::new(lines).block(panel(t!(" İşlemler ", " Actions "), false)),
+            Paragraph::new(lines)
+                .wrap(Wrap { trim: false })
+                .block(panel(t!(" İşlemler ", " Actions "), false)),
             detail_area,
         );
     }
@@ -184,8 +233,24 @@ pub(super) fn render_tools(
     }
     if let Some(p) = &view.picker {
         let tool = &view.tools[p.tool];
-        let mut lines = vec![Line::from("")];
-        for (i, a) in tool.actions.iter().enumerate() {
+        // Long lists scroll with the cursor; the popup keeps its border, the
+        // two "more" lines and the key line.
+        let room = usize::from(f.area().height.saturating_sub(8)).max(1);
+        let n = tool.actions.len();
+        let first = (p.cursor + 1)
+            .saturating_sub(room)
+            .min(n.saturating_sub(room));
+        let last = (first + room).min(n);
+        let more = |count: usize, up: bool| {
+            if count == 0 {
+                Line::from("")
+            } else {
+                let arrow = if up { "↑" } else { "↓" };
+                Line::from(tf!("  {arrow} {count} daha", "  {arrow} {count} more")).muted()
+            }
+        };
+        let mut lines = vec![more(first, true)];
+        for (i, a) in tool.actions.iter().enumerate().take(last).skip(first) {
             let (style, text) = risk_style(a.risk);
             let check = if p.checked[i] { "[✓] " } else { "[ ] " };
             let row = if a.manual() {
@@ -210,7 +275,7 @@ pub(super) fn render_tools(
                 row
             });
         }
-        lines.push(Line::from(""));
+        lines.push(more(n - last, false));
         lines.push(
             Line::from(t!(
                 " Space: seç   Enter: devam   Esc: vazgeç",
@@ -241,15 +306,17 @@ pub(super) fn render_tools(
             ))
             .normal(),
         ];
-        for a in &c.actions {
-            let (style, text) = risk_style(a.risk);
-            lines.push(Line::from(vec![
-                Span::styled(text, style),
-                Span::raw(format!(" {}", a.label)).normal().bold(),
-            ]));
-            for step in &a.steps {
-                lines.push(Line::from(format!("    $ {}", step.describe())).muted());
-            }
+        // The prompt below must stay on screen, however many steps there are.
+        let width = f.area().width.saturating_sub(4).min(100).saturating_sub(2);
+        let hint = tool.kind.hint();
+        let hint_rows = hint.map_or(0, |h| 1 + wrapped_rows(&Line::from(h), width));
+        let room = usize::from(f.area().height.saturating_sub(2 + 2 + 5))
+            .saturating_sub(hint_rows)
+            .max(1);
+        lines.extend(action_lines(&c.actions, room, width));
+        if let Some(hint) = hint {
+            lines.push(Line::from(""));
+            lines.push(Line::from(hint).warn());
         }
         lines.push(Line::from(""));
         match &c.typed {

@@ -71,14 +71,15 @@ harekete geçmenizi sağlar:
   betikler ve zamanlanmış görevler için. Yalnızca okur, hiçbir şey silmez.
 - **Silme kaydı:** çöp kutusuna taşınan her şey, günlere göre ve nasıl
   silindiğiyle (menü → Silme kaydı).
-- **Geliştirici araçları temizliği:** Docker, Xcode simülatörleri,
-  DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew ve Cargo'nun ne
-  kadar yer açabileceğini ölçer; onayınızdan sonra **araçların kendi temizlik
-  komutlarını** çalıştırır. Linux'ta apt, dnf ve pacman paket önbelleklerini,
-  systemd günlüğünü ve devre dışı snap sürümlerini; Windows'ta `%TEMP%`,
-  `C:\Windows\Temp`, Windows Update indirme önbelleğini ve Geri Dönüşüm
-  Kutusunu da ölçer. Root ya da yönetici izni gerekenler için komutu gösterir,
-  siz çalıştırırsınız.
+- **Geliştirici araçları temizliği:** Docker, Xcode (simülatörler,
+  DerivedData, arşivler), Android SDK (emülatörler, sistem imajları), npm,
+  pnpm, Yarn, Bun, pip, uv, conda, Gradle, Maven, Go, Flutter / Dart pub,
+  Playwright, CocoaPods, Homebrew ve Cargo'nun ne kadar yer açabileceğini
+  ölçer; onayınızdan sonra **araçların kendi temizlik komutlarını** çalıştırır.
+  Linux'ta apt, dnf ve pacman paket önbelleklerini, systemd günlüğünü ve
+  devre dışı snap sürümlerini; Windows'ta `%TEMP%`, `C:\Windows\Temp`,
+  Windows Update indirme önbelleğini ve Geri Dönüşüm Kutusunu da ölçer. Root
+  ya da yönetici izni gerekenler için komutu gösterir, siz çalıştırırsınız.
 - **Tarama geçmişi:** Her tarama özetlenir; son taramadan beri neyin
   büyüdüğünü görürsünüz.
 - **Sistem verileri paneli** (macOS): APFS bölümleri, Time Machine yerel anlık
@@ -121,10 +122,10 @@ rustClean kendiliğinden hiçbir şey silmez:
 - Disk bağlama noktaları ve başka disklerdeki klasörler reddedilir.
 - Geliştirici araçları temizliği çalıştıracağı **komutları birebir** gösterir.
   Komutlar kabuk üzerinden değil doğrudan ve asla `sudo` ile çalıştırılmaz.
-  Veri kaybettirebilecek işlemler (Docker volume'ları) için `evet` yazmak
-  gerekir. Root ya da yönetici izni gereken temizlikler (Linux paket
-  önbellekleri, günlük, snap'ler, Windows sistem klasörleri) yalnızca
-  gösterilir; onları siz çalıştırırsınız.
+  Veri kaybettirebilecek işlemler (Docker volume'ları, emülatörler, eski
+  Xcode arşivleri) için `evet` yazmak gerekir. Root ya da yönetici izni
+  gereken temizlikler (Linux paket önbellekleri, günlük, snap'ler, Windows
+  sistem klasörleri) yalnızca gösterilir; onları siz çalıştırırsınız.
 - Raporlarda başta hiçbir şey seçili değildir. Tahmin içeren yerlerde (hangi
   verinin hangi uygulamaya ait olduğu) rapor bunu açıkça söyler ve şüphede
   silmemekten yana karar verir.

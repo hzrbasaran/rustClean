@@ -1,0 +1,58 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Geliştirici araçları temizliği  │  geri kazanılabilir: 9.1 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Araç                               Kazanılır    Ayrıntı
+▶ Xcode simülatörleri                     4.0 GiB unavailable devices 0 (0 B) · unused for a year 40
+  Xcode arşivleri                       310.0 MiB 5 archives (742.0 MiB) · 2 older than 12 months (3
+  Android emülatör ve imajları            3.0 GiB 1 emulator (23.0 GiB) · 3 system images (5.4 GiB),
+  Go modül ve derleme önbelleği      —            not installed
+  conda paketleri                       790.0 MiB packages 116.0 MiB · tarballs 674.0 MiB · /opt/con
+  Playwright tarayıcıları                 1.0 GiB /Users/demo/Library/Caches/ms-playwright
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ İşlemler ────────────────────────────────────────────────────────────────────────────────────────┐
+│ güvenli  Hiç kullanılmamış 37 simülatörün tümü (647.1 MiB)                                       │
+│    $ xcrun simctl delete 89697EBC-CF4F-431F-89F4-B6D6F173B703                                    │
+│    … 36 adım daha                                                                                │
+│ VERİ KAYBI  Bir yıldır kullanılmayan 2 simülatörün tümü, uygulama verileriyle (2.5 GiB)          │
+│    $ xcrun simctl delete 07A31553-B627-40B9-9E07-725FAD180A6F                                    │
+│    … 1 adım daha                                                                                 │
+│ VERİ KAYBI  iPhone 15 Pro · iOS 18.2 · son kullanım 01.06.2024 10:00 · 2.0 GiB                   │
+│    $ xcrun simctl delete 07A31553-B627-40B9-9E07-725FAD180A6F                                    │
+│… 76 satır daha                                                                                   │
+│Silinen simülatörler Xcode › Window › Devices and Simulators'tan yeniden eklenebilir; bir yıldır  │
+│kullanılmayanlar içlerindeki uygulama verilerini de götürür.                                      │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
+ ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 White/Indexed(238) BOLD
+ 4: 2+15 White/- BOLD | 37+12 -/- BOLD
+ 5: 2+28 White/- BOLD | 37+12 -/- BOLD
+ 6: 2+29 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 7: 2+15 White/- BOLD | 37+12 -/- BOLD
+ 8: 2+23 White/- BOLD | 37+12 -/- BOLD
+15: 0+1 DarkGray/- | 1+10 White/- BOLD | 11+89 DarkGray/-
+16: 0+1 DarkGray/- | 1+9 Black/Green | 10+50 White/- BOLD | 99+1 DarkGray/-
+17: 0+1 DarkGray/- | 1+62 Gray/- | 99+1 DarkGray/-
+18: 0+1 DarkGray/- | 1+18 Gray/- | 99+1 DarkGray/-
+19: 0+1 DarkGray/- | 1+12 White/Red BOLD | 13+76 White/- BOLD | 99+1 DarkGray/-
+20: 0+1 DarkGray/- | 1+62 Gray/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 1+17 Gray/- | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 1+12 White/Red BOLD | 13+67 White/- BOLD | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+62 Gray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+15 Gray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+96 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+60 Gray/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 39+3 Black/Gray | 56+3 Black/Gray | 66+5 Black/Gray | 78+3 Black/Gray

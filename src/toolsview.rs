@@ -249,7 +249,7 @@ impl ToolsView {
         let Some(c) = self.confirm.take() else {
             return;
         };
-        let steps = c.actions.into_iter().flat_map(|a| a.steps).collect();
+        let steps = unique_steps(c.actions);
         let kind = self.tools[c.tool].kind;
         self.run = Some(Run {
             tool: c.tool,
@@ -258,5 +258,39 @@ impl ToolsView {
             failures: 0,
             events: tools::run(kind, steps),
         });
+    }
+}
+
+/// The steps of `actions` in order, each once: a device chosen both in a
+/// group and on its own is deleted once.
+fn unique_steps(actions: Vec<CleanAction>) -> Vec<tools::Step> {
+    let mut steps = Vec::new();
+    for step in actions.into_iter().flat_map(|a| a.steps) {
+        if !steps.contains(&step) {
+            steps.push(step);
+        }
+    }
+    steps
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tools::Step;
+
+    #[test]
+    fn repeated_steps_run_once() {
+        let cmd = |s: &str| Step::Command(vec!["/usr/bin/xcrun".into(), s.into()]);
+        let action = |steps| CleanAction {
+            label: String::new(),
+            risk: Risk::Safe,
+            steps,
+        };
+        let steps = unique_steps(vec![
+            action(vec![cmd("a"), cmd("b")]),
+            action(vec![cmd("b")]),
+            action(vec![cmd("c"), cmd("a")]),
+        ]);
+        assert_eq!(steps, [cmd("a"), cmd("b"), cmd("c")]);
     }
 }

@@ -67,9 +67,11 @@ one go.
   and cron jobs. It only reads; nothing is deleted.
 - **Deletion log** — everything moved to the trash, by day, with how it was
   deleted (menu → Deletion log).
-- **Developer tools cleanup** — measures what Docker, Xcode simulators,
-  DerivedData, npm, pnpm, Yarn, pip, Gradle, CocoaPods, Homebrew and Cargo
-  could free, and runs **their own cleanup commands** after you confirm.
+- **Developer tools cleanup** — measures what Docker, Xcode (simulators,
+  DerivedData, archives), the Android SDK (emulators, system images), npm,
+  pnpm, Yarn, Bun, pip, uv, conda, Gradle, Maven, Go, Flutter / Dart pub,
+  Playwright, CocoaPods, Homebrew and Cargo could free, and runs **their own
+  cleanup commands** after you confirm.
   On Linux it also measures the apt, dnf and pacman package caches, the
   systemd journal and disabled snap revisions; on Windows `%TEMP%`,
   `C:\Windows\Temp`, the Windows Update download cache and the Recycle Bin.
@@ -116,9 +118,10 @@ rustClean deletes nothing on its own:
 - Mount points and folders on other volumes are refused.
 - Developer tool cleanups show the **exact commands** before running them. They
   are started directly, never through a shell and never with `sudo`. Actions
-  that can lose data (Docker volumes) require typing `yes`. Cleanups that need
-  root or administrator rights (Linux package caches, the journal, snaps,
-  Windows system folders) are only shown, for you to run yourself.
+  that can lose data (Docker volumes, emulators, old Xcode archives) require
+  typing `yes`. Cleanups that need root or administrator rights (Linux
+  package caches, the journal, snaps, Windows system folders) are only
+  shown, for you to run yourself.
 - Reports start with nothing selected. Where a guess is involved (which data
   belongs to which app), the report says so and errs on the side of keeping
   things.

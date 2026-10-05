@@ -1,0 +1,58 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Developer tools cleanup  │  reclaimable: 9.1 GiB
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  Tool                               Reclaimable  Details
+▶ Xcode simulators                        4.0 GiB unavailable devices 0 (0 B) · unused for a year 40
+  Xcode archives                        310.0 MiB 5 archives (742.0 MiB) · 2 older than 12 months (3
+  Android emulators and images            3.0 GiB 1 emulator (23.0 GiB) · 3 system images (5.4 GiB),
+  Go module and build cache          —            not installed
+  conda packages                        790.0 MiB packages 116.0 MiB · tarballs 674.0 MiB · /opt/con
+  Playwright browsers                     1.0 GiB /Users/demo/Library/Caches/ms-playwright
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
+│ safe  All 37 simulators never used (647.1 MiB)                                                   │
+│    $ xcrun simctl delete 89697EBC-CF4F-431F-89F4-B6D6F173B703                                    │
+│    … 36 more steps                                                                               │
+│ DATA LOSS  All 2 simulators unused for a year, with their app data (2.5 GiB)                     │
+│    $ xcrun simctl delete 07A31553-B627-40B9-9E07-725FAD180A6F                                    │
+│    … 1 more step                                                                                 │
+│ DATA LOSS  iPhone 15 Pro · iOS 18.2 · last used 2024-06-01 10:00 · 2.0 GiB                       │
+│    $ xcrun simctl delete 07A31553-B627-40B9-9E07-725FAD180A6F                                    │
+│… 76 more lines                                                                                   │
+│Deleted simulators can be added again in Xcode › Window › Devices and Simulators; those unused for│
+│a year take their app data with them.                                                             │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+Measuring only reads. No command runs without your confirmation.
+ ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 2: 0+100 -/- BOLD | UNDERLINED
+ 3: 0+100 White/Indexed(238) BOLD
+ 4: 2+14 White/- BOLD | 37+12 -/- BOLD
+ 5: 2+28 White/- BOLD | 37+12 -/- BOLD
+ 6: 2+25 Gray/- | 37+12 Gray/- | 50+13 Gray/-
+ 7: 2+14 White/- BOLD | 37+12 -/- BOLD
+ 8: 2+19 White/- BOLD | 37+12 -/- BOLD
+15: 0+1 DarkGray/- | 1+9 White/- BOLD | 10+90 DarkGray/-
+16: 0+1 DarkGray/- | 1+6 Black/Green | 7+41 White/- BOLD | 99+1 DarkGray/-
+17: 0+1 DarkGray/- | 1+62 Gray/- | 99+1 DarkGray/-
+18: 0+1 DarkGray/- | 1+19 Gray/- | 99+1 DarkGray/-
+19: 0+1 DarkGray/- | 1+11 White/Red BOLD | 12+66 White/- BOLD | 99+1 DarkGray/-
+20: 0+1 DarkGray/- | 1+62 Gray/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 1+17 Gray/- | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 1+11 White/Red BOLD | 12+64 White/- BOLD | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+62 Gray/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+15 Gray/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+98 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+37 Gray/- | 99+1 DarkGray/-
+27: 0+100 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 10+4 Black/Gray | 23+7 Black/Gray | 38+3 Black/Gray | 57+3 Black/Gray | 67+5 Black/Gray | 79+3 Black/Gray

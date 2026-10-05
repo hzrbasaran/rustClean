@@ -128,6 +128,38 @@
     ],
     "com.apple.CoreSimulator.SimRuntime.iOS-18-2" : [
       {
+        "dataPath" : "\/Users\/user\/Library\/Developer\/CoreSimulator\/Devices\/07A31553-B627-40B9-9E07-725FAD180A6F\/data",
+        "dataPathSize" : 2147483648,
+        "logPath" : "\/Users\/user\/Library\/Logs\/CoreSimulator\/07A31553-B627-40B9-9E07-725FAD180A6F",
+        "udid" : "07A31553-B627-40B9-9E07-725FAD180A6F",
+        "lastUsedAt" : "2024-06-01T10:00:00Z",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-15-Pro",
+        "state" : "Shutdown",
+        "name" : "iPhone 15 Pro"
+      },
+      {
+        "dataPath" : "\/Users\/user\/Library\/Developer\/CoreSimulator\/Devices\/9500ECEF-A10B-43C2-BFAE-E54C28335BB8\/data",
+        "dataPathSize" : 536870912,
+        "logPath" : "\/Users\/user\/Library\/Logs\/CoreSimulator\/9500ECEF-A10B-43C2-BFAE-E54C28335BB8",
+        "udid" : "9500ECEF-A10B-43C2-BFAE-E54C28335BB8",
+        "lastBootedAt" : "2024-03-12T08:30:00Z",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-Air--5th-generation-",
+        "state" : "Shutdown",
+        "name" : "iPad Air (5th generation)"
+      },
+      {
+        "dataPath" : "\/Users\/user\/Library\/Developer\/CoreSimulator\/Devices\/B372021E-8C0D-46C0-8E1E-C6BAB3B43392\/data",
+        "dataPathSize" : 1073741824,
+        "logPath" : "\/Users\/user\/Library\/Logs\/CoreSimulator\/B372021E-8C0D-46C0-8E1E-C6BAB3B43392",
+        "udid" : "B372021E-8C0D-46C0-8E1E-C6BAB3B43392",
+        "isAvailable" : true,
+        "deviceTypeIdentifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-16",
+        "state" : "Booted",
+        "name" : "iPhone 16 (booted)"
+      },
+      {
         "dataPath" : "\/Users\/user\/Library\/Developer\/CoreSimulator\/Devices\/A64A3718-CFF9-4767-AE6E-9701962734FF\/data",
         "dataPathSize" : 3712655360,
         "logPath" : "\/Users\/user\/Library\/Logs\/CoreSimulator\/A64A3718-CFF9-4767-AE6E-9701962734FF",

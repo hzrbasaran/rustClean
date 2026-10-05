@@ -711,6 +711,146 @@ fn tools_app() -> App {
     app
 }
 
+/// The tools added in 0.4.0, measured: old simulators (from the simctl
+/// fixture), Xcode archives, the Android SDK and two caches.
+fn more_tools_view() -> ToolsView {
+    let ready = |reclaimable, detail: &str| Status::Ready {
+        reclaimable,
+        detail: detail.into(),
+    };
+    let tool = |kind, status, actions| Tool {
+        kind,
+        status,
+        actions,
+    };
+    let trash = |path: &str| Step::Trash(PathBuf::from(path));
+    let devices = crate::tools::xcode::parse_stale_devices(
+        include_str!("../../tests/fixtures/simctl_devices.json"),
+        NOW,
+    );
+    let simulators =
+        crate::tools::xcode::stale_device_actions(Path::new("/usr/bin/xcrun"), &devices);
+    let archives = vec![CleanAction {
+        label: "Move 2 archives older than 12 months to the trash (310.0 MiB)".into(),
+        risk: Risk::DataLoss,
+        steps: vec![
+            trash("/Users/demo/Library/Developer/Xcode/Archives/2024-09-07/App 07.09.2024, 10.00.xcarchive"),
+            trash("/Users/demo/Library/Developer/Xcode/Archives/2025-03-17/App 17.03.2025, 16.20.xcarchive"),
+        ],
+    }];
+    let android = vec![
+        CleanAction {
+            label: "Delete the Pixel 9 Pro XL emulator with its apps and data (23.0 GiB)".into(),
+            risk: Risk::DataLoss,
+            steps: vec![Step::Command(vec![
+                "/Users/demo/Library/Android/sdk/cmdline-tools/latest/bin/avdmanager".into(),
+                "delete".into(),
+                "avd".into(),
+                "-n".into(),
+                "Pixel_9_Pro_XL".into(),
+            ])],
+        },
+        CleanAction {
+            label: "Unused image android-34/google_apis_playstore/arm64-v8a (3.1 GiB)".into(),
+            risk: Risk::Redownload,
+            steps: vec![trash(
+                "/Users/demo/Library/Android/sdk/system-images/android-34/google_apis_playstore/arm64-v8a",
+            )],
+        },
+    ];
+    ToolsView::with_tools(vec![
+        tool(
+            ToolKind::Simulators,
+            ready(
+                4 * GIB,
+                "unavailable devices 0 (0 B) · unused for a year 40 (4.0 GiB)",
+            ),
+            simulators,
+        ),
+        tool(
+            ToolKind::XcodeArchives,
+            ready(
+                310 * MIB,
+                "5 archives (742.0 MiB) · 2 older than 12 months (310.0 MiB)",
+            ),
+            archives,
+        ),
+        tool(
+            ToolKind::Android,
+            ready(
+                3 * GIB,
+                "1 emulator (23.0 GiB) · 3 system images (5.4 GiB), 2 unused",
+            ),
+            android,
+        ),
+        tool(
+            ToolKind::Go,
+            Status::Missing("not installed".into()),
+            Vec::new(),
+        ),
+        tool(
+            ToolKind::Conda,
+            ready(
+                790 * MIB,
+                "packages 116.0 MiB · tarballs 674.0 MiB · /opt/conda/pkgs",
+            ),
+            Vec::new(),
+        ),
+        tool(
+            ToolKind::Playwright,
+            ready(GIB, "/Users/demo/Library/Caches/ms-playwright"),
+            Vec::new(),
+        ),
+    ])
+}
+
+/// The screen with `more_tools_view`, the cursor on `kind` and `keys`
+/// pressed in the tools view.
+fn more_tools_app(kind: ToolKind, keys: &[KeyCode]) -> App {
+    let mut app = app();
+    let mut view = more_tools_view();
+    let row = view.tools.iter().position(|t| t.kind == kind).unwrap();
+    view.table.select(Some(row));
+    for &key in keys {
+        view.on_key(key);
+    }
+    browser(&mut app).tools = Some(view);
+    app
+}
+
+#[test]
+fn developer_tools_simulators() {
+    // Groups with many steps are shortened to fit the actions panel.
+    snap("tools-simulators", || {
+        more_tools_app(ToolKind::Simulators, &[])
+    });
+    // The picker scrolls with the cursor.
+    let mut keys = vec![KeyCode::Enter, KeyCode::Char(' ')];
+    keys.extend([KeyCode::Down; 30]);
+    keys.push(KeyCode::Char(' '));
+    snap("tools-simulators-picker", move || {
+        more_tools_app(ToolKind::Simulators, &keys)
+    });
+}
+
+#[test]
+fn developer_tools_archives_confirm() {
+    let keys = [
+        KeyCode::Enter,
+        KeyCode::Char(' '),
+        KeyCode::Enter,
+        KeyCode::Char('e'),
+    ];
+    snap("tools-archives-confirm", move || {
+        more_tools_app(ToolKind::XcodeArchives, &keys)
+    });
+}
+
+#[test]
+fn developer_tools_android() {
+    snap("tools-android", || more_tools_app(ToolKind::Android, &[]));
+}
+
 #[test]
 fn linux_and_windows_tools() {
     snap("tools-linux", linux_tools_app);

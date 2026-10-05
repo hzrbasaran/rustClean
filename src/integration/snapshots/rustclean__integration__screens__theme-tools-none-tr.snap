@@ -21,14 +21,14 @@ expression: screen
 
 
 
-
-
-
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌ İşlemler ────────────────────────────────────────────────────────────────────────────────────────┐
 │ yeniden indirilir  docker system prune                                                           │
 │    $ docker system prune                                                                         │
+│Docker Desktop, temizlikle boşalan alanı diske kendisi geri verir (TRIM, birkaç dakika sürebilir).│
+│Belgelerdeki elle geri kazanma komutu eski, yalnızca amd64 bir imajdan ayrıcalıklı container      │
+│çalıştırdığı için sunulmuyor. Ayrıntı:                                                            │
+│docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs                                     │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
  ?  yardım   ↑↓  seç   Enter  temizle   r  yeniden ölç   m  menü   Esc  geri   q  çık
@@ -39,6 +39,6 @@ expression: screen
  4: 2+13 -/- BOLD | 37+12 -/- BOLD
  5: 2+23 -/- BOLD
  7: 2+16 -/- BOLD
-24: 1+10 -/- BOLD
-25: 1+19 -/- REVERSED | 20+20 -/- BOLD
+20: 1+10 -/- BOLD
+21: 1+19 -/- REVERSED | 20+20 -/- BOLD
 29: 0+3 -/- REVERSED | 12+4 -/- REVERSED | 22+7 -/- REVERSED | 39+3 -/- REVERSED | 56+3 -/- REVERSED | 66+5 -/- REVERSED | 78+3 -/- REVERSED

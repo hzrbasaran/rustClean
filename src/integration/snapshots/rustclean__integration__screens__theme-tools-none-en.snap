@@ -22,13 +22,13 @@ expression: screen
 
 
 
-
-
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌ Actions ─────────────────────────────────────────────────────────────────────────────────────────┐
 │ re-downloaded  docker system prune                                                               │
 │    $ docker system prune                                                                         │
+│Docker Desktop gives the space freed by pruning back to the disk by itself (TRIM, may take a few  │
+│minutes). Its documented manual reclaim runs a privileged container from an old amd64-only image, │
+│so it is not offered. See docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs           │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 Measuring only reads. No command runs without your confirmation.
  ?  help   ↑↓  select   Enter  clean   r  measure again   m  menu   Esc  back   q  quit
@@ -39,6 +39,6 @@ Measuring only reads. No command runs without your confirmation.
  4: 2+9 -/- BOLD | 37+12 -/- BOLD
  5: 2+20 -/- BOLD
  7: 2+12 -/- BOLD
-24: 1+9 -/- BOLD
-25: 1+15 -/- REVERSED | 16+20 -/- BOLD
+21: 1+9 -/- BOLD
+22: 1+15 -/- REVERSED | 16+20 -/- BOLD
 29: 0+3 -/- REVERSED | 10+4 -/- REVERSED | 23+7 -/- REVERSED | 38+3 -/- REVERSED | 57+3 -/- REVERSED | 67+5 -/- REVERSED | 79+3 -/- REVERSED

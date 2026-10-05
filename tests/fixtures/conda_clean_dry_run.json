@@ -1,0 +1,50 @@
+{
+  "index_cache": {
+    "files": [
+      "/opt/conda/pkgs/cache"
+    ]
+  },
+  "logfiles": [],
+  "packages": {
+    "pkg_sizes": {
+      "/opt/conda/pkgs": {
+        "_anaconda_depends-2024.10-py312_openblas_0": 891635,
+        "anaconda-client-1.12.3-py312hca03da5_0": 753000,
+        "anaconda-cloud-auth-0.5.1-py312hca03da5_0": 157637,
+        "anaconda-cloud-auth-0.8.6-py312hca03da5_0": 118752
+      }
+    },
+    "pkgs_dirs": {
+      "/opt/conda/pkgs": [
+        "_anaconda_depends-2024.10-py312_openblas_0",
+        "anaconda-client-1.12.3-py312hca03da5_0",
+        "anaconda-cloud-auth-0.5.1-py312hca03da5_0",
+        "anaconda-cloud-auth-0.8.6-py312hca03da5_0"
+      ]
+    },
+    "total_size": 1921024,
+    "warnings": []
+  },
+  "success": true,
+  "tarballs": {
+    "pkg_sizes": {
+      "/opt/conda/pkgs": {
+        "_anaconda_depends-2024.10-py312_openblas_0.conda": 101836,
+        "aext-assistant-4.20.0-py312hca03da5_jl4_0.conda": 4347889,
+        "aext-assistant-server-4.20.0-py312hca03da5_0.conda": 23170,
+        "aext-core-4.20.0-py312hca03da5_jl4_0.conda": 243458
+      }
+    },
+    "pkgs_dirs": {
+      "/opt/conda/pkgs": [
+        "_anaconda_depends-2024.10-py312_openblas_0.conda",
+        "aext-assistant-4.20.0-py312hca03da5_jl4_0.conda",
+        "aext-assistant-server-4.20.0-py312hca03da5_0.conda",
+        "aext-core-4.20.0-py312hca03da5_jl4_0.conda"
+      ]
+    },
+    "total_size": 4716353,
+    "warnings": []
+  },
+  "tempfiles": []
+}

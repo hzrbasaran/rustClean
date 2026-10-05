@@ -59,6 +59,9 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    ├─ tools.rs ─── developer tool measurement and cleanup commands
    │    ├─ tools_linux.rs    apt/dnf/pacman caches, journal, snaps (#18)
    │    └─ tools_windows.rs  %TEMP%, Windows temp, update cache, Recycle Bin (#19)
+   ├─ tools/ ───── later tools: caches (Go, Maven, Bun, uv, conda, pub,
+   │               Playwright), xcode (archives, old simulators), android,
+   │               docker_vm (Docker.raw sizes)
    ├─ system.rs ── macOS system data (diskutil, tmutil, sysctl)
    ├─ delete.rs ── safety checks and moving to the trash
    ├─ trashlog.rs  the deletion log (deletions.jsonl)
@@ -155,6 +158,12 @@ polls them on every tick:
 | duplicate search | `duplicates::DupJob` (progress in atomics) |
 | tool measurement and commands | `tools::measure_all`, `tools::run` |
 | saving history | a detached thread in `Browser::record_history` |
+
+Before a tool step empties or trashes a folder, `tools::run` checks it
+with `tools::safe_target`: no relative paths, roots, the home folder or its
+ancestors, or the home folder's standard folders (Desktop, Documents,
+`Library`, `.config`…). Measuring uses the same check for folders taken
+from environment variables, so a refused folder is never offered.
 
 Every successful move to the trash is appended to the deletion log
 (`trashlog::append`): by `Browser::poll_delete` for deletions from the

@@ -72,6 +72,30 @@ follows [Semantic Versioning](https://semver.org/).
   and the error's line and column; unknown keys only give a warning.
   `rustclean --config` prints the file's path and the values in effect
   ([#22](https://github.com/hzrbasaran/rustClean/issues/22)).
+- More developer caches in the tools cleanup: Go (`go clean -modcache`,
+  `go clean -cache`), Maven (`~/.m2/repository`), Bun, uv (`uv cache clean`),
+  conda (`conda clean --all`, sized with its own dry run), the Flutter / Dart
+  pub cache and Playwright's browsers
+  ([#14](https://github.com/hzrbasaran/rustClean/issues/14)).
+- Xcode archives: their size, and moving archives older than 12 months to
+  the trash (data loss: they are needed to symbolicate crash reports).
+  Simulators never used, or not used for over a year, can be deleted all at
+  once or one by one
+  ([#16](https://github.com/hzrbasaran/rustClean/issues/16)).
+- Android SDK: emulators with their sizes, deleting one with `avdmanager`
+  (or moving it to the trash without it), leftover `.avd` folders, and
+  system images no emulator uses
+  ([#15](https://github.com/hzrbasaran/rustClean/issues/15)).
+- Docker Desktop's `Docker.raw`: its size on disk next to its apparent size,
+  and a note on how the space comes back after pruning
+  ([#17](https://github.com/hzrbasaran/rustClean/issues/17)).
+- Tool cleanups refuse to empty or trash a relative path, a root, the
+  home folder or a folder above it, or a standard folder such as Desktop,
+  Documents or `~/Library`, for example when `PUB_CACHE` points to the
+  home folder.
+- The tools screen shortens long step lists to fit, the action picker
+  scrolls, and a step chosen twice runs once. Some tools show a note under
+  their actions.
 
 ### Fixed
 - English counts use the singular for one: "1 item", "1 row", "1 file"

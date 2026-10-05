@@ -1,0 +1,65 @@
+---
+source: src/integration/screens.rs
+expression: screen
+---
+ rustClean  Geliştirici araçları temizliği  │  geri kazanılabilir: 9.1 GiB
+─────┌ Xcode simülatörleri — ne temizlensin? ─────────────────────────────────────────────────┐─────
+  Ara│  ↑ 9 daha                                                                              │
+▶ Xco│  [ ]  güvenli  iPad Air 11-inch (M3) · iOS 26.0 · hiç kullanılmadı · 17.5 MiB          │ar 40
+  Xco│  [ ]  güvenli  iPad Air 11-inch (M3) · iOS 26.2 · hiç kullanılmadı · 17.5 MiB          │hs (3
+  And│  [ ]  güvenli  iPad Air 11-inch (M4) · iOS 27.0 · hiç kullanılmadı · 17.5 MiB          │GiB),
+  Go │  [ ]  güvenli  iPad Air 13-inch (M2) · iOS 18.2 · hiç kullanılmadı · 17.5 MiB          │
+  con│  [ ]  güvenli  iPad Air 13-inch (M3) · iOS 26.0 · hiç kullanılmadı · 17.5 MiB          │t/con
+  Pla│  [ ]  güvenli  iPad Air 13-inch (M3) · iOS 26.2 · hiç kullanılmadı · 17.5 MiB          │
+     │  [ ]  güvenli  iPad Air 13-inch (M4) · iOS 27.0 · hiç kullanılmadı · 17.5 MiB          │
+     │  [ ]  güvenli  iPad Pro 11-inch (M4) · iOS 18.2 · hiç kullanılmadı · 17.5 MiB          │
+     │  [ ]  güvenli  iPad Pro 11-inch (M4) · iOS 26.0 · hiç kullanılmadı · 17.5 MiB          │
+     │  [ ]  güvenli  iPad Pro 11-inch (M5) · iOS 26.0 · hiç kullanılmadı · 17.5 MiB          │
+     │  [ ]  güvenli  iPad Pro 11-inch (M5) · iOS 26.2 · hiç kullanılmadı · 17.5 MiB          │
+─────│  [ ]  güvenli  iPad Pro 11-inch (M5) · iOS 27.0 · hiç kullanılmadı · 17.5 MiB          │─────
+┌ İşl│  [ ]  güvenli  iPad Pro 13-inch (M4) · iOS 18.2 · hiç kullanılmadı · 17.5 MiB          │────┐
+│ güv│  [ ]  güvenli  iPad Pro 13-inch (M4) · iOS 26.0 · hiç kullanılmadı · 17.5 MiB          │    │
+│    │  [ ]  güvenli  iPad Pro 13-inch (M5) · iOS 26.2 · hiç kullanılmadı · 17.5 MiB          │    │
+│    │  [ ]  güvenli  iPad Pro 13-inch (M5) · iOS 27.0 · hiç kullanılmadı · 17.5 MiB          │    │
+│ VER│  [ ]  güvenli  iPad mini (A17 Pro) · iOS 18.2 · hiç kullanılmadı · 17.5 MiB            │    │
+│    │  [ ]  güvenli  iPad mini (A17 Pro) · iOS 26.0 · hiç kullanılmadı · 17.5 MiB            │    │
+│    │  [ ]  güvenli  iPad mini (A17 Pro) · iOS 26.2 · hiç kullanılmadı · 17.5 MiB            │    │
+│ VER│  [ ]  güvenli  iPad mini (A17 Pro) · iOS 27.0 · hiç kullanılmadı · 17.5 MiB            │    │
+│    │  [ ]  güvenli  iPhone 16 Plus · iOS 18.2 · hiç kullanılmadı · 17.5 MiB                 │    │
+│… 76│▶ [✓]  güvenli  iPhone 16e · iOS 26.2 · hiç kullanılmadı · 17.5 MiB                     │    │
+│Sili│  ↓ 10 daha                                                                             │ır  │
+│kull│ Space: seç   Enter: devam   Esc: vazgeç                                                │    │
+└────└────────────────────────────────────────────────────────────────────────────────────────┘────┘
+Ölçüm yalnızca okur. Hiçbir komut siz onaylamadan çalışmaz.
+ ?  yardım   Esc  vazgeç
+--- styles (column+width foreground/background modifiers) ---
+ 0: 0+11 Black/Cyan BOLD
+ 1: 5+1 Cyan/- | 6+39 White/- BOLD | 45+50 Cyan/-
+ 2: 0+5 -/- BOLD | UNDERLINED | 5+1 Cyan/- | 6+10 Gray/- | 94+1 Cyan/- | 95+5 -/- BOLD | UNDERLINED
+ 3: 0+5 White/Indexed(238) BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/- | 95+5 White/Indexed(238) BOLD
+ 4: 2+3 White/- BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+ 5: 2+3 White/- BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+ 6: 2+3 Gray/- | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+ 7: 2+3 White/- BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+ 8: 2+3 White/- BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+ 9: 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+10: 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+11: 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+12: 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+13: 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+14: 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/-
+15: 0+1 DarkGray/- | 1+4 White/- BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/- | 95+5 DarkGray/-
+16: 0+1 DarkGray/- | 1+4 Black/Green | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+17: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+18: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+63 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+19: 0+1 DarkGray/- | 1+4 White/Red BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+61 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+20: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+61 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+21: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+61 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+22: 0+1 DarkGray/- | 1+4 White/Red BOLD | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+61 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+23: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 8+4 -/- BOLD | 12+9 Black/Green | 21+56 White/- | 94+1 Cyan/- | 99+1 DarkGray/-
+24: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 6+6 White/Indexed(238) BOLD | 12+9 Black/Green BOLD | 21+52 White/Indexed(238) BOLD | 94+1 Cyan/- | 99+1 DarkGray/-
+25: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 6+11 Gray/- | 94+1 Cyan/- | 95+2 Gray/- | 99+1 DarkGray/-
+26: 0+1 DarkGray/- | 1+4 Gray/- | 5+1 Cyan/- | 6+40 Gray/- | 94+1 Cyan/- | 99+1 DarkGray/-
+27: 0+5 DarkGray/- | 5+90 Cyan/- | 95+5 DarkGray/-
+28: 0+100 Gray/-
+29: 0+3 Black/Gray | 12+5 Black/Gray

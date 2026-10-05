@@ -110,7 +110,13 @@ fn table_block() -> Block<'static> {
 fn popup(f: &mut Frame<'_>, title: &str, color: Color, lines: Vec<Line<'_>>, max_width: u16) {
     let area = f.area();
     let width = area.width.saturating_sub(4).min(max_width);
-    let height = (lines.len() as u16 + 2).min(area.height);
+    // Long lines wrap; count the rows they take so the last line (usually
+    // the keys to press) is not cut off.
+    let rows: usize = lines
+        .iter()
+        .map(|l| wrapped_rows(l, width.saturating_sub(2)))
+        .sum();
+    let height = (rows as u16 + 2).min(area.height);
     let rect = Rect {
         x: area.x + (area.width.saturating_sub(width)) / 2,
         y: area.y + (area.height.saturating_sub(height)) / 2,
@@ -126,6 +132,28 @@ fn popup(f: &mut Frame<'_>, title: &str, color: Color, lines: Vec<Line<'_>>, max
         ),
         rect,
     );
+}
+
+/// About how many rows `line` takes in a paragraph that wraps at word
+/// boundaries at `width` columns.
+fn wrapped_rows(line: &Line<'_>, width: u16) -> usize {
+    let width = usize::from(width.max(1));
+    let text: String = line.spans.iter().map(|s| s.content.as_ref()).collect();
+    let (mut rows, mut col) = (1, 0);
+    for word in text.split_inclusive(' ') {
+        let w = Span::raw(word).width();
+        let visible = Span::raw(word.trim_end()).width();
+        if col > 0 && col + visible > width {
+            rows += 1;
+            col = 0;
+        }
+        col += w;
+        while col > width {
+            rows += 1;
+            col -= width;
+        }
+    }
+    rows
 }
 
 /// Where the rows of a table drawn with `table_block` (or

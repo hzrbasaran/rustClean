@@ -4,6 +4,15 @@
 //! Measuring only reads: it runs listing commands (`docker system df`,
 //! `simctl list`, `brew cleanup -n`, `npm config get cache`…) and sizes
 //! cache folders. Cleaning runs only the actions the user confirmed.
+//!
+//! The submodules hold the tools added later: more package caches
+//! (`caches`), Xcode archives and old simulators (`xcode`), the Android SDK
+//! (`android`) and the Docker Desktop disk (`docker_vm`).
+
+mod android;
+mod caches;
+mod docker_vm;
+pub(crate) mod xcode;
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -39,6 +48,8 @@ pub enum Step {
     Command(Vec<String>),
     /// Move everything inside this folder to the trash.
     TrashContents(PathBuf),
+    /// Move this file or folder to the trash.
+    Trash(PathBuf),
     /// A command that needs root or administrator rights. rustClean never
     /// runs it; it only shows it, exactly as the user should type it.
     Manual(String),
@@ -64,6 +75,7 @@ impl Step {
             Step::TrashContents(dir) | Step::TrashEach(dir) => {
                 tf!("{}/* → çöp kutusu", "{}/* → trash", dir.display())
             }
+            Step::Trash(path) => tf!("{} → çöp kutusu", "{} → trash", path.display()),
             Step::Manual(line) => line.clone(),
         }
     }
@@ -110,6 +122,15 @@ pub enum ToolKind {
     CocoaPods,
     Homebrew,
     Cargo,
+    Go,
+    Maven,
+    Bun,
+    Uv,
+    Conda,
+    Pub,
+    Playwright,
+    XcodeArchives,
+    Android,
     AptCache,
     DnfCache,
     PacmanCache,
@@ -123,7 +144,7 @@ pub enum ToolKind {
 
 impl ToolKind {
     /// Every tool, on any platform.
-    pub const ALL: [ToolKind; 20] = [
+    pub const ALL: [ToolKind; 29] = [
         ToolKind::Docker,
         ToolKind::Simulators,
         ToolKind::XcodeData,
@@ -135,6 +156,15 @@ impl ToolKind {
         ToolKind::CocoaPods,
         ToolKind::Homebrew,
         ToolKind::Cargo,
+        ToolKind::Go,
+        ToolKind::Maven,
+        ToolKind::Bun,
+        ToolKind::Uv,
+        ToolKind::Conda,
+        ToolKind::Pub,
+        ToolKind::Playwright,
+        ToolKind::XcodeArchives,
+        ToolKind::Android,
         ToolKind::AptCache,
         ToolKind::DnfCache,
         ToolKind::PacmanCache,
@@ -160,8 +190,9 @@ impl ToolKind {
     pub fn available() -> Vec<ToolKind> {
         use ToolKind::*;
         let mut all = vec![Docker, Npm, Pnpm, Yarn, Pip, Gradle, Cargo];
+        all.extend([Go, Maven, Bun, Uv, Conda, Pub, Playwright, Android]);
         if cfg!(target_os = "macos") {
-            all.splice(1..1, [Simulators, XcodeData]);
+            all.splice(1..1, [Simulators, XcodeData, XcodeArchives]);
             all.extend([CocoaPods, Homebrew]);
         } else if cfg!(target_os = "linux") {
             all.push(Homebrew);
@@ -187,6 +218,18 @@ impl ToolKind {
             ToolKind::CocoaPods => t!("CocoaPods önbelleği", "CocoaPods cache"),
             ToolKind::Homebrew => "Homebrew",
             ToolKind::Cargo => t!("Cargo indirme önbelleği", "Cargo download cache"),
+            ToolKind::Go => t!("Go modül ve derleme önbelleği", "Go module and build cache"),
+            ToolKind::Maven => t!("Maven yerel deposu", "Maven local repository"),
+            ToolKind::Bun => t!("Bun önbelleği", "Bun cache"),
+            ToolKind::Uv => t!("uv önbelleği", "uv cache"),
+            ToolKind::Conda => t!("conda paketleri", "conda packages"),
+            ToolKind::Pub => t!("Flutter / Dart pub önbelleği", "Flutter / Dart pub cache"),
+            ToolKind::Playwright => t!("Playwright tarayıcıları", "Playwright browsers"),
+            ToolKind::XcodeArchives => t!("Xcode arşivleri", "Xcode archives"),
+            ToolKind::Android => t!(
+                "Android emülatör ve imajları",
+                "Android emulators and images"
+            ),
             ToolKind::AptCache
             | ToolKind::DnfCache
             | ToolKind::PacmanCache
@@ -196,6 +239,27 @@ impl ToolKind {
             | ToolKind::WinSystemTemp
             | ToolKind::WinUpdate
             | ToolKind::RecycleBin => windows::label(self),
+        }
+    }
+
+    /// A note shown under the tool's actions: what to know before cleaning,
+    /// or what rustClean leaves to the tool itself.
+    pub fn hint(self) -> Option<&'static str> {
+        match self {
+            ToolKind::Docker => Some(docker_vm::hint()),
+            ToolKind::Simulators => Some(t!(
+                "Silinen simülatörler Xcode › Window › Devices and Simulators'tan yeniden eklenebilir; bir yıldır kullanılmayanlar içlerindeki uygulama verilerini de götürür.",
+                "Deleted simulators can be added again in Xcode › Window › Devices and Simulators; those unused for a year take their app data with them.",
+            )),
+            ToolKind::XcodeArchives => Some(t!(
+                "Arşivler, yayımlanmış sürümlerin çökme raporlarını sembolize etmek için gereken dSYM dosyalarını tutar. Hâlâ kullanılan sürümlerinkini saklayın.",
+                "Archives hold the dSYM files needed to symbolicate crash reports of shipped builds. Keep those of versions still in use.",
+            )),
+            ToolKind::Android => Some(t!(
+                "Önce emülatörü kapatın: silinince içindeki uygulamalar ve veriler de gider. avdmanager bulunamazsa klasörü ve .ini dosyası çöp kutusuna taşınır. Kullanılmayan imajlar çöp kutusuna taşınır; SDK Manager yeniden indirir.",
+                "Close the emulator first: deleting it also deletes the apps and data in it. Without avdmanager, its folder and .ini file are moved to the trash. Unused images are moved to the trash; SDK Manager downloads them again.",
+            )),
+            _ => None,
         }
     }
 }
@@ -286,6 +350,15 @@ pub fn measure(kind: ToolKind) -> (Status, Vec<CleanAction>) {
                 "Move downloaded .crate files to the trash",
             ),
         ),
+        ToolKind::Go => caches::go(),
+        ToolKind::Maven => caches::maven(),
+        ToolKind::Bun => caches::bun(),
+        ToolKind::Uv => caches::uv(),
+        ToolKind::Conda => caches::conda(),
+        ToolKind::Pub => caches::dart_pub(),
+        ToolKind::Playwright => caches::playwright(),
+        ToolKind::XcodeArchives => xcode::archives(),
+        ToolKind::Android => android::measure(),
         ToolKind::AptCache
         | ToolKind::DnfCache
         | ToolKind::PacmanCache
@@ -319,7 +392,7 @@ pub fn run(kind: ToolKind, steps: Vec<Step>) -> Receiver<RunEvent> {
         for step in steps {
             let desc = step.describe();
             let _ = tx.send(RunEvent::Started(desc.clone()));
-            let ok = run_step(kind, &step, &tx);
+            let ok = run_step(kind, &step, &tx, home().as_deref());
             let _ = tx.send(RunEvent::Done { step: desc, ok });
         }
         let _ = tx.send(RunEvent::Finished);
@@ -327,7 +400,18 @@ pub fn run(kind: ToolKind, steps: Vec<Step>) -> Receiver<RunEvent> {
     rx
 }
 
-fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
+/// Runs one step. `home` is the user's home folder, for `safe_target`.
+fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>, home: Option<&Path>) -> bool {
+    if let Step::TrashContents(path) | Step::TrashEach(path) | Step::Trash(path) = step {
+        if !safe_target(path, home) {
+            let _ = tx.send(RunEvent::Output(tf!(
+                "rustClean bu klasörü boşaltmaz: {}",
+                "rustClean does not empty this folder: {}",
+                path.display()
+            )));
+            return false;
+        }
+    }
     match step {
         Step::Command(args) => {
             let child = Command::new(&args[0])
@@ -408,28 +492,45 @@ fn run_step(kind: ToolKind, step: &Step, tx: &mpsc::Sender<RunEvent>) -> bool {
                 "moving {} to the trash…",
                 crate::i18n::count(entries.len() as u64, "öğe", "item", "items")
             )));
-            // Measured before the move, for the deletion log.
-            let size = entries
-                .iter()
-                .fold(crate::tree::Size::default(), |mut total, e| {
-                    total += size_on_disk(e);
-                    total
-                });
-            match crate::delete::trash_all(&entries) {
-                Ok(()) => {
-                    crate::trashlog::append(&[crate::trashlog::Entry {
-                        time: crate::ui::now_secs(),
-                        path: dir.display().to_string(),
-                        size,
-                        via: crate::trashlog::Via::Tool(kind),
-                    }]);
-                    true
-                }
-                Err(e) => {
-                    let _ = tx.send(RunEvent::Output(tf!("hata: {e}", "error: {e}")));
-                    false
-                }
+            trash_logged(kind, dir, &entries, tx)
+        }
+        Step::Trash(path) => {
+            if std::fs::symlink_metadata(path).is_err() {
+                let _ = tx.send(RunEvent::Output(t!("zaten yok", "already gone").into()));
+                return true;
             }
+            trash_logged(kind, path, std::slice::from_ref(path), tx)
+        }
+    }
+}
+
+/// Moves `entries` to the trash and writes one line for `logged` to the
+/// deletion log, with their size measured before the move.
+fn trash_logged(
+    kind: ToolKind,
+    logged: &Path,
+    entries: &[PathBuf],
+    tx: &mpsc::Sender<RunEvent>,
+) -> bool {
+    let size = entries
+        .iter()
+        .fold(crate::tree::Size::default(), |mut total, e| {
+            total += size_on_disk(e);
+            total
+        });
+    match crate::delete::trash_all(entries) {
+        Ok(()) => {
+            crate::trashlog::append(&[crate::trashlog::Entry {
+                time: crate::ui::now_secs(),
+                path: logged.display().to_string(),
+                size,
+                via: crate::trashlog::Via::Tool(kind),
+            }]);
+            true
+        }
+        Err(e) => {
+            let _ = tx.send(RunEvent::Output(tf!("hata: {e}", "error: {e}")));
+            false
         }
     }
 }
@@ -469,6 +570,81 @@ fn size_on_disk(path: &Path) -> crate::tree::Size {
 
 fn home() -> Option<PathBuf> {
     dirs::home_dir()
+}
+
+/// Whether rustClean may empty or trash `path`. Folders often come from
+/// environment variables (`PUB_CACHE`, `BUN_INSTALL`, `ANDROID_HOME`…), and
+/// a wrong one must not empty the home folder. Refused: relative paths and
+/// paths with `..`, roots (no parent), the home folder and its ancestors, and
+/// the home folder's standard folders themselves (Desktop, Documents,
+/// Library, `.config`…); what is inside them is allowed.
+pub fn safe_target(path: &Path, home: Option<&Path>) -> bool {
+    use std::path::Component;
+    if !path.is_absolute()
+        || path.components().any(|c| c == Component::ParentDir)
+        || path.parent().is_none()
+    {
+        return false;
+    }
+    // Compare real paths, so a symbolic link to the home folder is caught.
+    let real = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+    let target = real(path);
+    if target.parent().is_none() {
+        return false;
+    }
+    let Some(home) = home else {
+        return true;
+    };
+    let home_real = real(home);
+    if home.starts_with(path) || home_real.starts_with(&target) {
+        return false;
+    }
+    let names = [
+        "Desktop",
+        "Documents",
+        "Downloads",
+        "Pictures",
+        "Music",
+        "Movies",
+        "Videos",
+        "Public",
+        "Library",
+        "AppData",
+        ".config",
+        ".local",
+        ".cache",
+    ];
+    let standard = [
+        dirs::desktop_dir(),
+        dirs::document_dir(),
+        dirs::download_dir(),
+        dirs::picture_dir(),
+        dirs::audio_dir(),
+        dirs::video_dir(),
+        dirs::public_dir(),
+    ];
+    !names
+        .iter()
+        .map(|n| home.join(n))
+        .chain(standard.into_iter().flatten())
+        .any(|d| d == path || real(&d) == target)
+}
+
+/// `dir` when `safe_target` allows it; otherwise the "refused" status to
+/// show instead of offering it.
+fn guarded(dir: PathBuf) -> Result<PathBuf, (Status, Vec<CleanAction>)> {
+    if safe_target(&dir, home().as_deref()) {
+        Ok(dir)
+    } else {
+        Err((
+            Status::Unavailable(tf!(
+                "reddedildi, korunan klasör: {}",
+                "refused, protected folder: {}",
+                dir.display()
+            )),
+            Vec::new(),
+        ))
+    }
 }
 
 /// Full path of a program found in PATH.
@@ -584,6 +760,10 @@ fn trash_folder(dir: Option<PathBuf>, risk: Risk, label: &str) -> (Status, Vec<C
     let Some(dir) = dir.filter(|d| d.is_dir()) else {
         return missing(t!("klasör yok", "no folder"));
     };
+    let dir = match guarded(dir) {
+        Ok(dir) => dir,
+        Err(refused) => return refused,
+    };
     let size = dir_size(&dir).unwrap_or(0);
     ready(
         size,
@@ -603,16 +783,22 @@ fn docker() -> (Status, Vec<CleanAction>) {
         &["system", "df", "--format", "{{json .}}"],
         Duration::from_secs(15),
     ) else {
-        return (
-            Status::Unavailable(t!("Docker çalışmıyor", "Docker is not running").into()),
-            Vec::new(),
-        );
+        let mut why = t!("Docker çalışmıyor", "Docker is not running").to_string();
+        if let Some(disk) = docker_vm::describe() {
+            why = format!("{why} · {disk}");
+        }
+        return (Status::Unavailable(why), Vec::new());
     };
     let parts = parse_docker_df(&out);
     let total = parts.iter().map(|p| p.1).sum();
-    let detail = parts
-        .iter()
-        .map(|(kind, size)| format!("{kind} {}", fmt_size(*size)))
+    // The disk image first: the parts add up to the size column already.
+    let detail = docker_vm::describe()
+        .into_iter()
+        .chain(
+            parts
+                .iter()
+                .map(|(kind, size)| format!("{kind} {}", fmt_size(*size))),
+        )
         .collect::<Vec<_>>()
         .join(" · ");
     let actions = vec![
@@ -707,6 +893,8 @@ fn simulators() -> (Status, Vec<CleanAction>) {
         return missing(t!("simctl çalıştırılamadı", "could not run simctl"));
     };
     let (count, size) = parse_unavailable_devices(&devices);
+    let stale = xcode::parse_stale_devices(&devices, crate::ui::now_secs());
+    let stale_size: u64 = stale.iter().map(|d| d.size).sum();
     let runtimes = runtimes.map(|r| parse_runtimes(&r)).unwrap_or_default();
     let runtime_total: u64 = runtimes.iter().map(|r| r.size).sum();
 
@@ -734,14 +922,17 @@ fn simulators() -> (Status, Vec<CleanAction>) {
             vec![command(&xcrun, &["simctl", "runtime", "delete", &r.id])],
         ));
     }
+    actions.extend(xcode::stale_device_actions(&xcrun, &stale));
     let detail = tf!(
-        "kullanılamayan cihaz {count} ({}) · çalışma zamanı {} ({})",
-        "unavailable devices {count} ({}) · runtimes {} ({})",
+        "kullanılamayan cihaz {count} ({}) · bir yıldır kullanılmayan {} ({}) · çalışma zamanı {} ({})",
+        "unavailable devices {count} ({}) · unused for a year {} ({}) · runtimes {} ({})",
         fmt_size(size),
+        stale.len(),
+        fmt_size(stale_size),
         runtimes.len(),
         fmt_size(runtime_total)
     );
-    ready(size, detail, actions)
+    ready(size + stale_size, detail, actions)
 }
 
 /// Count and data size of simulator devices whose runtime is gone.
@@ -1005,6 +1196,70 @@ mod tests {
             .collect();
         assert_eq!(done, vec![true, false, false]);
         assert_eq!(events.last(), Some(&RunEvent::Finished));
+    }
+
+    #[test]
+    fn guard_refuses_home_roots_and_standard_folders() {
+        let home = std::env::temp_dir().join("rc-guard-home");
+        let h = Some(home.as_path());
+        let root = if cfg!(windows) { "C:\\" } else { "/" };
+        assert!(!safe_target(Path::new(root), h), "root");
+        assert!(!safe_target(&home, h), "home");
+        assert!(!safe_target(home.parent().unwrap(), h), "a parent of home");
+        assert!(!safe_target(&home.join("Desktop"), h), "Desktop");
+        assert!(!safe_target(&home.join("Library"), h), "Library");
+        assert!(!safe_target(&home.join(".cache"), h), ".cache");
+        assert!(!safe_target(&home.join("x/.."), h), "..");
+        assert!(!safe_target(Path::new("relative/cache"), h), "relative");
+        assert!(safe_target(&home.join(".m2/repository"), h));
+        assert!(safe_target(&home.join("Library/Caches/ms-playwright"), h));
+        assert!(safe_target(&home.join("Desktop/project/cache"), h));
+    }
+
+    #[test]
+    fn refused_folders_keep_their_contents() {
+        let home = tempfile::tempdir().unwrap();
+        std::fs::write(home.path().join("notes.txt"), b"keep").unwrap();
+        let (tx, rx) = mpsc::channel();
+        let step = Step::TrashContents(home.path().to_path_buf());
+        assert!(!run_step(ToolKind::Pub, &step, &tx, Some(home.path())));
+        assert!(home.path().join("notes.txt").exists());
+        let out: Vec<RunEvent> = rx.try_iter().collect();
+        assert!(
+            matches!(&out[..], [RunEvent::Output(l)] if l.starts_with("rustClean bu klasörü boşaltmaz")),
+            "{out:?}"
+        );
+        let step = Step::Trash(home.path().join("Documents"));
+        std::fs::create_dir(home.path().join("Documents")).unwrap();
+        assert!(!run_step(ToolKind::Pub, &step, &tx, Some(home.path())));
+        assert!(home.path().join("Documents").exists());
+        // Emptying entry by entry (%TEMP%) is guarded the same way.
+        let step = Step::TrashEach(home.path().to_path_buf());
+        assert!(!run_step(ToolKind::WinTemp, &step, &tx, Some(home.path())));
+        assert!(home.path().join("notes.txt").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn trashes_single_entries() {
+        let tmp = tempfile::tempdir().unwrap();
+        let archive = tmp.path().join("App.xcarchive");
+        std::fs::create_dir_all(archive.join("dSYMs")).unwrap();
+        let gone = tmp.path().join("gone.ini");
+        let events = collect(&run(
+            ToolKind::XcodeArchives,
+            vec![Step::Trash(archive.clone()), Step::Trash(gone)],
+        ));
+        assert!(!archive.exists(), "moved to the (test) trash");
+        let done: Vec<bool> = events
+            .iter()
+            .filter_map(|e| match e {
+                RunEvent::Done { ok, .. } => Some(*ok),
+                _ => None,
+            })
+            .collect();
+        // A path that is already gone is not a failure.
+        assert_eq!(done, vec![true, true]);
     }
 
     #[test]
