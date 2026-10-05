@@ -1,10 +1,11 @@
 //! The configuration file's settings, applied to a real scan.
 
-use super::{browser, find, menu, open, rows, tick_until, Fixture};
+use super::{browser, find, menu, open, press, rows, tick_until, Fixture};
 use crate::app::{App, Screen, SortMode};
 use crate::config::{self, Config};
 use crate::reports::{MenuItem, ReportKind};
 use crate::tree::SizeMode;
+use crossterm::event::KeyCode;
 
 /// The menu row of a report, wherever the menu puts it.
 fn menu_index(kind: ReportKind) -> usize {
@@ -34,6 +35,7 @@ fn excluded_folders_view_and_thresholds() {
         let media = b.tree.node(find(&b.tree, "Media"));
         assert_eq!((media.size.apparent, media.file_count), (0, 0));
         assert_eq!(b.tree.name(b.entries[0]), "Archive", "sorted by name");
+        assert!(media.unread, "not read, so never counted as empty");
 
         // Old and large: ≥ 1 MiB, unchanged for more than 20 days.
         menu(&mut app, menu_index(ReportKind::OldBig));
@@ -43,6 +45,20 @@ fn excluded_folders_view_and_thresholds() {
             browser(&app).results.as_ref().unwrap().note,
             "≥ 1 MiB ve 20 günden uzun süredir değişmemiş dosyalar."
         );
+
+        // The clutter report does not offer the excluded folder as empty.
+        press(&mut app, KeyCode::Esc);
+        menu(&mut app, menu_index(ReportKind::Clutter));
+        tick_until(&mut app, "the report", |a| browser(a).results.is_some());
+        let b = browser(&app);
+        let listed = b
+            .results
+            .as_ref()
+            .unwrap()
+            .rows
+            .iter()
+            .flat_map(|r| &r.nodes);
+        assert!(listed.into_iter().all(|&id| b.tree.name(id) != "Media"));
     });
 }
 
