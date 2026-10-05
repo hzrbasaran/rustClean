@@ -224,6 +224,23 @@ impl Browser {
             }
             return Action::None;
         }
+        if self.similar_job.is_some() {
+            match code {
+                KeyCode::Char('q') => return Action::Quit,
+                KeyCode::Esc => {
+                    self.similar_job = None; // dropping the job cancels it
+                    self.set_status(
+                        t!(
+                            "Benzer görsel araması iptal edildi.",
+                            "Similar image search cancelled."
+                        ),
+                        true,
+                    );
+                }
+                _ => {}
+            }
+            return Action::None;
+        }
         if let Some(input) = &mut self.input {
             match code {
                 KeyCode::Char(c) => input.push(c),

@@ -198,6 +198,7 @@ unselected. `Enter` opens a group or goes to an entry, and `Esc` goes back.
 | Old and large files | ≥ 100 MiB and unchanged for over a year (both [configurable](#configuration-file)) |
 | Installers and archives in Downloads | disk images (`.dmg`, `.iso`…), installers (`.pkg`, `.msi`, `.deb`…) and archives (`.zip`, `.xip`, `.tar.gz`…) in `Downloads` folders below the current one (or in the current folder when it is inside `Downloads`) |
 | Duplicate files | files with identical content (≥ 1 MiB, [configurable](#configuration-file)); `Space` on a group adds all but the oldest copy |
+| Similar images | images that look alike: resized, re-compressed or re-saved copies (JPEG, PNG, WebP, GIF, TIFF, BMP of 100 KiB or more; not HEIC or RAW); `Space` on a group adds all but the largest; see below |
 | Empty folders, broken links, temporary files | three groups: folders with nothing below them (only the topmost is listed), symbolic links whose target is gone, and temporary files (`.DS_Store`, `Thumbs.db`, `*.tmp`, Office `~$…` locks, unfinished downloads) untouched for a day; `Enter` opens a group, `Space` adds it whole |
 | iPhone / iPad backups | one row per backup folder in `MobileSync/Backup`: the device name and model, then the date of the backup, `newest` on the newest backup of each device, `encrypted`, and the iOS version, read from the backup's `Info.plist` and `Manifest.plist`; see below |
 
@@ -219,6 +220,35 @@ bundle id only.
 bundle identifiers. The report excludes shared and system folders and
 anything that looks like it belongs to an installed app. Still, look inside
 (`Enter`) before deleting.
+
+**Similar images.** The duplicates report finds files whose bytes are the
+same. A photo that was resized, saved again as JPEG or turned into a PNG has
+different bytes, so this report looks at the pictures instead:
+- Each image of 100 KiB or more below the current folder is decoded and
+  reduced to a 64-bit fingerprint (a gradient hash).
+- Images whose fingerprints differ in at most 4 bits form a group. The
+  number is `similar_distance` in the [configuration file](#configuration-file),
+  from 0 to 16.
+- The search runs in the background, shows how many images are read, and
+  `Esc` cancels it.
+
+The same folders as the clutter report are skipped: hidden folders, bundles
+(a Photos library manages its own files), `Library` and system folders.
+
+Each group is one row: how many images, and the size of the largest in
+pixels. The size column is what deleting all but the largest would free.
+`Space` adds the others to the basket, and `Enter` lists the images, with
+their size in pixels and the one to keep marked `largest`. When two are
+equally large, the larger file is kept, then the oldest one.
+
+Similar is not identical: a cropped or edited version can be in the group
+too, so look before deleting (`Enter`, then reveal the file).
+
+HEIC (iPhone photos) and camera RAW files are not read, nor are images over
+512 MiB once decoded. A rustClean built with `--no-default-features` has no
+image decoders, and the report says so.
+
+![The similar images report: three sizes of one photo and two of another](screenshots/similar-images.svg)
 
 **What the clutter report leaves alone.** Nothing is lost by removing an
 empty folder or a broken link, unless something expects it. So the report
@@ -524,6 +554,7 @@ The kinds are the reports of the `m` menu:
 | `old-big` | old and large files (already over a year) | no |
 | `downloads` | installers and archives in Downloads | yes |
 | `duplicates` | duplicate files (same content; reads the files) | no |
+| `similar-images` | similar images (decodes the images) | no |
 | `clutter` | empty folders, broken links, temporary files | yes |
 | `device-backups` | iPhone / iPad backups (by the backup date) | yes |
 
@@ -694,6 +725,8 @@ old_big_min_mib = 100
 old_big_min_days = 365
 # The smallest file the duplicate search reads, in MiB.
 duplicates_min_mib = 1
+# How different similar images may be: 0 (the same picture) to 16 (loose).
+similar_distance = 4
 
 [view]
 # The size a scan opens with: "disk" (what du reports) or "apparent"
@@ -711,7 +744,8 @@ disks = []
 # disks = ["/Volumes/Data"]
 ```
 
-The numbers are whole numbers of 1 or more (the threshold: 1 to 99). The menu line and the note of
+The numbers are whole numbers of 1 or more (the threshold: 1 to 99, the
+similar distance: 0 to 16). The menu line and the note of
 "Old and large files" and of the duplicate search show the values in effect.
 
 Theme and language are not in this file: `T` and `L` save them in the

@@ -22,6 +22,7 @@ use backups::backups;
 pub use backups::{with_fake_backups, BackupInfo};
 use caches::caches;
 use clutter::clutter;
+pub(crate) use clutter::searched;
 use dev_junk::dev_junk;
 use downloads::downloads;
 use names::repeated_names;
@@ -43,6 +44,8 @@ pub enum ReportKind {
     OldBig,
     Downloads,
     Duplicates,
+    /// Images that look alike (resized or re-compressed copies).
+    SimilarImages,
     /// Empty folders, broken links and temporary files.
     Clutter,
     /// iPhone and iPad backups in `MobileSync/Backup`.
@@ -50,7 +53,7 @@ pub enum ReportKind {
 }
 
 impl ReportKind {
-    pub const ALL: [ReportKind; 12] = [
+    pub const ALL: [ReportKind; 13] = [
         ReportKind::LargestFiles,
         ReportKind::LargestDirs,
         ReportKind::RepeatedNames,
@@ -61,6 +64,7 @@ impl ReportKind {
         ReportKind::OldBig,
         ReportKind::Downloads,
         ReportKind::Duplicates,
+        ReportKind::SimilarImages,
         ReportKind::Clutter,
         ReportKind::DeviceBackups,
     ];
@@ -85,6 +89,7 @@ impl ReportKind {
             ReportKind::OldBig => "old-big",
             ReportKind::Downloads => "downloads",
             ReportKind::Duplicates => "duplicates",
+            ReportKind::SimilarImages => "similar-images",
             ReportKind::Clutter => "clutter",
             ReportKind::DeviceBackups => "device-backups",
         }
@@ -114,6 +119,10 @@ impl ReportKind {
             ReportKind::Duplicates => t!(
                 "Kopya dosyalar (içeriği aynı)",
                 "Duplicate files (same content)"
+            ),
+            ReportKind::SimilarImages => t!(
+                "Benzer görseller (yeniden boyutlanmış kopyalar)",
+                "Similar images (resized copies)"
             ),
             ReportKind::Clutter => t!(
                 "Boş klasörler, kırık bağlantılar, geçici dosyalar",
@@ -194,6 +203,10 @@ impl ReportKind {
             ReportKind::OldBig | ReportKind::Duplicates => {
                 unreachable!("{self:?} is described with its thresholds")
             }
+            ReportKind::SimilarImages => t!(
+                "Birbirine benzeyen JPEG, PNG, WebP, GIF, TIFF, BMP görselleri (HEIC hariç); görseller okunur, sürebilir",
+                "JPEG, PNG, WebP, GIF, TIFF and BMP images that look alike (not HEIC); images are read, may take a while"
+            ),
             ReportKind::Clutter => t!(
                 "Gizli klasörler, paketler, Library ve sistem dışında; geçici dosyalar 1 günden eski",
                 "Outside hidden folders, bundles, Library and system; temporary files over a day old"
@@ -220,7 +233,7 @@ pub enum MenuItem {
 }
 
 impl MenuItem {
-    pub const ALL: [MenuItem; 17] = [
+    pub const ALL: [MenuItem; 18] = [
         MenuItem::Report(ReportKind::LargestFiles),
         MenuItem::Report(ReportKind::LargestDirs),
         MenuItem::Report(ReportKind::RepeatedNames),
@@ -231,6 +244,7 @@ impl MenuItem {
         MenuItem::Report(ReportKind::OldBig),
         MenuItem::Report(ReportKind::Downloads),
         MenuItem::Report(ReportKind::Duplicates),
+        MenuItem::Report(ReportKind::SimilarImages),
         MenuItem::Report(ReportKind::Clutter),
         MenuItem::Report(ReportKind::DeviceBackups),
         MenuItem::Changes,
@@ -343,7 +357,10 @@ pub fn run(
         ReportKind::Downloads => downloads(tree, base, mode, age),
         ReportKind::Clutter => clutter(tree, base, mode, age, now),
         ReportKind::DeviceBackups => backups(tree, base, mode, age),
-        ReportKind::Apps | ReportKind::Orphans | ReportKind::Duplicates => {
+        ReportKind::Apps
+        | ReportKind::Orphans
+        | ReportKind::Duplicates
+        | ReportKind::SimilarImages => {
             unreachable!("{kind:?} is computed elsewhere")
         }
     };

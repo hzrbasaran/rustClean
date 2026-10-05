@@ -21,6 +21,7 @@ mod reports;
 mod scanner;
 mod search;
 mod settings;
+mod similar;
 mod stats;
 mod system;
 mod tools;

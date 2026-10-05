@@ -16,21 +16,21 @@ expression: screen
         │   8. Eski ve büyük dosyalar                                                      │
         │   9. İndirilen kurulum dosyaları ve arşivler                                     │
         │  10. Kopya dosyalar (içeriği aynı)                                               │
-        │  11. Boş klasörler, kırık bağlantılar, geçici dosyalar                           │
-        │  12. iPhone / iPad yedekleri                                                     │
+        │  11. Benzer görseller (yeniden boyutlanmış kopyalar)                             │
+        │  12. Boş klasörler, kırık bağlantılar, geçici dosyalar                           │
+        │  13. iPhone / iPad yedekleri                                                     │
         │                                                                                  │
         │ Araçlar                                                                          │
-        │  13. Son taramadan bu yana değişenler                                            │
-        │  14. Silinmiş uygulama artıkları                                                 │
-        │  15. Geliştirici araçları temizliği                                              │
-        │  16. Sistem verileri                                                             │
-        │  17. Silme kaydı                                                                 │
+        │  14. Son taramadan bu yana değişenler                                            │
+        │  15. Silinmiş uygulama artıkları                                                 │
+        │  16. Geliştirici araçları temizliği                                              │
+        │  17. Sistem verileri                                                             │
+        │  18. Silme kaydı                                                                 │
         │                                                                                  │
         │ Bu klasörün altındaki en büyük 200 dosya                                         │
         │ Raporlar bulunduğunuz klasörün altında çalışır (uygulamalar: tüm tarama). L:     │
-        │ English                                                                          │
-────────└──────────────────────────────────────────────────────────────────────────────────┘────────
-37 öğe tarandı, 1.2 sn   ⚠ 2 öğeye erişilemedi
+────────│ English                                                                          │────────
+37 öğe t└──────────────────────────────────────────────────────────────────────────────────┘
  ?  yardım   ↑↓  seç   Enter  çalıştır   Esc  kapat
 --- styles (column+width foreground/background modifiers) ---
  0: 0+11 Black/Cyan BOLD
@@ -47,19 +47,19 @@ expression: screen
 11: 8+1 Cyan/- | 11+4 Gray/- | 15+22 White/- BOLD | 91+1 Cyan/-
 12: 8+1 Cyan/- | 11+4 Gray/- | 15+39 White/- BOLD | 91+1 Cyan/-
 13: 8+1 Cyan/- | 11+4 Gray/- | 15+29 White/- BOLD | 91+1 Cyan/-
-14: 8+1 Cyan/- | 11+4 Gray/- | 15+49 White/- BOLD | 91+1 Cyan/-
-15: 8+1 Cyan/- | 11+4 Gray/- | 15+23 White/- BOLD | 91+1 Cyan/-
-16: 8+1 Cyan/- | 91+1 Cyan/-
-17: 8+1 Cyan/- | 9+8 Cyan/- BOLD | 91+1 Cyan/-
-18: 8+1 Cyan/- | 11+4 Gray/- | 15+32 White/- BOLD | 91+1 Cyan/-
-19: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
-20: 8+1 Cyan/- | 11+4 Gray/- | 15+30 White/- BOLD | 91+1 Cyan/-
-21: 8+1 Cyan/- | 11+4 Gray/- | 15+15 White/- BOLD | 91+1 Cyan/-
-22: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
-23: 8+1 Cyan/- | 91+1 Cyan/-
-24: 8+1 Cyan/- | 10+40 Yellow/- | 91+1 Cyan/-
-25: 8+1 Cyan/- | 10+76 Gray/- | 91+1 Cyan/-
-26: 8+1 Cyan/- | 10+7 Gray/- | 91+1 Cyan/-
-27: 8+84 Cyan/-
-28: 0+22 Gray/- | 22+24 Yellow/-
+14: 8+1 Cyan/- | 11+4 Gray/- | 15+47 White/- BOLD | 91+1 Cyan/-
+15: 8+1 Cyan/- | 11+4 Gray/- | 15+49 White/- BOLD | 91+1 Cyan/-
+16: 8+1 Cyan/- | 11+4 Gray/- | 15+23 White/- BOLD | 91+1 Cyan/-
+17: 8+1 Cyan/- | 91+1 Cyan/-
+18: 8+1 Cyan/- | 9+8 Cyan/- BOLD | 91+1 Cyan/-
+19: 8+1 Cyan/- | 11+4 Gray/- | 15+32 White/- BOLD | 91+1 Cyan/-
+20: 8+1 Cyan/- | 11+4 Gray/- | 15+27 White/- BOLD | 91+1 Cyan/-
+21: 8+1 Cyan/- | 11+4 Gray/- | 15+30 White/- BOLD | 91+1 Cyan/-
+22: 8+1 Cyan/- | 11+4 Gray/- | 15+15 White/- BOLD | 91+1 Cyan/-
+23: 8+1 Cyan/- | 11+4 Gray/- | 15+11 White/- BOLD | 91+1 Cyan/-
+24: 8+1 Cyan/- | 91+1 Cyan/-
+25: 8+1 Cyan/- | 10+40 Yellow/- | 91+1 Cyan/-
+26: 8+1 Cyan/- | 10+76 Gray/- | 91+1 Cyan/-
+27: 8+1 Cyan/- | 10+7 Gray/- | 91+1 Cyan/-
+28: 0+8 Gray/- | 8+84 Cyan/-
 29: 0+3 Black/Gray | 12+4 Black/Gray | 22+7 Black/Gray | 40+5 Black/Gray

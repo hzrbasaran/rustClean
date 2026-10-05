@@ -16,9 +16,9 @@ expression: screen
   │   8. Old and large files                                                 │
   │   9. Installers and archives in Downloads                                │
   │  10. Duplicate files (same content)                                      │
-  │  11. Empty folders, broken links, temporary files                        │
-  │  12. iPhone / iPad backups                                               │
-  │                                                                          │
+  │  11. Similar images (resized copies)                                     │
+  │  12. Empty folders, broken links, temporary files                        │
+  │  13. iPhone / iPad backups                                               │
   │                                                                          │
   │ ▼ 5 more items                                                           │
   │                                                                          │
@@ -41,9 +41,9 @@ expression: screen
 11: 2+1 Cyan/- | 5+4 Gray/- | 9+19 White/- BOLD | 77+1 Cyan/-
 12: 2+1 Cyan/- | 5+4 Gray/- | 9+36 White/- BOLD | 77+1 Cyan/-
 13: 2+1 Cyan/- | 5+4 Gray/- | 9+30 White/- BOLD | 77+1 Cyan/-
-14: 2+1 Cyan/- | 5+4 Gray/- | 9+44 White/- BOLD | 77+1 Cyan/-
-15: 2+1 Cyan/- | 5+4 Gray/- | 9+21 White/- BOLD | 77+1 Cyan/-
-16: 2+1 Cyan/- | 77+1 Cyan/-
+14: 2+1 Cyan/- | 5+4 Gray/- | 9+31 White/- BOLD | 77+1 Cyan/-
+15: 2+1 Cyan/- | 5+4 Gray/- | 9+44 White/- BOLD | 77+1 Cyan/-
+16: 2+1 Cyan/- | 5+4 Gray/- | 9+21 White/- BOLD | 77+1 Cyan/-
 17: 2+1 Cyan/- | 77+1 Cyan/-
 18: 2+1 Cyan/- | 3+74 Gray/- | 77+1 Cyan/-
 19: 2+1 Cyan/- | 77+1 Cyan/-

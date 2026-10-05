@@ -47,6 +47,9 @@ one go.
   - old and large files
   - **installers and archives in Downloads** (`.dmg`, `.pkg`, `.zip`, `.xip`…)
   - **duplicate files** with identical content, keeping the oldest copy
+  - **similar images**: resized, re-compressed or re-saved copies of the
+    same picture (JPEG, PNG, WebP, GIF, TIFF, BMP; not HEIC), keeping the
+    largest
   - **empty folders, broken links and temporary files** (`.DS_Store`,
     `*.tmp`, Office locks, unfinished downloads), leaving alone hidden
     folders, bundles, `Library`, build output and system folders
@@ -105,16 +108,18 @@ one go.
 | ![Treemap](docs/screenshots/treemap.svg) | ![Summary](docs/screenshots/summary.svg) |
 | **Reports menu** | **Developer junk untouched for 90+ days** |
 | ![Reports](docs/screenshots/menu.svg) | ![Developer junk](docs/screenshots/dev-junk-stale.svg) |
-| **Duplicate files** | **Basket** |
-| ![Duplicates](docs/screenshots/duplicates.svg) | ![Basket](docs/screenshots/basket.svg) |
-| **Empty folders, broken links, temporary files** | **Deletion log** |
-| ![Clutter report](docs/screenshots/clutter.svg) | ![Deletion log](docs/screenshots/deletion-log.svg) |
-| **iPhone / iPad backups** | **Saving a list (`o`)** |
-| ![iPhone / iPad backups](docs/screenshots/device-backups.svg) | ![Export](docs/screenshots/export.svg) |
-| **Light theme** | **Color-blind friendly theme** |
-| ![Light theme](docs/screenshots/theme-light.svg) | ![Color-blind friendly theme](docs/screenshots/theme-colorblind.svg) |
-| **Help (`?`)** | **The treemap as a web page (`w`)** |
-| ![Help](docs/screenshots/help.svg) | ![The treemap page in a browser](docs/screenshots/html-treemap.png) |
+| **Duplicate files** | **Similar images** |
+| ![Duplicates](docs/screenshots/duplicates.svg) | ![Similar images](docs/screenshots/similar-images.svg) |
+| **Basket** | **Empty folders, broken links, temporary files** |
+| ![Basket](docs/screenshots/basket.svg) | ![Clutter report](docs/screenshots/clutter.svg) |
+| **Deletion log** | **iPhone / iPad backups** |
+| ![Deletion log](docs/screenshots/deletion-log.svg) | ![iPhone / iPad backups](docs/screenshots/device-backups.svg) |
+| **Saving a list (`o`)** | **Light theme** |
+| ![Export](docs/screenshots/export.svg) | ![Light theme](docs/screenshots/theme-light.svg) |
+| **Color-blind friendly theme** | **Help (`?`)** |
+| ![Color-blind friendly theme](docs/screenshots/theme-colorblind.svg) | ![Help](docs/screenshots/help.svg) |
+| **The treemap as a web page (`w`)** | |
+| ![The treemap page in a browser](docs/screenshots/html-treemap.png) | |
 
 ## Safety first
 
@@ -155,6 +160,10 @@ cargo install rustclean
 This needs a recent stable [Rust toolchain](https://rustup.rs) (developed and
 tested with Rust 1.99; older ones such as 1.79 cannot build the dependencies).
 Run `rustup update` if the build fails.
+
+The image decoders behind the similar images report add about 1.2 MB.
+`cargo install rustclean --no-default-features` builds without them (and
+without that report).
 
 ### Pre-built binaries
 
@@ -202,7 +211,7 @@ rustclean check --install
 
 Report kinds: `largest-files`, `largest-dirs`, `repeated-names`, `apps`,
 `orphans`, `dev-junk`, `caches`, `old-big`, `downloads`, `duplicates`,
-`clutter`, `device-backups`. See the [usage guide](docs/USAGE.md#reports-from-the-command-line)
+`similar-images`, `clutter`, `device-backups`. See the [usage guide](docs/USAGE.md#reports-from-the-command-line)
 for the options and the columns.
 
 Every screen lists its keys at the bottom. The most important ones:

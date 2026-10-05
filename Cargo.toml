@@ -19,6 +19,8 @@ clap = { version = "4.5.61", features = ["derive"] }
 crossterm = "0.29.0"
 dirs = "7.0.0"
 flate2 = "1.1.10"
+image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp", "gif", "tiff", "bmp"], optional = true }
+image_hasher = { version = "3.1.1", optional = true }
 plist = "1.10.1"
 ratatui = "0.30.2"
 rayon = "1.12.0"
@@ -27,6 +29,11 @@ sysinfo = "0.39.6"
 toml = { version = "1.1.6", default-features = false, features = ["parse", "std", "serde"] }
 trash = "5.2.9"
 xxhash-rust = { version = "0.8.19", features = ["xxh3"] }
+
+[features]
+default = ["similar-images"]
+# The "Similar images" report: decodes images to compare them (about 1.2 MB).
+similar-images = ["dep:image", "dep:image_hasher"]
 
 [target.'cfg(target_os = "macos")'.dependencies]
 libc = "0.2"

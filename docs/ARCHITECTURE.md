@@ -44,6 +44,8 @@ main.rs ─ CLI (clap), terminal setup, event loop (50 ms tick)
    │    ├─ data.rs       data folders and matching them to apps
    │    └─ orphans.rs    leftovers of removed apps (errs on keeping data)
    ├─ duplicates.rs  identical-content search (background thread)
+   ├─ similar.rs ─ similar images: gradient hashes, BK-tree, groups
+   │               (background thread; `similar-images` feature)
    ├─ stats.rs ─── summary statistics, age groups, file categories
    ├─ search.rs ── name patterns
    ├─ lists.rs ─── generic result list (rows, groups, drill-down)
@@ -132,8 +134,8 @@ basket (`Browser::row_in_basket`), which is the single source of truth for what
 is selected.
 
 A list records its `Source`: a report and its age filter, a search pattern, a
-saved scan, the duplicates (rebuilt from their own rows, without hashing
-again), the basket, or the members of a group. `Browser::rebuild_results`
+saved scan, the duplicates or similar images (rebuilt from their own rows,
+without hashing again), the basket, or the members of a group. `Browser::rebuild_results`
 builds the open list again from it and puts the cursor back on the same entry,
 re-opening groups level by level. It runs after `L` (so titles and details
 follow the language), after the age filter changes, and after the basket or
@@ -161,6 +163,7 @@ polls them on every tick:
 | scanning | `scanner::start` → `ScanHandle` |
 | moving to the trash | `delete::Deletion` |
 | duplicate search | `duplicates::DupJob` (progress in atomics) |
+| similar image search | `similar::SimilarJob` (progress in atomics) |
 | tool measurement and commands | `tools::measure_all`, `tools::run` |
 | saving history | a detached thread in `Browser::record_history` |
 
@@ -174,6 +177,21 @@ Every successful move to the trash is appended to the deletion log
 (`trashlog::append`): by `Browser::poll_delete` for deletions from the
 interface, and by `tools::run` for a tool's "move the contents to the trash"
 step. A failed move is never written.
+
+The similar image search decodes each candidate with the `image` crate,
+limited to 512 MiB per image so a huge one cannot use up the memory. It
+reduces the image to a 64-bit gradient hash (`image_hasher`, 8×8). A
+BK-tree over Hamming distance finds the hashes within `similar_distance`
+bits without comparing every pair, and union-find joins them into groups.
+The widths and heights go into `Browser::image_sizes`: the row details use
+them, and `results::keeper` keeps the image with the most pixels where the
+duplicates keep the oldest copy. Like the duplicates, the list is rebuilt
+from its own rows, without decoding again. The search goes into the same
+folders as the clutter report (`reports::searched`).
+
+The decoders sit behind the default `similar-images` feature (about 1.2 MB).
+Without it `similar::hash_one` is a stub, `similar::AVAILABLE` is false and
+the report explains that. CI checks that build with clippy too.
 
 Reports that only read the tree run synchronously. They take under a second
 even on a full disk. A "preparing" message is drawn first so the UI never looks

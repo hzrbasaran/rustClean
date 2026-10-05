@@ -1013,6 +1013,84 @@
 "age": 35596800,
 "created": 35596800,
 "size": 966367641
+},
+{
+"path": "Pictures/Trip",
+"age": 3456000,
+"created": 3456000,
+"dir": true
+},
+{
+"path": "Pictures/Export",
+"age": 777600,
+"created": 777600,
+"dir": true
+},
+{
+"path": "Pictures/Old",
+"age": 43200000,
+"created": 43200000,
+"dir": true
+},
+{
+"path": "Pictures/Trip/beach.png",
+"age": 3456000,
+"created": 3456000,
+"image": {
+"w": 1024,
+"h": 768,
+"pattern": "beach"
+}
+},
+{
+"path": "Pictures/Trip/beach-edited.png",
+"age": 3283200,
+"created": 3283200,
+"image": {
+"w": 800,
+"h": 600,
+"pattern": "beach"
+}
+},
+{
+"path": "Pictures/Export/beach-small.png",
+"age": 777600,
+"created": 777600,
+"image": {
+"w": 480,
+"h": 360,
+"pattern": "beach"
+}
+},
+{
+"path": "Pictures/IMG_0042.png",
+"age": 25920000,
+"created": 25920000,
+"image": {
+"w": 600,
+"h": 800,
+"pattern": "portrait"
+}
+},
+{
+"path": "Pictures/Old/IMG_0042-small.png",
+"age": 43200000,
+"created": 43200000,
+"image": {
+"w": 300,
+"h": 400,
+"pattern": "portrait"
+}
+},
+{
+"path": "Pictures/chess.png",
+"age": 10368000,
+"created": 10368000,
+"image": {
+"w": 400,
+"h": 400,
+"pattern": "chess"
+}
 }
 ]
 }
