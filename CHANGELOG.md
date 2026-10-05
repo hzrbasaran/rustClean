@@ -6,6 +6,8 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-05
+
 ### Added
 - Optional mouse support: `M` turns it on or off (off by default and not
   saved, as mouse capture stops the terminal from selecting text). A click
@@ -240,7 +242,8 @@ First public release.
 - Turkish and English interface (`L`, `--lang`).
 - `--list-disks` and `--summary` command line modes.
 
-[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/hzrbasaran/rustClean/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/hzrbasaran/rustClean/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/hzrbasaran/rustClean/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/hzrbasaran/rustClean/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/hzrbasaran/rustClean/releases/tag/v0.1.0
