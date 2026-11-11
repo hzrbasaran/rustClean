@@ -11,6 +11,8 @@
 
 [English](README.md) · Türkçe
 
+<sub>Son düzenleme: 11.11.2026 14:30</sub>
+
 ![rustClean bir klasörü gösterirken](docs/screenshots/browser-tr.svg)
 
 </div>

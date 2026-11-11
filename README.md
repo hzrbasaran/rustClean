@@ -11,6 +11,8 @@
 
 English · [Türkçe](README.tr.md)
 
+<sub>Last edited: 2026-11-11 14:30</sub>
+
 ![rustClean browsing a folder](docs/screenshots/browser.svg)
 
 </div>
