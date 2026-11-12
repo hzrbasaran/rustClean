@@ -240,6 +240,38 @@ Every screen lists its keys at the bottom. The most important ones:
 
 See the [usage guide](docs/USAGE.md) for every screen and report.
 
+### Scan totals as JSON
+
+`--summary --json` prints the totals of a scan as one JSON object, for scripts
+and cron jobs. Sizes are in bytes and `elapsed_secs` is in seconds. `--json`
+needs `--summary`; for a report as JSON, see `rustclean report … --json` above.
+
+```bash
+rustclean --summary --json ~/Projects | jq .apparent_size
+```
+
+```json
+{
+  "root": "/Users/you/Projects",
+  "disk_size": 12288,
+  "apparent_size": 8000,
+  "files": 2,
+  "entries": 3,
+  "inaccessible": 0,
+  "elapsed_secs": 0.001428583
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `root` | the folder that was scanned |
+| `disk_size` | size on disk, in bytes (what `du` reports) |
+| `apparent_size` | apparent size, in bytes |
+| `files` | number of files |
+| `entries` | files and folders inside it (the folder itself is not counted) |
+| `inaccessible` | entries that could not be read |
+| `elapsed_secs` | scan time, in seconds |
+
 ### macOS: Full Disk Access
 
 macOS protects some locations (Mail, Safari, `~/Library/Containers`…). Without
