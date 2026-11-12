@@ -245,6 +245,39 @@ Her ekranın alt satırında o ekranın tuşları yazar. En önemlileri:
 
 Tüm ekranlar ve raporlar için [kullanım kılavuzu](docs/USAGE.md) (İngilizce).
 
+### Tarama toplamlarını JSON olarak
+
+`--summary --json`, bir taramanın toplamlarını tek bir JSON nesnesi olarak
+yazdırır; betikler ve zamanlanmış görevler için. Boyutlar bayt, `elapsed_secs`
+saniye cinsindendir. `--json` için `--summary` gerekir; bir raporu JSON olarak
+almak için yukarıdaki `rustclean report … --json` bölümüne bakın.
+
+```bash
+rustclean --summary --json ~/Projects | jq .apparent_size
+```
+
+```json
+{
+  "root": "/Users/you/Projects",
+  "disk_size": 12288,
+  "apparent_size": 8000,
+  "files": 2,
+  "entries": 3,
+  "inaccessible": 0,
+  "elapsed_secs": 0.001428583
+}
+```
+
+| Alan | Anlamı |
+|---|---|
+| `root` | taranan klasör |
+| `disk_size` | diskteki boyut, bayt (`du`'nun gösterdiği) |
+| `apparent_size` | görünen boyut, bayt |
+| `files` | dosya sayısı |
+| `entries` | içindeki dosya ve klasörler (klasörün kendisi sayılmaz) |
+| `inaccessible` | okunamayan girdi sayısı |
+| `elapsed_secs` | tarama süresi, saniye |
+
 ### macOS: Tam Disk Erişimi
 
 macOS bazı konumları korur (Mail, Safari, `~/Library/Containers`…). İzin
