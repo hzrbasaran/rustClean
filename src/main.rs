@@ -23,6 +23,7 @@ mod search;
 mod settings;
 mod similar;
 mod stats;
+mod summary;
 mod system;
 mod tools;
 mod toolsview;
@@ -83,6 +84,10 @@ struct Args {
     /// Arayüz açmadan YOL'u tarayıp özetini yazdır / scan PATH and print a summary, no interface
     #[arg(long, requires = "path")]
     summary: bool,
+
+    /// --summary çıktısını JSON olarak yazdır / print the --summary output as JSON
+    #[arg(long, requires = "summary")]
+    json: bool,
 
     /// Ayar dosyasının yerini ve geçerli değerleri yazdır / print the config file's path and the
     /// values in effect
@@ -172,7 +177,7 @@ fn main() -> Result<()> {
         for message in loaded.messages() {
             eprintln!("{message}");
         }
-        return print_summary(&args.path.expect("clap enforces path"));
+        return print_summary(&args.path.expect("clap enforces path"), args.json);
     }
 
     let mut app = App::new(args.path);
@@ -209,10 +214,13 @@ fn set_mouse_capture(on: bool) -> std::io::Result<()> {
     }
 }
 
-fn print_summary(path: &std::path::Path) -> Result<()> {
+fn print_summary(path: &std::path::Path, json: bool) -> Result<()> {
     use tree::{SizeMode, ROOT};
 
     let res = scanner::scan(path, config::scan_skip(), &Default::default(), |_| {})?;
+    if json {
+        return write_summary_json(&summary::ScanSummary::of(&res));
+    }
     let t = &res.tree;
     let root = t.node(ROOT);
     println!("{}", t.root_path().display());
@@ -244,6 +252,22 @@ fn print_summary(path: &std::path::Path) -> Result<()> {
     );
     println!("{counts}");
     Ok(())
+}
+
+/// `--summary --json`: one pretty-printed object and a newline.
+fn write_summary_json(summary: &summary::ScanSummary) -> Result<()> {
+    use std::io::Write;
+
+    let mut out = std::io::stdout().lock();
+    let written = serde_json::to_writer_pretty(&mut out, summary)
+        .map_err(std::io::Error::from)
+        .and_then(|()| writeln!(out))
+        .and_then(|()| out.flush());
+    match written {
+        // `rustclean --summary --json … | head` closes the pipe early: not an error.
+        Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => Ok(()),
+        other => Ok(other?),
+    }
 }
 
 /// `--config`: where the file is, then the values in effect as a file that
