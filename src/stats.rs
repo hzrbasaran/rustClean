@@ -258,6 +258,24 @@ mod tests {
     }
 
     #[test]
+    fn total_excludes_removed_entries() {
+        let mut t = Tree::new(Path::new("/r"));
+        let base = t.push(ROOT, "base", true, sz(0));
+        let keep = t.push(base, "keep.bin", false, sz(100));
+        let gone = t.push(base, "gone.bin", false, sz(40));
+        let dir = t.push(base, "dir", true, sz(0));
+        t.push(dir, "inner.bin", false, sz(7));
+        t.finalize();
+
+        t.remove(gone);
+        t.remove(dir);
+        let s = compute(&t, base, SizeMode::Disk, 0);
+        assert_eq!(s.size, 100);
+        assert_eq!((s.files, s.dirs), (1, 0));
+        assert_eq!(t.children(base).collect::<Vec<_>>(), vec![keep]);
+    }
+
+    #[test]
     fn computes_subtree_stats() {
         let now = 1000 * DAY;
         let days_ago = |d: u64| (now - d * DAY) as u32;
