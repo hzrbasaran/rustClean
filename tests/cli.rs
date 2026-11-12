@@ -66,6 +66,73 @@ fn summary_needs_a_path() {
     );
 }
 
+fn summary_json_fixture() -> tempfile::TempDir {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir(dir.path().join("sub")).unwrap();
+    std::fs::write(dir.path().join("a.bin"), vec![0u8; 5000]).unwrap();
+    std::fs::write(dir.path().join("sub/b.bin"), vec![1u8; 3000]).unwrap();
+    dir
+}
+
+#[test]
+fn summary_as_json() {
+    let dir = summary_json_fixture();
+    let path = dir.path().to_str().unwrap();
+    let out = rustclean(&["--summary", "--json", "--lang", "en", path]);
+    assert!(out.status.success(), "{out:?}");
+    assert!(stdout(&out).ends_with('\n'));
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["apparent_size"], 8000);
+    assert_eq!(v["files"], 2);
+    assert_eq!(v["entries"], 3);
+    assert_eq!(v["inaccessible"], 0);
+    assert!(v["disk_size"].is_u64(), "{v}");
+    assert!(v["elapsed_secs"].is_f64(), "{v}");
+    let root = std::path::Path::new(v["root"].as_str().unwrap());
+    assert_eq!(
+        root.canonicalize().unwrap(),
+        dir.path().canonicalize().unwrap()
+    );
+}
+
+#[test]
+fn summary_json_keys_do_not_depend_on_the_language() {
+    let dir = summary_json_fixture();
+    let path = dir.path().to_str().unwrap();
+    let keys = |lang: &str| -> Vec<String> {
+        let out = rustclean(&["--summary", "--json", "--lang", lang, path]);
+        assert!(out.status.success(), "{out:?}");
+        let v: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+        v.as_object().unwrap().keys().cloned().collect()
+    };
+    let en = keys("en");
+    assert_eq!(en, keys("tr"));
+    assert!(en.contains(&"apparent_size".to_string()), "{en:?}");
+}
+
+#[test]
+fn json_needs_summary() {
+    let dir = tempfile::tempdir().unwrap();
+    let out = rustclean(&["--json", dir.path().to_str().unwrap()]);
+    assert_eq!(out.status.code(), Some(2));
+    assert!(stdout(&out).is_empty(), "{out:?}");
+}
+
+#[test]
+fn summary_json_of_a_missing_folder_fails() {
+    let dir = tempfile::tempdir().unwrap();
+    let missing = dir.path().join("nope");
+    let out = rustclean(&[
+        "--summary",
+        "--json",
+        "--lang",
+        "en",
+        missing.to_str().unwrap(),
+    ]);
+    assert_eq!(out.status.code(), Some(1));
+    assert!(stdout(&out).is_empty(), "{out:?}");
+}
+
 #[test]
 fn help_and_version() {
     let help = rustclean(&["--help"]);
