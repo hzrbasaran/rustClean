@@ -670,7 +670,7 @@ notification.
 
 ```text
 rustclean [PATH] [--lang tr|en] [--theme dark|light|colorblind] [--no-color]
-          [--list-disks] [--summary [--json]] [--config]
+          [--list-disks] [--summary] [--config]
 rustclean report <KIND> [PATH] [--older DAYS] [--json | --csv] [--limit N]
           [--lang tr|en]
 rustclean check [--threshold PERCENT] [--no-notify] [--install | --uninstall]
@@ -682,9 +682,6 @@ rustclean check [--threshold PERCENT] [--no-notify] [--install | --uninstall]
 - `--summary`: scan `PATH` without the interface and print the totals.
   Folders excluded in the [configuration file](#configuration-file) are
   skipped here too.
-- `--json` (with `--summary`): print the totals as one JSON object instead:
-  `root`, `disk_size` and `apparent_size` (bytes), `files`, `entries`,
-  `inaccessible`, and `elapsed_secs` (seconds). Nothing else goes to stdout.
 - `--config`: print where the configuration file is and the values in
   effect, then exit.
 - `report`: print one report without the interface; see
