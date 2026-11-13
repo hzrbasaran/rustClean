@@ -6,11 +6,6 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Added
-- `rustclean --summary --json` prints the scan totals as one JSON object
-  (`root`, `disk_size`, `apparent_size`, `files`, `entries`, `inaccessible`,
-  `elapsed_secs`). Sizes are in bytes and the time is in seconds.
-
 ## [0.5.0] - 2026-10-05
 
 ### Added

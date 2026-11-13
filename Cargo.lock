@@ -1737,7 +1737,6 @@ dependencies = [
  "plist",
  "ratatui",
  "rayon",
- "serde",
  "serde_json",
  "sysinfo",
  "tempfile",
