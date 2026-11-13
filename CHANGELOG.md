@@ -10,6 +10,9 @@ follows [Semantic Versioning](https://semver.org/).
 - `rustclean --summary --json` prints the scan totals as one JSON object
   (`root`, `disk_size`, `apparent_size`, `files`, `entries`, `inaccessible`,
   `elapsed_secs`). Sizes are in bytes and the time is in seconds.
+- `rustclean --summary` prints the local time of the scan as its last line
+  (`  scanned: 2026-11-13 14:05:32`, `taranma:` in Turkish). The lines before
+  it are unchanged.
 
 ## [0.5.0] - 2026-10-05
 

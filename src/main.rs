@@ -251,7 +251,15 @@ fn print_summary(path: &std::path::Path, json: bool) -> Result<()> {
         ),
     );
     println!("{counts}");
+    println!("{}", scanned_line(chrono::Local::now().naive_local()));
     Ok(())
+}
+
+/// The last line of `--summary` text: when the scan ran, local time. The
+/// three lines above it keep their place, since scripts read them.
+fn scanned_line(at: chrono::NaiveDateTime) -> String {
+    let when = at.format("%Y-%m-%d %H:%M:%S");
+    tf!("  taranma: {}", "  scanned: {}", when)
 }
 
 /// `--summary --json`: one pretty-printed object and a newline.
@@ -327,4 +335,36 @@ fn is_pointer_motion(ev: &Event) -> bool {
         ev,
         Event::Mouse(m) if matches!(m.kind, MouseEventKind::Moved | MouseEventKind::Drag(_))
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::scanned_line;
+    use crate::i18n::{set_lang, Lang};
+    use chrono::NaiveDate;
+
+    fn fixed() -> chrono::NaiveDateTime {
+        NaiveDate::from_ymd_opt(2026, 11, 13)
+            .unwrap()
+            .and_hms_opt(14, 5, 32)
+            .unwrap()
+    }
+
+    #[test]
+    fn scanned_line_in_both_languages() {
+        set_lang(Lang::Tr);
+        assert_eq!(scanned_line(fixed()), "  taranma: 2026-11-13 14:05:32");
+        set_lang(Lang::En);
+        assert_eq!(scanned_line(fixed()), "  scanned: 2026-11-13 14:05:32");
+    }
+
+    #[test]
+    fn scanned_line_pads_single_digits() {
+        set_lang(Lang::En);
+        let at = NaiveDate::from_ymd_opt(2026, 1, 2)
+            .unwrap()
+            .and_hms_opt(3, 4, 5)
+            .unwrap();
+        assert_eq!(scanned_line(at), "  scanned: 2026-01-02 03:04:05");
+    }
 }

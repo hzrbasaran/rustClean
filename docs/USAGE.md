@@ -685,6 +685,8 @@ rustclean check [--threshold PERCENT] [--no-notify] [--install | --uninstall]
 - `--json` (with `--summary`): print the totals as one JSON object instead:
   `root`, `disk_size` and `apparent_size` (bytes), `files`, `entries`,
   `inaccessible`, and `elapsed_secs` (seconds). Nothing else goes to stdout.
+- Without `--json`, the last line of `--summary` is the time of the scan,
+  local time: `  scanned: 2026-11-13 14:05:32` (`  taranma: …` in Turkish).
 - `--config`: print where the configuration file is and the values in
   effect, then exit.
 - `report`: print one report without the interface; see

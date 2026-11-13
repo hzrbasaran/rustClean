@@ -34,6 +34,23 @@ fn summary_prints_the_totals() {
 }
 
 #[test]
+fn summary_ends_with_the_scan_time() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::write(dir.path().join("a.bin"), vec![0u8; 1000]).unwrap();
+    let before = chrono::Local::now().naive_local();
+    let out = rustclean(&["--summary", "--lang", "en", dir.path().to_str().unwrap()]);
+    let after = chrono::Local::now().naive_local();
+    assert!(out.status.success(), "{out:?}");
+    let text = stdout(&out);
+    let last = text.lines().last().unwrap();
+    let when = last.strip_prefix("  scanned: ").expect(last);
+    let at = chrono::NaiveDateTime::parse_from_str(when, "%Y-%m-%d %H:%M:%S").unwrap();
+    // The line has whole seconds, so it may be up to a second early.
+    let slack = chrono::TimeDelta::seconds(1);
+    assert!(at + slack >= before && at <= after, "{text}");
+}
+
+#[test]
 fn summary_speaks_turkish() {
     let dir = tempfile::tempdir().unwrap();
     std::fs::write(dir.path().join("a.bin"), vec![0u8; 1000]).unwrap();
