@@ -637,9 +637,9 @@ checksum = "0ce7134b9999ecaf8bcd65542e436736ef32ddca1b3e06094cb6ec5755203b80"
 
 [[package]]
 name = "flate2"
-version = "1.1.10"
+version = "1.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb"
+checksum = "626d4928326b646e70f65ed36fc7cf9f206bdb68a0019ee7c6b4709da4e084c4"
 dependencies = [
  "crc32fast",
  "miniz_oxide 0.9.1",
@@ -1431,9 +1431,9 @@ checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
 
 [[package]]
 name = "plist"
-version = "1.10.2"
+version = "1.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65dca778f41c79ebbe8b2b2139fee86f01b766b67130d108c7c2b8ffbd949f77"
+checksum = "327a4cb2ad49dc48adfdc9da89e22c64d488b508c67a044d71ba729e4521a285"
 dependencies = [
  "base64 0.23.1",
  "indexmap",
@@ -1851,9 +1851,9 @@ dependencies = [
 
 [[package]]
 name = "serde_spanned"
-version = "1.1.2"
+version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e7523beb55eece201a2356bee0bbca0d1ab466c14c07703b2e0ee6d42cb0c2c"
+checksum = "9c187e0a369471c550af028cba56d4f4fa2a489ad28151ae95a4d340a2a8b782"
 dependencies = [
  "serde_core",
 ]
@@ -2010,9 +2010,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.39.6"
+version = "0.40.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2071df9448915b71c4fe6d25deaf1c22f12bd234f01540b77312bb8e41361e6"
+checksum = "0e8a3edbe0394ce115f3917a00349dd242be09eb5a091ed509eaf67b55cfb8a8"
 dependencies = [
  "libc",
  "memchr",
@@ -2200,9 +2200,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "1.1.8+spec-1.1.0"
+version = "1.2.1+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20489e00e4d8741d6be680764cc12e270655e375a20d1011e844a9c3379e678d"
+checksum = "d5755c51863cdac711f1956baf8eb9588e060755f7d3c4c979e70ea1e1f32cd7"
 dependencies = [
  "indexmap",
  "serde_core",
@@ -2215,9 +2215,9 @@ dependencies = [
 
 [[package]]
 name = "toml_datetime"
-version = "1.1.2+spec-1.1.0"
+version = "1.1.3+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b86d767906c6c42421dcba507eb9d203e779497710a47782a224bb871653053"
+checksum = "173f25c883cd2176a2d8212155638c0a60d484a9d84546d270866f40f56b6e49"
 dependencies = [
  "serde_core",
 ]
@@ -2233,9 +2233,9 @@ dependencies = [
 
 [[package]]
 name = "toml_writer"
-version = "1.1.3+spec-1.1.0"
+version = "1.2.0+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06bdbd8cfc056b8d2e2e85f29b56a3bdbecb527cef81eb39e3e7b98af4652770"
+checksum = "009dbb7700f11c55ef83aebbe4c0e9cf1f1ac0844bd8d6f00dc38f302026e13a"
 
 [[package]]
 name = "transpose"
@@ -2249,9 +2249,9 @@ dependencies = [
 
 [[package]]
 name = "trash"
-version = "5.2.9"
+version = "5.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be89b3fe156965d29ac4f8522f3a640c655affdd9f21cb4f36857f0c92c00317"
+checksum = "1e13ed7a76ae8b9053f33493745ebb4cd2e5ee1cccd9823bb96ec97b78ec4844"
 dependencies = [
  "chrono",
  "libc",
@@ -2263,6 +2263,7 @@ dependencies = [
  "scopeguard",
  "urlencoding",
  "windows",
+ "windows-core",
 ]
 
 [[package]]
